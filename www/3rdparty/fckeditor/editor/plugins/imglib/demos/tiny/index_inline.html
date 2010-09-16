@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ImgLib demo - TinyMCE</title>
+
+<!-- TinyMCE -->
+<script type="text/javascript" src="jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="../../css/imglib_tiny_manager.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+	mode : "exact",
+	elements : "tinymce",
+	theme : "advanced",
+	plugins : "advimage,advlink,media,contextmenu,inlinepopups",
+	theme_advanced_buttons1_add_before : "newdocument,separator",
+	theme_advanced_buttons1_add : "fontselect,fontsizeselect",
+	theme_advanced_buttons2_add : "separator,forecolor,backcolor,liststyle",
+	theme_advanced_buttons2_add_before: "cut,copy,separator,",
+	theme_advanced_buttons3_add_before : "",
+	theme_advanced_buttons3_add : "media",
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	extended_valid_elements : "hr[class|width|size|noshade]",
+	paste_use_dialog : false,
+	theme_advanced_resizing : true,
+	theme_advanced_resize_horizontal : true,
+	apply_source_formatting : true,
+	force_br_newlines : true,
+	force_p_newlines : false,
+	relative_urls : true,
+
+	file_browser_callback : "imgLibManager.open"
+});
+
+imgLibManager.init({url: '../../index_tinymce.html'});
+</script>
+
+</head>
+<body>
+<h1>ImgLib TinyMCE demo with inline popups</h1>
+<p>Use this demo to test the insert image dialog.</p>
+<form method="post" action="">
+	<textarea id="tinymce" name="tinymce" rows="15" cols="80" style="width: 80%">
+		&lt;p&gt;
+			This is some example text that you can edit inside the &lt;strong&gt;TinyMCE editor&lt;/strong&gt;.
+		&lt;/p&gt;
+		&lt;p&gt;
+		Nam nisi elit, cursus in rhoncus sit amet, pulvinar laoreet leo. Nam sed lectus quam, ut sagittis tellus. Quisque dignissim mauris a augue rutrum tempor. Donec vitae purus nec massa vestibulum ornare sit amet id tellus. Nunc quam mauris, fermentum nec lacinia eget, sollicitudin nec ante. Aliquam molestie volutpat dapibus. Nunc interdum viverra sodales. Morbi laoreet pulvinar gravida. Quisque ut turpis sagittis nunc accumsan vehicula. Duis elementum congue ultrices. Cras faucibus feugiat arcu quis lacinia. In hac habitasse platea dictumst. Pellentesque fermentum magna sit amet tellus varius ullamcorper. Vestibulum at urna augue, eget varius neque. Fusce facilisis venenatis dapibus. Integer non sem at arcu euismod tempor nec sed nisl. Morbi ultricies, mauris ut ultricies adipiscing, felis odio condimentum massa, et luctus est nunc nec eros.
+		&lt;/p&gt;
+	</textarea>
+</form>
+
+</body>
+</html>

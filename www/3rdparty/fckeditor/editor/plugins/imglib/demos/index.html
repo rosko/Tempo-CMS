@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>imgLib Demos</title>
+<script type="text/javascript">
+var imgLibManager = {
+	init: function (conf) {
+		/*
+			conf = {
+				url: 'index.html', // imgLib start file
+				width: 600, // Open window width
+				height: 500, // Open window height
+				returnTo: 'src' // Calback function name or element id to insert the selected file path
+			}
+		*/
+		conf = conf || {};
+		this.url = conf.url || '/scripts/imglib/index.html';
+		this.width = conf.width || 600;
+		this.height = conf.height || 500;
+		this.returnTo = conf.returnTo || '';
+	},
+	open: function () {
+		var url = this.url + ((this.returnTo != '') ? ('#returnto=' + this.returnTo) : '' );
+		window.open( url, 'imglib','width=' + this.width + ', height=' + this.height + ', location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
+	}
+};
+
+imgLibManager.init({url: '../index.html', returnTo: 'insertImage'});
+
+function insertImage(url) {
+	document.getElementById('url').value = url;
+	document.getElementById('src').src = url;
+	document.getElementById('src').style.display = '';
+}
+</script>
+</head>
+<body>
+	<h1 align="center">imgLib Demos</h1>
+	<h2>Inline demo</h2>
+	<input type="text" maxlength="400" size="50" id="url" name="url" />
+	<button onclick="imgLibManager.open(); return false;" title="Browse" id='br'>Browse</button>
+	<h2>TiinyMCE 3.2.7 demos:</h2>
+	<ul>
+		<li>Simple <a href="tiny/" target="_blank">demo</a></li>
+		<li>Inline popups <a href="tiny/index_inline.html" target="_blank">demo</a></li>
+	</ul>
+	<h2>CKEditor 3.1 <a href="ckeditor/index.html" target="_blank">demo</a>.</h2>
+	<center>
+		<img src="" id="src" style="display:none;" />
+	</center>
+</body>
+</html>

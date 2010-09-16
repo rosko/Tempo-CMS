@@ -1,0 +1,37 @@
+/********************************************************************
+ * imgLib v0.1.1 03.02.2010
+ * Contact me at dev@imglib.endofinternet.net
+ * Site: http://www.imglib.endofinternet.net/
+ * This copyright notice MUST stay intact for use.
+ *
+ * This library gives you the possibility to upload, browse, manipulate and select
+ * images on your webserver.
+ *
+ * Requirements:
+ * - PHP 4.1.x or later
+ ********************************************************************/
+
+Version 0.1.1
+	03.02.2010 - 09.03.2010
+		Add the imgLib config options - overlayOpacity - opacity of overlay on wait message
+		Add the imgLib config options - dbclickDelay
+		Add the imgLib config options - onDblSelect - function to execute on double click
+		Fix the image select if the port specified in URL
+		Add the warning messages if directory is read only
+		Add hot key support. Default actions is: 1) Delete element on 'Del'; 2) Open file in new window on 'Shift+Enter'; 3) Rename file on 'F2'; 4) Create directory on 'F7'; 5) Show upload form on 'Insert'; 6) Cut file on 'Ctrl+X'; 7) Copy file on 'Ctrl+C'; 8) Paste file on 'Ctrl+V'.
+		Optimizing Img Tools
+		Add PHP config options to enable/disable Img Tools
+		Support of Unicode names in file and directory name. Enabled in config. Default disabled. Not work on MS Windows.
+		Add check of free space on device on upload file
+		Updating the structure of config file.
+	22.11.2009 - 03.02.2010
+		Add the functionality to set the start dir to browsing
+		Add the german translation by Martin.
+		Add support to absolute url to image, like "http://some.host/path/to/upload/dir/"
+		Image Tools support enable if add new argument "imgtools_config=1" to config call.
+		Add support for the Microsoft Windows.
+		New public method imglib.gotoPath() - browse the selected path.
+		Change the license to MIT/BSD.
+		Updating the structure of config file.
+		Change the file extension set in config file to "|" delimiter.
+		Add France translation by Hubert Garrido

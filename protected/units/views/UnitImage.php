@@ -1,0 +1,1 @@
+<?php if ($content->url) { ?><a href="<?=$content->url?>"><?php } ?><img src="<?=$content->image?>" width="<?=$content->width?>" height="<?=$content->height?>" /><?php if ($content->url) { ?></a><?php } ?>

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>ImgLib v.0.1.1</title>
+<link href="css/imglib.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<div id="imgLibContainer">
+	<div id="imgLib">
+		<noscript>imgLib requires JavaScript to run!</noscript>
+	</div>
+</div>
+<div id="controls">
+	<div id="info"><span id="select_file_label">Selected file</span>: <span id="file_path_label"></span></div>
+	<a href="#" id="select" class="gray_btn" onclick="return imgLibManager.select();">Select</a>
+	<a href="#" id="cancel" class="red_btn" onclick="window.close();">Cancel</a>
+</div>
+
+<script type="text/javascript" src="css/core.js"></script>
+<script type="text/javascript" src="css/imglib.js"></script>
+<script type="text/javascript">
+var params = getURLArg(); // Get window arguments as object
+/**************************** Height adjust *******************************/
+addEvent(window, 'resize', adjustHeight);
+addEvent(window, 'load', adjustHeight);
+function adjustHeight() {
+	var
+		winGeom = getWindowGeometry(),
+		controlsEl = $('controls'),
+		controlsGeom = getElPos(controlsEl)
+	;
+	$('imgLib').style.height = (winGeom.height - controlsGeom.height - 14) + 'px';
+}
+/*********************** Set the start path to browse ********************/
+if (params.path) {
+	imgLib.setStartPath(params.path);
+}
+/**************************** Selection files *******************************/
+var imgLibManager = {
+	selectedFile: null,
+	init: function () {
+		// Here goes your code for setting your custom things onLoad.
+	},
+	onSelect: function (file) {
+		// Save selected file and indicate the selection
+		imgLibManager.selectedFile = file;
+		$('select').className = 'gren_btn';
+		$('file_path_label').innerHTML = file.path + ' (' + getFloatSize(file.filesize) + ')';
+	},
+	onDeselect: function () {
+		// Clear selected file
+		imgLibManager.selectedFile = null;
+		$('select').className = 'gray_btn';
+		$('file_path_label').innerHTML = '';
+	},
+	select: function () {
+		// Insert selected file
+		if (!imgLibManager.selectedFile) {
+			return false;
+		}
+		if (params.returnto) {
+			if (opener.document.getElementById(params.returnto)) {
+			// returnto - some element to insert the selected file path
+				var return_element = opener.document.getElementById(params.returnto);
+				// Set the value property if returnto is input element, and innerHTML if it a regular HTML tag
+//				return_element.innerHTML =  imgLibManager.selectedFile.wwwPath;
+				if (params.caller_type) {
+					if (params.caller_type == 'Link') {
+						return_element.value = location.hostname+imgLibManager.selectedFile.wwwPath;													
+					} else if (params.caller_type == 'Image') {
+						return_element.value =imgLibManager.selectedFile.wwwPath;						
+					} else {
+						return_element.value ='http://'+location.hostname+imgLibManager.selectedFile.wwwPath;												
+					}
+				} else
+					return_element.value ='http://'+location.hostname+imgLibManager.selectedFile.wwwPath;
+			} else if ( (typeof opener[params.returnto] == 'function') ) {
+				// window.returnto - function (or object in IE) created by opener window to get the selected file path
+				opener[params.returnto](imgLibManager.selectedFile.wwwPath, imgLibManager.selectedFile);
+			}
+			window.close();
+		} else {
+		// Else do nothing
+			return false;
+		}
+	}
+};
+</script>
+<script type="text/javascript" src="imglib.php?imglib_config=1"></script>
+</body>
+</html>

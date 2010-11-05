@@ -11,7 +11,7 @@ return array(
     'theme'=>'classic', // Перенести настройку в БД, когда будем делать поддержку переключения графических тем
     'defaultController' => 'page',
 
-	//'preload'=>array('log'),
+//	'preload'=>array('log'),
 
 	// autoloading model and component classes
 	'import'=>array(
@@ -50,6 +50,7 @@ return array(
 			'password' => '',
 			'charset' => 'utf8',
             'schemaCachingDuration' => 3600,
+            'enableParamLogging' => true,
 		),
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
@@ -58,10 +59,10 @@ return array(
 		'log'=>array(
 			'class'=>'CLogRouter',
             'routes'=>array(
-                array(
-                    'class'=>'CFileLogRoute',
-                    'levels'=>'error, warning, trace',
-                ),
+//                array(
+//                    'class'=>'CFileLogRoute',
+//                    'levels'=>'error, warning, trace',
+//                ),
                 array( 
                     'class'=>'XWebDebugRouter',
                     'config'=>'alignLeft, opaque, runInDebug, yamlStyle',

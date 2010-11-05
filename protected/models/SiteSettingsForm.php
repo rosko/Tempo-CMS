@@ -48,7 +48,7 @@ class SiteSettingsForm extends CFormModel
 						'max'=>50
 					)
                 ),
-/*				'areaTopThrough'=>array(
+				'areaTopThrough'=>array(
 					'type'=>'checkbox',
 				),
 				'areaRightThrough'=>array(
@@ -59,7 +59,7 @@ class SiteSettingsForm extends CFormModel
 				),
 				'simpleMode'=>array(
 					'type'=>'checkbox',
-				),*/
+				),
             ),
         );
     }

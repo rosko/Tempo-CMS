@@ -17,19 +17,27 @@ class PageController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('index','view','pageunitView'),
+				'actions'=>array('view', 'unitView'),
 				'users'=>array('*'),
 			),
 			array('allow',
-				'actions'=>array('create','update', 'pageunitsByUnit'),
+				'actions'=>array('getPageunitsByUnit'),
 				'users'=>array('@'),
 			),
 			array('allow',
-				'actions'=>array('admin','delete','areaSort', 'pageunitForm',
-								 'pageunitAdd', 'pageunitRemove', 'pageForm', 'pageTree',
-								 'pageAdd', 'pageFill', 'hasChildren', 'siteSettings',
-								 'siteMap', 'pageDeleteConfirm', 'pageDelete', 'getUrl',
-								 'pagesSort', 'pageRename', 'pageunitDeleteConfirm'),
+				'actions'=>array('unitAdd', 'unitForm',
+                                 'unitSetDialog', 'unitSet', 'unitMove',
+								 'unitDeleteDialog','unitDelete',
+
+                                 'pageAdd', 'pageForm',
+                                 'pageRename', 'pageFill', 'pagesSort',
+                                 'pageDeleteDialog', 'pageDelete',
+
+                                  'pageTree',
+
+                                 'hasChildren', 'siteSettings',
+								 'siteMap', 'getUrl',
+                ),
 				'users'=>array('admin'),
 			),
 			array('deny',
@@ -41,6 +49,12 @@ class PageController extends Controller
 	// Отображает страницу
 	public function actionView()
 	{
+        $ret = PageUnit::checkIntegrity();
+        if ($ret['percents'] > 0) {
+            echo '<pre>';
+            print_r ($ret);
+            echo '</pre>';
+        }
 		if (!isset($_GET['id'])) {
 			$_GET['id'] = 1;
 		}
@@ -220,14 +234,28 @@ class PageController extends Controller
 		}
 	}
 
-	// Обрабатывает перемещение юнитов по странице
-	public function actionAreaSort()
+    /**
+     * Обрабатывает перемещение блоков по странице
+     */
+	public function actionUnitMove()
 	{
+        /*
+         * $_REQUEST['area'] - название области блоков
+         * $_REQUEST['cms-pageunit'] - массив id блоков в порядке их размещения в области $_REQUEST['area']
+         * $_REQUEST['pageunit_id'] - id блока, который перемещается
+         */
+        if (isset($_REQUEST['pageunit_id']) && isset($_REQUEST['area']) && isset($_REQUEST['cms-pageunit']) && is_array($_REQUEST['cms-pageunit']))
+        {
+            $unit = Unit::model()->findByPk(PageUnit::getUnitIdById($_REQUEST['pageunit_id']));
+            echo $unit->move($_REQUEST['area'], $_REQUEST['cms-pageunit'], $_REQUEST['pageunit_id']);
+        }
+/*
 		$transaction=Yii::app()->db->beginTransaction();
 		try
 		{
 			if ($_REQUEST['area'])
 			{
+                // Перемещение блока в пределах одной области
 				if ($units = $_REQUEST['cms-pageunit'])
 				{
 					foreach ($units as $order=>$id)
@@ -244,13 +272,14 @@ class PageController extends Controller
 						$command->bindValue(':order', intval($order), PDO::PARAM_INT);
 						if ($through) {
 							$command->bindValue(':unit_id', intval($pageunit->unit_id), PDO::PARAM_INT);
-							$command->bindValue(':area', $pageunit->area, PDO::PARAM_INT);
+							$command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
 						} else {
 							$command->bindValue(':id', intval($id), PDO::PARAM_INT);							
 						}
 						$command->execute();
 					}
 				}
+                // Перемещение блока из одной области в другую
 				if ($_REQUEST['old_area'] && $_REQUEST['pageunit_id'])
 				{
 					$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($_REQUEST['area'])).'Through');
@@ -332,10 +361,12 @@ class PageController extends Controller
 			$transaction->rollBack();
 			echo '0';
 		}
+ * 
+ */
 	}
 	
 	// Отображает юнит
-	public function actionPageunitView()
+	public function actionUnitView()
 	{
 		$unit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
 		
@@ -346,11 +377,18 @@ class PageController extends Controller
 		
 	}
 	
-	// Создает новый юнит
-	public function actionPageunitAdd()
+    /*
+     * Создает новый юнит
+     * $_REQUEST['pageunit_id'] - id блока на странице после которого размещается новый блок
+     * $_REQUEST['area'] - область, где размещается новый блок
+     * $_REQUEST['type'] - тип юнита
+     * $_REQUEST['page_id'] - id страницы
+     */
+	public function actionUnitAdd()
 	{
 		if (isset($_REQUEST['pageunit_id']) && isset($_REQUEST['area']) && isset($_REQUEST['type']) && isset($_REQUEST['page_id']))
 		{
+            // Создаем юнит
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
 			$className = 'Unit'.ucfirst(strtolower($_REQUEST['type']));
@@ -358,45 +396,11 @@ class PageController extends Controller
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
-			$pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
-			$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
-			$command = Yii::app()->db->createCommand($sql);
-			$command->bindValue(':page_id', intval($_REQUEST['page_id']));
-			$command->bindValue(':area', $_REQUEST['area']);
-			$command->bindValue(':order', $pu->order);
-			$command->execute();
-			
-			$pageunit = new PageUnit;
-			$pageunit->page_id = intval($_REQUEST['page_id']);
-			$pageunit->unit_id = $unit->id;
-			$pageunit->order = $pu->order+1;
-			$pageunit->area = $_REQUEST['area'];
-			$pageunit->save();
-			
-			$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($pageunit->area)).'Through');
-			// Если область является сквозной, то разместить новый блок на всех страницах
-			if ($through) {
-				$sql = 'SELECT id FROM `' . Page::tableName() . '` WHERE id <> ' . $pageunit->page_id;
-				$ids = Yii::app()->db->createCommand($sql)->queryColumn();
-				$sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
-				$sql_arr = array();
-				foreach ($ids as $id)
-				{
-					$sql_arr[] = '('.intval($id).', '.intval($unit->id).', '.intval($pageunit->order).', :area)';
-				}
-				$sql .= implode(',', $sql_arr);
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(':area', $pageunit->area);
-				$command->execute();
-
-				$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` != :page_id AND `area` = :area AND `order` > :order';
-				$command = Yii::app()->db->createCommand($sql);
-				$command->bindValue(':page_id', intval($_REQUEST['page_id']));
-				$command->bindValue(':area', $_REQUEST['area']);
-				$command->bindValue(':order', $pu->order);
-				$command->execute();
-			}
-			
+			// Размещаем его на только текущей странице
+            $pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
+            $pageunit = $unit->setOnPage($_REQUEST['page_id'], $_REQUEST['area'], $pu->order);
+            
+			// Заполняем юнит информацией по-умолчанию
 			if (method_exists($className, 'defaultObject')) {
 				$content = $className::defaultObject();
 			} else {
@@ -405,12 +409,13 @@ class PageController extends Controller
 			$content->unit_id = $unit->id;
 			$content->save(false);
 			
-			echo CJavaScript::jsonEncode(array('pageunit_id'=>$pageunit->id,'unit_id'=>$unit->id));
-		} else echo '0';
+            echo CJavaScript::jsonEncode(array('pageunit_id'=>$pageunit->id,'unit_id'=>$unit->id));
+		}
+        else echo '0';
 	}
 	
 	// Редактирует свойства юнита
-	public function actionPageunitForm()
+	public function actionUnitForm()
 	{
 		$unit_class = 'Unit'.ucfirst(strtolower($_REQUEST['unit_type']));
 		if ($_REQUEST['pageunit_id']) {
@@ -476,7 +481,7 @@ class PageController extends Controller
 	}
 	
 	// Удаляет юнит
-	public function actionPageunitRemove()
+	public function actionUnitDelete()
 	{
 		if (isset($_REQUEST['unit_id']) && (isset($_REQUEST['pageunit_id']) || isset($_REQUEST['page_ids'])))
 		{
@@ -587,35 +592,87 @@ class PageController extends Controller
 	}
 	
 	// Отображает уточнение при удалении страницы
-	public function actionPageDeleteConfirm()
+	public function actionPageDeleteDialog()
 	{
 		$this->layout = 'blank';
-		$this->render('pageDeleteConfirm',array(
+		$this->render('pageDeleteDialog',array(
 			'model'=>$this->loadModel()
 		));
 		
 	}
-	
-	// Отображает уточнение при удалении юнита
-	public function actionPageunitDeleteConfirm()
+
+    // Обрабатывает размещение юнита на нескольких страницах
+	public function actionUnitSet()
+	{
+		if (isset($_REQUEST['unit_id']) && isset($_REQUEST['pageunit_id']) && isset($_REQUEST['page_ids']))
+		{
+            $unit = Unit::model()->findByPk(intval($_REQUEST['unit_id']));
+            echo (int)$unit->setOnPagesOnly($_REQUEST['page_ids'], $_REQUEST['pageunit_id']);
+        }
+/*
+
+//			if (is_array($_REQUEST['pageunit_id']) && isset($_REQUEST['pageunit_id'][0])) {
+//				$pageunit = PageUnit::model()->findByPk($_REQUEST['pageunit_id'][0]);
+//				$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($pageunit->area)).'Through');
+//			} else
+//				$through = false;
+
+			if (isset($_REQUEST['pageunit_id']))
+			{
+				if ($_REQUEST['pageunit_id'] == 'all') {
+					PageUnit::model()->deleteAll('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
+				} elseif (is_array($_REQUEST['pageunit_id'])) {
+					PageUnit::model()->deleteAll('`id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")');
+				}
+			}
+			elseif (isset($_REQUEST['page_ids']) && is_array($_REQUEST['page_ids']))
+			{
+				PageUnit::model()->deleteAll('unit_id = :unit_id AND `page_id` IN ("'.implode('","',$_REQUEST['page_ids']).'")',
+											 array(':unit_id' => $_REQUEST['unit_id']));
+			}
+
+			$c = PageUnit::model()->count('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
+			if ($c == 0)
+			{
+				$unit = Unit::model()->findByPk($_REQUEST['unit_id']);
+				$unit->content->delete();
+				$unit->delete();
+			}
+ */
+	}
+
+    // Отображает диалог выбора страниц где будет размещен юнит
+    public function actionUnitSetDialog()
 	{
 		$this->layout = 'blank';
-		$this->render('pageunitDeleteConfirm',array(
+		$this->render('unitSetDialog',array(
+			'model'=>$this->loadModel(),
+			'unit'=>Unit::model()->findByPk($_REQUEST['unit_id']),
+			'unit_id'=>intval($_REQUEST['unit_id']),
+			'pageunit_id'=>intval($_REQUEST['pageunit_id'])
+		));
+	}
+
+    // Отображает уточнение при удалении юнита
+	public function actionUnitDeleteDialog()
+	{
+		$this->layout = 'blank';
+		$this->render('unitDeleteDialog',array(
 			'model'=>$this->loadModel(),
 			'unit'=>Unit::model()->findByPk($_REQUEST['unit_id']),
 			'unit_id'=>$_REQUEST['unit_id'],
 			'pageunit_id'=>$_REQUEST['pageunit_id']
-		));
-		
+		));		
 	}
-	// Возвращает ссылку по id страницы
+
+    // Возвращает ссылку по id страницы
 	public function actionGetUrl()
 	{
 		echo $this->createAbsoluteUrl('page/view', array('id'=>intval($_GET['id'])));
 	}
 
 	// Возвращает размещения юнитов по юниту
-	public function actionPageunitsByUnit()
+	public function actionGetPageunitsByUnit()
 	{
 		if (isset($_REQUEST['unit_id']))
 		{

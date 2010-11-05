@@ -256,7 +256,7 @@ div.search-form
 	float:left;
 }
 
-#cms-pageunit-remove ul {
+#cms-pageunit-delete ul, #cms-pageunit-set ul  {
 	width:200px;
 }
 
@@ -321,10 +321,10 @@ div.search-form
 .cms-button-add:hover {
 	background-image:url('/images/icons/iconic/cyan/plus_32x32.png');
 }
-.cms-button-remove {
+.cms-button-delete {
 	background-image:url('/images/icons/iconic/light_gray/trash_stroke_32x32.png');
 }
-.cms-button-remove:hover {
+.cms-button-delete:hover {
 	background-image:url('/images/icons/iconic/cyan/trash_stroke_32x32.png');
 }
 .cms-button-up {

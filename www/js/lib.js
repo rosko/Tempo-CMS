@@ -30,7 +30,7 @@ function CmsCommand(url, data, method, success)
 
 function ajaxSaveArea(area, name, page_id, add_params)
 {
-    var url = '/?r=page/areaSort&page_id='+page_id;
+    var url = '/?r=page/unitMove&page_id='+page_id;
     var params = $(area).sortable('serialize');
     var data = 'area='+name+'&'+params
     if (add_params) {
@@ -171,8 +171,8 @@ function showPageunitPanel(pageunit)
             'left': left,
             'top': position.top-10
         }).show();
-        var width = $('#cms-pageunit-menu').width();
-        var left = position.left-width;
+        width = $('#cms-pageunit-menu').width();
+        left = position.left-width;
         $('#cms-pageunit-menu').css('left', left);
     }
 }
@@ -192,7 +192,7 @@ function GetOutPageunitPanel()
 function showSplash(t, onComplete, with_confirm, onClose, resizable, draggable)
 {
     if (draggable == null) {
-        draggable = true;
+        draggable = false;
     }
     $.fancybox(t, {
         showNavArrows: false,
@@ -374,7 +374,7 @@ function pageunitEditForm(t)
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
     $.ajax({
-        url:'/?r=page/pageunitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id,
+        url:'/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id,
         cache: false,
         pageunit: pageunit,
         pageunit_id: pageunit_id,
@@ -408,7 +408,7 @@ function updatePageunit(pageunit_id, selector)
 {
     var page_id = $('body').attr('rel');
     $.ajax({
-        url: '/?r=page/pageunitView&pageunit_id='+pageunit_id+'&id='+page_id,
+        url: '/?r=page/unitView&pageunit_id='+pageunit_id+'&id='+page_id,
         async: false,
         cache: false,
         success: function(html) {
@@ -416,6 +416,24 @@ function updatePageunit(pageunit_id, selector)
             CmsPageunitDisabling();
         }
     });
+}
+
+function pageunitSetDialog(page_id, pageunit_id, unit_id)
+{
+    $.ajax({
+        url: '/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
+        method: 'GET',
+        cache: false,
+        beforeSend: function() {
+            showInfoPanel(cms_html_loading_image, 0);
+        },
+        success: function(html) {
+            hideInfoPanel();
+            $('#cms-pageunit-set').html(html);
+            showSplash($('#cms-pageunit-set'));
+        }
+    });
+
 }
 
 // =============================================================
@@ -482,7 +500,7 @@ function pageEditForm()
             showSplash($('#cms-page-edit'), function() {
                 $('#Page_title').get(0).focus();
                 $('input[name=deletepage]').unbind('click').click(function() {
-                    pageDeleteConfirm(null, function() {
+                    pageDeleteDialog(null, function() {
                         $('#cms-page-edit').find('form').eq(0).append('<input class="submit" type="hidden" name="delete" value="delete" />').submit();
                     }, function(html) {
                         if (html.substring(0,2) == '{"') {
@@ -502,7 +520,7 @@ function pageEditForm()
     });    
 }
 
-function pageDeleteConfirm(page_id, onOneDelete, onChildrenDelete, onCancel)
+function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
 {
     if (!page_id) {
         page_id = $('body').attr('rel');
@@ -532,7 +550,7 @@ function pageDeleteConfirm(page_id, onOneDelete, onChildrenDelete, onCancel)
                 }
             } else {
                 $.ajax({
-                    url:'/?r=page/pageDeleteConfirm&id='+page_id,
+                    url:'/?r=page/pageDeleteDialog&id='+page_id,
                     cache: false,
                     onChildrenDelete: onChildrenDelete,
                     onCancel: onCancel,

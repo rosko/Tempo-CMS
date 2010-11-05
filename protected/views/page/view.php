@@ -43,12 +43,11 @@ if (!Yii::app()->user->isGuest) {
             cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
             update:function(event, ui) {
                 var pageunit_id = $(ui.item).attr('id').replace('cms-pageunit-','');
-                var url = '/?r=page/areaSort&page_id={$model->id}';
                 var area_name = getAreaNameByPageunit(ui.item);
                 if (ui.sender) {
                     // Запрос на обновление предыдущей области + перемещенному элементу указывается новое значение в area
-                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
-                    ajaxSaveArea($(ui.sender), area_name, {$model->id}, 'pageunit_id='+pageunit_id+'&old_area='+old_area);
+//                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
+//                    ajaxSaveArea($(ui.sender), area_name, {$model->id}, 'pageunit_id='+pageunit_id+'&old_area='+old_area);
 
                 } else {
                     // Запрос на обновление текущей области
@@ -106,7 +105,7 @@ if (!Yii::app()->user->isGuest) {
             var area_name = $(this).attr('rel');
             var pageunit_id = $(this).attr('rev');
             var page_id = {$model->id};
-            var url = '/?r=page/pageunitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
+            var url = '/?r=page/unitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
             ajaxSave(url, '', 'GET', function(id) {
                 GetOutPageunitPanel();
                 hideSplash();
@@ -119,7 +118,7 @@ if (!Yii::app()->user->isGuest) {
                 pageunit.after('<div id="cms-pageunit-'+id.pageunit_id+'" class="cms-pageunit cms-unit-'+type+'" rel="'+type+'" rev="'+id.unit_id+'"></div>');
                 
                 var orig_bg = $('#cms-pageunit-'+id.pageunit_id).css('backgroundColor');
-                $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/pageunitView&pageunit_id='+id.pageunit_id+'&id='+page_id, function() {
+                $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id, function() {
                     CmsPageunitHovering();
                     CmsPageunitDisabling();
                     CmsPageunitEditing();
@@ -136,26 +135,13 @@ if (!Yii::app()->user->isGuest) {
 
         
         // Обработчик нажатия кнопки "Удалить юнит"
-        $('.cms-btn-pageunit-remove').click(function() {
+        $('.cms-btn-pageunit-delete').click(function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
             hidePageunitPanel(pageunit);
             pageunit.addClass('selected');
-/*
-                    var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                    var unit_id = pageunit.attr('rev');
-                        if (confirm('Вы действительно хотите удалить этот блок? Удаляемая информация будет безвозвратно потеряна.'))
-                        {
-                            ajaxSave('/?r=page/pageunitRemove&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
-                                GetOutPageunitPanel();
-                                $('#cms-pageunit-'+pageunit_id).remove();
-                                CmsAreaEmptyCheck();                                
-                            });
-                        } else {
-                            $('.selected').removeClass('selected');
-                        }
-*/                        
+
             $.ajax({
-                url: '/?r=page/pageunitsByUnit&unit_id='+pageunit.attr('rev'),
+                url: '/?r=page/getPageunitsByUnit&unit_id='+pageunit.attr('rev'),
                 method: 'GET',
                 cache: false,
                 beforeSend: function() {
@@ -169,7 +155,7 @@ if (!Yii::app()->user->isGuest) {
                     if (ids.length > 1)
                     {
                         $.ajax({
-                            url: '/?r=page/pageunitDeleteConfirm&id={$model->id}&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
+                            url: '/?r=page/unitDeleteDialog&id={$model->id}&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
                             method: 'GET',
                             cache: false,
                             beforeSend: function() {
@@ -177,15 +163,15 @@ if (!Yii::app()->user->isGuest) {
                             },
                             success: function(html) {
                                 hideInfoPanel();
-                                $('#cms-pageunit-remove').html(html);
-                                showSplash($('#cms-pageunit-remove'));
+                                $('#cms-pageunit-delete').html(html);
+                                showSplash($('#cms-pageunit-delete'));
                             }
                         });
                     }
                     else {
                         if (confirm('Вы действительно хотите удалить этот блок? Удаляемая информация будет безвозвратно потеряна.'))
                         {
-                            ajaxSave('/?r=page/pageunitRemove&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
+                            ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
                                 GetOutPageunitPanel();
                                 $('#cms-pageunit-'+pageunit_id).remove();
                                 CmsAreaEmptyCheck();                                
@@ -220,6 +206,16 @@ if (!Yii::app()->user->isGuest) {
                 area = getAreaByPageunit(pageunit);
                 ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit.attr('id'));
             }
+            return false;
+        });
+
+        // Обработчик нажатия кнопки "Размещение блока на других страницах"
+        $('.cms-btn-pageunit-set').click(function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            pageunit.addClass('selected');
+            var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+            var unit_id = pageunit.attr('rev');
+            pageunitSetDialog({$model->id}, pageunit_id, unit_id);
             return false;
         });
 
@@ -373,11 +369,11 @@ EOD
     <div id="cms-pageunit-menu" class="cms-panel cms-pageunit-menu">
         <ul>
             <li><a class="cms-button-big cms-button-add cms-btn-pagenit-add" title="Добавить еще один блок" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-remove cms-btn-pageunit-remove" title="Удалить этот блок" href="#"></a></li>
+            <li><a class="cms-button-big cms-button-edit cms-btn-pageunit-edit" title="Редактировать" href="#"></a></li>
+            <li><a class="cms-button-big cms-button-move cms-btn-pageunit-set" title="Размещение блока на других страницах" href="#"></a></li>
             <li><a class="cms-button-big cms-button-up cms-btn-pageunit-moveup" title="Переместить выше" href="#"></a></li>
             <li><a class="cms-button-big cms-button-down cms-btn-pageunit-movedown" title="Переместить ниже" href="#"></a></li>
-<!--            <li><a class="cms-button-big cms-button-move" title="Переместить в другое место" href="#"></a></li>   -->
-            <li><a class="cms-button-big cms-button-edit cms-btn-pageunit-edit" title="Редактировать" href="#"></a></li>        
+            <li><a class="cms-button-big cms-button-delete cms-btn-pageunit-delete" title="Удалить этот блок" href="#"></a></li>
         </ul>
     </div>
 
@@ -405,7 +401,10 @@ EOD
     <div id="cms-pageunit-edit">
     </div>
 
-    <div id="cms-pageunit-remove" class="cms-splash">
+    <div id="cms-pageunit-delete" class="cms-splash">
+    </div>
+
+    <div id="cms-pageunit-set" class="cms-splash">
     </div>
 
     <div id="cms-page-fill" class="cms-splash">

@@ -269,7 +269,7 @@ js:function(e, data) {
 //        if(data.args[0]) {
 //            var id = $(data.args[0]).children('a:eq(0)').attr('rel');
             var id = $(data.rslt.obj).children('a:eq(0)').attr('rel');
-            pageDeleteConfirm(id, function() {
+            pageDeleteDialog(id, function() {
                 var url = '/?r=page/pageDelete&id='+id;
                 var params = 'deletechildren=1';
                 ajaxSave(url, params, 'GET');

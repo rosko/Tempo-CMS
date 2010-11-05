@@ -9,6 +9,7 @@ class PageSelect extends CInputWidget
     public $width = null;
     public $height = 250;
     public $checked = array();
+    public $checkedOnly = array();
     public $enabledOnly = null;
     
     public function run()
@@ -133,6 +134,11 @@ EOD;
         else
         {
             $checked = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checked);
+            if (!empty($this->checkedOnly)) {
+                $checked = '';
+                $checkedOnly = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checkedOnly);
+            }
+
             $js = <<<EOD
 
 $(function() {
@@ -150,8 +156,13 @@ $(function() {
                 //$('#pagetree_{$id}-1').children("a:eq(0)").click();
                 //$('#pagetree_{$id}').jstree('uncheck_all');
                 $('#{$id}_dialog').click();
-                $('#pagetree_{$id}').jstree('check_node_all', $('{$checked}'));
-                $('#pagetree_{$id}').jstree('open_all', $('{$checked}'));
+                if ('{$checked}' != '') {
+                    $('#pagetree_{$id}').jstree('check_node_all', $('{$checked}'));
+                    $('#pagetree_{$id}').jstree('open_all', $('{$checked}'));
+                } else if ('{$checkedOnly}' != '') {
+                     $('#pagetree_{$id}').jstree('check_node', $('{$checkedOnly}'));
+                     $('#pagetree_{$id}').jstree('open_all', $('{$checkedOnly}'));
+                }
             }, 100);
         }
     });

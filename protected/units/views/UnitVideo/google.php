@@ -1,0 +1,1 @@
+<embed id=VideoPlayback src="http://video.google.com/googleplayer.swf?docid=<?=$id?>&hl=ru&fs=true" style="width:<?=$width?>px;height:<?=$height?>px" allowFullScreen="true" allowScriptAccess="always" type="application/x-shockwave-flash" wmode="opaque"></embed>

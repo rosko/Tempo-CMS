@@ -4,7 +4,7 @@ class UnitNewslist extends Content
 {
 	const NAME = "Список новостей";
 	const ICON = '/images/icons/iconic/green/document_fill_16x16.png';
-    const HIDDEN = false;
+    const HIDDEN = true;
 
 	public static function model($className=__CLASS__)
 	{

@@ -1,0 +1,1 @@
+<embed src="http://www.tangle.com/flash/swf/flvplayer.swf" FlashVars="viewkey=<?=$id?>" wmode="opaque" quality="high" width="<?=$width?>" height="<?=$height?>" name="tangle" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" /></embed>

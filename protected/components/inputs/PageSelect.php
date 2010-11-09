@@ -157,11 +157,11 @@ $(function() {
                 //$('#pagetree_{$id}').jstree('uncheck_all');
                 $('#{$id}_dialog').click();
                 if ('{$checked}' != '') {
-                    $('#pagetree_{$id}').jstree('check_node_all', $('{$checked}'));
                     $('#pagetree_{$id}').jstree('open_all', $('{$checked}'));
+                    $('#pagetree_{$id}').jstree('check_node_all', $('{$checked}'));
                 } else if ('{$checkedOnly}' != '') {
-                     $('#pagetree_{$id}').jstree('check_node', $('{$checkedOnly}'));
                      $('#pagetree_{$id}').jstree('open_all', $('{$checkedOnly}'));
+                     $('#pagetree_{$id}').jstree('check_node', $('{$checkedOnly}'));
                 }
             }, 100);
         }
@@ -179,7 +179,6 @@ EOD;
         }
 
         $cs=Yii::app()->getClientScript();
-        $cs->setCoreScriptUrl('/js/empty');
         $cs->registerScript('Yii.PageSelect#'.$id,$js);
 
     }

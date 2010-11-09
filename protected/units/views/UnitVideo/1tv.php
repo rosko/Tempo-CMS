@@ -1,0 +1,1 @@
+<object><embed width="<?=$width?>" height="<?=$height?>" align="middle" flashvars="stats=http://www.1tv.ru/addclick/" allowscriptaccess="always" swliveconnect="true" wmode="opaque" allowfullscreen="true" quality="high" bgcolor="white" name="videoportal" id="videoportal" src="http://www.1tv.ru/newsvideo/<?=$id?>" type="application/x-shockwave-flash"/></object>

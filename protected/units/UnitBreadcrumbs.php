@@ -1,10 +1,12 @@
 <?php
 
-class UnitBreadcrumbs extends CActiveRecord
+class UnitBreadcrumbs extends Content
 {
 	const NAME = "Путь к странице";
 	const ICON = '/images/icons/iconic/green/read_more_16x16.png';
     const HIDDEN = true;
+
+    const DEFAULT_SEPARATOR = ' &raquo; ';
 
 	public static function model($className=__CLASS__)
 	{
@@ -40,7 +42,8 @@ class UnitBreadcrumbs extends CActiveRecord
 			'elements'=>array(
                 'separator'=>array(
                     'type'=>'text'
-                )
+                ),
+                'Если пусто, используется \'<b>' . UnitBreadcrumbs::DEFAULT_SEPARATOR . '</b>\'',
 			),
 		);
 	}

@@ -1,0 +1,1 @@
+<iframe id="gt_embed_<?=$id?>" width="<?=$width?>" height="<?=$height?>" frameborder="0" scrolling="no" src="http://www.godtube.com/embed/watch/<?=$id?>/<?=$width?>/<?=$height?>/false/"><a target="_top" href="http://www.godtube.com/watch/?v=<?=$id?>"><?=$title?></a></iframe>

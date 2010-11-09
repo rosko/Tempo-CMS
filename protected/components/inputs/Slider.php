@@ -4,6 +4,11 @@ Yii::import('zii.widgets.jui.CJuiSliderInput');
 
 class Slider extends CJuiSliderInput
 {
+    public function init()
+    {
+        $this->themeUrl = Yii::app()->params->jui['themeUrl'];
+        $this->theme = Yii::app()->params->jui['theme'];
+    }
 
     public function run()
     {
@@ -54,7 +59,6 @@ jQuery('#{$idHidden}').keyup(function () {
         
 EOD;
         $cs = Yii::app()->getClientScript();
-        $cs->setCoreScriptUrl('/js/empty');
         $cs->registerScript(__CLASS__.'#'.$id, $js);        
     }
 

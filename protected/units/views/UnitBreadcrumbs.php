@@ -20,7 +20,7 @@ if ($page->id != 1)
 else
     $links[] = '';
 
-$separator = $content->separator ? ' ' . $content->separator . ' ' : ' &raquo; ';
+$separator = $content->separator ? $content->separator : UnitBreadcrumbs::DEFAULT_SEPARATOR;
 
 $this->widget('zii.widgets.CBreadcrumbs', array(
     'separator' => $separator,

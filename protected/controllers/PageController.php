@@ -33,10 +33,12 @@ class PageController extends Controller
                                  'pageRename', 'pageFill', 'pagesSort',
                                  'pageDeleteDialog', 'pageDelete',
 
-                                  'pageTree',
+                                 'pageTree',
 
                                  'hasChildren', 'siteSettings',
 								 'siteMap', 'getUrl',
+
+
                 ),
 				'users'=>array('admin'),
 			),
@@ -55,6 +57,7 @@ class PageController extends Controller
             print_r ($ret);
             echo '</pre>';
         }
+
 		if (!isset($_GET['id'])) {
 			$_GET['id'] = 1;
 		}
@@ -66,18 +69,19 @@ class PageController extends Controller
 	// Создает новую страницу
 	public function actionPageAdd()
 	{
-		$this->layout = 'blank';
-
 		$page = Page::defaultObject();
 		$form_array = Page::form();
+        $form_array['activeForm'] = Form::ajaxify('PageAdd');
 		$form_array['buttons']['go'] = array(
 			'type'=>'submit',
 			'label'=>'Сохранить и перейти',
 			'title'=>'Сохранить и перейти к созданной странице',
 		);
 		
-		$form = new CForm($form_array);
+		$form = new Form($form_array);
 		$form->model = $page;
+
+        $this->performAjaxValidation($page);
 		
 		if ($form->submitted('save') || $form->submitted('go')) {
 			$page = $form->model;
@@ -140,6 +144,14 @@ class PageController extends Controller
 	{
 		$page = $this->loadModel();
 		$form_array = Page::form();
+        $form_array['buttons'] = array(
+            'refresh'=>array(
+                'type'=>'submit',
+                'label'=>'Сохранить',
+                'title'=>'Сохранить и обновить страницу'
+            ),
+        );
+        $form_array['activeForm'] = Form::ajaxify('PageForm_'.$page->id);
 		if ($page->id != 1) {
 			$form_array['buttons']['deletepage'] = array(
 				'type'=>'submit',
@@ -147,10 +159,12 @@ class PageController extends Controller
 				'title'=>'Удалить страницу',
 			);
 		}
-		$form = new CForm($form_array);
+		$form = new Form($form_array);
 		$form->model = $page;
+
+        $this->performAjaxValidation($page);
 		
-		if ($form->submitted('save')) {
+		if ($form->submitted('save')||$form->submitted('refresh')) {
 			$page = $form->model;
 			if ($form->validate()) {
 				$page->path = '';
@@ -249,131 +263,24 @@ class PageController extends Controller
             $unit = Unit::model()->findByPk(PageUnit::getUnitIdById($_REQUEST['pageunit_id']));
             echo $unit->move($_REQUEST['area'], $_REQUEST['cms-pageunit'], $_REQUEST['pageunit_id']);
         }
-/*
-		$transaction=Yii::app()->db->beginTransaction();
-		try
-		{
-			if ($_REQUEST['area'])
-			{
-                // Перемещение блока в пределах одной области
-				if ($units = $_REQUEST['cms-pageunit'])
-				{
-					foreach ($units as $order=>$id)
-					{
-						$pageunit = PageUnit::model()->findByPk($id);
-						$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($pageunit->area)).'Through');
-						if ($through) {
-							$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order` = :order WHERE `unit_id` = :unit_id AND `area` = :area';
-						} else {
-							$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order` = :order WHERE `id` = :id';
-						}
-
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':order', intval($order), PDO::PARAM_INT);
-						if ($through) {
-							$command->bindValue(':unit_id', intval($pageunit->unit_id), PDO::PARAM_INT);
-							$command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
-						} else {
-							$command->bindValue(':id', intval($id), PDO::PARAM_INT);							
-						}
-						$command->execute();
-					}
-				}
-                // Перемещение блока из одной области в другую
-				if ($_REQUEST['old_area'] && $_REQUEST['pageunit_id'])
-				{
-					$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($_REQUEST['area'])).'Through');
-					$old_through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($_REQUEST['old_area'])).'Through');
-					$pageunit = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
-
-					if ($through && $old_through)
-					{
-						// Перенести блок на всех страницах
-						$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area WHERE `unit_id` = :unit_id AND `area` = :old_area LIMIT 1';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area'], PDO::PARAM_STR);
-						$command->bindValue(':old_area', $_REQUEST['old_area'], PDO::PARAM_STR);
-						$command->bindValue(':unit_id', intval($pageunit->unit_id), PDO::PARAM_INT);
-						$command->execute();			
-					}
-					elseif (!$through && !$old_through)
-					{
-						// Перенести этот блок
-						$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area WHERE `id` = :id LIMIT 1';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area'], PDO::PARAM_STR);
-						$command->bindValue(':id', intval($_REQUEST['pageunit_id']), PDO::PARAM_INT);
-						$command->execute();			
-					}
-					elseif ($through && !$old_through)
-					{
-						// Перенести этот блок и добавить его по всем страницам
-						$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area WHERE `id` = :id LIMIT 1';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area'], PDO::PARAM_STR);
-						$command->bindValue(':id', intval($_REQUEST['pageunit_id']), PDO::PARAM_INT);
-						$command->execute();
-
-						$sql = 'SELECT id FROM `' . Page::tableName() . '` WHERE id <> ' . $pageunit->page_id;
-						$ids = Yii::app()->db->createCommand($sql)->queryColumn();
-						$sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
-						$sql_arr = array();
-						foreach ($ids as $id)
-						{
-							$sql_arr[] = '('.intval($id).', '.intval($pageunit->unit_id).', '.intval($pageunit->order).', :area)';
-						}
-						$sql .= implode(',', $sql_arr);
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area']);
-						$command->execute();
-		
-						$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `area` = :area AND `order` > :order';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area']);
-						$command->bindValue(':order', $pu->order);
-						$command->execute();
-					}
-					elseif (!$through && $old_through)
-					{
-						// Перенести этот блок, а на других страницах убрать его
-						$sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area WHERE `id` = :id LIMIT 1';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['area'], PDO::PARAM_STR);
-						$command->bindValue(':id', intval($_REQUEST['pageunit_id']), PDO::PARAM_INT);
-						$command->execute();
-
-						$sql = 'DELETE FROM `' . PageUnit::tableName() . '` WHERE `area` = :area AND `unit_id` = :unit_id AND `id` != :id';
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $_REQUEST['old_area']);
-						$command->bindValue(':unit_id', $pageunit->unit_id);
-						$command->bindValue(':id', intval($_REQUEST['pageunit_id']), PDO::PARAM_INT);
-						$command->execute();
-
-					}
-
-				}
-			}
-			$transaction->commit();
-			echo '1';
-		}
-		catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
-		{
-			$transaction->rollBack();
-			echo '0';
-		}
- * 
- */
 	}
 	
 	// Отображает юнит
 	public function actionUnitView()
 	{
 		$unit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
+        $className = 'Unit' . ucfirst(strtolower($unit->unit->type));
 		
-        $this->renderPartial('application.units.views.Unit'.ucfirst(strtolower($unit->unit->type)),
-			array('unit'=>$unit->unit,
-                'content'=>$unit->unit->content,
-				'page'=>$this->loadModel()));
+        $output = $this->renderPartial('application.units.views.'.$className,
+                array('unit'=>$unit->unit,
+                      'pageunit'=>$unit,
+                      'content'=>$unit->unit->content,
+                      'page'=>$this->loadModel()), true);
+        if (trim($output) == '' && !Yii::app()->user->isGuest)  {
+            $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
+        }
+        echo $output;
+
 		
 	}
 	
@@ -398,7 +305,8 @@ class PageController extends Controller
 
 			// Размещаем его на только текущей странице
             $pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
-            $pageunit = $unit->setOnPage($_REQUEST['page_id'], $_REQUEST['area'], $pu->order);
+            $order = $pu->order ? $pu->order : -1;
+            $pageunit = $unit->setOnPage($_REQUEST['page_id'], $_REQUEST['area'], $order);
             
 			// Заполняем юнит информацией по-умолчанию
 			if (method_exists($className, 'defaultObject')) {
@@ -417,37 +325,41 @@ class PageController extends Controller
 	// Редактирует свойства юнита
 	public function actionUnitForm()
 	{
-		$unit_class = 'Unit'.ucfirst(strtolower($_REQUEST['unit_type']));
-		if ($_REQUEST['pageunit_id']) {
-			$pageunit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
-			$unit = $pageunit->unit;
-			$content = $unit->content;
-		} else {
-			$unit = new Unit;
-			$content = new $unit_class;
-		}
+        if ($_REQUEST['unit_type']) {
+            $unit_class = 'Unit'.ucfirst(strtolower($_REQUEST['unit_type']));
+            if ($_REQUEST['pageunit_id']) {
+                $pageunit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
+                $unit = $pageunit->unit;
+                $content = $unit->content;
+            } elseif ($_REQUEST['unit_id']) {
+                $unit = Unit::model()->findByPk($_REQUEST['unit_id']);
+                $content = $unit->content;
+            } else {
+                $unit = new Unit;
+                $content = new $unit_class;
+            }
+        } elseif ($_REQUEST['class_name'] && $_REQUEST['id']) {
+            $unit_class = $_REQUEST['class_name'];
+            $content = $unit_class::model()->findByPk($_REQUEST['id']);
+            if ($content->unit_id) {
+                $unit = $content->unit;
+            }
+            
+        } else return false;
 		$unit_form_array = $unit_class::form();
 		$unit_form_array['type'] = 'form';
+        //  В окно редактирования свойств подключаем диалог для управления размещением
+//        if (isset($pageunit)) {
+//            $unit_form_array['elements'][] = Form::tab('Размещение', '/?r=page/unitSetDialog&id='.$pageunit->page_id.'&unit_id='.$pageunit->unit_id.'&pageunit_id='.$pageunit->id);
+//        }
 		$form_array = array(
-			'title'=>$unit_class::NAME,
-			'elements'=>array(
-				'unit'=>array(
-					'type'=>'form',
-					'elements'=>array(
-						'title'=>array(
-							'type'=>'text',
-							'maxlength'=>255,
-							'size'=>60
-						)
-					)
-				),
-				'content'=> $unit_form_array
-			),
-			'buttons'=>array(
+//			'title'=>$unit_class::NAME,
+            'activeForm' => Form::ajaxify('UnitForm'.$unit->id),
+            'buttons'=>array(
 				'save'=>array(
 					'type'=>'submit',
 					'label'=>'Сохранить',
-					'title'=>'Сохранить и закрыть окно'
+					'title'=>'Сохранить и закрыть окно',
 				),
 				'apply'=>array(
 					'type'=>'submit',
@@ -456,24 +368,52 @@ class PageController extends Controller
 				),
 			)
 		);
+        if (substr($unit_form_array['elements'][0],0,2)!=Form::TAB_DELIMETER
+                || substr($unit_form_array['elements'][0],-2)!=Form::TAB_DELIMETER)
+        {
+            $form_array['title']=$unit_class::NAME;
+        }
+        if (isset($unit)) {
+            $form_array['elements']['unit'] = array(
+					'type'=>'form',
+					'elements'=>array(
+						'title'=>array(
+							'type'=>'text',
+							'maxlength'=>255,
+							'size'=>60
+						)
+					)
+                );
+        }
+        $form_array['elements']['content'] = $unit_form_array;
 
-		$form = new CForm($form_array);
-		$form['unit']->model = $unit;
-		$form['content']->model = $content;				
-		
+		$form = new Form($form_array);
+        if (isset($unit))
+            $form['unit']->model = $unit;
+		$form['content']->model = $content;
+
+        if (isset($unit)) {            
+            $this->performAjaxValidation(array($unit, $content));
+        } else
+            $this->performAjaxValidation($content);
+
 		if ($form->submitted('save') || $form->submitted('apply')) {
-			$unit = $form['unit']->model;
+            if (isset($unit))
+                $unit = $form['unit']->model;
 			$content = $form['content']->model;
 			if ($form->validate()) {
-				$content->unit_id = $unit->id;
-				$unit->modify = new CDbExpression('NOW()');
-				if ($unit->save(false)) {
-					$content->save(false);
-				}
+                if (isset($unit)) {
+    				$content->unit_id = $unit->id;
+        			$unit->modify = new CDbExpression('NOW()');
+            		if ($unit->save(false)) {
+                		$content->save(false);
+                    }
+                } else $content->save(false);
 			}
 		}
-		$form = new CForm($form_array);
-		$form['unit']->model = $unit;
+		$form = new Form($form_array);
+        if (isset($unit))
+            $form['unit']->model = $unit;
 		$form['content']->model = $content;
 		
 		$this->layout = 'empty';
@@ -485,13 +425,7 @@ class PageController extends Controller
 	{
 		if (isset($_REQUEST['unit_id']) && (isset($_REQUEST['pageunit_id']) || isset($_REQUEST['page_ids'])))
 		{
-/*
-			if (is_array($_REQUEST['pageunit_id']) && isset($_REQUEST['pageunit_id'][0])) {
-				$pageunit = PageUnit::model()->findByPk($_REQUEST['pageunit_id'][0]);
-				$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($pageunit->area)).'Through');
-			} else
-				$through = false;
-*/
+            // TODO: После удаления пододвигать следующие блоки на освободившееся место
 			if (isset($_REQUEST['pageunit_id']))
 			{
 				if ($_REQUEST['pageunit_id'] == 'all') {
@@ -514,7 +448,8 @@ class PageController extends Controller
 				$unit->delete();				
 			}
 			echo '1';
-		}		
+        } else 
+            echo '0';
 	}
 	
 	// Редактирует свойства сайта
@@ -522,7 +457,8 @@ class PageController extends Controller
 	{
 		//$settingsForm = ;
 		$form_array = SiteSettingsForm::form();
-		$form_array['title'] = 'Настройки сайта';
+//		$form_array['title'] = 'Настройки сайта';
+        $form_array['activeForm'] = Form::ajaxify('SiteSettings');
 		$form_array['buttons'] = array(
 				'save'=>array(
 					'type'=>'submit',
@@ -530,8 +466,10 @@ class PageController extends Controller
 					'title'=>'Сохранить и закрыть окно'
 				),
 			);
-		$form = new CForm($form_array);
+		$form = new Form($form_array);
 		$form->model = clone Yii::app()->settings->model;
+
+        $this->performAjaxValidation($form->model);
 
 		if ($form->submitted('save') && $form->model->validate()) {
 			Yii::app()->settings->saveAll($form->model->getAttributes());
@@ -608,37 +546,8 @@ class PageController extends Controller
 		{
             $unit = Unit::model()->findByPk(intval($_REQUEST['unit_id']));
             echo (int)$unit->setOnPagesOnly($_REQUEST['page_ids'], $_REQUEST['pageunit_id']);
-        }
-/*
-
-//			if (is_array($_REQUEST['pageunit_id']) && isset($_REQUEST['pageunit_id'][0])) {
-//				$pageunit = PageUnit::model()->findByPk($_REQUEST['pageunit_id'][0]);
-//				$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($pageunit->area)).'Through');
-//			} else
-//				$through = false;
-
-			if (isset($_REQUEST['pageunit_id']))
-			{
-				if ($_REQUEST['pageunit_id'] == 'all') {
-					PageUnit::model()->deleteAll('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
-				} elseif (is_array($_REQUEST['pageunit_id'])) {
-					PageUnit::model()->deleteAll('`id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")');
-				}
-			}
-			elseif (isset($_REQUEST['page_ids']) && is_array($_REQUEST['page_ids']))
-			{
-				PageUnit::model()->deleteAll('unit_id = :unit_id AND `page_id` IN ("'.implode('","',$_REQUEST['page_ids']).'")',
-											 array(':unit_id' => $_REQUEST['unit_id']));
-			}
-
-			$c = PageUnit::model()->count('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
-			if ($c == 0)
-			{
-				$unit = Unit::model()->findByPk($_REQUEST['unit_id']);
-				$unit->content->delete();
-				$unit->delete();
-			}
- */
+        } else
+            echo '0';
 	}
 
     // Отображает диалог выбора страниц где будет размещен юнит
@@ -707,9 +616,10 @@ class PageController extends Controller
 
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='page-form')
+		if(isset($_REQUEST['ajax-validate']))
 		{
-			echo CActiveForm::validate($model);
+            if (!$_REQUEST['delete'] && !$_REQUEST['deletepage'])
+                echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
 	}

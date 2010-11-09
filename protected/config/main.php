@@ -24,9 +24,9 @@ return array(
 
 	// application components
 	'components'=>array(
-        'cache'=>array(
-            'class'=>'system.caching.CFileCache'  
-        ),
+//        'cache'=>array(
+//            'class'=>'system.caching.CFileCache'
+//        ),
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
@@ -49,8 +49,8 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-            'schemaCachingDuration' => 3600,
-            'enableParamLogging' => true,
+            'schemaCachingDuration' => 1,
+            //'enableParamLogging' => true,
 		),
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
@@ -77,5 +77,9 @@ return array(
 	// using Yii::app()->params['paramName']
 	'params'=>array(
         'hashSalt'=>'D4gQf032',
+        'jui'=>array(
+            'themeUrl'=>'/css/jui',
+            'theme'=>'redmond',
+        )
 	),
 );

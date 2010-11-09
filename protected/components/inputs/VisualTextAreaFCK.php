@@ -73,7 +73,6 @@ class VisualTextAreaFCK extends CInputWidget
         $name = $this->htmlOptions['name'];
 
         $cs=Yii::app()->getClientScript();
-        $cs->setCoreScriptUrl('/js/empty');
 
         $cs->registerScriptFile('/3rdparty/fckeditor/fckeditor.js');
         $baseUrl = Yii::app()->baseUrl;

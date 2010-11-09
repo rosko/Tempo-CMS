@@ -4,12 +4,12 @@ Yii::import('zii.widgets.jui.CJuiDatePicker');
 
 class DatePicker extends CJuiDatePicker
 {
-    public function run()
+    public function init()
     {
-        parent::run();
-        $cs = Yii::app()->getClientScript();
-        $cs->setCoreScriptUrl('/js/empty');       
+        $this->themeUrl = Yii::app()->params->jui['themeUrl'];
+        $this->theme = Yii::app()->params->jui['theme'];
     }
+
 }
 
 ?>

@@ -2,6 +2,7 @@
     $page_select_name = 'set_page_ids';
 
     $cs=Yii::app()->getClientScript();
+    $cs->setCoreScriptUrl('/js/empty');
     $cs->registerScript('unitSetDialog', <<<EOD
 
 $(function() {
@@ -40,10 +41,10 @@ $(function() {
 
     $('#cms-pageunit-set-select').toggle(function() {
         $('#cms-dlg-select-set-page').show();
-        $.fancybox.resize();
+        resizeSplash();
     }, function () {
         $('#cms-dlg-select-set-page').hide();
-        $.fancybox.resize();
+        resizeSplash();
     });
 
     $('.cms-btn-pagemap-openall').click(function() {
@@ -112,8 +113,8 @@ EOD
     $pages_ids = array();
     if ($pages && is_array($pages))
     {
-        foreach ($pages as $page) {
-            $pages_ids[] = $page->id;
+        foreach ($pages as $p) {
+            $pages_ids[] = $p->id;
         }
     }
 

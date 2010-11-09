@@ -42,10 +42,10 @@ class UnitText extends Content
 				'text'=>array(
 					'type'=>'VisualTextAreaFCK',
 				),
-/*				'author'=>array(
+				'author'=>array(
 					'type'=>'text',
 					'maxlength'=>64
-				)*/
+				)
 			),
 		);
 	}

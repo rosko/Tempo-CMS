@@ -1,6 +1,6 @@
 <?php
 
-class UnitMenu extends CActiveRecord
+class UnitMenu extends Content
 {
 	const NAME = "Меню";
 	const ICON = '/images/icons/iconic/green/read_more_16x16.png';

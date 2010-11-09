@@ -11,7 +11,6 @@ class SiteSettingsForm extends CFormModel
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('areaTopThrough, areaRightThrough, areaMainThrough', 'boolean'),
 			array('simpleMode', 'boolean')
         );
     }
@@ -22,9 +21,6 @@ class SiteSettingsForm extends CFormModel
 			'sitename' => 'Название сайта',
             'adminEmail' => 'E-mail администратора',
             'defaultsPerPage' => 'Количество объектов на одной странице, по-умолчанию',
-			'areaTopThrough' => 'Верхняя область для блоков является сквозной',
-			'areaRightThrough' => 'Правая область для блоков является сквозной',
-			'areaMainThrough' => 'Центральная область является сквозной',
 			'simpleMode' => 'Упрощенный режим управления сайтом',
 		);
 	}
@@ -33,6 +29,7 @@ class SiteSettingsForm extends CFormModel
     {
         return array(
             'elements'=>array(
+                Form::tab('Общие настройки'),
                 'sitename'=>array(
                     'type'=>'text',
                     'size'=>60
@@ -48,15 +45,6 @@ class SiteSettingsForm extends CFormModel
 						'max'=>50
 					)
                 ),
-				'areaTopThrough'=>array(
-					'type'=>'checkbox',
-				),
-				'areaRightThrough'=>array(
-					'type'=>'checkbox',
-				),
-				'areaMainThrough'=>array(
-					'type'=>'checkbox',
-				),
 				'simpleMode'=>array(
 					'type'=>'checkbox',
 				),

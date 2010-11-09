@@ -27,9 +27,32 @@ class Page extends CActiveRecord
 	{
 		return array(
 			'parent'=>array(self::BELONGS_TO, 'Page', 'parent_id'),
-			'children'=>array(self::HAS_MANY, 'Page', 'parent_id'),
+			'children'=>array(self::HAS_MANY, 'Page', 'parent_id', 
+                'order'=>'`order`'
+            ),
+			'childrenCount'=>array(self::STAT, 'Page', 'parent_id'),
 		);
 	}
+
+	public function scopes()
+	{
+		return array(
+            'order' => array(
+                'order'=>'`order`',
+            ),
+		);
+	}
+
+    public function childrenPages()
+    {
+        $this->getDbCriteria()->mergeWith(array(
+            'condition'=>'parent_id = :id',
+            'params'=>array(
+                ':id' => $this->id
+            ),
+        ));
+        return $this;
+    }
 
 	public function getUnits($area='', $exclude=false)
 	{
@@ -76,7 +99,22 @@ class Page extends CActiveRecord
 		return $tree;
 	}
 	
-	public function beforeSave()
+    public function selectPage($number, $per_page=0)
+    {
+        if ($per_page<1)
+            $per_page = Yii::app()->settings->getValue('defaultsPerPage');
+
+        $offset = ($number-1)*$per_page;
+        if ($offset < 0)
+            $offset = 0;
+        $this->getDbCriteria()->mergeWith(array(
+            'limit'=>$per_page,
+            'offset'=>$offset
+        ));
+        return $this;
+    }
+
+    public function beforeSave()
 	{
 		$this->_path = $this->path;
 		$newpath = $this->generatePath(true);
@@ -132,7 +170,7 @@ class Page extends CActiveRecord
 			}
 		$this->delete();
 	}
-	
+
 	public function generatePath($full=false)
 	{
 		$ret = array();
@@ -164,8 +202,9 @@ class Page extends CActiveRecord
 	public static function form()
 	{
 		return array(
-			'title'=>'Свойства страницы',
+//			'title'=>'Свойства страницы',
 			'elements'=>array(
+                Form::tab('Свойства страницы'),
 				'title'=>array(
 					'type'=>'text',
 					'maxlength'=>255,
@@ -198,39 +237,25 @@ class Page extends CActiveRecord
 		);
 	}
 	
-	// Проверяем каждую область и вставляем блоки с родительской страницы в сквозных областях
+	// Проверяем каждую область и вставляем блоки с родительской страницы со всех областей, кроме main
 	public function fill()
 	{
-		$areas = Yii::app()->settings->getValue('areas');
-		if ($areas && is_array($areas))
-		{
-			foreach ($areas as $area) {							
-				$through = Yii::app()->settings->getValue('area'.ucfirst(strtolower($area)).'Through');
-				if ($through)
-				{
-					$sql = 'SELECT * FROM `' . PageUnit::tableName() . '` WHERE `page_id` = :page_id AND `area` = :area';
-					$command = Yii::app()->db->createCommand($sql);
-					$command->bindValue(':page_id', $this->parent_id, PDO::PARAM_INT);
-					$command->bindValue(':area', $area, PDO::PARAM_STR);
-					$pus = $command->queryAll();
-					if ($pus && is_array($pus))
-					{
-						$sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
-						$sql_arr = array();
-						foreach ($pus as $pu)
-						{
-							$sql_arr[] = '('.intval($this->id).', '.intval($pu['unit_id']).', '.intval($pu['order']).', :area)';
-						}
-						$sql .= implode(',', $sql_arr);
-						$command = Yii::app()->db->createCommand($sql);
-						$command->bindValue(':area', $area, PDO::PARAM_STR);
-						$command->execute();									
-					}
-				}
-			}
-		}
-
-		
+        $sql = 'SELECT * FROM `' . PageUnit::tableName() . '` WHERE `page_id` = :page_id AND `area` NOT LIKE "main%"';
+        $command = Yii::app()->db->createCommand($sql);
+        $command->bindValue(':page_id', $this->parent_id, PDO::PARAM_INT);
+        $pus = $command->queryAll();
+        if ($pus && is_array($pus))
+        {
+            $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
+            $sql_arr = array();
+            foreach ($pus as $pu)
+            {
+                $sql_arr[] = '('.intval($this->id).', '.intval($pu['unit_id']).', '.intval($pu['order']).', "'.$pu['area'].'")';
+            }
+            $sql .= implode(',', $sql_arr);
+            $command = Yii::app()->db->createCommand($sql);
+            $command->execute();
+        }
 	}
 	
 	public static function defaultObject()

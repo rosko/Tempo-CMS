@@ -553,3 +553,8 @@ ul.dropdown li:hover > ul {
 	height:20px;
 	display:inline-block;
 }
+
+.ui-widget {
+    font-size:1em !important;
+}
+

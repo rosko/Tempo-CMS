@@ -1,0 +1,1 @@
+<embed wmode="opaque" width="<?=$width?>" height="<?=$height?>" quality="high" bgcolor="#000000" name="trueGODtvClick" id="trueGODtvClick" allowfullscreen="true" allowscriptaccess="always" src="http://truegod.tv/player/vPlayer.swf?f=http://truegod.tv/player/v4Config.php?vkey=<?=$id?>" type="application/x-shockwave-flash" />

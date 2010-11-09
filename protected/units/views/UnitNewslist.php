@@ -1,18 +1,16 @@
+<?php if ($unit->title) { ?>
+<h3><?=$unit->title?></h3>
+<?php } ?>
 <?php
 if ($content->rule)
-    eval("\$items = UnitNewsitem::model()->default()->{$content->rule}->findAll();");
+    eval("\$items = UnitNewsitem::model()->public()->{$content->rule}->findAll();");
 if ($items) {
     foreach ($items as $item)
     {
-        if (get_class($this) == 'Area') {
-            $this->render('application.units.views.UnitNewsitem',
-                          array('unit'=>$item->unit,
-                                'content'=>$item));
-        } else {
-            $this->renderPartial('application.units.views.UnitNewsitem',
-                          array('unit'=>$item->unit,
-                                'content'=>$item));        
-        }
+        Yii::app()->controller->renderPartial('application.units.views.UnitNewsitem',
+                      array('unit'=>$item->unit,
+                            'pageunit'=>$pageunit,
+                            'content'=>$item));
     }
 } else {
 ?>

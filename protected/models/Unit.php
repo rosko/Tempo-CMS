@@ -47,7 +47,16 @@ class Unit extends CActiveRecord
 		return $tmp_class::model()->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
-	/**
+    public function getUnitUrl()
+    {
+        $sql = 'SELECT page_id FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
+        $command = Yii::app()->db->createCommand($sql);
+        $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+        $page_id = $command->queryScalar();
+        return Yii::app()->controller->createUrl('page/view', array('id'=>$page_id));
+    }
+
+    /**
      * Возвращает список типов блоков, установленных в CMS
      * @return array список типов блоков, установленных в CMS
      */
@@ -59,9 +68,13 @@ class Unit extends CActiveRecord
 		$ret = array();
 		foreach ($files as $f) {
 			$p = pathinfo($f);
-			$ret[] = $p['filename'];
+            $className = $p['filename'];
+            if (!Yii::app()->settings->getValue('simpleMode') || !$className::HIDDEN)
+                $ret[$className] = $className::NAME;
+            
 		}
-		return $ret;
+        asort($ret);
+		return array_keys($ret);
 	}
 	
 	public function beforeDelete()

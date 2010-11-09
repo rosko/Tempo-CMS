@@ -3,8 +3,7 @@
 <?php } ?>
 
 <?=$content->text?>
-<!--
+
 <?php if ($content->author) { ?>
     <p>Автор: <?=$content->author?></p>
 <?php } ?>
--->

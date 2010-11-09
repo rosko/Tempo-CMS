@@ -11,9 +11,9 @@ if (!Yii::app()->user->isGuest) {
 
     $cs=Yii::app()->getClientScript();
     $cs->registerCoreScript('jquery');
-    $juiUrl=Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('zii.vendors.jui'));
-    $cs->registerScriptFile($juiUrl.'/js/jquery-ui.min.js');
-    $cs->registerCssFile($juiUrl.'/css/base/jquery-ui.css');
+    $cs->registerCoreScript('yiiactiveform');
+    $cs->registerCoreScript('jquery.ui');
+    $cs->registerCssFile(Yii::app()->params->jui['themeUrl'] . '/'. Yii::app()->params->jui['theme'].'/jquery-ui.css');
 
     $cs->registerScriptFile('/js/jquery.scrollTo.js');
 	$cs->registerScriptFile('/js/jquery.cookie.js');
@@ -83,7 +83,7 @@ if (!Yii::app()->user->isGuest) {
         });
         
         // Обработчик нажатия кнопки "Добавить юнит"
-        $('.cms-btn-pagenit-add').live('click', function() {
+        $('.cms-btn-pageunit-add').live('click', function() {
             var pageunit = $(this).parents('.cms-pageunit');
             if (pageunit.length) {
                 pageunit  = pageunit.eq(0);
@@ -139,49 +139,8 @@ if (!Yii::app()->user->isGuest) {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
             hidePageunitPanel(pageunit);
             pageunit.addClass('selected');
+            pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
 
-            $.ajax({
-                url: '/?r=page/getPageunitsByUnit&unit_id='+pageunit.attr('rev'),
-                method: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);                    
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                    var unit_id = pageunit.attr('rev');
-                    var ids = jQuery.parseJSON(html);
-                    if (ids.length > 1)
-                    {
-                        $.ajax({
-                            url: '/?r=page/unitDeleteDialog&id={$model->id}&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
-                            method: 'GET',
-                            cache: false,
-                            beforeSend: function() {
-                                showInfoPanel(cms_html_loading_image, 0);                    
-                            },
-                            success: function(html) {
-                                hideInfoPanel();
-                                $('#cms-pageunit-delete').html(html);
-                                showSplash($('#cms-pageunit-delete'));
-                            }
-                        });
-                    }
-                    else {
-                        if (confirm('Вы действительно хотите удалить этот блок? Удаляемая информация будет безвозвратно потеряна.'))
-                        {
-                            ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
-                                GetOutPageunitPanel();
-                                $('#cms-pageunit-'+pageunit_id).remove();
-                                CmsAreaEmptyCheck();                                
-                            });
-                        } else {
-                            $('.selected').removeClass('selected');
-                        }
-                    }
-                }
-            });
             return false;
         });
 
@@ -259,13 +218,13 @@ if (!Yii::app()->user->isGuest) {
                 success: function(html) {
                     hideInfoPanel();
                     $('#cms-page-edit').html(html);
-                    AjaxifyForm('#cms-page-edit', $('#cms-page-edit').find('form').eq(0), function(f) {
-                    }, function (html) {
-                        if ($(html).find('form').eq(0).find('.errorMessage').length == 0) {
-                            location.reload();
-                        }
+                    $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
+                        $(this).parents('form').attr('rev', $(this).attr('name'));
+                    });                    
+                    showSplash($('#cms-page-edit'), {
+                        draggable: true,
+                        resizable: true
                     });
-                    showSplash($('#cms-page-edit'));
                 }
             });
             return false;
@@ -285,7 +244,10 @@ if (!Yii::app()->user->isGuest) {
                 success: function(html) {
                     hideInfoPanel();
                     $('#cms-page-edit').html(html);
-                    showSplash($('#cms-page-edit'), null, null, null, true);
+                    showSplash($('#cms-page-edit'), {
+                        resizable: true,
+                        draggable: true
+                    });
                 }
             });
             return false;
@@ -321,7 +283,7 @@ if (!Yii::app()->user->isGuest) {
         });
 
         // Отображение диалога "Заполнить страницу" на пустой странице
-        if ($('.cms-pageunit').length == 0)
+        if ($('.pageunit').length == 0)
         {
             var page_id = $('body').attr('rel');
             hidePageunitPanel();
@@ -368,7 +330,7 @@ EOD
 <div class="hidden">
     <div id="cms-pageunit-menu" class="cms-panel cms-pageunit-menu">
         <ul>
-            <li><a class="cms-button-big cms-button-add cms-btn-pagenit-add" title="Добавить еще один блок" href="#"></a></li>
+            <li><a class="cms-button-big cms-button-add cms-btn-pageunit-add" title="Добавить еще один блок" href="#"></a></li>
             <li><a class="cms-button-big cms-button-edit cms-btn-pageunit-edit" title="Редактировать" href="#"></a></li>
             <li><a class="cms-button-big cms-button-move cms-btn-pageunit-set" title="Размещение блока на других страницах" href="#"></a></li>
             <li><a class="cms-button-big cms-button-up cms-btn-pageunit-moveup" title="Переместить выше" href="#"></a></li>
@@ -386,7 +348,6 @@ EOD
             $unit_types_count = count($unit_types);
             $i=0;
             foreach ($unit_types as $unit_class) {
-                if (Yii::app()->settings->getValue('simpleMode') && $unit_class::HIDDEN) continue;
                 $i++;
                 $unit_type = substr(strtolower($unit_class),4);
                 ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=$unit_class::NAME?>" href="#" ><img src="<?=$unit_class::ICON?>" alt="<?=$unit_class::NAME?>" /> <?=$unit_class::NAME?></a></li><?php
@@ -416,6 +377,8 @@ EOD
     <div id="cms-page-delete" class="cms-splash">
     </div>
     
+    <div id="cms-dialog">
+    </div>
 </div>
 
 

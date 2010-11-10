@@ -236,6 +236,23 @@ class Page extends CActiveRecord
 			)
 		);
 	}
+
+    public function isSimilarTo($page, $areas=array(), $unit_id=0)
+    {
+        $id = is_object($page) ? $page->id : $page;
+        $sql = 'SELECT `unit_id` FROM `' . PageUnit::tableName() . '`
+                WHERE `page_id` = :id
+                      AND `area` ' . (!empty($areas) ? (is_array($areas) ? 'IN ('.implode(',',$areas).')' : ' = `area`') : 'NOT LIKE "main%"').'
+                      '.($unit_id ? ' AND `unit_id` != '.intval($unit_id) : '');
+        $command = Yii::app()->db->createCommand($sql);
+        $command->bindParam(':id', $this->id, PDO::PARAM_INT);
+        $arr = $command->queryColumn();
+
+        $command = Yii::app()->db->createCommand($sql);
+        $command->bindParam(':id', $id, PDO::PARAM_INT);
+        $ret = array_diff($arr, $command->queryColumn());
+        return empty($ret);
+    }
 	
 	// Проверяем каждую область и вставляем блоки с родительской страницы со всех областей, кроме main
 	public function fill()

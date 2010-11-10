@@ -15,7 +15,7 @@ class RecordsController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('view', 'getUrl'
+				'actions'=>array('view', 'delete', 'getUrl'
 
 
                 ),
@@ -31,6 +31,20 @@ class RecordsController extends Controller
 	public function actionView()
 	{
 
+    }
+
+    public function actionDelete()
+    {
+        if ($_REQUEST['id'] && $_REQUEST['class_name']) {
+            $ids =  is_array($_REQUEST['id']) ? $_REQUEST['id'] : array($_REQUEST['id']);
+            $className = $_REQUEST['class_name'];
+            $ret = true;
+            foreach ($ids as $id) {
+                $model = $className::model()->findByPk($_REQUEST['id']);
+                $ret = $ret && $model->delete();
+            }
+            echo (int)$ret;
+        }
     }
 
     public function actionGetUrl()

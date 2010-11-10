@@ -92,6 +92,7 @@ class Unit extends CActiveRecord
      */
     public function setOnPage($page_id, $area, $order)
     {
+        // Раздвигаем последующие юниты
         $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':page_id', intval($page_id), PDO::PARAM_INT);
@@ -99,6 +100,7 @@ class Unit extends CActiveRecord
         $command->bindValue(':order', $order, PDO::PARAM_INT);
         $command->execute();
 
+        // Устанавливаем юнит
         $pageunit = new PageUnit;
         $pageunit->page_id = intval($page_id);
         $pageunit->unit_id = $this->id;

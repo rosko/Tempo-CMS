@@ -80,10 +80,22 @@ EOD
                 array(
                     array(
                         'class'=>'CButtonColumn',
-                        'updateButtonUrl'=>'"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\')"',
-                        'viewButtonLabel'=>'Перейти на страницу',
-                        'viewButtonUrl'=>'"javascript:gotoRecordPage({$data->id}, \'".get_class($data)."\')"',
-                        'deleteButtonUrl'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\')"',
+                        'template'=>'{view} {update} {del}',
+                        'buttons'=>array(
+                            'view'=>array(
+                                'label'=>'Перейти на страницу',
+                                'url' => '"javascript:gotoRecordPage({$data->id}, \'".get_class($data)."\')"',
+                                'visible' => '$data->unit',
+                            ),
+                            'update'=>array(
+                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\')"',
+                            ),
+                            'del'=>array(
+                                'label'=>'Удалить',
+                                'imageUrl'=>'/images/delete.png',
+                                'url'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\')"',
+                            ),
+                        ),
                     ),
                 )
             )

@@ -25,20 +25,19 @@ class PageController extends Controller
 				'users'=>array('@'),
 			),
 			array('allow',
-				'actions'=>array('unitAdd', 'unitForm',
-                                 'unitSetDialog', 'unitSet', 'unitMove',
-								 'unitDeleteDialog','unitDelete',
+				'actions'=>array(
+                     'unitAdd', 'unitForm',
+                     'unitSetDialog', 'unitSet', 'unitMove',
+                     'unitDeleteDialog','unitDelete', 'unitCheck',
 
-                                 'pageAdd', 'pageForm',
-                                 'pageRename', 'pageFill', 'pagesSort',
-                                 'pageDeleteDialog', 'pageDelete',
+                     'pageAdd', 'pageForm',
+                     'pageRename', 'pageFill', 'pagesSort',
+                     'pageDeleteDialog', 'pageDelete',
 
-                                 'pageTree',
+                     'pageTree',
 
-                                 'hasChildren', 'siteSettings',
-								 'siteMap', 'getUrl',
-
-
+                     'hasChildren', 'siteSettings',
+                     'siteMap', 'getUrl',
                 ),
 				'users'=>array('admin'),
 			),
@@ -305,7 +304,7 @@ class PageController extends Controller
 
 			// Размещаем его на только текущей странице
             $pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
-            $order = $pu->order ? $pu->order : -1;
+            $order = $_REQUEST['pageunit_id'] ? $pu->order : -1;
             $pageunit = $unit->setOnPage($_REQUEST['page_id'], $_REQUEST['area'], $order);
             
 			// Заполняем юнит информацией по-умолчанию
@@ -423,34 +422,79 @@ class PageController extends Controller
 	// Удаляет юнит
 	public function actionUnitDelete()
 	{
-		if (isset($_REQUEST['unit_id']) && (isset($_REQUEST['pageunit_id']) || isset($_REQUEST['page_ids'])))
+        if (isset($_REQUEST['unit_id']) && isset($_REQUEST['pageunit_id']))
 		{
-            // TODO: После удаления пододвигать следующие блоки на освободившееся место
-			if (isset($_REQUEST['pageunit_id']))
-			{
-				if ($_REQUEST['pageunit_id'] == 'all') {
-					PageUnit::model()->deleteAll('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
-				} elseif (is_array($_REQUEST['pageunit_id'])) {
-					PageUnit::model()->deleteAll('`id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")');
-				}
-			}
-			elseif (isset($_REQUEST['page_ids']) && is_array($_REQUEST['page_ids']))
-			{
-				PageUnit::model()->deleteAll('unit_id = :unit_id AND `page_id` IN ("'.implode('","',$_REQUEST['page_ids']).'")',
-											 array(':unit_id' => $_REQUEST['unit_id']));
-			}
+
+            if ($_REQUEST['pageunit_id'] == 'all') {
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM `' . PageUnit::tableName() . '`
+                                    WHERE `unit_id` = :unit_id) as pu2
+                        ON pu.`page_id` = pu2.`page_id`
+                        SET pu.`order` = pu.`order`-1
+                        WHERE
+                            pu.`area` = pu2.`area`
+                            AND pu.`order` > pu2.`order`';
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(':unit_id', $_REQUEST['unit_id'], PDO::PARAM_INT);
+                $command->execute();
+                PageUnit::model()->deleteAll('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
+            } elseif (is_array($_REQUEST['pageunit_id'])) {
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM `' . PageUnit::tableName() . '`
+                                    WHERE `id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")
+                                        AND `unit_id` = :unit_id) as pu2
+                        ON pu.`page_id` = pu2.`page_id`
+                        SET pu.`order` = pu.`order`-1
+                        WHERE
+                            pu.`area` = pu2.`area`
+                            AND pu.`order` > pu2.`order`';
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(':unit_id', $_REQUEST['unit_id'], PDO::PARAM_INT);
+                $command->execute();
+                PageUnit::model()->deleteAll('`id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")');
+            }
 			
 			$c = PageUnit::model()->count('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
 			if ($c == 0)
 			{
-				$unit = Unit::model()->findByPk($_REQUEST['unit_id']);
-				$unit->content->delete();
-				$unit->delete();				
+                $unit = Unit::model()->findByPk($_REQUEST['unit_id']);
+				if ($unit) {
+                    // Если нужно, также удаляем ассоциированную страницу
+                    if ($_REQUEST['with_page'] && $unit->content && $unit->content->hasAttribute('page_id'))
+                    {
+                        $p = Page::model()->findByPk($unit->content->page_id);
+                        if ($p)
+                            $p->delete();
+                    }
+                    $unit->delete();
+                }
 			}
 			echo '1';
-        } else 
+        } else
             echo '0';
-	}
+    }
+
+    public function actionUnitCheck()
+    {
+        $ret = array();
+        if ($_REQUEST['unit_id']) {
+            $unit = Unit::model()->findByPk($_REQUEST['unit_id']);
+            // Связана ли какая-то страница с этим юнитом?
+            if ($unit->content && $unit->content->hasAttribute('page_id')) {
+                $p = Page::model()->findByPk($unit->content->page_id);
+                $pu = PageUnit::model()->find('unit_id = :unit_id AND page_id = :page_id',
+                                        array(':unit_id'=>$_REQUEST['unit_id'], ':page_id'=>$unit->content->page_id));
+                if ($p && $pu) {
+                    $ret['page'] = array(
+                        'title' => $p->title,
+                        'url' => $this->createAbsoluteUrl('view', array('id'=>$p->id)),
+                        'similarToParent' => $p->isSimilarTo($p->parent_id, 'all', $unit->id),
+                    );
+                }
+            }
+        }
+        echo CJavaScript::jsonEncode($ret);
+    }
 	
 	// Редактирует свойства сайта
 	public function actionSiteSettings()
@@ -601,7 +645,7 @@ class PageController extends Controller
 			echo Page::model()->count('parent_id = :parent_id',array(':parent_id'=>intval($_REQUEST['id'])));
 		}
 	}
-	
+
 	public function loadModel()
 	{
 		if($this->_model===null)

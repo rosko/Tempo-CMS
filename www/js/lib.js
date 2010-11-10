@@ -728,6 +728,7 @@ function recordEditForm(id, class_name, unit_id, grid_id)
             var height = $(window).height()-100;
             var width = $(window).width()-200;
             dlg.dialog({
+                title: 'Редактирование',
                 resizable: true,
                 draggable: true,
                 maxHeight: height,
@@ -751,7 +752,77 @@ function recordEditForm(id, class_name, unit_id, grid_id)
 
 function recordDelete(id, class_name, unit_id, grid_id)
 {
-    
+    if (unit_id) {
+        // Удаляем юнит
+        $.ajax({
+            url:'/?r=page/unitCheck&unit_id='+unit_id+'&class_name='+class_name+'&id='+id,
+            cache: false,
+            id: id,
+            class_name: class_name,
+            unit_id: unit_id,
+            beforeSend: function() {
+                showInfoPanel(cms_html_loading_image, 0);
+            },
+            success: function(html) {
+                hideInfoPanel();
+                if (html.substring(0,2) == '{"') {
+                    var ret = jQuery.parseJSON(html);
+                    if (ret.page) {
+                        if (ret.page.similarToParent) {
+                            recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
+                        } else {
+                            var dlg_id = 'UnitDeleteConform_'+unit_id;
+                            var dlg = $('#cms-dialog').clone().attr('id', dlg_id).addClass('cms-dialog').appendTo('body');
+                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>На странице (<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>), где размещен удаляемый блок, также присутствуют какие-то другие информационные блоки. Возможно, вы добавили что-то самостоятельно на указанную страницу. Что делать?');
+                            dlg.dialog({
+                                title: 'Удаление блока',
+                                modal: true,
+                                zIndex: 10000,
+                                buttons: {
+                                    "Удалить только блок": function() {
+                                        recordDeleteConfirm(unit_id, grid_id);
+                                        $(this).dialog('close');
+                                    },
+                                    "Удалить и блок, и страницу": function() {
+                                        recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
+                                        $(this).dialog('close');
+                                    }
+                                },
+                                close: function() {
+                                    $('#'+dlg_id).remove();
+                                }
+                            });
+                        }
+                    } else {
+                        recordDeleteConfirm(unit_id, grid_id);
+                    }
+                } else {
+                    recordDeleteConfirm(unit_id, grid_id);
+                }
+            }
+        });
+    } else {
+        // Удаляем просто запись
+        if (confirm('Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.'))
+        {
+            ajaxSave('/?r=records/delete&id='+id+'&class_name='+class_name, '', 'GET', function(ret) {
+                $.fn.yiiGridView.update(grid_id);
+            });
+        }
+    }
+}
+
+function recordDeleteConfirm(unit_id, grid_id, data, str)
+{
+    if (str == undefined) {
+        var str = 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.';
+    }
+    if (confirm(str))
+    {
+        ajaxSave('/?r=page/unitDelete&unit_id='+unit_id+'&pageunit_id=all'+data, '', 'GET', function(ret) {
+            $.fn.yiiGridView.update(grid_id);
+        });
+    }
 }
 
 function gotoRecordPage(id, class_name)

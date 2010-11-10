@@ -140,7 +140,6 @@ if (!Yii::app()->user->isGuest) {
             hidePageunitPanel(pageunit);
             pageunit.addClass('selected');
             pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
-
             return false;
         });
 

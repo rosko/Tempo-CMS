@@ -18,6 +18,17 @@ class Content extends CActiveRecord
 		return Unit::model()->find('id=:id', array(':id'=>$this->unit_id));        
     }
 */
+    public function beforeSave()
+    {
+        if ($this->isNewRecord) 
+        {
+            if ($this->hasAttribute('date')) {
+                $this->date = new CDbExpression('NOW()');
+            }
+        }
+        return parent::beforeSave();
+    }
+
     public function dependencies()
     {
         return array();

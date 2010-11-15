@@ -475,7 +475,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
         pageunit_id: pageunit_id,
         unit_id: unit_id,
         page_id: page_id,
-        method: 'GET',
+        type: 'GET',
         cache: false,
         beforeSend: function() {
             showInfoPanel(cms_html_loading_image, 0);
@@ -487,7 +487,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
             {
                 $.ajax({
                     url: '/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
-                    method: 'GET',
+                    type: 'GET',
                     cache: false,
                     beforeSend: function() {
                         showInfoPanel(cms_html_loading_image, 0);
@@ -537,7 +537,7 @@ function pageunitSetDialog(page_id, pageunit_id, unit_id)
 {
     $.ajax({
         url: '/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
-        method: 'GET',
+        type: 'GET',
         cache: false,
         beforeSend: function() {
             showInfoPanel(cms_html_loading_image, 0);

@@ -150,7 +150,8 @@ if (!Yii::app()->user->isGuest) {
                 pageunit.insertBefore(pageunit.prev());
                 showPageunitPanel(pageunit);
                 area = getAreaByPageunit(pageunit);
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit.attr('id'));
+                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
             }
             return false;
         });
@@ -162,7 +163,8 @@ if (!Yii::app()->user->isGuest) {
                 pageunit.insertAfter(pageunit.next());
                 showPageunitPanel(pageunit);
                 area = getAreaByPageunit(pageunit);
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit.attr('id'));
+                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
             }
             return false;
         });
@@ -209,7 +211,7 @@ if (!Yii::app()->user->isGuest) {
             hidePageunitPanel();
             $.ajax({
                 url: '/?r=page/siteSettings',
-                method: 'GET',
+                type: 'GET',
                 cache: false,
                 beforeSend: function() {
                     showInfoPanel(cms_html_loading_image, 0);                    
@@ -235,7 +237,7 @@ if (!Yii::app()->user->isGuest) {
             var page_id = {$model->id};
             $.ajax({
                 url: '/?r=page/siteMap&id='+page_id,
-                method: 'GET',
+                type: 'GET',
                 cache: false,
                 beforeSend: function() {
                     showInfoPanel(cms_html_loading_image, 0);                    
@@ -288,7 +290,7 @@ if (!Yii::app()->user->isGuest) {
             hidePageunitPanel();
             $.ajax({
                 url: '/?r=page/pageFill&id='+page_id,
-                method: 'GET',
+                type: 'GET',
                 cache: false,
                 beforeSend: function() {
                     showInfoPanel(cms_html_loading_image, 0);                    

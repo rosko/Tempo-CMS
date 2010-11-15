@@ -2,22 +2,22 @@
 
 class RecordsGrid extends CInputWidget
 {
-    public $className;
-    public $foreignAttribute;
-    public $sectionType='';
-    public $sectionId=0;
+    public $class_name;
+    public $foreign_attribute;
+    public $section_type='';
+    public $section_id=0;
     public $columns;
     public $order;
 
     public function run()
     {
         if($this->hasModel()===false)  {
-            $this->model = $sectionType::model()->findByPk($sectionId);
+            $this->model = $section_type::model()->findByPk($section_id);
         }
 
-        $dataProvider=new CActiveDataProvider($this->className, array(
+        $dataProvider=new CActiveDataProvider($this->class_name, array(
             'criteria'=> array(
-                'condition'=> $this->foreignAttribute . ' = :id',
+                'condition'=> $this->foreign_attribute . ' = :id',
                 'with' => 'unit',
                 'params'=>array(
                     ':id' => $this->model->id
@@ -43,7 +43,9 @@ class RecordsGrid extends CInputWidget
 
         $this->getController()->layout = 'blank';
         $this->registerClientScript();
-        $this->widget('zii.widgets.grid.CGridView', array(
+
+
+        $records_grid = $this->widget('zii.widgets.grid.CGridView', array(
             'id'=>$id,
             'dataProvider'=>$dataProvider,
             'ajaxUpdate'=> $id,
@@ -99,25 +101,29 @@ EOD
                     ),
                 )
             )
-        ));
-?>
-<script type="text/javascript">
-$('#<?=$id?>_check input').live('click', function() {
-    var check = $(this).attr('checked');
-    var settings = $.fn.yiiGridView.settings['<?=$id?>'];
-    $('#<?=$id?> .'+settings.tableClass+' > tbody > tr').each(function(i){
-        if (check) {
-            $(this).addClass('selected');
-        } else {
-            $(this).removeClass('selected');
-        }
-    });
-});
-</script>
-<div id="<?=$id?>_footer">
+        ), true);
 
-</div>
-<?php
+        $page_id = 0;
+        $area = '';
+        $type = '';
+        if ($this->model->unit_id) {
+            $pageunit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
+            $page_id = $pageunit->page_id;
+            $area = $pageunit->area;
+            $type = strtolower(str_replace('Unit', '', $this->class_name));
+        }
+
+        $this->render('RecordsGrid', array(
+            'id' => $id,
+            'foreign_attribute' => $this->foreign_attribute,
+            'page_id' => $page_id,
+            'area' => $area,
+            'type' => $type,
+            'class_name' => $this->class_name,
+            'records_grid' => $records_grid,
+            'section_id' => $this->model->id,
+            'section_type' => get_class($this->model),
+        ));
 
     }
 

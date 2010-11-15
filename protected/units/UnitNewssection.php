@@ -48,8 +48,8 @@ class UnitNewssection extends Content
                 Form::tab('Раздел новостей'),
                 'items' => array(
                     'type'=>'RecordsGrid',
-                    'className' => 'UnitNewsitem',
-                    'foreignAttribute' => 'newssection_id',
+                    'class_name' => 'UnitNewsitem',
+                    'foreign_attribute' => 'newssection_id',
                     'columns' => array(
                         'date',
                     ),

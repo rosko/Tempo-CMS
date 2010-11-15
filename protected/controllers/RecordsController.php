@@ -15,7 +15,7 @@ class RecordsController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('view', 'delete', 'getUrl'
+				'actions'=>array('create', 'view', 'delete', 'getUrl'
 
 
                 ),
@@ -33,6 +33,28 @@ class RecordsController extends Controller
 
     }
 
+    public function actionCreate()
+    {
+        if ($_REQUEST['class_name'] && $_REQUEST['foreign_attribute'] && $_REQUEST['section_id'])
+        {
+            $className = $_REQUEST['class_name'];
+			if (method_exists($className, 'defaultObject')) {
+				$model = $className::defaultObject();
+			} else {
+				$model = new $className;
+			}
+            if ($model->hasAttribute($_REQUEST['foreign_attribute']))
+            {
+                $model->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['section_id']);
+            }
+            $model->save(false);
+            echo CJavaScript::jsonEncode(array(
+                'id'=>$model->id,
+            ));
+        } else
+            echo '0';
+    }
+
     public function actionDelete()
     {
         if ($_REQUEST['id'] && $_REQUEST['class_name']) {
@@ -44,7 +66,8 @@ class RecordsController extends Controller
                 $ret = $ret && $model->delete();
             }
             echo (int)$ret;
-        }
+        } else
+            echo '0';
     }
 
     public function actionGetUrl()

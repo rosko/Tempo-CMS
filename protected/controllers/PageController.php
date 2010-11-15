@@ -79,6 +79,7 @@ class PageController extends Controller
 		
 		$form = new Form($form_array);
 		$form->model = $page;
+        $form->id = sprintf('%x',crc32(serialize(array_keys($form->getElements()->toArray()))));
 
         $this->performAjaxValidation($page);
 		
@@ -90,17 +91,26 @@ class PageController extends Controller
 					$page->fill();
 					
 					if ($form->submitted('go')) {
-						echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$page->id))));
+						echo CJavaScript::jsonEncode(array(
+                            'url' => $this->createAbsoluteUrl('page/view', array('id'=>$page->id)),
+                            'id' => $page->id,
+                        ));
 						Yii::app()->end();
 					}
 				}
 			}
-		}		
-		
-		$this->layout = 'blank';
-		$this->render('form', array('form'=>$form));
+		}
+        if (isset($_REQUEST['json']) && $_REQUEST['json']) {
+            echo CJavaScript::jsonEncode(array(
+                'unique_id'=> 'yform_'.$form->id,
+                'underscore' => $_REQUEST['_'],
+            ));
+            Yii::app()->end();
+        }
+        $this->layout = 'blank';
+        $this->render('form', array('form'=>$form));
 	}
-	
+
 	// Переименовывает название страницы или создает новую
 	public function actionPageRename()
 	{
@@ -303,8 +313,12 @@ class PageController extends Controller
 			$unit->save();
 
 			// Размещаем его на только текущей странице
-            $pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
-            $order = $_REQUEST['pageunit_id'] ? $pu->order : -1;
+            if ($_REQUEST['pageunit_id']) {
+                $pu = PageUnit::model()->findByPk($_REQUEST['pageunit_id']);
+                $order = $pu->order;
+            } else {
+                $order = -1;
+            }
             $pageunit = $unit->setOnPage($_REQUEST['page_id'], $_REQUEST['area'], $order);
             
 			// Заполняем юнит информацией по-умолчанию
@@ -314,9 +328,16 @@ class PageController extends Controller
 				$content = new $className;				
 			}
 			$content->unit_id = $unit->id;
+            if (isset($_REQUEST['content_page_id']) && $content->hasAttribute('page_id')) {
+                $content->page_id = intval($_REQUEST['content_page_id']);
+            }
+            if (isset($_REQUEST['section_id']) && isset($_REQUEST['foreign_attribute'])
+                && $content->hasAttribute($_REQUEST['foreign_attribute'])    ) {
+                $content->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['section_id']);
+            }
 			$content->save(false);
 			
-            echo CJavaScript::jsonEncode(array('pageunit_id'=>$pageunit->id,'unit_id'=>$unit->id));
+            echo CJavaScript::jsonEncode(array('pageunit_id'=>$pageunit->id,'unit_id'=>$unit->id,'content_id'=>$content->id));
 		}
         else echo '0';
 	}

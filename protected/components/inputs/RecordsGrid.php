@@ -110,7 +110,7 @@ EOD
             $pageunit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
             $page_id = $pageunit->page_id;
             $area = $pageunit->area;
-            $type = strtolower(str_replace('Unit', '', $this->class_name));
+            $type = Unit::getUnitTypeByClassName($this->class_name);
         }
 
         $this->render('RecordsGrid', array(

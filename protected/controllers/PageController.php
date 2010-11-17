@@ -278,7 +278,7 @@ class PageController extends Controller
 	public function actionUnitView()
 	{
 		$unit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
-        $className = 'Unit' . ucfirst(strtolower($unit->unit->type));
+        $className = Unit::getClassNameByUnitType($unit->unit->type);
 		
         $output = $this->renderPartial('application.units.views.'.$className,
                 array('unit'=>$unit->unit,
@@ -307,7 +307,7 @@ class PageController extends Controller
             // Создаем юнит
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
-			$className = 'Unit'.ucfirst(strtolower($_REQUEST['type']));
+            $className = Unit::getClassNameByUnitType($_REQUEST['type']);
 			$unit->title = $className::NAME;
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
@@ -346,7 +346,7 @@ class PageController extends Controller
 	public function actionUnitForm()
 	{
         if ($_REQUEST['unit_type']) {
-            $unit_class = 'Unit'.ucfirst(strtolower($_REQUEST['unit_type']));
+            $unit_class = Unit::getClassNameByUnitType($_REQUEST['unit_type']);
             if ($_REQUEST['pageunit_id']) {
                 $pageunit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
                 $unit = $pageunit->unit;

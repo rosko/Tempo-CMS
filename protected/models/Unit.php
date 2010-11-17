@@ -43,7 +43,7 @@ class Unit extends CActiveRecord
      */
     public function getContent()
 	{
-		$tmp_class = 'Unit'.ucfirst(strtolower($this->type));
+        $tmp_class = Unit::getClassNameByUnitType($this->type);
 		return $tmp_class::model()->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
@@ -414,5 +414,20 @@ class Unit extends CActiveRecord
 		}
 
     }
+
+    public static function getUnitTypeByClassName($className)
+    {
+        return strtolower(str_replace('Unit', '', $className));
+    }
+
+    public static function getClassNameByUnitType($unitType)
+    {
+        $unitType = strtolower($unitType);
+        if (substr($unitType,0,4) != 'unit')
+            return 'Unit'.ucfirst($unitType);
+        else
+            return 'Unit'.ucfirst(substr($unitType,4));
+    }
+
 
 }

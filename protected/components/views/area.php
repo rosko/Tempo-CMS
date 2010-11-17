@@ -10,14 +10,14 @@ if (get_class($this->controller) == 'PageController' && $this->controller->_mode
 $units = $this->controller->_model->getUnits($name);
 foreach ($units as $unit) {
     
-    $className = 'Unit'.ucfirst(strtolower($unit->unit->type));
+    $className = Unit::getClassNameByUnitType($unit->unit->type);
 
     ?>
 
     <div <?php if (!Yii::app()->user->isGuest) { ?>title="<?php echo $className::NAME; ?>"<?php } ?> id="cms-pageunit-<?=$unit->id?>" class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$unit->unit->type?>" rel="<?=$unit->unit->type?>" rev="<?=$unit->unit->id?>">
 
         <?php
-            $output = $this->render('application.units.views.Unit'.ucfirst(strtolower($unit->unit->type)),
+            $output = $this->render('application.units.views.'.$className,
                                            array('unit'=>$unit->unit,
                                                  'pageunit'=>$unit,
                                                  'content'=>$unit->unit->content,

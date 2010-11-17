@@ -152,7 +152,7 @@ class Page extends CActiveRecord
 			foreach ($pus as $pu)
 			{
 				$ids[] = intval($pu['id']);
-				$tmp_class = 'Unit'.ucfirst(strtolower($pu['type']));
+                $tmp_class = Unit::getClassNameByUnitType($pu['type']);
 				$tmp_class::model()->deleteAll('unit_id = ' . intval($pu['id']));
 			}
 			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';

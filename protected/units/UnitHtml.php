@@ -36,6 +36,7 @@ class UnitHtml extends Content
 	public static function form()
 	{
 		return array(
+            'title' => false,
 			'elements'=>array(
 				'html'=>array(
 					'type'=>'textarea',

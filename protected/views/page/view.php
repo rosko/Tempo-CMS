@@ -3,21 +3,79 @@ $this->pageTitle = $model->title;
 $this->keywords = $model->keywords;
 $this->description = $model->description;
 
+$cs=Yii::app()->getClientScript();
+
+$cs->registerCoreScript('jquery');
+$cs->registerCoreScript('jquery.ui');
+$cs->registerCssFile(Yii::app()->params->jui['themeUrl'] . '/'. Yii::app()->params->jui['theme'].'/jquery-ui.css');
+
+$cs->registerScript('all', <<<EOD
+
+        $('<div id="cms-statusbar"></div>').prependTo('body');
+        $('<div id="cms-notification"></div>').prependTo('body');
+            $('#cms-statusbar').jnotifyInizialize({
+                oneAtTime: true
+            })
+            $('#cms-notification')
+                .jnotifyInizialize({
+                    oneAtTime: false,
+                    appendType: 'append'
+                })
+                .css({ 'position': 'fixed',
+                    'marginTop': '10px',
+                    'left': Math.ceil($('body').width()/2-125)+'px',
+                    'width': '300px',
+                    'z-index': '9999'
+                });
+
+
+EOD
+, CClientScript::POS_READY);
+
+$js = '';
+$flashes = Yii::app()->user->getFlashes();
+foreach ($flashes as $k => $flash)
+{
+    if (!is_string($flash)) continue;
+    $params = explode('-', $k);
+    $k = $params[0];
+    $params = array_values(array_slice($params, 1));
+    $types = array('error', 'hint', 'message');
+    $type = 'message';
+    foreach ($types as $t) {
+        if (in_array($t, $params)) {
+            $type = $t;
+            break;
+        }
+    }
+    $options = array(
+        'type'=> $type,
+        'permanent'=> in_array('permanent', $params),
+        'showIcon' => !in_array('noicon', $params)
+    );
+    $options = CJavaScript::encode($options);
+    $flash = CJavaScript::encode($flash);
+    $js .= "notify({$flash}, {$options});\n";
+}
+if ($js)
+    $cs->registerScript('flashes', $js, CClientScript::POS_READY);
+
+
 if (!Yii::app()->user->isGuest) {
 
     if (!$model->active) {
         $this->pageTitle = '[Страница отключена] ' . $this->pageTitle;
     }
 
-    $cs=Yii::app()->getClientScript();
-    $cs->registerCoreScript('jquery');
     $cs->registerCoreScript('yiiactiveform');
-    $cs->registerCoreScript('jquery.ui');
-    $cs->registerCssFile(Yii::app()->params->jui['themeUrl'] . '/'. Yii::app()->params->jui['theme'].'/jquery-ui.css');
+    $cs->registerScriptFile($cs->getCoreScriptUrl() . '/jui/js/jquery-ui-i18n.min.js');
 
     $cs->registerScriptFile('/js/jquery.scrollTo.js');
 	$cs->registerScriptFile('/js/jquery.cookie.js');
     $cs->registerScriptFile('/js/jquery.hotkeys.js');
+
+    $cs->registerScriptFile('/3rdparty/jnotify/jquery.jnotify.js');
+    $cs->registerCssFile('/3rdparty/jnotify/jquery.jnotify.css');
 
     $cs->registerScriptFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.js');
     $cs->registerCssFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.css');
@@ -138,7 +196,7 @@ if (!Yii::app()->user->isGuest) {
         $('.cms-btn-pageunit-delete').click(function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
             hidePageunitPanel(pageunit);
-            pageunit.addClass('selected');
+            fadeIn(pageunit, 'selected');
             pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
             return false;
         });
@@ -172,7 +230,7 @@ if (!Yii::app()->user->isGuest) {
         // Обработчик нажатия кнопки "Размещение блока на других страницах"
         $('.cms-btn-pageunit-set').click(function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            pageunit.addClass('selected');
+            fadeIn(pageunit, 'selected');
             var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
             var unit_id = pageunit.attr('rev');
             pageunitSetDialog({$model->id}, pageunit_id, unit_id);
@@ -214,7 +272,7 @@ if (!Yii::app()->user->isGuest) {
                 type: 'GET',
                 cache: false,
                 beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);                    
+                    showInfoPanel(cms_html_loading_image, 0);
                 },
                 success: function(html) {
                     hideInfoPanel();
@@ -311,6 +369,19 @@ if (!Yii::app()->user->isGuest) {
 EOD
 , CClientScript::POS_READY);
 
+
+    if (Yii::app()->settings->getValue('autoSave')) {
+
+        $cs->registerScript('autoSave', <<<EOD
+            setInterval(function() {
+                $('form input[name=apply]:submit').each(function() {
+                    $(this).parents('form').attr('rev', 'apply').trigger('submit');
+                });
+            }, 30000);
+EOD
+        , CClientScript::POS_READY);
+    
+    }
 
 ?>
 

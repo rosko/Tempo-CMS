@@ -47,17 +47,19 @@ class Settings extends CApplicationComponent
         $this->model->{$name}  = $value;
         if ($save)
         {
-//            if (isset($this->model->{$name}))
-//            {
-                $sql = 'UPDATE `' . $this->tableName . '` SET `value` = :value WHERE `name` = :name';
-//            }
-//            else {
-//                $sql = 'INSERT INTO `' . $this->tableName . '` (`name`, `value`) VALUES (:name, :value)';
-//            }
+            $sql = 'UPDATE `' . $this->tableName . '` SET `value` = :value WHERE `name` = :name';
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(':value', $value, PDO::PARAM_STR);
             $command->bindValue(':name', $name, PDO::PARAM_STR);
-            return $command->execute();
+            $q = $command->execute();
+            if (!$q) {
+                $sql = 'INSERT INTO `' . $this->tableName . '` (`name`, `value`) VALUES (:name, :value)';
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(':value', $value, PDO::PARAM_STR);
+                $command->bindValue(':name', $name, PDO::PARAM_STR);
+                $q = $command->execute();
+            }
+            return $q;
         }
         return true;
     }

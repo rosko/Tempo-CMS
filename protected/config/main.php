@@ -49,7 +49,7 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-            'schemaCachingDuration' => 1,
+            'schemaCachingDuration' => 3600,
             //'enableParamLogging' => true,
 		),
 		'errorHandler'=>array(
@@ -59,15 +59,15 @@ return array(
 		'log'=>array(
 			'class'=>'CLogRouter',
             'routes'=>array(
-//                array(
-//                    'class'=>'CFileLogRoute',
-//                    'levels'=>'error, warning, trace',
-//                ),
-                array( 
-                    'class'=>'XWebDebugRouter',
-                    'config'=>'alignLeft, opaque, runInDebug, yamlStyle',
-                    'levels'=>'error, warning, trace, profile, info',
+                array(
+                    'class'=>'CFileLogRoute',
+                    'levels'=>'error, warning',
                 ),
+//                array(
+//                    'class'=>'XWebDebugRouter',
+//                    'config'=>'alignLeft, opaque, runInDebug, yamlStyle',
+//                    'levels'=>'error, warning, trace, profile, info',
+//                ),
             ),
 		),
         

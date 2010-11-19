@@ -3,7 +3,8 @@
 <?php } ?>
 <?php
 if ($content->rule)
-    eval("\$items = UnitNewsitem::model()->public()->{$content->rule}->findAll();");
+    $content->rule .= '->';
+eval("\$items = UnitNewsitem::model()->public()->{$content->rule}findAll();");
 if ($items) {
     foreach ($items as $item)
     {

@@ -19,7 +19,7 @@ class Page extends CActiveRecord
 		return array(
 			array('parent_id, title', 'required'),
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
-			array('path, title, keywords, description', 'length', 'max'=>255),
+			array('path, title, keywords, description, redirect', 'length', 'max'=>255),
 		);
 	}
 	
@@ -196,6 +196,7 @@ class Page extends CActiveRecord
 			'description' => 'Описание',
 			'order' => 'Order',
 			'active' => 'Включено',
+            'redirect' => 'Переадресация',
 		);
 	}
 	
@@ -225,7 +226,13 @@ class Page extends CActiveRecord
 					'type'=>'textarea',
 					'rows'=>4,
 					'cols'=>40
-				)
+				),
+                Form::tab('Дополнительно'),
+                'redirect'=>array(
+                    'type'=>'Link',
+                    'showFileManagerButton'=>false,
+                    'showUploadButton'=>false
+                )
 			),
 			'buttons'=>array(
 				'save'=>array(

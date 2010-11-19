@@ -11,7 +11,7 @@ class SiteSettingsForm extends CFormModel
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('simpleMode', 'boolean')
+			array('simpleMode, autoSave', 'boolean')
         );
     }
     
@@ -22,6 +22,7 @@ class SiteSettingsForm extends CFormModel
             'adminEmail' => 'E-mail администратора',
             'defaultsPerPage' => 'Количество объектов на одной странице, по-умолчанию',
 			'simpleMode' => 'Упрощенный режим управления сайтом',
+            'autoSave' => 'Автосохранение при редактировании',
 		);
 	}
 
@@ -48,6 +49,9 @@ class SiteSettingsForm extends CFormModel
 				'simpleMode'=>array(
 					'type'=>'checkbox',
 				),
+                'autoSave'=>array(
+                    'type'=>'checkbox'
+                )
             ),
         );
     }
@@ -56,41 +60,31 @@ class SiteSettingsForm extends CFormModel
 	public function __get($name)
 	{
 		if(isset($this->_attributes[$name]))
-				return $this->_attributes[$name];
-		else
-				return parent::__get($name);
+            return $this->_attributes[$name];
 	}
 
 	public function __set($name,$value)
 	{
-		if($this->setAttribute($name,$value)===false)
-		{
-			parent::__set($name,$value);
-		}
+		$this->setAttribute($name,$value);
 	}
 
 	public function __isset($name)
 	{
-		if(isset($this->_attributes[$name]))
-			return true;
-		else
-			return parent::__isset($name);
+		return isset($this->_attributes[$name]);
 	}
 
 	public function __unset($name)
 	{
 		if(isset($this->_attributes[$name]))
 			unset($this->_attributes[$name]);
-		else
-			parent::__unset($name);
 	}
 	
 	public function setAttribute($name,$value)
 	{
 		if(property_exists($this,$name))
-				$this->$name=$value;
-		else 
-				$this->_attributes[$name]=$value;
+    		$this->$name=$value;
+		else
+			$this->_attributes[$name]=$value;
 		return true;
 	}
 	

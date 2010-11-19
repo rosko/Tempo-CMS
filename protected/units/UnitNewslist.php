@@ -19,7 +19,7 @@ class UnitNewslist extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id, rule', 'required'),
+			array('unit_id', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('rule', 'length', 'max'=>255),
 		);
@@ -30,7 +30,7 @@ class UnitNewslist extends Content
 		return array(
 			'id' => 'ID',
 			'unit_id' => 'Unit',
-			'rule' => 'Правило'
+			'rule' => 'Какие новости отображать'
 		);
 	}
 
@@ -38,11 +38,10 @@ class UnitNewslist extends Content
 	{
 		return array(
 			'elements'=>array(
-				'rule'=>array(
-					'type'=>'text',
-					'maxlength'=>255,
-					'size'=>30
-				),
+				'rule'=> array(
+                    'type' => 'Scopes',
+                    'className' => 'UnitNewsitem'
+                )
 			),
 		);
 	}

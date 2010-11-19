@@ -60,8 +60,16 @@ class PageController extends Controller
 		if (!isset($_GET['id'])) {
 			$_GET['id'] = 1;
 		}
+        $this->loadModel();
+        if ($this->_model->redirect) {
+            if (Yii::app()->user->isGuest)
+                $this->redirect($this->_model->redirect);
+            else
+                Yii::app()->user->setFlash('redirect-permanent-hint', 'На странице настроена переадресация на <a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>');
+        }
+
 		$this->render('view',array(
-			'model'=>$this->loadModel()
+			'model'=>$this->_model
 		));
 	}
 
@@ -91,10 +99,12 @@ class PageController extends Controller
 					$page->fill();
 					
 					if ($form->submitted('go')) {
+                        $url = $this->createAbsoluteUrl('page/view', array('id'=>$page->id));
 						echo CJavaScript::jsonEncode(array(
-                            'url' => $this->createAbsoluteUrl('page/view', array('id'=>$page->id)),
+                            'url' => $url,
                             'id' => $page->id,
                         ));
+                        Yii::app()->user->setFlash('add', 'Страница успешно создана');
 						Yii::app()->end();
 					}
 				}
@@ -177,7 +187,10 @@ class PageController extends Controller
 			$page = $form->model;
 			if ($form->validate()) {
 				$page->path = '';
-				$page->save(false);
+				if ($page->save(false))
+                    Yii::app()->user->setFlash('save', 'Свойства страницы успешно сохранены.');
+                else
+                    Yii::app()->user->setFlash('save-error-permanent', 'При сохранении страницы произошла какая-то ошибка');
 			}
 		} elseif ($form->submitted('delete')) {
 			$page = $form->model;
@@ -186,6 +199,7 @@ class PageController extends Controller
 				$parent_id = $page->parent_id ? $page->parent_id : 1;
 				echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$parent_id))));
 				$page->delete();
+                Yii::app()->user->setFlash('delete', 'Страница успешно удалена.');
 				Yii::app()->end();
 			}
 		}
@@ -368,6 +382,12 @@ class PageController extends Controller
         } else return false;
 		$unit_form_array = $unit_class::form();
 		$unit_form_array['type'] = 'form';
+        $show_title = true;
+        if (isset($unit_form_array['title'])) {
+            if ($unit_form_array['title'] === false)
+                $show_title = false;
+            unset($unit_form_array['title']);
+        }
         //  В окно редактирования свойств подключаем диалог для управления размещением
 //        if (isset($pageunit)) {
 //            $unit_form_array['elements'][] = Form::tab('Размещение', '/?r=page/unitSetDialog&id='.$pageunit->page_id.'&unit_id='.$pageunit->unit_id.'&pageunit_id='.$pageunit->id);
@@ -412,7 +432,7 @@ class PageController extends Controller
             $form['unit']->model = $unit;
 		$form['content']->model = $content;
 
-        if (isset($unit)) {            
+        if (isset($unit)) {
             $this->performAjaxValidation(array($unit, $content));
         } else
             $this->performAjaxValidation($content);
@@ -437,7 +457,7 @@ class PageController extends Controller
 		$form['content']->model = $content;
 		
 		$this->layout = 'empty';
-		$this->render('form', array('form'=>$form));
+		$this->render('form', array('form'=>$form, 'show_title'=>$show_title));
 	}
 	
 	// Удаляет юнит
@@ -534,10 +554,15 @@ class PageController extends Controller
 		$form = new Form($form_array);
 		$form->model = clone Yii::app()->settings->model;
 
-        $this->performAjaxValidation($form->model);
+        $this->performAjaxValidation(Yii::app()->settings->model);
 
-		if ($form->submitted('save') && $form->model->validate()) {
-			Yii::app()->settings->saveAll($form->model->getAttributes());
+		if ($form->submitted('save')) {
+            if ($form->model->validate()) {
+                Yii::app()->settings->saveAll($form->model->getAttributes());
+            } else {
+                echo '0';
+                Yii::app()->end();
+            }
 		}
 
 		$this->layout = 'blank';

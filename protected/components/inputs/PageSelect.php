@@ -86,6 +86,23 @@ EOD;
         if (!$this->multiple) {
             $js = <<<EOD
 
+$( "<a>&nbsp;</a>" )
+    .attr( "tabIndex", -1 )
+    .attr( "title", "Show All Items" )
+    .insertAfter('#{$id}_title')
+    .button({
+        icons: {
+            primary: "ui-icon-triangle-1-s"
+        },
+        text: false
+    })
+    .removeClass( "ui-corner-all" )
+    .addClass( "ui-corner-right ui-button-icon" )
+    .click(function() {
+        $('#{$id}_title').click();
+        return false;
+    });
+
 $('#{$id}_title').click(function() {
     if ($('#{$id}_dialog').html() == '') {
         $('#{$id}_dialog').html('loading...');
@@ -109,8 +126,13 @@ $('#{$id}_title').click(function() {
                         e.stopImmediatePropagation();
                         return false;
                     }
-                }).bind('keydown', 'esc', function(e) {
+                });
+                $(document).bind('keydown', 'esc', function(e) {
                    $('#{$id}_dialog').hide().html('');
+                }).bind('click', function(e) {
+                   if (!$(e.target).parents('#{$id}_dialog').length && e.target.id != '{$id}_dialog') {
+                       $('#{$id}_dialog').hide().html('');
+                   }
                 });
                 setTimeout(function() {
                   //$('#pagetree_{$id}').jstree('select_node', '#pagetree_{$id}-1');

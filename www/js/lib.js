@@ -63,6 +63,7 @@ function ajaxSaveProcess()
                 showInfoPanel(cms_html_loading_image, 0);
             },
             success: function(ret) {
+                hideInfoPanel();
                 if (ret != 0) {
                     if ($.isFunction(cms_current_command.success)) {
                         cms_current_command.success(ret);
@@ -99,8 +100,9 @@ function ajaxSaveRepeat(timeout)
     cms_save_commands.unshift(cms_current_command);
     cms_current_command = null;
     
-    showInfoPanel('Ошибка при сохранении. Попытка через <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">Повторить сейчас</a>', timeout-1);
+    showInfoPanel('Ошибка при сохранении. Попытка через <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">Повторить сейчас</a>', timeout-1, true);
     $('#cms-info-button-repeat').click(function() {
+        hideInfoPanel();
         cms_save_timer = false;
         clearTimeout(cms_saveprocess_timer);
         ajaxSaveProcess();
@@ -133,18 +135,26 @@ function showInfoPanelTimer(timeout)
 
 // Уведомляющая надпись
 
-function showInfoPanel(html, timeout)
+function showInfoPanel(html, timeout, error)
 {
     clearTimeout(cms_infopanel_timer);
-    if (html) {
-        $('#cms-info').html(html);
+//    if (html) {
+//        $('#cms-info').html(html);
+//    }
+//    var width = $('#cms-info').width();
+//    var body_width = $('body').width();
+//    $('#cms-info').css('left',Math.round((body_width-width)/2)).slideDown();
+    var t = 'message';
+    if (error) {
+        t = 'error';
     }
-    var width = $('#cms-info').width();
-    var body_width = $('body').width();
-    $('#cms-info').css('left',Math.round((body_width-width)/2)).slideDown();
     if (timeout == null) {
         timeout = cms_infopanel_timeout;
     }
+    notify(html, {
+        type: t,
+        disappearTime: timeout
+    });
     if (timeout > 0) {
         cms_infopanel_timer = setTimeout('hideInfoPanel()', timeout*1000);
     }
@@ -152,7 +162,47 @@ function showInfoPanel(html, timeout)
 
 function hideInfoPanel()
 {
-    $('#cms-info').slideUp();
+    removeLastNotification();
+//    $('#cms-info').slideUp();
+}
+
+function notify(message, opts)
+{
+    if (opts == null) {
+        opts = {};
+    }
+    if (opts.disappearTime <= 0) {
+        opts.permanent = true;
+    }
+    $('#cms-notification').jnotifyAddMessage({
+        text: message,
+        type: opts.type,
+        showIcon: opts.showIcon,
+        permanent: opts.permanent,
+        disappearTime: opts.disappearTime*1000
+    });
+}
+
+function removeLastNotification()
+{
+    var obj = $('#cms-notification .jnotify-item:last');
+    obj.animate({ opacity: '0' }, 600, function() {
+        obj.parent().animate({ height: '0px' }, 300,
+              function() {
+                  obj.parent().remove();
+                  // IEsucks
+                  if (navigator.userAgent.match(/MSIE (\d+\.\d+);/)) {
+                      //http://groups.google.com/group/jquery-dev/browse_thread/thread/ba38e6474e3e9a41
+                      obj.parent().parent().removeClass('IEsucks');
+                  }
+                  // -------
+        });
+    });
+}
+
+function getLastNotification()
+{
+    return $('#cms-notification .jnotify-item:last').text();
 }
 
 // Панель управления юнитом (создать, удалить, вверх, вниз, редактировать)
@@ -218,7 +268,6 @@ function showSplash(elem, options) {
         },
         onClosed: function() {
             hideSplash();
-            //$('.selected').removeClass('selected');
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);
             }
@@ -234,12 +283,29 @@ function resizeSplash()
 
 function hideSplash()
 {
-    $('.selected').removeClass('selected');
+    fadeOut('.selected', 'selected');
     $('#fancybox-outer, #fancybox-inner').resizable("destroy");
     $('#fancybox-outer').removeAttr('style');
     $('#fancybox-wrap').draggable("destroy");
     $.fancybox.resize();
     $.fancybox.close();
+}
+
+function fadeIn(selector, className)
+{
+    $(selector).removeClass('hover').addClass(className);
+}
+
+function fadeOut(selector, className)
+{
+    var elems = $(selector);
+    elems.removeClass('hover');
+    elems.each(function(){
+        color1 = $(this).css('backgroundColor');
+        $(this).removeClass(className);
+        color2 = $(this).css('backgroundColor');
+        $(this).css('backgroundColor', color1).animate({backgroundColor: color2}, 1000);
+    });
 }
 
 // =============================================================
@@ -432,7 +498,7 @@ function CmsPageunitEditing()
 function pageunitEditForm(t)
 {
     var pageunit = $(t);
-    pageunit.addClass('selected');
+    fadeIn(pageunit, 'selected');
     hidePageunitPanel(t);
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
@@ -457,9 +523,11 @@ function pageunitEditForm(t)
                 draggable: true,
                 withConfirm: true,
                 onComplete: function() {
-                    $('#Unit_title').get(0).focus();
+                    if ($('#Unit_title').length)
+                        $('#Unit_title').get(0).focus();
                 },
                 onClose: function() {
+                    $('#cms-pageunit-edit').html('');
                     GetOutPageunitPanel();
                     updatePageunit(pageunit_id, '.cms-pageunit[rev='+pageunit.attr('rev')+']');
                 }
@@ -508,7 +576,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
                         CmsAreaEmptyCheck();
                     });
                 } else {
-                    $('.selected').removeClass('selected');
+                    fadeOut('.selected', 'selected');
                 }
             }
         }

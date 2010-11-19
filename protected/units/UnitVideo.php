@@ -144,7 +144,7 @@ EOD;
 
         $vs = array(
             'youtube.com' => array(
-                'pattern' => "|youtube\.com([^0-9\?\#\=]*)(\?v[=/])?(#p/u/)?([0-9]*/)?([a-zA-Z0-9]*)|msi",
+                'pattern' => "|youtube\.com([^0-9\?\#\=]*)(\?v[=/])?(#p/u/)?([0-9]*/)?([a-zA-Z0-9\-]*)|msi",
                 'match' => 5,
                 'width' => 480,
                 'height' => 385,

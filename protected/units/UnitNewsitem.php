@@ -57,18 +57,11 @@ class UnitNewsitem extends Content
 					'type'=>'VisualTextAreaFCK',
 				),
                 'newssection_id'=> !empty($newsArray) ? array(
-                    'type'=>'dropdownlist',
-                    'items'=>$newsArray,
-                    'prompt'=>'Выберите раздел',
+                    'type'=>'ComboBox',
+                    'array'=>$newsArray,
                 ) : '',
 				'date'=>array(
-					'type'=>'DatePicker',
-					'language'=>'ru',
-					'options'=> array(
-						'dateFormat'=>'yy-mm-dd',
-//						'showOtherMonths'=>'true',
-//						'selectOtherMonths'=>'true'
-					)
+					'type'=>'DateTimePicker',
 				),
                 Form::tab('Источник новости'),
 				'source'=>array(
@@ -84,6 +77,22 @@ class UnitNewsitem extends Content
 			),
 		);
 	}
+
+    public function scopesLabels()
+    {
+        return array(
+            'public' => 'Только опубликованные',
+            'imported' => 'С указанием источника',
+            'recently' => array(
+                'Самые свежие',
+                'limit' => 'Количество',
+             ),
+            'section' => array(
+                'Из раздела',
+                'newssection_id' => ''
+            )
+        );
+    }
 	
 	public function scopes()
 	{
@@ -97,6 +106,11 @@ class UnitNewsitem extends Content
 			),
 		);
 	}
+
+    public function hiddenScopes()
+    {
+        return array('public');
+    }
 	
 	public function namedScopes()
 	{
@@ -109,10 +123,16 @@ class UnitNewsitem extends Content
 						'max' => 20,
 					)
 				)
+			),
+			'section'=>array(
+				'newssection_id'=>array(
+					'type'=>'ComboBox',
+                    'array'=>UnitNewssection::getSectionsArray(),
+				)
 			)
 		);
 	}
-	
+
 	public function recently($limit=5)
 	{
 		$this->getDbCriteria()->mergeWith(array(
@@ -121,4 +141,13 @@ class UnitNewsitem extends Content
 		return $this;
 	}
 	
+    public function section($id=0)
+    {
+		$this->getDbCriteria()->mergeWith(array(
+			'condition'=>'newssection_id = :id',
+            'params' => array(':id' => $id),
+		));
+		return $this;
+    }
+
 }

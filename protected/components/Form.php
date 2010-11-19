@@ -19,7 +19,7 @@ class Form extends CForm
 			}
         });
 	});
-	</script>
+    </script>
 EOD;
         $preoutput = '<ul>';
         $counter = 0;

@@ -46,4 +46,18 @@ class UnitNewslist extends Content
 		);
 	}
 
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        if ($params['content']->rule)
+            $params['content']->rule .= '->';
+        eval("\$items = UnitNewsitem::model()->public()->{$params['content']->rule}findAll();");
+        $params['items'] = array();
+        foreach ($items as $item)
+        {
+            $params['items'][] = $item->run(array(), true);
+        }
+        return $params;
+    }
+
 }

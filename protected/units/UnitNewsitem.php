@@ -150,4 +150,16 @@ class UnitNewsitem extends Content
 		return $this;
     }
 
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        $params['unitUrl'] = $params['content']->getUnitUrl();
+        if ($params['content']->section) {
+            $params['sectionUrl'] = $params['content']->section->getUnitUrl();
+            $params['sectionTitle'] = $params['content']->section->unit->title;
+            
+        }
+        return $params;
+    }
+
 }

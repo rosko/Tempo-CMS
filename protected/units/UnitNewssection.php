@@ -81,4 +81,30 @@ class UnitNewssection extends Content
         return $ret;
     }
 
+
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        $items = UnitNewsitem::model()
+                    ->public()
+                    ->selectPage($params['content']->pageNumber, $params['content']->per_page)
+                    ->findAll('newssection_id = :id', array(':id'=>$params['content']->id));
+        
+        $params['items'] = array();
+        foreach ($items as $item)
+        {
+            $params['items'][] = $item->run(array(
+                'in_section'=>true
+            ), true);
+        }
+        $params['pager'] = $params['content']->renderPager(
+                count($items),
+                $params['content']->itemsCount,
+                $params['content']->pageNumber,
+                $params['content']->per_page);
+
+        return $params;
+    }
+
+
 }

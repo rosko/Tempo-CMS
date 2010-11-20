@@ -16,17 +16,7 @@ foreach ($units as $unit) {
 
     <div <?php if (!Yii::app()->user->isGuest) { ?>title="<?php echo $className::NAME; ?>"<?php } ?> id="cms-pageunit-<?=$unit->id?>" class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$unit->unit->type?>" rel="<?=$unit->unit->type?>" rev="<?=$unit->unit->id?>">
 
-        <?php
-            $output = $this->render('application.units.views.'.$className,
-                                           array('unit'=>$unit->unit,
-                                                 'pageunit'=>$unit,
-                                                 'content'=>$unit->unit->content,
-                                                 'page'=>$this->controller->_model), true);
-            if (trim($output) == '' && !Yii::app()->user->isGuest)  {
-                $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
-            }
-            echo $output;
-        ?>
+        <?=$unit->unit->content->run(array('pageunit'=>$unit));?>
 
     </div>
 

@@ -38,10 +38,17 @@ return array(
             'class'=>'Appearance',
             'iconsets' => include ('iconsets.php'),
             'options' => array(
-                'iconSet' => 'iconic',
+                'iconSet' => 'fatcow',
+                'iconSize' => '32x32',
             ),
         ),
-		'urlManager'=>array(
+        'viewRenderer'=>array(
+            'class'=>'application.extensions.smarty.ESmartyViewRenderer',
+            'fileExtension' => '.tpl',
+            //'pluginsDir' => 'application.smartyPlugins',
+            //'configDir' => 'application.smartyConfig',
+        ),
+        'urlManager'=>array(
 //			'urlFormat'=>'path',
             'showScriptName'=>false,
 			/*'rules'=>array(
@@ -56,7 +63,7 @@ return array(
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
-            'schemaCachingDuration' => 3600,
+            'schemaCachingDuration' => 1,
             //'enableParamLogging' => true,
 		),
 		'errorHandler'=>array(

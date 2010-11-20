@@ -1,0 +1,1 @@
+{breadcrumbs separator=$separator homeLink=$homeLink  links=$links}

@@ -199,7 +199,9 @@ EOD
 				"move_node" => false,
 				"delete_node" => false,
 				"remove" => false,
-                'hover_node'=>false
+                'hover_node'=>false,
+                'open_node'=>true,
+                'open_all'=>true
             )
         )
     ),
@@ -291,11 +293,11 @@ EOD
 function showBranch($tree, $path) {
     if ($tree)
 	foreach ($tree[$path] as $page) {
-		$data = ($page->id == 1) ?  ' rel="mainpage"' : '';
-		echo '<li id="page-' . $page->id . '" ' . $data . ' ><a rev="page" rel="'.$page->id.'" href="#'.$page->id.'"><ins>&nbsp;</ins>' . $page->title . "</a>\n";
-		if ($tree[$path.','.$page->id]) {
+		$data = ($page['id'] == 1) ?  ' rel="mainpage"' : '';
+		echo '<li id="page-' . $page['id']. '" ' . $data . ' ><a rev="page" rel="'.$page['id'].'" href="#'.$page['id'].'"><ins>&nbsp;</ins>' . $page['title'] . "</a>\n";
+		if ($tree[$path.','.$page['id']]) {
 			echo "<ul>\n";
-			showBranch($tree, $path.','.$page->id);
+			showBranch($tree, $path.','.$page['id']);
 			echo "</ul>\n";
 		}
 		echo "</li>\n";

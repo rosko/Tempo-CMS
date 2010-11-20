@@ -54,8 +54,8 @@ class Scopes extends CInputWidget
             if (in_array($k, $hidden)) continue;
             $_id = __CLASS__ . '_' . $id . '_' . $k;
             echo '<div class="row">';
-            echo CHtml::checkBox($k, $value[$k][0], array('id' => $_id, 'rev' => $k, 'class' => $id . '-scope'));
             echo CHtml::label($labels[$k], $_id);
+            echo CHtml::checkBox($k, $value[$k][0], array('id' => $_id, 'rev' => $k, 'class' => $id . '-scope'));
             echo '</div>';
         }
         foreach ($className::namedScopes() as $k => $scope)
@@ -64,10 +64,10 @@ class Scopes extends CInputWidget
             $i=0;
             $_id = __CLASS__ . '_' . $id . '_' . $k;
             echo '<div class="row">';
+            echo CHtml::label($labels[$k][0], $_id);
             echo CHtml::checkBox($k, $value[$k][0], array('id' => $_id, 'rev' => $k, 'class' => $id . '-scope',
                 'onclick' => "js:$('#{$id}_{$k}_div').slideToggle();"
                  ));
-            echo CHtml::label($labels[$k][0], $_id);
             echo "<fieldset class='{$id}_fieldset' id='{$id}_{$k}_div' style='display:".($value[$k][0]?'block':'none').";'>";
             foreach ($scope as $field => $input)
             {

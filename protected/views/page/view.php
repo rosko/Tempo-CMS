@@ -142,10 +142,6 @@ if (!Yii::app()->user->isGuest) {
             return false;
         })
 
-        $('#cms-pageunit-menu').dblclick(function() {
-            return false;
-        });
-        
         // Обработчик для выбора типа юнита при создании
         $('.cms-btn-pageunit-create').click(function() {
             var type = $(this).attr('id').replace('cms-button-create-', '');
@@ -341,6 +337,7 @@ EOD
         'iconSize' => '32x32',
         'vertical'=>true,
         'rows'=>1,
+        'dblclick' => 'js:function() { return false; }',
         'buttons'=>array(
             'add' => array(
                 'icon' => 'add',

@@ -53,6 +53,8 @@ class Appearance extends CApplicationComponent
         // Функции отображения и скрытия
         'functionShow' => "show()",
         'functionHide' => "hide()",
+        // Обработка двойного клика
+        'dblclick' => null,
     );
 
     public $iconsets = array();
@@ -95,7 +97,7 @@ class Appearance extends CApplicationComponent
             $iconSize = $this->default['iconSize'];
 
         // Если указанного набора нету в библиотеке, выбираем первый набор из списка
-        if (isset($this->iconsets[$iconSet])) {
+        if (!isset($this->iconsets[$iconSet])) {
             foreach ($this->iconsets as $k => $v) {
                 $iconSet = $k;
                 break;
@@ -109,6 +111,7 @@ class Appearance extends CApplicationComponent
         if (!in_array($iconSize, $this->iconsets[$iconSet]['sizes']))
         {
             list($w, $h) = explode('x', $iconSize);
+            $iconSize = $this->iconsets[$iconSet]['sizes'][0];
             foreach ($this->iconsets[$iconSet]['sizes'] as $v) {
                 list($_w, $_h) = explode('x', $v);
                 if ($_w <= $w || $_h <= $h)

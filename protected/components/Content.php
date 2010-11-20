@@ -98,6 +98,37 @@ class Content extends CActiveRecord
         return Yii::app()->controller->createUrl('page/view', array('id'=>$page_id));
     }
 
+    public function prepare($params)
+    {
+        $params['unit'] = $this->unit;
+        $params['content'] = $this;
+        $params['page'] = Yii::app()->controller->loadModel();
+        $params['editMode'] = !Yii::app()->user->isGuest;
+        return $params;
+    }
+
+    public function run($params=array(), $return=false)
+    {
+        $params = $this->prepare($params);
+        $className = Unit::getClassNameByUnitType($this->unit->type);
+        $params['content'] = $params['content']->attributes;
+        foreach ($params as $k => $v)
+        {
+            if ($v instanceof CModel)
+                $params[$k] = $v->attributes;
+        }
+        $output = Yii::app()->controller->renderPartial('application.units.views.'.$className,
+                           $params, true);
+        if (trim($output) == '' && $params['editMode'])  {
+            $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
+        }
+        if ($return)
+            return $output;
+        else
+            echo $output;
+        
+    }
+
 }
 
 ?>

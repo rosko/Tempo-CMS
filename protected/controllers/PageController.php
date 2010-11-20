@@ -295,18 +295,9 @@ class PageController extends Controller
 	{
 		$unit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
         $className = Unit::getClassNameByUnitType($unit->unit->type);
-		
-        $output = $this->renderPartial('application.units.views.'.$className,
-                array('unit'=>$unit->unit,
-                      'pageunit'=>$unit,
-                      'content'=>$unit->unit->content,
-                      'page'=>$this->loadModel()), true);
-        if (trim($output) == '' && !Yii::app()->user->isGuest)  {
-            $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
-        }
-        echo $output;
-
-		
+        $unit->unit->content->run(array(
+            'pageunit'=>$unit
+        ));
 	}
 	
     /*
@@ -582,8 +573,8 @@ class PageController extends Controller
 		{
 			foreach ($pages as $p)
 			{
-				if (substr_count($p->path,',') < $opened_levels)
-					$initially_open[] = 'page-'.$p->id;
+				if (substr_count($p['path'],',') < $opened_levels)
+					$initially_open[] = 'page-'.$p['id'];
 			}
 		}
 		if (Yii::app()->request->isAjaxRequest) {

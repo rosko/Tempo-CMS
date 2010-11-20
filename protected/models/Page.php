@@ -43,12 +43,14 @@ class Page extends CActiveRecord
 		);
 	}
 
-    public function childrenPages()
+    public function childrenPages($id=0)
     {
+        if ($id == 0)
+            $id = $this->id;
         $this->getDbCriteria()->mergeWith(array(
             'condition'=>'parent_id = :id',
             'params'=>array(
-                ':id' => $this->id
+                ':id' => $id
             ),
         ));
         return $this;
@@ -85,16 +87,16 @@ class Page extends CActiveRecord
 			if (!is_array($exclude)) $exclude = array($exclude);
 			$criteria['condition'] = '`id` NOT IN ('.implode(',',$exclude).')';
 		}
-		$pages = Page::model()->findAll($criteria);
+		$pages = Page::model()->getAll($criteria);
 		$tree = array();
 		foreach ($pages as $page) {
 			if ($exclude_children && !empty($exclude))
 			{
-				$ids = explode(',',$page->path);
+				$ids = explode(',',$page['path']);
 				$intersect = array_intersect($exclude, $ids);
 				if (!empty($intersect)) continue;
 			}
-			$tree[$page->path][] = $page;
+			$tree[$page['path']][] = $page;
 		}
 		return $tree;
 	}
@@ -290,5 +292,13 @@ class Page extends CActiveRecord
 		$obj->order = 0;
 		return $obj;
 	}
+
+    public function getAll($condition = '', $params = array())
+    {
+        $criteria=$this->getCommandBuilder()->createCriteria($condition,$params);
+        $this->beforeFind($criteria);
+		$this->applyScopes($criteria);
+        return $this->getCommandBuilder()->createFindCommand($this->getTableSchema(), $criteria)->queryAll();
+    }
 
 }

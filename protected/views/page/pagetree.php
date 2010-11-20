@@ -133,18 +133,18 @@ EOD
 function showBranch($tree, $path, $tree_id, $enabledOnly, $disabled) {
     if ($tree)
 	foreach ($tree[$path] as $page) {
-        $dsbl = (is_array($enabledOnly) && !in_array($page->id, $enabledOnly)) ||
-                    (is_array($disabled) && in_array($page->id, $disabled));
+        $dsbl = (is_array($enabledOnly) && !in_array($page['id'], $enabledOnly)) ||
+                    (is_array($disabled) && in_array($page['id'], $disabled));
         if ($dsbl)
         {
             $data = ' rel="disabled"';
         } else {
-            $data = ($page->id == 1) ?  ' rel="mainpage"' : '';
+            $data = ($page['id'] == 1) ?  ' rel="mainpage"' : '';
         }
-		echo '<li id="'.$tree_id.'-' . $page->id . '" ' . $data . ' ><a rev="page" rel="'.$page->id.'" href="#"><ins>&nbsp;</ins>'.($dsbl ? '<s>' : '') . $page->title .($dsbl ? '</s>' : '')."</a>\n";
-		if ($tree[$path.','.$page->id]) {
+		echo '<li id="'.$tree_id.'-' . $page['id'] . '" ' . $data . ' ><a rev="page" rel="'.$page['id'].'" href="#"><ins>&nbsp;</ins>'.($dsbl ? '<s>' : '') . $page['title'] .($dsbl ? '</s>' : '')."</a>\n";
+		if ($tree[$path.','.$page['id']]) {
 			echo "<ul>\n";
-			showBranch($tree, $path.','.$page->id, $tree_id, $enabledOnly, $disabled);
+			showBranch($tree, $path.','.$page['id'], $tree_id, $enabledOnly, $disabled);
 			echo "</ul>\n";
 		}
 		echo "</li>\n";

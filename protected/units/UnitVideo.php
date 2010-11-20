@@ -288,4 +288,15 @@ EOD;
         return false;
     }
 
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        $params['video'] = UnitVideo::getHtmlByUrl(
+            $params['content']->video,
+            $params['content']->width,
+            $params['content']->height,
+            $params['unit']->title);
+        return $params;
+    }
+
 }

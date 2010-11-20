@@ -77,29 +77,41 @@ class UnitSitemap extends Content
 		);
 	}
 
-    public static function renderPagelist($pages,$recursive=0,$length=0,$ul_class='',$li_class='',$a_class='',$p_class='') {
-        $ul_class = $ul_class ? ' class="'.$ul_class.'"' : '';
-        $li_class = $li_class ? ' class="'.$li_class.'"' : '';
-        $a_class = $a_class ? ' class="'.$a_class.'"' : '';
-        $p_class = $p_class ? ' class="'.$p_class.'"' : '';
-        $output = '';
-        if (count($pages) > 0)  {
-            $output .= '<ul'.$ul_class.'>';
-            foreach ($pages as $page) {
-                $output .= '<li'.$li_class.'><a'.$a_class.' href="'.Yii::app()->controller->createAbsoluteUrl('page/view', array('id'=>$page->id)).'">'.$page->title.'</a>';
-
-                if ($page->description && $length) {
-                    $output .= '<p'.$p_class.'>' . nl2br(substr(strip_tags($page->description),0,$length)) . '</p>';
-                }
-
-                if ($recursive>0)
-                        $output .= self::renderPagelist($page->children, $recursive-1);
-
-                $output .= '</li>';
+    public static function getTree($id, $params, $recursive=0, $start=false)
+    {
+        if ($start)
+            $items = Page::model()->order()->selectPage($params['content']->pageNumber, $params['content']->per_page)->childrenPages($id)->getAll();
+        else
+            $items = Page::model()->order()->childrenPages($id)->getAll();
+        if ($recursive > 1) {
+            foreach ($items as $k => $item)
+            {
+                $items[$k]['children'] = self::getTree($item['id'], $params, $recursive-1);
             }
-            $output .= '</ul>';
         }
-        return $output;
+        return $items;
+    }
+
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        $model = $params['content']->page_id ? Page::model()->findByPk($params['content']->page_id) : $params['page'];
+        $params['title'] = $params['unit']->title ? $params['unit']->title : $model->title;
+
+        $id = $params['content']->recursive ? $model->id : $model->parent_id;
+        $params['items'] = array();
+        if ($id)
+            $params['items'] = self::getTree($id, $params, $params['content']->recursive, true);
+
+        $params['count_items'] = count($params['items']);
+
+        $params['pager'] = $params['content']->renderPager(
+                $params['count_items'],
+                $model->childrenCount,
+                $params['content']->pageNumber,
+                $params['content']->per_page
+        );
+        return $params;
     }
 
 

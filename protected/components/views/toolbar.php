@@ -1,4 +1,11 @@
-<?php $css = ''; $js = ''; ?>
+<?php $css = ''; $js = '';
+
+if ($config['click'])
+    $js .= "$('#{$id}').click(".CJavaScript::encode($config['click']).");\n";
+if ($config['dblclick'])
+    $js .= "$('#{$id}').dblclick(".CJavaScript::encode($config['dblclick']).");\n";
+
+?>
 
 <div class="cms-panel" id="<?=$id?>" style="background-color:<?=$config['panelBackgroundColor']?>; display:none;
             border:1px solid <?=$config['panelBorderColor'];?>;
@@ -10,7 +17,7 @@
             ">
     <div style="padding:<?=ceil($width/10)?>px <?=ceil($height/10)?>px;">
 
-    <ul style="margin:0px;padding:0px;clear:both;">
+    <ul style="margin:0px;padding:0px;clear:both;list-style-type:none;">
 <?php if (is_array($config['buttons'])) {
 
 if ($config['vertical']) {
@@ -26,6 +33,8 @@ $i=0;
 $i++;
 $url = Yii::app()->appearance->getIconUrlByAlias($button['icon'], '', $config['iconSet'], $config['iconSize']);
 $hover = Yii::app()->appearance->getIconUrlByAlias($button['icon'], 'hover', $config['iconSet'], $config['iconSize']);
+if (!$hover) { $hover = $url; }
+$incss = ($hover == $url) ? 'background-color: '. $config['buttonBorderColor'] . ';' : '';
 $_tmp = ceil($width/10);
 if ($_tmp < 6) $_tmp = 6;
 $css .= <<<EOD
@@ -40,6 +49,7 @@ $css .= <<<EOD
     }
     #{$id}_{$name}:hover {
         background-image:url('{$hover}');
+        {$incss}
         border:1px solid {$config['buttonBorderColor']};
     }
 EOD;
@@ -51,7 +61,7 @@ if ($button['click'])
         <li style="margin:<?=ceil($width/10)?>px;float:left;"><a id="<?=$id?>_<?=$name?>" title="<?=$button['title']?>" href="#"></a></li>
 <?php
 if ($nl == $i) {
-    echo '</ul><ul style="margin:0px;padding:0px;clear:both;">';
+    echo '</ul><ul style="margin:0px;padding:0px;clear:both;list-style-type:none;">';
     $i=0;
 }
 ?>

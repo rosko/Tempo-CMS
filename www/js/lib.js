@@ -17,9 +17,6 @@ var cms_current_command = null;
 
 var cms_save_commands = new Array();
 
-var pageunit_dragging = false;
-
-
 function CmsCommand(url, data, method, success)
 {
     this.url = url;
@@ -138,12 +135,6 @@ function showInfoPanelTimer(timeout)
 function showInfoPanel(html, timeout, error)
 {
     clearTimeout(cms_infopanel_timer);
-//    if (html) {
-//        $('#cms-info').html(html);
-//    }
-//    var width = $('#cms-info').width();
-//    var body_width = $('body').width();
-//    $('#cms-info').css('left',Math.round((body_width-width)/2)).slideDown();
     var t = 'message';
     if (error) {
         t = 'error';
@@ -163,7 +154,6 @@ function showInfoPanel(html, timeout, error)
 function hideInfoPanel()
 {
     removeLastNotification();
-//    $('#cms-info').slideUp();
 }
 
 function notify(message, opts)
@@ -203,38 +193,6 @@ function removeLastNotification()
 function getLastNotification()
 {
     return $('#cms-notification .jnotify-item:last').text();
-}
-
-// Панель управления юнитом (создать, удалить, вверх, вниз, редактировать)
-
-function showPageunitPanel(pageunit)
-{
-    if (!pageunit_dragging) {
-        var position = $(pageunit).position();
-        var width = $('#cms-pageunit-menu').width();
-        var left = position.left-width;
-        if (left < 0) {
-            left = 0;
-        }
-        $('#cms-pageunit-menu').prependTo($(pageunit)).css({
-            'position': 'absolute',
-            'left': left,
-            'top': position.top-10
-        }).show();
-        width = $('#cms-pageunit-menu').width();
-        left = position.left-width;
-        $('#cms-pageunit-menu').css('left', left);
-    }
-}
-
-function hidePageunitPanel()
-{
-    $('#cms-pageunit-menu').hide();
-}
-
-function GetOutPageunitPanel()
-{
-    $('#cms-pageunit-menu').appendTo('body');
 }
 
 // Диалоговое окно
@@ -411,7 +369,6 @@ function ajaxSubmitForm(form, data, hasError)
             var pageunit_id = form.attr('rel');
             if (pageunit_id != undefined) {
                 var pageunit = $('#cms-pageunit-'+pageunit_id);
-                GetOutPageunitPanel();
                 var unit_id = pageunit.attr('rev');
                 //alert(pageunit.attr('rev'));
                 updatePageunit(pageunit_id, '.cms-pageunit[rev='+unit_id+']');
@@ -448,48 +405,35 @@ function ajaxSubmitForm(form, data, hasError)
 // =============================================================
 
 
-function CmsPageunitHovering()
-{
-    $('.cms-pageunit').unbind('mouseenter').unbind('mouseleave').mouseenter(function() {
-        $(this).addClass('hover');
-        showPageunitPanel(this);
-    }).mouseleave(function() {
-        $(this).removeClass('hover');
-        hidePageunitPanel(this);
-    });    
-}
-
 function CmsAreaEmptyCheck()
 {
     $('.cms-area').each(function() {
         if ($(this).find('.cms-pageunit').length > 0) {
             $(this).find('.cms-empty-area-buttons').remove();
         } else {
-            $(this).html('<div class="cms-empty-area-buttons"><a class="cms-button-medium cms-button-add cms-btn-pageunit-add" title="Добавить еще один блок" href="#"></a></div>');
+            var btn = $('<a class="cms-button w200" title="Добавить еще один блок" href="#">Добавить блок</a>')
+                .click(function() {
+                    pageunitAddForm(this);
+                    return false;
+                });
+            $(this).html('').append($('<div class="cms-empty-area-buttons"></div>').append(btn));
         }
     });    
 }
 
-function CmsPageunitDisabling()
+function pageunitAddForm(t)
 {
-    CmsAreaEmptyCheck();
-//    $('.cms-pageunit a').unbind('click').click(function(){
-//        return false;
-//    });    
-}
-
-function CmsPageunitEnabling()
-{
-//    $('.cms-pageunit a').unbind('click');
-}
-
-function CmsPageunitEditing()
-{
-    $('.cms-pageunit').unbind('dblclick').dblclick(function() {
-        clearSelection();
-        pageunitEditForm(this);
-        return false;
-    })    
+    var pageunit = $(t).parents('.cms-pageunit');
+    if (pageunit.length) {
+        pageunit  = pageunit.eq(0);
+        var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+    } else {
+        var pageunit_id = '0';
+    }
+    var area_name = $(t).parents('.cms-area').eq(0).attr('id').replace('cms-area-','');
+    $('#cms-pageunit-add').find('.cms-btn-pageunit-create').attr('rel', area_name);
+    $('#cms-pageunit-add').find('.cms-btn-pageunit-create').attr('rev', pageunit_id);
+    showSplash($('#cms-pageunit-add'));
 }
 
 // =============================================================
@@ -499,7 +443,6 @@ function pageunitEditForm(t)
 {
     var pageunit = $(t);
     fadeIn(pageunit, 'selected');
-    hidePageunitPanel(t);
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
     $.ajax({
@@ -528,7 +471,6 @@ function pageunitEditForm(t)
                 },
                 onClose: function() {
                     $('#cms-pageunit-edit').html('');
-                    GetOutPageunitPanel();
                     updatePageunit(pageunit_id, '.cms-pageunit[rev='+pageunit.attr('rev')+']');
                 }
             });
@@ -571,7 +513,6 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
                 if (confirm('Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.'))
                 {
                     ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
-                        GetOutPageunitPanel();
                         $('#cms-pageunit-'+pageunit_id).remove();
                         CmsAreaEmptyCheck();
                     });
@@ -593,7 +534,7 @@ function updatePageunit(pageunit_id, selector, onSuccess)
         cache: false,
         success: function(html) {
             $(selector).html(html);
-            CmsPageunitDisabling();
+            CmsAreaEmptyCheck();
             if ($.isFunction(onSuccess)) {
                 onSuccess(html);
             }
@@ -625,7 +566,6 @@ function pageunitSetDialog(page_id, pageunit_id, unit_id)
 function pageAddForm()
 {
     var page_id = $('body').attr('rel');
-    hidePageunitPanel();
     $.ajax({
         url:'/?r=page/pageAdd&id='+page_id,
         cache: false,
@@ -658,7 +598,6 @@ function pageAddForm()
 function pageEditForm()
 {
     var page_id = $('body').attr('rel');
-    hidePageunitPanel();
     $.ajax({
         url:'/?r=page/pageForm&id='+page_id,
         cache: false,

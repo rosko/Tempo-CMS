@@ -50,13 +50,15 @@ class PageController extends Controller
 	// Отображает страницу
 	public function actionView()
 	{
+/*
+ * TODO: Доделать перемещение блоков, бывают некритические ошибки
         $ret = PageUnit::checkIntegrity();
         if ($ret['percents'] > 0) {
             echo '<pre>';
             print_r ($ret);
             echo '</pre>';
         }
-
+*/
 		if (!isset($_GET['id'])) {
 			$_GET['id'] = 1;
 		}

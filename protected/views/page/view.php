@@ -96,7 +96,7 @@ if (!Yii::app()->user->isGuest) {
             connectWith: '.cms-area',
             placeholder: 'cms-pageunit-highlight',
             revert: true,
-            opacity:0.8,
+            opacity:1,
             forcePlaceholderSize:true,
             cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
             update:function(event, ui) {
@@ -113,8 +113,7 @@ if (!Yii::app()->user->isGuest) {
                 }
             },
             start:function(event, ui) {
-                hidePageunitPanel(ui.item);
-                pageunit_dragging = true;
+                $(ui.helper).find('.cms-panel').hide();
                 $('.cms-area').addClass('potential');
                 $('.cms-area').each(function() {
                     if ($(this).find('.cms-pageunit').length == 0)
@@ -123,8 +122,6 @@ if (!Yii::app()->user->isGuest) {
                 CmsAreaEmptyCheck();
             },
             stop:function(event, ui) {
-                pageunit_dragging = false;
-                showPageunitPanel(ui.item);
                 $('.cms-area').removeClass('potential').removeClass('cms-empty-area');
                 CmsAreaEmptyCheck();
             }
@@ -132,28 +129,20 @@ if (!Yii::app()->user->isGuest) {
         
         $('.cms-pageunit').css('cursor', 'move');
         
-        CmsPageunitDisabling();
-        CmsPageunitHovering();
-        CmsPageunitEditing();
+        CmsAreaEmptyCheck();
+        $('.cms-pageunit').live('mouseenter', function() {
+            $(this).addClass('hover');
+        }).live('mouseleave', function() {
+            $(this).removeClass('hover');
+        });
+
+        $('.cms-pageunit').live('dblclick', function() {
+            clearSelection();
+            pageunitEditForm(this);
+            return false;
+        })
 
         $('#cms-pageunit-menu').dblclick(function() {
-            return false;
-        });
-        
-        // Обработчик нажатия кнопки "Добавить юнит"
-        $('.cms-btn-pageunit-add').live('click', function() {
-            var pageunit = $(this).parents('.cms-pageunit');
-            if (pageunit.length) {
-                pageunit  = pageunit.eq(0);
-                hidePageunitPanel(pageunit);
-                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-            } else {
-                var pageunit_id = '0';
-            }
-            var area_name = $(this).parents('.cms-area').eq(0).attr('id').replace('cms-area-','');
-            $('#cms-pageunit-add').find('.cms-btn-pageunit-create').attr('rel', area_name);
-            $('#cms-pageunit-add').find('.cms-btn-pageunit-create').attr('rev', pageunit_id);
-            showSplash($('#cms-pageunit-add'));
             return false;
         });
         
@@ -165,7 +154,6 @@ if (!Yii::app()->user->isGuest) {
             var page_id = {$model->id};
             var url = '/?r=page/unitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
             ajaxSave(url, '', 'GET', function(id) {
-                GetOutPageunitPanel();
                 hideSplash();
                 id = jQuery.parseJSON(id);
                 if (pageunit_id != '0') {
@@ -177,9 +165,7 @@ if (!Yii::app()->user->isGuest) {
                 
                 var orig_bg = $('#cms-pageunit-'+id.pageunit_id).css('backgroundColor');
                 $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id, function() {
-                    CmsPageunitHovering();
-                    CmsPageunitDisabling();
-                    CmsPageunitEditing();
+                    CmsAreaEmptyCheck();
                 }).css('backgroundColor', '#FFFF00');
                 $('#cms-pageunit-'+id.pageunit_id).animate({
                     backgroundColor: orig_bg
@@ -190,162 +176,11 @@ if (!Yii::app()->user->isGuest) {
             });
             return false;
         });
-
         
-        // Обработчик нажатия кнопки "Удалить юнит"
-        $('.cms-btn-pageunit-delete').click(function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            hidePageunitPanel(pageunit);
-            fadeIn(pageunit, 'selected');
-            pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Переместить юнит выше"
-        $('.cms-btn-pageunit-moveup').click(function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            if (pageunit.prev().length) {
-                pageunit.insertBefore(pageunit.prev());
-                showPageunitPanel(pageunit);
-                area = getAreaByPageunit(pageunit);
-                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
-            }
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Переместить юнит ниже"
-        $('.cms-btn-pageunit-movedown').click(function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            if (pageunit.next().length) {
-                pageunit.insertAfter(pageunit.next());
-                showPageunitPanel(pageunit);
-                area = getAreaByPageunit(pageunit);
-                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
-            }
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Размещение блока на других страницах"
-        $('.cms-btn-pageunit-set').click(function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            fadeIn(pageunit, 'selected');
-            var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-            var unit_id = pageunit.attr('rev');
-            pageunitSetDialog({$model->id}, pageunit_id, unit_id);
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Редактировать свойства юнита"
-        $('.cms-btn-pageunit-edit').click(function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            pageunitEditForm(pageunit);
-            return false;
-        });
-
-
-        // Обработчик нажатия кнопки "Редактировать свойства страницы"
-        $('.cms-btn-page-edit').click(function(){
-            pageEditForm();
-            return false;
-        });
-        
-        // Обработчик нажатия кнопки "Добавить страницу"
-        $('.cms-btn-page-add').click(function(){
-            pageAddForm();
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Файлменеджер"
-        $('.cms-btn-filemanager').click(function(){
-            var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html';
-            window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
-            return false;
-        });
-        
-        // Обработчик нажатия кнопки "Редактировать настроки сайта"
-        $('.cms-btn-settings').click(function(){
-            hidePageunitPanel();
-            $.ajax({
-                url: '/?r=page/siteSettings',
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit').html(html);
-                    $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
-                        $(this).parents('form').attr('rev', $(this).attr('name'));
-                    });                    
-                    showSplash($('#cms-page-edit'), {
-                        draggable: true,
-                        resizable: true
-                    });
-                }
-            });
-            return false;
-        });
-
-        // Обработчик нажатия кнопки "Карта сайта"
-        $('.cms-btn-sitemap').click(function(){
-            hidePageunitPanel();
-            var page_id = {$model->id};
-            $.ajax({
-                url: '/?r=page/siteMap&id='+page_id,
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);                    
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit').html(html);
-                    showSplash($('#cms-page-edit'), {
-                        resizable: true,
-                        draggable: true
-                    });
-                }
-            });
-            return false;
-        });
-        
-        // Обработчик нажатия кнопки "Выход из режима редактирования"
-        $('.cms-btn-exit').click(function(){
-            if (confirm('Действительно выйти из режима управления сайтом?')) {
-                location.href = '{$this->createUrl('site/logout')}';
-            }
-            return false;
-        });
-        
-        // Отображение тулбара
-        var body_width = $('body').width();
-        var body_height = $('body').height();
-        var toolbar_width = $('#cms-toolbar').width();
-        var cms_toolbar_top = $.cookie('cms_toolbar_top') ? $.cookie('cms_toolbar_top') : '20';
-        var cms_toolbar_left = $.cookie('cms_toolbar_left') ? $.cookie('cms_toolbar_left') : body_width-toolbar_width-40;
-        if (cms_toolbar_top > body_height-30) { cms_toolbar_top = body_height - 30; }
-        if (cms_toolbar_left > body_width-30) { cms_toolbar_left = body_width - 30 }
-        $('#cms-toolbar').appendTo('body').show().draggable({
-            stop: function(event, ui) {
-                $.cookie('cms_toolbar_top', ui.offset.top, { expires: 30, path: '/'});
-                $.cookie('cms_toolbar_left', ui.offset.left, { expires: 30, path: '/'});
-            }
-        }).css({
-            position:'fixed',
-            left:cms_toolbar_left+'px',
-            top:cms_toolbar_top+'px',
-            width:'92px',
-            'z-index': 1000
-        });
-
         // Отображение диалога "Заполнить страницу" на пустой странице
         if ($('.pageunit').length == 0)
         {
             var page_id = $('body').attr('rel');
-            hidePageunitPanel();
             $.ajax({
                 url: '/?r=page/pageFill&id='+page_id,
                 type: 'GET',
@@ -383,34 +218,216 @@ EOD
     
     }
 
+/*
+ * Общая панель инструментов для всего сайта
+ */
+    echo Yii::app()->appearance->toolbar(array(
+        'id' => 'toolbar',
+        'location' => array(
+            'selector' => 'body',
+            'position' => array('absolute', 'top', 'right'),
+            'show' => 'always',
+            'draggable' => true,
+            //'resizable' => true,
+            'save' => true,
+        ),
+        'vertical'=>true,
+        'rows'=>2,
+        'buttons'=>array(
+            'edit' => array(
+                'icon' => 'edit',
+                'title' => 'Свойства страницы',
+                'click' => 'js:function(){ pageEditForm(); return false; }',
+            ),
+            'settings' => array(
+                'icon' => 'settings',
+                'title' => 'Настройки всего сайта',
+                'click' => <<<EOD
+js:function(){
+            $.ajax({
+                url: '/?r=page/siteSettings',
+                type: 'GET',
+                cache: false,
+                beforeSend: function() {
+                    showInfoPanel(cms_html_loading_image, 0);
+                },
+                success: function(html) {
+                    hideInfoPanel();
+                    $('#cms-page-edit').html(html);
+                    $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
+                        $(this).parents('form').attr('rev', $(this).attr('name'));
+                    });
+                    showSplash($('#cms-page-edit'), {
+                        draggable: true,
+                        resizable: true
+                    });
+                }
+            });
+            return false;
+        }
+EOD
+            ),
+            'pageadd' => array(
+                'icon' => 'add',
+                'title' => 'Создать новую страницу',
+                'click' => 'js:function() { pageAddForm(); return false; }',
+            ),
+            'sitemap' => array(
+                'icon' => 'sitemap',
+                'title' => 'Карта сайта',
+                'click' => <<<EOD
+js:function(){
+            var page_id = {$model->id};
+            $.ajax({
+                url: '/?r=page/siteMap&id='+page_id,
+                type: 'GET',
+                cache: false,
+                beforeSend: function() {
+                    showInfoPanel(cms_html_loading_image, 0);
+                },
+                success: function(html) {
+                    hideInfoPanel();
+                    $('#cms-page-edit').html(html);
+                    showSplash($('#cms-page-edit'), {
+                        resizable: true,
+                        draggable: true
+                    });
+                }
+            });
+            return false;
+        }
+EOD
+            ),
+            'filemanager' => array(
+                'icon' => 'files',
+                'title' => 'Хранилище файлов',
+                'click' => <<<EOD
+js:function(){
+            var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html';
+            window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
+            return false;
+}
+EOD
+            ),
+            'exit' => array(
+                'icon' => 'exit',
+                'title' => 'Выход',
+                'click' => <<<EOD
+js:function(){
+            if (confirm('Действительно выйти из режима управления сайтом?')) {
+                location.href = '{$this->createUrl('site/logout')}';
+            }
+            return false;
+        }
+EOD
+            ),
+        ),
+    ));
+
+/*
+ * Панель инструментов для блоков
+ */
+    echo Yii::app()->appearance->toolbar(array(
+        'id' => 'pageunitpanel',
+        'location' => array(
+            'selector' => '.cms-pageunit',
+            'position' => array('outter', 'left', 'top'),
+            'show' => 'hover',
+            'draggable' => false,
+            //'resizable' => true,
+            //'save' => true,
+        ),
+        'zIndex' => 1010,
+        'iconSize' => '32x32',
+        'vertical'=>true,
+        'rows'=>1,
+        'buttons'=>array(
+            'add' => array(
+                'icon' => 'add',
+                'title' => 'Добавить еще один блок',
+                'click' => <<<EOD
+js:function() {
+            pageunitAddForm(this);
+            return false;
+        }
+EOD
+            ),
+            'edit' => array(
+                'icon' => 'edit',
+                'title' => 'Редактировать',
+                'click' => <<<EOD
+js:function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            pageunitEditForm(pageunit);
+            return false;
+        }
+EOD
+            ),
+            'move' => array(
+                'icon' => 'move',
+                'title' => 'Размещение блока на других страницах',
+                'click' => <<<EOD
+js:function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            fadeIn(pageunit, 'selected');
+            var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+            var unit_id = pageunit.attr('rev');
+            pageunitSetDialog({$model->id}, pageunit_id, unit_id);
+            return false;
+        }
+EOD
+            ),
+            'up' => array(
+                'icon' => 'up',
+                'title' => 'Переместить выше',
+                'click' => <<<EOD
+js:function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            if (pageunit.prev().length) {
+                pageunit.insertBefore(pageunit.prev());
+                area = getAreaByPageunit(pageunit);
+                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
+            }
+            return false;
+        }
+EOD
+            ),
+            'down' => array(
+                'icon' => 'down',
+                'title' => 'Переместить ниже',
+                'click' => <<<EOD
+js:function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            if (pageunit.next().length) {
+                pageunit.insertAfter(pageunit.next());
+                area = getAreaByPageunit(pageunit);
+                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
+            }
+            return false;
+        }
+EOD
+            ),
+            'delete' => array(
+                'icon' => 'delete',
+                'title' => 'Удалить этот блок',
+                'click' => <<<EOD
+js:function() {
+            var pageunit = $(this).parents('.cms-pageunit').eq(0);
+            fadeIn(pageunit, 'selected');
+            pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
+            return false;
+        }
+EOD
+            ),
+        )
+    ));
+
+
 ?>
 
-    <div id="cms-toolbar" class="cms-panel cms-toolbar cms-splash">
-        <ul>
-            <li><a class="cms-button-medium cms-button-medium-edit cms-btn-page-edit" title="Свойства страницы" href="#"></a></li>
-            <li><a class="cms-button-medium cms-button-medium-add cms-btn-page-add" title="Создать новую страницу" href="#"></a></li>
-            <li><a class="cms-button-medium cms-button-medium-files cms-btn-filemanager" title="Хранилище файлов" href="#"></a></li>
-        </ul>
-        <ul>
-            <li><a class="cms-button-medium cms-button-medium-settings cms-btn-settings" title="Настройки всего сайта" href="#"></a></li>
-            <li><a class="cms-button-medium cms-button-medium-sitemap cms-btn-sitemap" title="Карта сайта" href="#"></a></li>
-            <li><a class="cms-button-medium cms-button-medium-exit  cms-btn-exit" title="Выход" href="#"></a></li>
-        </ul>
-    </div>
-
-
 <div class="hidden">
-    <div id="cms-pageunit-menu" class="cms-panel cms-pageunit-menu">
-        <ul>
-            <li><a class="cms-button-big cms-button-add cms-btn-pageunit-add" title="Добавить еще один блок" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-edit cms-btn-pageunit-edit" title="Редактировать" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-move cms-btn-pageunit-set" title="Размещение блока на других страницах" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-up cms-btn-pageunit-moveup" title="Переместить выше" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-down cms-btn-pageunit-movedown" title="Переместить ниже" href="#"></a></li>
-            <li><a class="cms-button-big cms-button-delete cms-btn-pageunit-delete" title="Удалить этот блок" href="#"></a></li>
-        </ul>
-    </div>
-
 
     <div id="cms-pageunit-add" class="cms-splash">
         <h3>Добавить блок</h3>
@@ -452,9 +469,6 @@ EOD
     <div id="cms-dialog">
     </div>
 </div>
-
-
-<div class="top fixed cms-panel" id="cms-info"></div>
 
 <?php
 }

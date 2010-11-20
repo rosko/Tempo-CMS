@@ -244,7 +244,7 @@ div.search-form
 }
 .cms-pageunit-menu li {
 	display:block;
-	margin:6px 12px;	
+	margin:6px 9px;
 }
 .cms-pageunit-menu li a {
 	line-height:0px;
@@ -315,85 +315,6 @@ div.search-form
 	/*background-position:7px 7px;*/
 	padding:7px 5px 5px 7px;
 }
-.cms-button-add {
-	background-image:url('/images/icons/iconic/light_gray/plus_32x32.png');
-}
-.cms-button-add:hover {
-	background-image:url('/images/icons/iconic/cyan/plus_32x32.png');
-}
-.cms-button-delete {
-	background-image:url('/images/icons/iconic/light_gray/trash_stroke_32x32.png');
-}
-.cms-button-delete:hover {
-	background-image:url('/images/icons/iconic/cyan/trash_stroke_32x32.png');
-}
-.cms-button-up {
-	background-image:url('/images/icons/iconic/light_gray/arrow_up_32x32.png');
-}
-.cms-button-up:hover {
-	background-image:url('/images/icons/iconic/cyan/arrow_up_32x32.png');
-}
-.cms-button-down {
-	background-image:url('/images/icons/iconic/light_gray/arrow_down_32x32.png');
-}
-.cms-button-down:hover {
-	background-image:url('/images/icons/iconic/cyan/arrow_down_32x32.png');
-}
-.cms-button-move {
-	background-image:url('/images/icons/iconic/light_gray/move_alt1_32x32.png');
-}
-.cms-button-move:hover {
-	background-image:url('/images/icons/iconic/cyan/move_alt1_32x32.png');
-}
-.cms-button-edit {
-	background-image:url('/images/icons/iconic/light_gray/cog_32x32.png');
-}
-.cms-button-edit:hover {
-	background-image:url('/images/icons/iconic/cyan/cog_32x32.png');
-}
-
-.cms-button-medium-editmode {
-	background-image:url('/images/icons/iconic/light_gray/cursor_24x24.png');	
-}
-.cms-button-medium-editmode:hover {
-	background-image:url('/images/icons/iconic/cyan/cursor_24x24.png');	
-}
-.cms-button-medium-edit {
-	background-image:url('/images/icons/iconic/light_gray/cog_24x24.png');
-}
-.cms-button-medium-edit:hover {
-	background-image:url('/images/icons/iconic/cyan/cog_24x24.png');	
-}
-.cms-button-medium-add {
-	background-image:url('/images/icons/iconic/light_gray/plus_24x24.png');	
-}
-.cms-button-medium-add:hover {
-	background-image:url('/images/icons/iconic/cyan/plus_24x24.png');	
-}
-.cms-button-medium-settings {
-	background-image:url('/images/icons/iconic/light_gray/equalizer_24x24.png');	
-}
-.cms-button-medium-settings:hover {
-	background-image:url('/images/icons/iconic/cyan/equalizer_24x24.png');	
-}
-.cms-button-medium-sitemap {
-	background-image:url('/images/icons/iconic/light_gray/calendar_alt_stroke_24x24.png');	
-}
-.cms-button-medium-sitemap:hover {
-	background-image:url('/images/icons/iconic/cyan/calendar_alt_stroke_24x24.png');	
-}
-.cms-button-medium-files {
-	background-image:url('/images/icons/iconic/light_gray/folder_stroke_24x24.png');	
-}
-.cms-button-medium-files:hover {
-	background-image:url('/images/icons/iconic/cyan/folder_stroke_24x24.png');	
-}
-.cms-button-medium-exit {
-	background-image:url('/images/icons/iconic/light_gray/x_21x21.png');	
-}
-.cms-button-medium-exit:hover {
-	background-image:url('/images/icons/iconic/cyan/x_21x21.png');	
-}
 
 .hidden {
 	display:none;
@@ -409,23 +330,6 @@ form input, form label, form select {
 }
 .hover {
 	background-color:rgb(244, 255, 244) !important;
-}
-
-.cms-toolbar {
-	display: block !important;
-	position:fixed;
-	right:10px;
-	top:20px;
-	width:92px;
-	padding:5px 10px;
-	cursor:move;
-}
-#cms-toolbar ul {
-	float:left;
-	margin:0px;
-}
-#cms-toolbar ul li {
-	margin:8px 4px;
 }
 
 input.cms-button,

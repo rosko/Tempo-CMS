@@ -75,7 +75,7 @@ EOD
                         'name'=>'title',
                         'type'=>'raw',
                         'header'=>'Название',
-                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"Редактировать", "ondblclick"=>""))',
+                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"Редактировать", "ondblclick"=>""))',
                     ),
                 ),
                 $this->columns,
@@ -90,7 +90,7 @@ EOD
                                 'visible' => '$data->unit',
                             ),
                             'update'=>array(
-                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\')"',
+                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\');"',
                             ),
                             'del'=>array(
                                 'label'=>'Удалить',

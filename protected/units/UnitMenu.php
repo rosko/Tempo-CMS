@@ -19,8 +19,8 @@ class UnitMenu extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id, items', 'required'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+			array('unit_id', 'required'),
+			array('unit_id, recursive', 'numerical', 'integerOnly'=>true),
 		);
 	}
 
@@ -30,6 +30,7 @@ class UnitMenu extends Content
 			'id' => 'ID',
 			'unit_id' => 'Unit',
 			'items' => 'Items',
+            'recursive' => 'Количество уровней',
 		);
 	}
 
@@ -37,6 +38,14 @@ class UnitMenu extends Content
 	{
 		return array(
 			'elements'=>array(
+				'recursive'=>array(
+					'type'=>'Slider',
+					'options'=>array(
+						'min' => 1,
+						'max' => 10,
+					)
+				),
+                'Если выбран 0, то отображаются соседние страницы',
 /*				'items'=>array(
 					'type'=>'textarea',
 					'rows'=>7,
@@ -45,4 +54,13 @@ class UnitMenu extends Content
 			),
 		);
 	}
+
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        $params['tree'] = Page::model()->getTree();
+
+        return $params;
+    }
+
 }

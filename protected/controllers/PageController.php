@@ -67,7 +67,7 @@ class PageController extends Controller
             if (Yii::app()->user->isGuest)
                 $this->redirect($this->_model->redirect);
             else
-                Yii::app()->user->setFlash('redirect-permanent-hint', 'На странице настроена переадресация на <a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>');
+                Yii::app()->user->setFlash('redirect-permanent-hint', 'На странице настроена переадресация на <a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">Свойства страницы</a>');
         }
 
 		$this->render('view',array(
@@ -408,15 +408,23 @@ class PageController extends Controller
         }
         if (isset($unit)) {
             $form_array['elements']['unit'] = array(
-					'type'=>'form',
-					'elements'=>array(
-						'title'=>array(
-							'type'=>'text',
-							'maxlength'=>255,
-							'size'=>60
-						)
-					)
+                'type'=>'form',
+                'elements'=>array(
+                    'title'=>array(
+                        'type'=>'text',
+                        'maxlength'=>255,
+                        'size'=>60
+                    ),
+                )
+            );
+            if (Yii::app()->settings->getValue('showUnitAppearance')) {
+                $form_array['elements']['unit']['elements']['template'] = array(
+                    'type'=>'TemplateSelect',
+                    'className'=>$unit_class,
+                    'empty'=>'«согласно общих настроек»',
                 );
+                $unit_form_array['elements'][] = Form::tab('Внешний вид');
+            }
         }
         $form_array['elements']['content'] = $unit_form_array;
 

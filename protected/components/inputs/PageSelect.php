@@ -2,7 +2,7 @@
 
 class PageSelect extends CInputWidget
 {
-    public $size = 40;
+    public $size = 35;
     public $textLinkId = null;
     public $multiple = false;
     public $excludeCurrent = true;
@@ -11,6 +11,7 @@ class PageSelect extends CInputWidget
     public $checked = array();
     public $checkedOnly = array();
     public $enabledOnly = null;
+    public $canClear = true;
     
     public function run()
     {
@@ -41,6 +42,7 @@ class PageSelect extends CInputWidget
         $options['readonly'] = true;
         unset($options['name']);
         
+        echo '<div style="white-space:nowrap;">';
         if (!$this->multiple) {
             if ($this->hasModel() && $this->model->id == 1 && $this->attribute == 'parent_id')
             {
@@ -49,7 +51,7 @@ class PageSelect extends CInputWidget
                 echo CHtml::textField('',$title,$options);
         }
         //echo $this->render('application.views.page.pagetree', array('tree' => Page::model()->getTree($this->model->id)), true);
-        echo "<div style='border:1px solid gray;background:white;width:{$this->width}px;height:{$this->height}px;overflow:scroll;" . (!$this->multiple ? "position:absolute;display:none;" : "") . "' id='" . $this->htmlOptions['id'] . "_dialog'></div>";
+        echo "</div><div style='border:1px solid gray;background:white;width:{$this->width}px;height:{$this->height}px;overflow:scroll;" . (!$this->multiple ? "position:absolute;display:none;" : "") . "' id='" . $this->htmlOptions['id'] . "_dialog'></div>";
 
     }    
 
@@ -84,11 +86,33 @@ EOD;
         $ajax_data .= "'";
 
         if (!$this->multiple) {
-            $js = <<<EOD
 
+            if ($this->canClear) {
+                $js = <<<EOD
 $( "<a>&nbsp;</a>" )
     .attr( "tabIndex", -1 )
-    .attr( "title", "Show All Items" )
+    .attr( "title", "Очистить поле" )
+    .insertAfter('#{$id}_title')
+    .button({
+        icons: {
+            primary: "ui-icon-closethick"
+        },
+        text: false
+    })
+    .removeClass( "ui-corner-all" )
+    .addClass( "ui-corner-right ui-button-icon" )
+    .click(function() {
+        $('#{$id}').val(0);
+        $('#{$id}_title').val('');
+        return false;
+    });
+    
+EOD;
+            }
+            $js .= <<<EOD
+$( "<a>&nbsp;</a>" )
+    .attr( "tabIndex", -1 )
+    .attr( "title", "Показать список" )
     .insertAfter('#{$id}_title')
     .button({
         icons: {
@@ -97,11 +121,12 @@ $( "<a>&nbsp;</a>" )
         text: false
     })
     .removeClass( "ui-corner-all" )
-    .addClass( "ui-corner-right ui-button-icon" )
+    .addClass( "ui-button-icon" )
     .click(function() {
         $('#{$id}_title').click();
         return false;
     });
+
 
 $('#{$id}_title').click(function() {
     if ($('#{$id}_dialog').html() == '') {

@@ -26,6 +26,22 @@ class UnitImage extends Content
 		);
 	}
 
+    public function settings()
+    {
+        return array_merge(parent::settings(__CLASS__), array(
+            'show_border' => array(
+                'type'=>'checkbox',
+                'label'=>'Показывать рамку'
+            )
+        ));
+    }
+    public function settingsRules()
+    {
+        return array_merge(parent::settingsRules(), array(
+            array('show_border', 'boolean')
+        ));
+    }
+
 	public function attributeLabels()
 	{
 		return array(

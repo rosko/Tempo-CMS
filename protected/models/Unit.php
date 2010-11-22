@@ -18,6 +18,7 @@ class Unit extends CActiveRecord
 			array('type', 'required'),
 			array('type', 'length', 'max'=>64),
 			array('title', 'length', 'max'=>255),
+			array('template', 'length', 'max'=>32),
 		);
 	}
 
@@ -34,6 +35,7 @@ class Unit extends CActiveRecord
 			'id' => 'ID',
 			'type' => 'Тип',
 			'title' => 'Название',
+            'template' => 'Шаблон',
 		);
 	}
 

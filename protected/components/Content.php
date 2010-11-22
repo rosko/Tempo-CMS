@@ -12,12 +12,7 @@ class Content extends CActiveRecord
             'unit' => array(self::BELONGS_TO, 'Unit', 'unit_id'),
         );
     }
-/*
-    public function getUnit()
-    {
-		return Unit::model()->find('id=:id', array(':id'=>$this->unit_id));        
-    }
-*/
+
     public function beforeSave()
     {
         if ($this->isNewRecord) 
@@ -32,6 +27,24 @@ class Content extends CActiveRecord
     public function dependencies()
     {
         return array();
+    }
+
+    // Настройки всего типа юнитов
+    public function settings($className)
+    {
+        return array(
+            'template' => array(
+                'type'=>'TemplateSelect',
+                'className'=>$className,
+                'label'=>'Шаблон',
+            ),
+        );
+    }
+    public function settingsRules()
+    {
+        return array(
+            array('template', 'length', 'max'=>32),
+        );
     }
     
     public function selectPage($number, $per_page=0)
@@ -100,10 +113,19 @@ class Content extends CActiveRecord
 
     public function prepare($params)
     {
+        $params['className'] = get_class($this);
         $params['unit'] = $this->unit;
         $params['content'] = $this;
         $params['page'] = Yii::app()->controller->loadModel();
         $params['editMode'] = !Yii::app()->user->isGuest;
+        $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
+        $len = strlen($params['className']);
+        foreach ($params['settings']['global'] as $k => $v) {
+            if (substr($k,0,$len+1) == $params['className'].'.') {
+                $params['settings']['local'][substr($k,$len+1)] = $v;
+            }
+            
+        }
         return $params;
     }
 
@@ -112,12 +134,24 @@ class Content extends CActiveRecord
         $params = $this->prepare($params);
         $className = Unit::getClassNameByUnitType($this->unit->type);
         $params['content'] = $params['content']->attributes;
+        if ($params['unit']->template) {
+            $template = basename($params['unit']->template);
+            $alias = 'webroot.templates.'.$className.'.'.$template;
+        } else {
+            $template = Yii::app()->settings->getValue($className.'.template');
+            if ($template)
+                $alias = 'webroot.templates.'.$className.'.'.$template;
+        }
+        if (Yii::app()->controller->getViewFile($alias)===false)
+            $alias = 'application.units.views.'.$className;
+
         foreach ($params as $k => $v)
         {
             if ($v instanceof CModel)
-                $params[$k] = $v->attributes;
+                $params[$k] = $v->getAttributes();
         }
-        $output = Yii::app()->controller->renderPartial('application.units.views.'.$className,
+
+        $output = Yii::app()->controller->renderPartial($alias,
                            $params, true);
         if (trim($output) == '' && $params['editMode'])  {
             $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
@@ -129,6 +163,37 @@ class Content extends CActiveRecord
         
     }
 
+    public function getTemplates($className='')
+    {
+        if ($className == '')
+            $className = get_class($this);
+        $data = array();
+        $path = Yii::getPathOfAlias('webroot.templates.'.$className);
+		if((Yii::app()->getViewRenderer())!==null)
+			$extension=Yii::app()->getViewRenderer()->fileExtension;
+		else
+			$extension='.php';
+
+        if (is_dir($path))
+            $files = CFileHelper::findFiles($path, array(
+                'fileTypes' => array(substr($extension,1)),
+                'level' => 0
+            ));
+        if ($files != array()) {
+            //array_walk($files, 'basename');
+            foreach ($files as $k => $file)
+                $files[$k] = basename($file, $extension);
+            $data = array_combine($files, $files);
+
+        }
+        return $data;
+    }
+
+    public function getAllValuesBy($attr)
+    {
+        $sql = "SELECT DISTINCT `{$attr}` FROM `" . $this->tableName() . "` ORDER BY `{$attr}` ASC";
+        return Yii::app()->db->createCommand($sql)->queryColumn();
+    }
 }
 
 ?>

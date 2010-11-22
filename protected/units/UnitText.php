@@ -43,8 +43,9 @@ class UnitText extends Content
 					'type'=>'VisualTextAreaFCK',
 				),
 				'author'=>array(
-					'type'=>'text',
-					'maxlength'=>64
+					'type'=>'ComboBox',
+					'showAllValues' => true,
+                    'canEdit' => true,
 				)
 			),
 		);

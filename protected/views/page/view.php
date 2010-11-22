@@ -217,7 +217,7 @@ EOD
 /*
  * Общая панель инструментов для всего сайта
  */
-    echo Yii::app()->appearance->toolbar(array(
+    $this->widget('Toolbar', array(
         'id' => 'toolbar',
         'location' => array(
             'selector' => 'body',
@@ -249,13 +249,17 @@ js:function(){
                 },
                 success: function(html) {
                     hideInfoPanel();
-                    $('#cms-page-edit').html(html);
+                    $('#cms-page-edit')
+                        .html(html)
+                        .width(Math.ceil($(window).width()*0.9))
+                        .height(Math.ceil($(window).height()*0.85));
                     $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
                         $(this).parents('form').attr('rev', $(this).attr('name'));
                     });
                     showSplash($('#cms-page-edit'), {
                         draggable: true,
-                        resizable: true
+                        resizable: true,
+                        centerOnScroll: true
                     });
                 }
             });
@@ -323,7 +327,7 @@ EOD
 /*
  * Панель инструментов для блоков
  */
-    echo Yii::app()->appearance->toolbar(array(
+    $this->widget('Toolbar', array(
         'id' => 'pageunitpanel',
         'location' => array(
             'selector' => '.cms-pageunit',
@@ -435,7 +439,7 @@ EOD
             $i=0;
             foreach ($unit_types as $unit_class) {
                 $i++;
-                $unit_type = substr(strtolower($unit_class),4);
+                $unit_type = Unit::getUnitTypeByClassName($unit_class);
                 ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=$unit_class::NAME?>" href="#" ><img src="<?=$unit_class::ICON?>" alt="<?=$unit_class::NAME?>" /> <?=$unit_class::NAME?></a></li><?php
                 if ($i == ceil($unit_types_count/2)) {
                     ?></ul><ul><?php

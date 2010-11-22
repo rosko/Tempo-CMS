@@ -206,6 +206,7 @@ function showSplash(elem, options) {
         showNavArrows: false,
         autoDimensions: true,
         autoScale: true,
+        centerOnScroll: options.centerOnScroll,
         hideOnOverlayClick: !options.withConfirm,
         onComplete: function() {
             $(document).unbind('keydown.fb');
@@ -226,6 +227,7 @@ function showSplash(elem, options) {
         },
         onClosed: function() {
             hideSplash();
+            elem.width('auto').height('auto').html('');
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);
             }

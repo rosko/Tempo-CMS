@@ -218,6 +218,7 @@ class Page extends CActiveRecord
 				),*/
 				'parent_id'=>array(
 					'type'=>'PageSelect',
+                    'canClear'=>false,
 				),
 				'keywords'=>array(
 					'type'=>'textarea',

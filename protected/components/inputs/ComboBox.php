@@ -6,6 +6,9 @@ class ComboBox extends CJuiInputWidget
 {
     public $array = array();
     public $empty = '«нет»';
+    public $showAllValues = false;
+    public $css = array();
+    public $canEdit = false;
 
     public function init()
     {
@@ -16,7 +19,11 @@ class ComboBox extends CJuiInputWidget
 
     public function run()
 	{
-        $this->array = array_merge(array('0'=>$this->empty), $this->array);
+        if ($this->showAllValues && $this->hasModel()) {
+            $this->array = $this->model->getAllValuesBy($this->attribute);
+            $this->array = array_combine($this->array, $this->array);
+        } else
+            $this->array = array_merge(array('0'=>$this->empty), $this->array);
 
         list($name,$id)=$this->resolveNameID();
 
@@ -28,26 +35,16 @@ class ComboBox extends CJuiInputWidget
 		if(isset($this->htmlOptions['name']))
 			$name=$this->htmlOptions['name'];
 
-		if($this->hasModel())
+        $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
+       
+        echo '<div style="white-space:nowrap;">';
+        if($this->hasModel())
 			echo CHtml::activeDropDownList($this->model,$this->attribute,$this->array, $this->htmlOptions);
 		else
 			echo CHtml::dropDownList($name,$this->value,$this->array,$this->htmlOptions);
+        echo '</div>';
 
-        $this->options['focus'] = <<<EOD
-js:function(event, ui) {
-    $('#{$id}').val(ui.item.label);
-    return false;
-}
-EOD;
-        $this->options['select'] = <<<EOD
-js:function(event, ui) {
-    $('#{$id}').val(ui.item.label);
-    $('#{$original_id}').val(ui.item.value);
-    return false;
-}
-EOD;
-
-        $options=CJavaScript::encode($this->options);
+        $css = CJavaScript::encode($this->css);
 
         $js = <<<EOD
 
@@ -55,12 +52,13 @@ EOD;
 		$.widget( "ui.combobox", {
 			_create: function() {
 				var self = this,
-					select = this.element.hide(),
+					select = this.element.hide();
 					selected = select.children( ":selected" ),
 					value = selected.val() ? selected.text() : "";
 				var input = $( "<input>" )
 					.insertAfter( select )
 					.val( value )
+                    .css({$css})
 					.autocomplete({
 						delay: 0,
 						minLength: 0,
@@ -100,15 +98,29 @@ EOD;
 								if ( !valid ) {
 									// remove invalid value, as it didn't match anything
 									$( this ).val( "" );
-									select.val( "" );
+									select.val( "{$value}" );
 									return false;
 								}
 							}
 						}
 					})
 					.addClass( "ui-widget ui-widget-content ui-corner-left" );
+EOD;
 
-				input.data( "autocomplete" )._renderItem = function( ul, item ) {
+        if ($this->canEdit) {
+                
+            $js .= <<<EOD
+                input.parents('form:eq(0)').submit(function() {
+                    $('#{$id}')
+                        .append('<option value="'+input.val()+'">'+input.val()+'</option>')
+                        .val(input.val());
+                    return true;
+                });
+EOD;
+        }
+
+        $js .= <<<EOD
+                input.data( "autocomplete" )._renderItem = function( ul, item ) {
 					return $( "<li></li>" )
 						.data( "item.autocomplete", item )
 						.append( "<a>" + item.label + "</a>" )

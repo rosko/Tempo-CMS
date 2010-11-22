@@ -6,13 +6,33 @@ class SiteSettingsForm extends CFormModel
 
     public function rules()
     {
-        return array(
+        // Правила для проверки общих настроек
+        $ret = array(
 			array('sitename, adminEmail, defaultsPerPage', 'required'),
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('simpleMode, autoSave', 'boolean')
+			array('simpleMode, autoSave, showUnitAppearance', 'boolean')
         );
+        // Правила для проверки настроек для юнитов
+        $unit_types = Unit::getTypes();
+        foreach ($unit_types as $unit_class) {
+            if (method_exists($unit_class, 'settingsRules')) {
+                $rules = $unit_class::settingsRules();
+                if (is_array($rules) && !empty($rules)) {
+                    foreach ($rules as $rule)
+                    {
+                        $params = explode(',',str_replace(' ', '', $rule[0]));
+                        foreach ($params as $k => $v) {
+                            $params[$k] = $unit_class . '.' . $v;
+                        }
+                        $rule[0] = implode(',',$params);
+                        $ret[] = $rule;
+                    }
+                }
+            }
+        }
+        return $ret;
     }
     
 	public function attributeLabels()
@@ -23,12 +43,14 @@ class SiteSettingsForm extends CFormModel
             'defaultsPerPage' => 'Количество объектов на одной странице, по-умолчанию',
 			'simpleMode' => 'Упрощенный режим управления сайтом',
             'autoSave' => 'Автосохранение при редактировании',
+            'showUnitAppearance' => 'Отображать для блоков закладку "Внешний вид"',
 		);
 	}
 
     public function form()
     {
-        return array(
+        // Общие настроки
+        $ret = array(
             'elements'=>array(
                 Form::tab('Общие настройки'),
                 'sitename'=>array(
@@ -39,6 +61,16 @@ class SiteSettingsForm extends CFormModel
                     'type'=>'text',
                     'size'=>60
                 ),
+//				'simpleMode'=>array(
+//					'type'=>'checkbox',
+//				),
+                'autoSave'=>array(
+                    'type'=>'checkbox'
+                ),
+                Form::tab('Внешний вид'),
+                'showUnitAppearance'=>array(
+                    'type'=>'checkbox'
+                ),
                 'defaultsPerPage'=>array(
                     'type'=>'Slider',
 					'options'=>array(
@@ -46,14 +78,24 @@ class SiteSettingsForm extends CFormModel
 						'max'=>50
 					)
                 ),
-				'simpleMode'=>array(
-					'type'=>'checkbox',
-				),
-                'autoSave'=>array(
-                    'type'=>'checkbox'
-                )
             ),
         );
+        // Настройки для юнитов
+        $unit_types = Unit::getTypes();
+        $ret['elements'][] = Form::tab('Настройки блоков');
+        foreach ($unit_types as $unit_class) {
+            if (method_exists($unit_class, 'settings')) {
+                $elems = $unit_class::settings($unit_class);
+                if (is_array($elems) && !empty($elems)) {
+                    $ret['elements'][] = Form::section($unit_class::NAME);
+                    foreach ($elems as $k => $elem)
+                    {
+                        $ret['elements'][$unit_class.'.'.$k] = $elem;
+                    }
+                }
+            }
+        }
+        return $ret;
     }
 
 

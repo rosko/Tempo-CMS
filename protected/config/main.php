@@ -34,14 +34,6 @@ return array(
         'settings'=>array(
             'class'=>'Settings'
         ),
-        'appearance'=>array(
-            'class'=>'Appearance',
-            'iconsets' => include ('iconsets.php'),
-            'options' => array(
-                'iconSet' => 'fatcow',
-                'iconSize' => '32x32',
-            ),
-        ),
         'viewRenderer'=>array(
             'class'=>'application.extensions.smarty.ESmartyViewRenderer',
             'fileExtension' => '.tpl',

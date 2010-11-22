@@ -11,14 +11,6 @@ class Form extends CForm
         $js = <<<EOD
     <script type="text/javascript">
 	$(function() {
-		$("#cms-form-tabs-{$this->uniqueId}").tabs({
-            collapsible: true,
-			ajaxOptions: {
-				error: function( xhr, status, index, anchor ) {
-					$( anchor.hash ).html( "Ошибка при загрузке закладки." );
-				}
-			}
-        });
 EOD;
         $preoutput = '<ul>';
         $t_counter = 0;
@@ -84,14 +76,33 @@ EOD;
                 } else $output.=$this->renderElement($element);
             } else $output.=$this->renderElement($element);
         }
+        if ($s_counter) {
+            $output .= '</div>';
+        }
         if ($t_counter > 0) {
             $preoutput .= '</ul>';
             $output = substr($output,6) . '</div>';
             $js .= <<<EOD
+		$("#cms-form-tabs-{$this->uniqueId}").tabs({
+            collapsible: true,
+			ajaxOptions: {
+				error: function( xhr, status, index, anchor ) {
+					$( anchor.hash ).html( "Ошибка при загрузке закладки." );
+				}
+			}
+        });
    	});
     </script>
 EOD;
             return '<div id="cms-form-tabs-'.$this->uniqueId.'">' . $preoutput . $output . '</div>' . $js;
+        } elseif ($s_counter >0) {
+            $output .= '</div>';
+            $js .= <<<EOD
+   	});
+    </script>
+EOD;
+            return $output . $js;
+
         } else {
             return $output;
         }

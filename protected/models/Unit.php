@@ -32,8 +32,8 @@ class Unit extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'type' => 'Тип',
+//			'id' => 'ID',
+//			'type' => 'Тип',
 			'title' => 'Название',
             'template' => 'Шаблон',
 		);

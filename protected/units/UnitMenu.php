@@ -27,9 +27,9 @@ class UnitMenu extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
-			'items' => 'Items',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
+//			'items' => 'Items',
             'recursive' => 'Количество уровней',
 		);
 	}
@@ -54,6 +54,13 @@ class UnitMenu extends Content
 			),
 		);
 	}
+
+    public function templateVars()
+    {
+        return array(
+            '{$tree}'=>'Массив пунктов меню',
+        );
+    }
 
     public function prepare($params)
     {

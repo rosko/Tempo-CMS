@@ -27,8 +27,8 @@ class UnitNewssection extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'per_page' => 'Новостей на одной странице',
             'items' => '',
 		);
@@ -81,6 +81,13 @@ class UnitNewssection extends Content
         return $ret;
     }
 
+    public function templateVars()
+    {
+        return array(
+            '{$items}' => 'Массив новостей',
+            '{$pager}' => 'Список страниц (если производится разбиение списка на страницы)',
+        );
+    }
 
     public function prepare($params)
     {

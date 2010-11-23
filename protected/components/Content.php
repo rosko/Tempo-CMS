@@ -163,7 +163,7 @@ class Content extends CActiveRecord
         
     }
 
-    public function getTemplates($className='')
+    public function getTemplates($className='', $basenameOnly=true)
     {
         if ($className == '')
             $className = get_class($this);
@@ -181,10 +181,13 @@ class Content extends CActiveRecord
             ));
         if ($files != array()) {
             //array_walk($files, 'basename');
-            foreach ($files as $k => $file)
-                $files[$k] = basename($file, $extension);
-            $data = array_combine($files, $files);
-
+            if ($basenameOnly) {
+                foreach ($files as $k => $file)
+                    $files[$k] = basename($file, $extension);
+                $data = array_combine($files, $files);
+            } else {
+                $data = $files;
+            }
         }
         return $data;
     }

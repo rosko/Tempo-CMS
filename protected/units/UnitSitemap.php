@@ -28,8 +28,8 @@ class UnitSitemap extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'length' => 'Длина описания',
             'recursive' => 'Количество уровней',
             'page_id' => 'Страница',
@@ -90,6 +90,16 @@ class UnitSitemap extends Content
             }
         }
         return $items;
+    }
+
+    public function templateVars()
+    {
+        return array(
+            '{$title}' => 'Заголовок',
+            '{$items}' => 'Массив пунктов',
+            '{$count_items}' => 'Количество пунктов',
+            '{$pager}' => 'Список страниц (если производится разбиение списка на страницы)',
+        );
     }
 
     public function prepare($params)

@@ -29,8 +29,8 @@ class UnitNewsitem extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'text' => 'Текст',
 			'date' => 'Дата',
 			'source' => 'Название источника',
@@ -148,6 +148,15 @@ class UnitNewsitem extends Content
             'params' => array(':id' => $id),
 		));
 		return $this;
+    }
+
+    public function templateVars()
+    {
+        return array(
+            '{$unitUrl}' => 'Ссылка на новость (в случае, если новость отображается на отдельно, а в списке или разделе)',
+            '{$sectionUrl}' => 'Ссылка на раздел новостей',
+            '{$sectionTitle}' => 'Название раздела новостей',
+        );
     }
 
     public function prepare($params)

@@ -87,7 +87,7 @@ class ESmartyViewRenderer extends CApplicationComponent implements IViewRenderer
     {
         $obj->assign("TIME", sprintf('%0.5f',Yii::getLogger()->getExecutionTime()));
         $obj->assign("MEMORY", round(Yii::getLogger()->getMemoryUsage()/(1024*1024),2)." MB");
-        $obj->assign('dateFormatter', Yii::app()->dateFormatter);
+        //$obj->assign('dateFormatter', Yii::app()->dateFormatter);
         //$obj->assign('Yii', Yii::app());
         return $obj;
     }

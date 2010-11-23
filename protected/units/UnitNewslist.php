@@ -28,8 +28,8 @@ class UnitNewslist extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'rule' => 'Какие новости отображать'
 		);
 	}
@@ -45,6 +45,13 @@ class UnitNewslist extends Content
 			),
 		);
 	}
+
+    public function templateVars()
+    {
+        return array(
+            '{$items}' => 'Массив новостей',
+        );
+    }
 
     public function prepare($params)
     {

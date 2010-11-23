@@ -30,8 +30,8 @@ class UnitBreadcrumbs extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
             'separator'=> 'Разделитель'
 		);
 	}
@@ -47,6 +47,16 @@ class UnitBreadcrumbs extends Content
 			),
 		);
 	}
+
+    public function templateVars()
+    {
+        return array(
+            '{breadcrumbs separator=$separator homeLink=$homeLink  links=$links}' => 'Путь к странице',
+            '{$separator}' => 'Разделитель',
+            '{$homeLink}' => 'Надпись или ссылка для главной страницы',
+            '{$links}' => 'Массив ссылок',
+        );
+    }
 
     public function prepare($params)
     {

@@ -9,6 +9,7 @@ class ComboBox extends CJuiInputWidget
     public $showAllValues = false;
     public $css = array();
     public $canEdit = false;
+    public $showValues = false;
 
     public function init()
     {
@@ -22,8 +23,9 @@ class ComboBox extends CJuiInputWidget
         if ($this->showAllValues && $this->hasModel()) {
             $this->array = $this->model->getAllValuesBy($this->attribute);
             $this->array = array_combine($this->array, $this->array);
-        } else
-            $this->array = array_merge(array('0'=>$this->empty), $this->array);
+        } elseif ($this->empty) {
+                $this->array = array_merge(array('0'=>$this->empty), $this->array);
+        }
 
         list($name,$id)=$this->resolveNameID();
 
@@ -46,6 +48,12 @@ class ComboBox extends CJuiInputWidget
 
         $css = CJavaScript::encode($this->css);
 
+        $aaa = 'text';
+        $aab = '';
+        if ($this->showValues) {
+            $aaa = 'this.value';
+            $aab = ' || matcher.test(this.value)';
+        }
         $js = <<<EOD
 
 	(function( $ ) {
@@ -66,7 +74,7 @@ class ComboBox extends CJuiInputWidget
 							var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
 							response( select.children( "option" ).map(function() {
 								var text = $( this ).text();
-								if ( this.value && ( !request.term || matcher.test(text) ) )
+								if ( this.value && ( !request.term || matcher.test(text) {$aab} ) )
 									return {
 										label: text.replace(
 											new RegExp(
@@ -74,7 +82,7 @@ class ComboBox extends CJuiInputWidget
 												$.ui.autocomplete.escapeRegex(request.term) +
 												")(?![^<>]*>)(?![^&;]+;)", "gi"
 											), "<strong>$1</strong>" ),
-										value: text,
+										value: {$aaa},
 										option: this
 									};
 							}) );
@@ -119,11 +127,15 @@ EOD;
 EOD;
         }
 
+        $aaa = '"<a>" + item.label + "</a>"';
+        if ($this->showValues) {
+            $aaa = '"<a><strong>" + item.label + "</strong><br>" + item.value +  "</a>"';
+        }
         $js .= <<<EOD
                 input.data( "autocomplete" )._renderItem = function( ul, item ) {
 					return $( "<li></li>" )
 						.data( "item.autocomplete", item )
-						.append( "<a>" + item.label + "</a>" )
+						.append( {$aaa} )
 						.appendTo( ul );
 				};
 
@@ -157,8 +169,12 @@ EOD;
 EOD;
 
 		$js .= "$('#{$id}').combobox();";
-        $cs = Yii::app()->getClientScript();
-		$cs->registerScript(__CLASS__.'#'.$id, $js);
+        if ($this->hasModel()) {
+            $cs = Yii::app()->getClientScript();
+            $cs->registerScript(__CLASS__.'#'.$id, $js);
+        } else {
+            echo '<script type="text/javascript">' . $js . '</script>';
+        }
 
     }
 

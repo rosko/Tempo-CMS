@@ -31,11 +31,11 @@ class PageUnit extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'page_id' => 'Page',
-			'unit_id' => 'Unit',
-			'area' => 'Area',
-			'order' => 'Order',
+//			'id' => 'ID',
+			'page_id' => 'Страница',
+//			'unit_id' => 'Unit',
+			'area' => 'Область страницы',
+//			'order' => 'Order',
 		);
 	}
 	

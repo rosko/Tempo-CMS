@@ -31,7 +31,7 @@ class UnitImage extends Content
         return array_merge(parent::settings(__CLASS__), array(
             'show_border' => array(
                 'type'=>'checkbox',
-                'label'=>'Показывать рамку'
+                'label'=>'Показывать ли рамку'
             )
         ));
     }
@@ -45,8 +45,6 @@ class UnitImage extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
 			'image' => 'Изображение',
 			'width' => 'Ширина',
 			'height' => 'Высота',

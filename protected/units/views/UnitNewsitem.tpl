@@ -7,7 +7,7 @@
 {/if}
 
 {if $content.date}
-    <p>Дата: {$dateFormatter->format("d MMMM yyyy", strtotime($content.date))}</p>
+    <p>Дата: {dateformat pattern="d MMMM yyyy" time=$content.date}</p>
 {/if}
 
 {$content.text}

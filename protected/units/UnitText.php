@@ -28,8 +28,8 @@ class UnitText extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'text' => 'Текст',
 			'author' => 'Автор',
 		);

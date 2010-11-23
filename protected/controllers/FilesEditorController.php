@@ -42,11 +42,10 @@ class FilesEditorController extends Controller
                     $extension='.php';
 
                 $data = $name::getTemplates($name, false);
-                $systemFile = Yii::getPathOfAlias('application.units.views.').'/'.$name.$extension;
                 $files[] = array(
                     'name' => '',
                     'title' => '«обычный»',
-                    'writable' => is_writable($systemFile)
+                    'writable' => false,
                 );
                 foreach ($data as $file)
                 {

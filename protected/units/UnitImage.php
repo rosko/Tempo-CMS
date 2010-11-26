@@ -89,7 +89,7 @@ EOD;
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
 					'onChange'=> "js:$('#cms-pageunit-'+pageunit_id).find('img').attr('src', $(this).val());"
 				),
-                self::renderFile($className, 'imagesize'),
+                self::renderFile($className, 'files.imagesize'),
 				'width'=>array(
 					'type'=>'Slider',
 					'event'=>'none',

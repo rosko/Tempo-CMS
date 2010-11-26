@@ -77,7 +77,7 @@ EOD;
                 'show_link'=>array(
                     'type'=>'checkbox',
                 ),
-                self::renderFile($className, 'containersize', array(
+                self::renderFile($className, 'files.containersize', array(
                     'attribute' => 'video',
                     'width' => 'width',
                     'height' => 'height',
@@ -277,7 +277,7 @@ EOD;
                 $id = $matches[$arr['match']];
                 $w = $width ? $width : $arr['width'];
                 $h = $height ? $height : $arr['height'];
-                return Content::renderFile('UnitVideo', $arr['view'], array(
+                return Content::renderFile('UnitVideo', 'codes.'.$arr['view'], array(
                     'id' => $id,
                     'width' => $w,
                     'height' => $h,

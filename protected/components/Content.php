@@ -65,10 +65,15 @@ class Content extends CActiveRecord
     public static function renderFile($className, $viewFile, $params=array())
     {
         $params['className'] = $className;
-        $file = 'application.units.views.' . $className . '.' . $viewFile;
-        if (is_file(Yii::getPathOfAlias($file).'.php'))
-		return Yii::app()->controller->renderPartial($file,
-                $params, true);
+        $files = array(
+            'application.units.' . $className . '.' . $viewFile,
+            'webroot.units.' . $className . '.' . $viewFile,
+        );
+        foreach ($files as $file) {
+            if (is_file(Yii::getPathOfAlias($file).'.php'))
+        	return Yii::app()->controller->renderPartial($file,
+                    $params, true);
+        }
     }
 
     public function getPageVar()

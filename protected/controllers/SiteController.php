@@ -57,10 +57,4 @@ class SiteController extends Controller
 			$this->redirect(Yii::app()->homeUrl);
 	}
 	
-	public function actionSettings()
-	{
-		$this->layout = 'blank';
-		$this->render('settings');
-	}
-
 }

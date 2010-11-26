@@ -36,6 +36,8 @@ class ComboBox extends CJuiInputWidget
 
 		if(isset($this->htmlOptions['name']))
 			$name=$this->htmlOptions['name'];
+        else
+            $this->htmlOptions['name']=$name;
 
         $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
        

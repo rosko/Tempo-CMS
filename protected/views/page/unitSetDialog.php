@@ -2,7 +2,6 @@
     $page_select_name = 'set_page_ids';
 
     $cs=Yii::app()->getClientScript();
-    $cs->setCoreScriptUrl('/js/empty');
     $cs->registerScript('unitSetDialog', <<<EOD
 
 $(function() {

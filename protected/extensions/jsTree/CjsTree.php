@@ -49,9 +49,6 @@ class CJsTree extends CWidget
         $this->baseUrl = Yii::app()->getAssetManager()->publish($dir);
 
         $cs=Yii::app()->getClientScript();
-		if (Yii::app()->request->isAjaxRequest) {
-			$cs->setCoreScriptUrl('/js/empty');
-		}
         //$cs->registerScriptFile($this->baseUrl.'/jquery.tree.js');
         $cs->registerScriptFile($this->baseUrl.'/jquery.jstree.js');
 
@@ -62,16 +59,6 @@ class CJsTree extends CWidget
         if($this->cssFile !== null && $this->cssFile !== false)
             $cs->registerCssFile($this->cssFile);
 			
-		if ($this->plugins) {
-			foreach ($this->plugins as $plugin => $options) {
-				if ($plugin == 'hotkeys') {
-					$cs->registerScriptFile($this->baseUrl.'/_lib/jquery.hotkeys.js');
-				} elseif ($plugin == 'cookie') {
-					$cs->registerScriptFile($this->baseUrl.'/_lib/jquery.cookie.js');
-				}
-			}
-		}
-
 		echo CHtml::tag('div', $this->htmlOptions,false,false)."\n";
 		echo "<ul>";
     }

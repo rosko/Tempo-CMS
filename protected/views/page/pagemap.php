@@ -5,7 +5,6 @@
 <?php
 
     $cs=Yii::app()->getClientScript();
-    $cs->setCoreScriptUrl('/js/empty/');
     $cs->registerScript('pagemap', <<<EOD
 $(function() {
     $('.cms-btn-pagemap-openall').click(function() {
@@ -22,14 +21,6 @@ EOD
 
 
 	if (!Yii::app()->request->isAjaxRequest) {
-        $cs->registerCoreScript('jquery');
-        /// TODO: туут скорее всего будет проблема с загрузко jquery.ui
-        $cs->registerCoreScript('jquery.ui');
-        $cs->registerCssFile(Yii::app()->params->jui['themeUrl'] . '/'. Yii::app()->params->jui['theme'].'/jquery-ui.css');
-
-        $cs->registerScriptFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.js');
-        $cs->registerCssFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.css');
-        $cs->registerScriptFile('/js/lib.js');
 ?>
 
 <div class="hidden">

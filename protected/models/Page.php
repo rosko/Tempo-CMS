@@ -20,6 +20,7 @@ class Page extends CActiveRecord
 			array('parent_id, title', 'required'),
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
 			array('path, title, keywords, description, redirect', 'length', 'max'=>255),
+            array('theme', 'length', 'max'=>50),
 		);
 	}
 	
@@ -199,6 +200,7 @@ class Page extends CActiveRecord
 			'order' => 'Order',
 			'active' => 'Включено',
             'redirect' => 'Переадресация',
+            'theme' => 'Тема оформления (дизайн) страницы',
 		);
 	}
 	
@@ -235,7 +237,10 @@ class Page extends CActiveRecord
                     'type'=>'Link',
                     'showFileManagerButton'=>false,
                     'showUploadButton'=>false
-                )
+                ),
+                'theme'=>array(
+                    'type'=>'ThemeSelect',
+                ),
 			),
 			'buttons'=>array(
 				'save'=>array(

@@ -2,7 +2,6 @@
 
 class PageController extends Controller
 {
-	public $layout='//layouts/column2';
 	public $_model;
 	public $defaultAction = 'view';
 
@@ -119,7 +118,6 @@ class PageController extends Controller
             ));
             Yii::app()->end();
         }
-        $this->layout = 'blank';
         $this->render('form', array('form'=>$form));
 	}
 
@@ -205,9 +203,8 @@ class PageController extends Controller
 				Yii::app()->end();
 			}
 		}
-		
-		$this->layout = 'blank';
-		$this->render('form', array('form'=>$form));
+
+        $this->render('form', array('form'=>$form));
 	}
 	
 	// Удаляет страницу
@@ -387,6 +384,7 @@ class PageController extends Controller
 //        }
 		$form_array = array(
 //			'title'=>$unit_class::NAME,
+            'id' => $unit_class.$unit->id,
             'activeForm' => Form::ajaxify('UnitForm'.$unit->id),
             'buttons'=>array(
 				'save'=>array(
@@ -457,7 +455,6 @@ class PageController extends Controller
             $form['unit']->model = $unit;
 		$form['content']->model = $content;
 		
-		$this->layout = 'empty';
 		$this->render('form', array('form'=>$form, 'show_title'=>$show_title));
 	}
 	
@@ -566,7 +563,6 @@ class PageController extends Controller
             }
 		}
 
-		$this->layout = 'blank';
 		$this->render('form', array('form'=>$form));
 		
 	}
@@ -584,9 +580,6 @@ class PageController extends Controller
 				if (substr_count($p['path'],',') < $opened_levels)
 					$initially_open[] = 'page-'.$p['id'];
 			}
-		}
-		if (Yii::app()->request->isAjaxRequest) {
-			$this->layout = 'blank';			
 		}
 		$this->render('pagemap', compact('tree', 'initially_open'));
 	}
@@ -606,7 +599,6 @@ class PageController extends Controller
 			}
 			$tree = Page::model()->getTree();
 		}
-		$this->layout = 'blank';
 		$this->render('pagetree', array('tree' => $tree, 'tree_id' => $_REQUEST['tree_id'],
 										'multiple' => (bool)$_REQUEST['multiple'],
 										'enabledOnly' => $_REQUEST['enabledOnly'],
@@ -616,14 +608,12 @@ class PageController extends Controller
 	// Отображает диалог для заполнения пустой страницы
 	public function actionPageFill()
 	{
-		$this->layout = 'empty';
 		$this->render('fill');
 	}
 	
 	// Отображает уточнение при удалении страницы
 	public function actionPageDeleteDialog()
 	{
-		$this->layout = 'blank';
 		$this->render('pageDeleteDialog',array(
 			'model'=>$this->loadModel()
 		));
@@ -644,7 +634,6 @@ class PageController extends Controller
     // Отображает диалог выбора страниц где будет размещен юнит
     public function actionUnitSetDialog()
 	{
-		$this->layout = 'blank';
 		$this->render('unitSetDialog',array(
 			'model'=>$this->loadModel(),
 			'unit'=>Unit::model()->findByPk($_REQUEST['unit_id']),
@@ -656,7 +645,6 @@ class PageController extends Controller
     // Отображает уточнение при удалении юнита
 	public function actionUnitDeleteDialog()
 	{
-		$this->layout = 'blank';
 		$this->render('unitDeleteDialog',array(
 			'model'=>$this->loadModel(),
 			'unit'=>Unit::model()->findByPk($_REQUEST['unit_id']),
@@ -714,4 +702,5 @@ class PageController extends Controller
 			Yii::app()->end();
 		}
 	}
+
 }

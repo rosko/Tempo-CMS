@@ -1,7 +1,4 @@
 <?php
-$cs = Yii::app()->getClientScript();
-$cs->setCoreScriptUrl('/js/empty/');
-
 $tree_id = $tree_id ? $tree_id : 'pagetree';
 $this->beginWidget('ext.jsTree.CjsTree', array(
     'id' => $tree_id,

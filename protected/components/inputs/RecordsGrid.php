@@ -41,7 +41,6 @@ class RecordsGrid extends CInputWidget
 
         $id = __CLASS__.'_'.get_class($this->model).'_'.$this->model->id;
 
-        $this->getController()->layout = 'blank';
         $this->registerClientScript();
 
 

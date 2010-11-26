@@ -1,6 +1,4 @@
 <?php
-    $this->controller->areas[] = $name;
-
     $editArea = !Yii::app()->user->isGuest && ((substr($name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
 ?>
 <div id="cms-area-<?=$name?>" class="<?php if ($editArea) { ?>cms-area <?php } ?>area">

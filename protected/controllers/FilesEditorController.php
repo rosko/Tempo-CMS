@@ -33,9 +33,13 @@ class FilesEditorController extends Controller
         $suggestions = array(
             ''=>'',
             '{dateformat pattern="d MMMM yyyy" time=$content.date}'=> 'Функция для отображения времени',
+            '{link text="Ссылка" url="page/view?id=1"}' => 'Функция для отображения ссылки, например на страницу с ID=1',
         );
         if ($type == 'templates') {
             if (class_exists($name)) {
+                $suggestions['{registercss file="file.css"}'] = 'Функция подключения CSS-файла, который размещен в папке ресурсов files текущего блока';
+                $suggestions['{registerjs file="file.js"}'] = 'Функция подключения яваскрипт-файла, который размещен в папке ресурсов files текущего блока';
+
                 if((Yii::app()->getViewRenderer())!==null)
                     $extension=Yii::app()->getViewRenderer()->fileExtension;
                 else
@@ -115,7 +119,7 @@ class FilesEditorController extends Controller
         $suggestions['{$MEMORY}'] = 'Использованная память (в мегабайтах)';
         if (!empty($files)) {
             $id = 'FilesEditor_'.sprintf('%x',crc32(serialize($files).$type.$name));
-            $this->renderPartial('form', array(
+            $this->render('form', array(
                 'id' => $id,
                 'files' => $files,
                 'type' => $type,
@@ -138,8 +142,15 @@ class FilesEditorController extends Controller
                 else
                     $extension='.php';
 
-                $filename = $file ? Yii::getPathOfAlias('webroot.templates.'.$name).'/'.basename($file).$extension
-                                  : Yii::getPathOfAlias('application.units.views.').'/'.$name.$extension;
+                $dirs = $name::getTemplateDirAliases($name);
+                foreach ($dirs as $s) {
+                    $filename = $file ? Yii::getPathOfAlias($s).'/'.basename($file).$extension
+                                      : Yii::getPathOfAlias($s).'/'.$name.$extension;
+                    if (is_file($filename)) {
+                        return $filename;
+                    }
+                }
+                if (!is_file($filename)) return false;
             }
         }
         return $filename;
@@ -148,7 +159,7 @@ class FilesEditorController extends Controller
     public function actionLoad($type, $name, $file)
     {
         $filename = $this->getFilenameByParams($type, $name, $file);
-        if (is_file($filename))
+        if ($filename !== false)
             echo file_get_contents($filename);
     }
 
@@ -165,12 +176,23 @@ class FilesEditorController extends Controller
         $content = is_file($systemFile) ? file_get_contents($systemFile) : '';
 
         if ($file != '') {
-            $filename = $this->getFilenameByParams($type, $name, $file);
-            if (!is_dir(dirname($filename))) {
-                mkdir(dirname($filename), 0777, true);
+            $filename = '';
+            if((Yii::app()->getViewRenderer())!==null)
+                $extension=Yii::app()->getViewRenderer()->fileExtension;
+            else
+                $extension='.php';
+
+            if ($type == 'templates') {
+                if (class_exists($name))
+                    $filename = Yii::getPathOfAlias('webroot.templates.'.$name).DIRECTORY_SEPARATOR.$file.$extension;
             }
-            if (!is_file($filename) && is_writable(dirname($filename))) {
-                echo file_put_contents($filename, $content)!==false;
+            if ($filename) {
+                if (!is_dir(dirname($filename))) {
+                    mkdir(dirname($filename), 0777, true);
+                }
+                if (!is_file($filename) && is_writable(dirname($filename))) {
+                    echo file_put_contents($filename, $content)!==false;
+                }
             }
         }
     }

@@ -124,7 +124,7 @@ class Content extends CActiveRecord
             if (substr($k,0,$len+1) == $params['className'].'.') {
                 $params['settings']['local'][substr($k,$len+1)] = $v;
             }
-            
+
         }
         return $params;
     }
@@ -134,16 +134,26 @@ class Content extends CActiveRecord
         $params = $this->prepare($params);
         $className = Unit::getClassNameByUnitType($this->unit->type);
         $params['content'] = $params['content']->attributes;
-        if ($params['unit']->template) {
-            $template = basename($params['unit']->template);
-            $alias = 'webroot.templates.'.$className.'.'.$template;
-        } else {
-            $template = Yii::app()->settings->getValue($className.'.template');
-            if ($template)
-                $alias = 'webroot.templates.'.$className.'.'.$template;
+
+        $aliases = array();
+        $template = $params['unit']->template
+                        ? basename($params['unit']->template)
+                        : Yii::app()->settings->getValue($className.'.template');
+
+        $dirs = $this->getTemplateDirAliases();
+        if ($template)
+            foreach ($dirs as $s)
+                $aliases[] = $s . '.'. $template;
+        foreach ($dirs as $s)
+            $aliases[] = $s . '.'. $className;
+
+        foreach ($aliases as $a) {
+            if (Yii::app()->controller->getViewFile($a)!==false) {
+                $alias = $a;
+                break;
+            }
         }
-        if (Yii::app()->controller->getViewFile($alias)===false)
-            $alias = 'application.units.views.'.$className;
+        if (!isset($alias)) return false;
 
         foreach ($params as $k => $v)
         {
@@ -163,32 +173,54 @@ class Content extends CActiveRecord
         
     }
 
+    public function getTemplateDirAliases($className='')
+    {
+        if ($className == '')
+            $className = get_class($this);
+        $pathes = array(
+            'application.units.'.$className.'.templates',
+            'webroot.units.'.$className.'.templates',
+            'webroot.templates.'.$className,
+        );
+        return $pathes;
+    }
+
     public function getTemplates($className='', $basenameOnly=true)
     {
         if ($className == '')
             $className = get_class($this);
-        $data = array();
-        $path = Yii::getPathOfAlias('webroot.templates.'.$className);
+
 		if((Yii::app()->getViewRenderer())!==null)
 			$extension=Yii::app()->getViewRenderer()->fileExtension;
 		else
 			$extension='.php';
 
-        if (is_dir($path))
-            $files = CFileHelper::findFiles($path, array(
-                'fileTypes' => array(substr($extension,1)),
-                'level' => 0
-            ));
+        $files = array();
+        $pathes = self::getTemplateDirAliases($className);
+        foreach ($pathes as $path) {
+            $path = Yii::getPathOfAlias($path);
+            if (is_dir($path))
+                $files = array_merge($files, CFileHelper::findFiles($path, array(
+                    'fileTypes' => array(substr($extension,1)),
+                    'level' => 0,
+                    'exclude' => array(
+                        $className . $extension,
+                     ),
+                )));
+            }
+        $data = array();
         if ($files != array()) {
             //array_walk($files, 'basename');
             if ($basenameOnly) {
-                foreach ($files as $k => $file)
+                foreach ($files as $k => $file) {
                     $files[$k] = basename($file, $extension);
+                }
                 $data = array_combine($files, $files);
             } else {
                 $data = $files;
             }
         }
+
         return $data;
     }
 

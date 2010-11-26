@@ -1,7 +1,3 @@
-<?php
-$cs = Yii::app()->getClientScript();
-$cs->setCoreScriptUrl('/js/empty/');
-?>
 <h3>Удаляемая страница содержит дочерние страницы</h3>
 <?=CHtml::form($this->createAbsoluteUrl('page/pageDelete', array('id'=>$model->id)));?>
 <ul>

@@ -12,7 +12,8 @@ class SiteSettingsForm extends CFormModel
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('simpleMode, autoSave, showUnitAppearance', 'boolean')
+			array('simpleMode, autoSave, showUnitAppearance', 'boolean'),
+            array('theme', 'length', 'max'=>100),
         );
         // Правила для проверки настроек для юнитов
         $unit_types = Unit::getTypes();
@@ -42,8 +43,9 @@ class SiteSettingsForm extends CFormModel
             'adminEmail' => 'E-mail администратора',
             'defaultsPerPage' => 'Количество объектов на одной странице, по-умолчанию',
 			'simpleMode' => 'Упрощенный режим управления сайтом',
-            'autoSave' => 'Автосохранение при редактировании',
+            'autoSave' => 'Автосохранение при редактировании (каждые 30 секунд)',
             'showUnitAppearance' => 'Отображать для блоков закладку "Внешний вид"',
+            'theme' => 'Тема оформления (дизайн) сайта',
 		);
 	}
 
@@ -68,8 +70,9 @@ class SiteSettingsForm extends CFormModel
                     'type'=>'checkbox'
                 ),
                 Form::tab('Внешний вид'),
-                'showUnitAppearance'=>array(
-                    'type'=>'checkbox'
+                'theme'=>array(
+                    'type'=>'ThemeSelect',
+                    'empty'=>null,
                 ),
                 'defaultsPerPage'=>array(
                     'type'=>'Slider',
@@ -77,6 +80,9 @@ class SiteSettingsForm extends CFormModel
 						'min'=>1,
 						'max'=>50
 					)
+                ),
+                'showUnitAppearance'=>array(
+                    'type'=>'checkbox'
                 ),
             ),
         );

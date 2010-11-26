@@ -1,6 +1,5 @@
 <?php
 $cs = Yii::app()->getClientScript();
-$cs->setCoreScriptUrl('/js/empty/');
 $cs->registerScript('pagefill', <<<EOD
     $(function() {
     });

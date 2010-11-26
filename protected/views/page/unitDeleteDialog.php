@@ -1,7 +1,6 @@
 <?php
 
     $cs=Yii::app()->getClientScript();
-    $cs->setCoreScriptUrl('/js/empty');
     $cs->registerScript('unitDeleteDialog', <<<EOD
 
 $(function() {

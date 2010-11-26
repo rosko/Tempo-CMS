@@ -241,6 +241,7 @@ function loadFile(file, writable, button)
 }
 
 $('#<?=$id?>').submit(function() {
+    $('#<?=$id?>').parent().unbind('dialogbeforeclose');
     if ($('#<?=$id?>_highlight').attr('checked'))
         $('#<?=$id?>_textarea').val(editor.getCode());
 });

@@ -8,7 +8,6 @@
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
     'language'=>'ru', // Перенести настройку в БД, когда будем делать мультиязычность
-    'theme'=>'classic', // Перенести настройку в БД, когда будем делать поддержку переключения графических тем
     'defaultController' => 'page',
 
 //	'preload'=>array('log'),
@@ -18,6 +17,7 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.units.*',
+        'webroot.units.*',
 		'application.components.inputs.*',
         'application.extensions.yiidebugtb.*',
 	),
@@ -39,6 +39,40 @@ return array(
             'fileExtension' => '.tpl',
             //'pluginsDir' => 'application.smartyPlugins',
             //'configDir' => 'application.smartyConfig',
+        ),
+        'clientScript'=>array(
+            'class'=>'ClientScript',
+            'notLoadCoreScriptsOnAjax' => array(
+                'jquery',
+                'jquery.ui',
+                'yiiactiveform',
+            ),
+            'neededCoreScripts' => array(
+                'jquery',
+                'jquery.ui',
+            ),
+            'neededCssFiles' => array(
+                '{juiThemeUrl}/{juiTheme}/jquery-ui.css',
+                '/3rdparty/jnotify/jquery.jnotify.css',
+            ),
+            'neededScriptFiles' => array(
+                '/3rdparty/jnotify/jquery.jnotify.js',                
+            ),
+            'neededAdminCoreScripts' => array(
+                'yiiactiveform',
+            ),
+            'neededAdminCssFiles' => array(
+                '/3rdparty/fancybox/jquery.fancybox-1.3.1.css',
+                '/css/cms.css',
+            ),
+            'neededAdminScriptFiles' => array(
+                '{core}/jui/js/jquery-ui-i18n.min.js',
+                '/js/jquery.scrollTo.js',
+                '/js/jquery.cookie.js',
+                '/js/jquery.hotkeys.js',
+                '/3rdparty/fancybox/jquery.fancybox-1.3.1.js',
+                '/js/lib.js',
+            )
         ),
         'urlManager'=>array(
 //			'urlFormat'=>'path',

@@ -1,13 +1,7 @@
 <?php
 $this->pageTitle = $model->title;
-$this->keywords = $model->keywords;
-$this->description = $model->description;
 
 $cs=Yii::app()->getClientScript();
-
-$cs->registerCoreScript('jquery');
-$cs->registerCoreScript('jquery.ui');
-$cs->registerCssFile(Yii::app()->params->jui['themeUrl'] . '/'. Yii::app()->params->jui['theme'].'/jquery-ui.css');
 
 $cs->registerScript('all', <<<EOD
 
@@ -67,24 +61,9 @@ if (!Yii::app()->user->isGuest) {
         $this->pageTitle = '[Страница отключена] ' . $this->pageTitle;
     }
 
-    $cs->registerCoreScript('yiiactiveform');
-    $cs->registerScriptFile($cs->getCoreScriptUrl() . '/jui/js/jquery-ui-i18n.min.js');
-
-    $cs->registerScriptFile('/js/jquery.scrollTo.js');
-	$cs->registerScriptFile('/js/jquery.cookie.js');
-    $cs->registerScriptFile('/js/jquery.hotkeys.js');
-
-    $cs->registerScriptFile('/3rdparty/jnotify/jquery.jnotify.js');
-    $cs->registerCssFile('/3rdparty/jnotify/jquery.jnotify.css');
-
-    $cs->registerScriptFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.js');
-    $cs->registerCssFile('/3rdparty/fancybox/jquery.fancybox-1.3.1.css');
-
-    $cs->registerScriptFile('/js/lib.js');
-
-        $dir = Yii::getPathOfAlias('ext.jsTree.source');
-        $baseUrl = Yii::app()->getAssetManager()->publish($dir);
-        $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
+    $dir = Yii::getPathOfAlias('ext.jsTree.source');
+    $baseUrl = Yii::app()->getAssetManager()->publish($dir);
+    $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
 		
     $cs->registerScript('cms-area', <<<EOD
 

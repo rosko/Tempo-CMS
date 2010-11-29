@@ -137,6 +137,15 @@ class Content extends CActiveRecord
     public function run($params=array(), $return=false)
     {
         $params = $this->prepare($params);
+
+        $output2 = '';
+        if ($params['editMode'])
+        {
+            if (method_exists($params['content'], 'resizableObjects')) {
+                $output2 .= Yii::app()->controller->renderPartial('application.components.views.resizable', $params, true);
+            }
+        }
+
         $className = Unit::getClassNameByUnitType($this->unit->type);
         $params['content'] = $params['content']->attributes;
 
@@ -171,10 +180,11 @@ class Content extends CActiveRecord
         if (trim($output) == '' && $params['editMode'])  {
             $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
         }
+
         if ($return)
-            return $output;
+            return $output . $output2;
         else
-            echo $output;
+            echo $output . $output2;
         
     }
 
@@ -233,6 +243,36 @@ class Content extends CActiveRecord
     {
         $sql = "SELECT DISTINCT `{$attr}` FROM `" . $this->tableName() . "` ORDER BY `{$attr}` ASC";
         return Yii::app()->db->createCommand($sql)->queryColumn();
+    }
+
+    // Обработка ajax-запроса
+    public function ajax($vars)
+    {
+        $unit = Unit::model()->findByPk($vars['unit_id']);
+        $content = $unit->content;
+        if ($content) {
+            if (isset($vars['Content'])) {
+                $content->attributes=$vars['Content'];
+            }
+            if (isset($vars['attribute']) && isset($vars['width']) && isset($vars['height'])
+                    && isset($vars['tag']) && isset($vars['number'])) {
+                $html = $content->{$vars['attribute']};
+                preg_match_all("/<{$vars['tag']}[^>]*?\/?>/msiu", $html, $matches, PREG_OFFSET_CAPTURE);
+                $t = $matches[0][intval($vars['number'])];
+                $source = $t[0];
+                $repl = preg_replace("/width=[\"\']?([\d]*)[\"\'?]/msi", 'width="'.intval($vars['width']).'"', $t[0]);
+                if ($repl == $t[0]) {
+                    $repl = str_ireplace('<'.$vars['tag'], '<'.$vars['tag'].' width="'.intval($vars['width']).'"', $repl);
+                }
+                $t[0] = $repl;
+                $repl = preg_replace("/height=[\"\']?([\d]*)[\"\'?]/msi", 'height="'.intval($vars['height']).'"', $repl);
+                if ($repl == $t[0]) {
+                    $repl = str_ireplace('<'.$vars['tag'], '<'.$vars['tag'].' height="'.intval($vars['height']).'"', $repl);
+                }
+                $content->{$vars['attribute']} = substr($html, 0, $t[1]) . str_replace($source, $repl, substr($html, $t[1], strlen($repl))) . substr($html, $t[1]+strlen($repl));
+            }
+            echo $content->save();
+        }
     }
 }
 

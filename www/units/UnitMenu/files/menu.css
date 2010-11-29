@@ -40,6 +40,7 @@ ul.dropdown ul {
 	position: absolute;
 	top: 1;
 	left: 0;
+    z-index:1010;
 }
 ul.dropdown ul li {
 	font-weight: normal;

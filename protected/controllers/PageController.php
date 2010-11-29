@@ -29,6 +29,8 @@ class PageController extends Controller
                      'unitSetDialog', 'unitSet', 'unitMove',
                      'unitDeleteDialog','unitDelete', 'unitCheck',
 
+                    'unitAjax',
+
                      'pageAdd', 'pageForm',
                      'pageRename', 'pageFill', 'pagesSort',
                      'pageDeleteDialog', 'pageDelete',
@@ -296,6 +298,12 @@ class PageController extends Controller
             'pageunit'=>$unit
         ));
 	}
+
+    public function actionUnitAjax($unit_id)
+    {
+        $unit = Unit::model()->findByPk($unit_id);
+        $unit->content->ajax($_REQUEST);
+    }
 	
     /*
      * Создает новый юнит

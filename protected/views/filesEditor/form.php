@@ -99,8 +99,8 @@ $('#<?=$id?>_textarea').data('initvalue',  $('#<?=$id?>_textarea').val());
 function HighlightEnable(writable) {
     if ($('#<?=$id?>_highlight').attr('checked') && !editor) {
         editor = CodeMirror.fromTextArea('<?=$id?>_textarea', {
-            height: $('#<?=$id?>_textarea').height(),
-            width: $('#<?=$id?>_textarea').width(),
+            height: $('#<?=$id?>_textarea').height()+'px',
+            width: $('#<?=$id?>_textarea').width()+'px',
             parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
             stylesheet: ["/3rdparty/codemirror/css/xmlcolors.css", "/3rdparty/codemirror/css/jscolors.css", "/3rdparty/codemirror/css/csscolors.css"],
             path: "/3rdparty/codemirror/js/",

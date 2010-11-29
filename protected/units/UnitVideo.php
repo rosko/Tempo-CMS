@@ -30,8 +30,8 @@ class UnitVideo extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'unit_id' => 'Unit',
+//			'id' => 'ID',
+//			'unit_id' => 'Unit',
 			'video' => 'Ссылка на видео',
 			'width' => 'Ширина',
 			'height' => 'Высота',
@@ -299,4 +299,13 @@ EOD;
         return $params;
     }
 
+    public function resizableObjects()
+    {
+        return array(
+            'object, embed, iframe' => array(
+                'attributes' => array('width', 'height'),
+                'aspectRatio' => true,
+            ),
+        );
+    }
 }

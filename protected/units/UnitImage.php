@@ -137,4 +137,15 @@ EOD;
 		$obj->height = 100;
 		return $obj;
 	}
+
+    public function resizableObjects()
+    {
+        return array(
+            'img' => array(
+                'attributes' => array('width', 'height'),
+                'aspectRatio' => false,
+            ),
+        );
+    }
+
 }

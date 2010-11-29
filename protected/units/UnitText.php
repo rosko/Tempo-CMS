@@ -50,4 +50,15 @@ class UnitText extends Content
 			),
 		);
 	}
+
+    public function resizableObjects()
+    {
+        return array(
+            'img' => array(
+                'attributes' => 'text',
+                'aspectRatio' => false,
+            ),
+        );
+    }
+
 }

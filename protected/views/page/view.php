@@ -58,7 +58,7 @@ if ($js)
 if (!Yii::app()->user->isGuest) {
 
     if (!$model->active) {
-        $this->pageTitle = '[Страница отключена] ' . $this->pageTitle;
+        $this->pageTitle = '['.Yii::t('cms', 'Page unactive').'] ' . $this->pageTitle;
     }
 
     $dir = Yii::getPathOfAlias('ext.jsTree.source');
@@ -196,6 +196,7 @@ EOD
 /*
  * Общая панель инструментов для всего сайта
  */
+    $txtSureExit = Yii::t('cms', 'Really exit from site edit mode?');
     $this->widget('Toolbar', array(
         'id' => 'toolbar',
         'location' => array(
@@ -211,12 +212,12 @@ EOD
         'buttons'=>array(
             'edit' => array(
                 'icon' => 'edit',
-                'title' => 'Свойства страницы',
+                'title' => Yii::t('cms', 'Page properties'),
                 'click' => 'js:function(){ pageEditForm(); return false; }',
             ),
             'settings' => array(
                 'icon' => 'settings',
-                'title' => 'Настройки всего сайта',
+                'title' => Yii::t('cms', 'Site properties'),
                 'click' => <<<EOD
 js:function(){
             $.ajax({
@@ -248,12 +249,12 @@ EOD
             ),
             'pageadd' => array(
                 'icon' => 'add',
-                'title' => 'Создать новую страницу',
+                'title' => Yii::t('cms', 'Create new page'),
                 'click' => 'js:function() { pageAddForm(); return false; }',
             ),
             'sitemap' => array(
                 'icon' => 'sitemap',
-                'title' => 'Карта сайта',
+                'title' => Yii::t('cms', 'Sitemap'),
                 'click' => <<<EOD
 js:function(){
             var page_id = {$model->id};
@@ -279,7 +280,7 @@ EOD
             ),
             'filemanager' => array(
                 'icon' => 'files',
-                'title' => 'Хранилище файлов',
+                'title' => Yii::t('cms', 'File manager'),
                 'click' => <<<EOD
 js:function(){
             var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html';
@@ -290,10 +291,10 @@ EOD
             ),
             'exit' => array(
                 'icon' => 'exit',
-                'title' => 'Выход',
+                'title' => Yii::t('cms', 'Exit'),
                 'click' => <<<EOD
 js:function(){
-            if (confirm('Действительно выйти из режима управления сайтом?')) {
+            if (confirm('{$txtSureExit}')) {
                 location.href = '{$this->createUrl('site/logout')}';
             }
             return false;
@@ -324,7 +325,7 @@ EOD
         'buttons'=>array(
             'add' => array(
                 'icon' => 'add',
-                'title' => 'Добавить еще один блок',
+                'title' => Yii::t('cms', 'Add another unit'),
                 'click' => <<<EOD
 js:function() {
             pageunitAddForm(this);
@@ -334,7 +335,7 @@ EOD
             ),
             'edit' => array(
                 'icon' => 'edit',
-                'title' => 'Редактировать',
+                'title' => Yii::t('cms', 'Edit'),
                 'click' => <<<EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
@@ -345,7 +346,7 @@ EOD
             ),
             'move' => array(
                 'icon' => 'move',
-                'title' => 'Размещение блока на других страницах',
+                'title' => Yii::t('cms', 'Unit location on pages'),
                 'click' => <<<EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
@@ -359,7 +360,7 @@ EOD
             ),
             'up' => array(
                 'icon' => 'up',
-                'title' => 'Переместить выше',
+                'title' => Yii::t('cms', 'Move up'),
                 'click' => <<<EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
@@ -375,7 +376,7 @@ EOD
             ),
             'down' => array(
                 'icon' => 'down',
-                'title' => 'Переместить ниже',
+                'title' => Yii::t('cms', 'Move down'),
                 'click' => <<<EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
@@ -391,7 +392,7 @@ EOD
             ),
             'delete' => array(
                 'icon' => 'delete',
-                'title' => 'Удалить этот блок',
+                'title' => Yii::t('cms', 'Delete the unit'),
                 'click' => <<<EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
@@ -410,7 +411,7 @@ EOD
 <div class="hidden">
 
     <div id="cms-pageunit-add" class="cms-splash">
-        <h3>Добавить блок</h3>
+        <h3><?=Yii::t('cms', 'Add unit')?></h3>
         <ul>
         <?php
             $unit_types = Unit::getTypes();
@@ -419,7 +420,7 @@ EOD
             foreach ($unit_types as $unit_class) {
                 $i++;
                 $unit_type = Unit::getUnitTypeByClassName($unit_class);
-                ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=$unit_class::NAME?>" href="#" ><img src="<?=$unit_class::ICON?>" alt="<?=$unit_class::NAME?>" /> <?=$unit_class::NAME?></a></li><?php
+                ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=$unit_class::name()?>" href="#" ><img src="<?=$unit_class::ICON?>" alt="<?=$unit_class::name()?>" /> <?=$unit_class::name()?></a></li><?php
                 if ($i == ceil($unit_types_count/2)) {
                     ?></ul><ul><?php
                 }

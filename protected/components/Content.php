@@ -36,7 +36,7 @@ class Content extends CActiveRecord
             'template' => array(
                 'type'=>'TemplateSelect',
                 'className'=>$className,
-                'label'=>'Шаблон',
+                'label'=>Yii::t('cms', 'Template'),
             ),
         );
     }
@@ -159,7 +159,7 @@ class Content extends CActiveRecord
             foreach ($dirs as $s)
                 $aliases[] = $s . '.'. $template;
         foreach ($dirs as $s)
-            $aliases[] = $s . '.'. $className;
+            $aliases[] = $s . '.unit';
 
         foreach ($aliases as $a) {
             if (Yii::app()->controller->getViewFile($a)!==false) {
@@ -178,7 +178,7 @@ class Content extends CActiveRecord
         $output = Yii::app()->controller->renderPartial($alias,
                            $params, true);
         if (trim($output) == '' && $params['editMode'])  {
-            $output = '[Блок "'.$className::NAME.'" на этой странице пуст] - это сообщение отображается только в режиме редактирования';
+            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => $className::name()));
         }
 
         if ($return)
@@ -275,5 +275,3 @@ class Content extends CActiveRecord
         }
     }
 }
-
-?>

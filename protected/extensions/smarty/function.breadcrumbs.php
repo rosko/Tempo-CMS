@@ -2,7 +2,7 @@
 
 function smarty_function_breadcrumbs($params, &$smarty){
 //    if(empty($params['text'])){
-//        throw new CException("Function 'text' parameter should be specified.");
+//        throw new CException(Yii::t('ESmartyViewRenderer.messages', 'Function "{name}" parameter should be specified.', array('{name}'=>'text')));
 //    }
 
     return Yii::app()->controller->widget('zii.widgets.CBreadcrumbs', array(

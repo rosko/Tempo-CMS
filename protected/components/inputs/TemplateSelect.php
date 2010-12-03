@@ -3,7 +3,7 @@
 class TemplateSelect extends CInputWidget
 {
     public $className;
-    public $empty = '«обычный»';
+    public $empty = '«default»';
 
     public function run()
 	{
@@ -24,7 +24,7 @@ class TemplateSelect extends CInputWidget
         $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
         $data = $className::getTemplates($className);
         if ($data != array()) {
-            $data = array_merge(array(''=>$this->empty), $data);
+            $data = array_merge(array(''=>Yii::t('cms', $this->empty)), $data);
 
             if($this->hasModel())
                 echo CHtml::activeDropDownList($this->model,$this->attribute,$data, $this->htmlOptions);
@@ -42,11 +42,12 @@ EOD;
         }
 
         $escaped_id = str_replace('.', '\\\\.', $id);
+        $txtTemplateEditor = Yii::t('cms', 'Template editor');
 
         $js = <<<EOD
 js:loadDialog({
         url: '/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escaped_id}').val(),
-        title: 'Редактор шаблонов',
+        title: '{$txtTemplateEditor}',
         id: 'filesEditor',
         className: 'filesEditor',
         width: $(window).width()-200,
@@ -97,7 +98,7 @@ js:loadDialog({
 EOD
 ;
 
-        echo '<br /> ' . CHtml::link('Редактировать шаблоны', '#', array('onclick' => $js));
+        echo '<br /> ' . CHtml::link(Yii::t('cms', 'Edit templates'), '#', array('onclick' => $js));
 
     }
 

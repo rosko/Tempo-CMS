@@ -46,7 +46,7 @@ class PageSelect extends CInputWidget
         if (!$this->multiple) {
             if ($this->hasModel() && $this->model->id == 1 && $this->attribute == 'parent_id')
             {
-                echo 'это главная страница сайта';    
+                echo Yii::t('cms', 'this is a home page');
             } else
                 echo CHtml::textField('',$title,$options);
         }
@@ -88,10 +88,11 @@ EOD;
         if (!$this->multiple) {
 
             if ($this->canClear) {
+                $txtClear = Yii::t('cms', 'Clear');
                 $js = <<<EOD
 $( "<a>&nbsp;</a>" )
     .attr( "tabIndex", -1 )
-    .attr( "title", "Очистить поле" )
+    .attr( "title", "{$txtClear}" )
     .insertAfter('#{$id}_title')
     .button({
         icons: {
@@ -109,10 +110,12 @@ $( "<a>&nbsp;</a>" )
     
 EOD;
             }
+            $txtShowlist = Yii::t('cms', 'Show list');
+            $txtLoading = Yii::t('cms', 'loading');
             $js .= <<<EOD
 $( "<a>&nbsp;</a>" )
     .attr( "tabIndex", -1 )
-    .attr( "title", "Показать список" )
+    .attr( "title", "{$txtShowlist}" )
     .insertAfter('#{$id}_title')
     .button({
         icons: {
@@ -130,7 +133,7 @@ $( "<a>&nbsp;</a>" )
 
 $('#{$id}_title').click(function() {
     if ($('#{$id}_dialog').html() == '') {
-        $('#{$id}_dialog').html('loading...');
+        $('#{$id}_dialog').html('{$txtLoading}...');
         $.ajax({
             url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=0',
             data: {$ajax_data},

@@ -8,6 +8,7 @@
     });
     $('#cms-pageunit-<?=$pageunit->id?>').find('<?=$selector?>').resizable({
         aspectRatio: false,
+        handles: 'n, e, s, w, ne, se, sw, nw',
         start: function(event, ui) {
             var s = $(event.target).children('<?=$selector?>');
             var o = $('<span></span>').css({
@@ -22,6 +23,10 @@
                 .width(s.eq(0).width())
                 .height(s.eq(0).height())
                 .insertBefore(s);
+            ui.helper.css({
+                'top': '',
+                'left': ''
+            });
         },
         resize: function(event, ui) {
             var s = $(event.target).children('<?=$selector?>');
@@ -36,6 +41,10 @@
                 .html(o)
                 .height(s.eq(0).height())
                 .css('padding-top', Math.ceil(s.eq(0).height()/2-10)+'px');
+            ui.helper.css({
+                'top': '',
+                'left': ''
+            });
         },
         stop: function(event, ui) {
             $('#infospan-<?=$pageunit->id?>').remove();
@@ -45,14 +54,21 @@
             var s = $(event.target).children('<?=$selector?>');
             var data = 'attribute=<?=$o['attributes']?>&width='+Math.round(ui.size.width)+'&height='+Math.round(ui.size.height)+'&tag='+s.get(0).tagName+'&number='+$('#cms-pageunit-<?=$pageunit->id?>').find('<?=$selector?>').index(s.get(0));
             <?php } ?>
+            ui.helper.css({
+                'top': '',
+                'left': ''
+            });
             ajaxSave('/?r=page/unitAjax&unit_id=<?=$unit->id?>', data, 'POST');
         }
     }).parent('.ui-wrapper').css({
         'position': 'relative',
-        'display': 'inline-block'
+        'display': 'inline-block',
+        'top': '',
+        'left': ''
     });
     $('#cms-pageunit-<?=$pageunit->id?>').find('<?=$selector?>').each(function(){
-        $(this).parent('.ui-wrapper').css('float', $(this).attr('align'));
+        if ($(this).attr('align'))
+            $(this).parent('.ui-wrapper').css('float', $(this).attr('align'));
     });
 <?php } ?>
 </script>

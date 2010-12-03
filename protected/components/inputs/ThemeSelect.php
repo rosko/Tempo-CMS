@@ -2,7 +2,7 @@
 
 class ThemeSelect extends CInputWidget
 {
-    public $empty = '«согласно общих настроек сайта»';
+    public $empty = '«as in general settings»';
 
     public function run()
 	{
@@ -20,7 +20,7 @@ class ThemeSelect extends CInputWidget
 
         $data = array_combine(Yii::app()->themeManager->themeNames, Yii::app()->themeManager->themeNames);
         if ($this->empty)
-            $data = array_merge(array(''=>$this->empty), $data);
+            $data = array_merge(array(''=>Yii::t('cms', $this->empty)), $data);
 
         if($this->hasModel())
             echo CHtml::activeDropDownList($this->model,$this->attribute,$data, $this->htmlOptions);

@@ -27,26 +27,26 @@ class Link extends CInputWidget
 
         $this->registerClientScript();
 
-        print "<ul><li>Ввести адрес ";
+        print "<ul><li>" . Yii::t('cms', 'URL') . " ";
         if($this->hasModel()) 
                 echo CHtml::activeTextField($this->model,$this->attribute,$this->htmlOptions);
         else
                 echo CHtml::textField($name,$this->value,$this->htmlOptions);
         if ($this->showFileManagerButton)
         {
-            print "</li><li>или ";
-            echo CHtml::button('Выбрать файл из загруженных', array(
+            print "</li><li>" . Yii::t('cms', 'or') . " ";
+            echo CHtml::button(Yii::t('cms', 'Browse uploaded'), array(
                 'id' => $this->htmlOptions['id'] . '_button',
                 'class' => 'cms-button',
             ));            
         }
         if ($this->showUploadButton)
         {
-            print "</li><li>или <div id='".$this->htmlOptions['id']."_file'></div>";            
+            print "</li><li>" . Yii::t('cms', 'or') . " <div id='".$this->htmlOptions['id']."_file'></div>";
         }
         if ($this->showPageSelectButton)
         {
-            print "</li><li>или Выбрать страницу<br />";
+            print "</li><li>" . Yii::t('cms', 'or') . " " . Yii::t('cms', 'Select page') . "<br />";
             $this->widget('PageSelect', array(
                 'textLinkId' => $this->htmlOptions['id'],
                 'name' => 'PageSelect',
@@ -81,22 +81,30 @@ EOD;
         if ($this->showUploadButton)
         {
             $cs->registerScriptFile('/3rdparty/file-uploader/client/jquery.fileuploader.js');
+            $txtDragHere = Yii::t('cms', 'Drag here');
+            $txtUpload = Yii::t('cms', 'Upload');
+            $txtCancel = Yii::t('cms', 'Cancel');
+            $txtError = Yii::t('cms', 'Error');
+            $txtServerError = Yii::t('cms', 'Some files were not uploaded, please contact support and/or try again.');
+            $txtTypeError = Yii::t('cms', '{file} has wrong type. Allowed only next types: {extensions}.');
+            $txtSizeError = Yii::t('cms', '{file} too big, maximum allowed size is {sizeLimit}.');
+            $txtEmptyError = Yii::t('cms' , '{file} is empty, please, choose files again except {file}.');
             $js .= <<<EOD
 var uploader = new qq.FileUploader({
     element: $('#{$id}_file')[0],
     action: '/3rdparty/file-uploader/server/php.php',
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
-                '<div class="cms-drop-area {$id}_drop"><span>{$id} Для загрузки переместите файл сюда</span></div>' +
-                '<div class="cms-button w200">Загрузить с компьютера</div>' +
+                '<div class="cms-drop-area {$id}_drop"><span>{$txtDragHere}</span></div>' +
+                '<div class="cms-button w200">{$txtUpload}</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
              '</div>',
     fileTemplate: '<li>' +
             '<span class="qq-upload-file"></span>' +
             '<span class="cms-upload-spinner"></span>' +
             '<span class="qq-upload-size"></span>' +
-            '<a class="qq-upload-cancel" href="#">Отмена</a>' +
-            '<span class="qq-upload-failed-text">Ошибка</span>' +
+            '<a class="qq-upload-cancel" href="#">{$txtCancel}</a>' +
+            '<span class="qq-upload-failed-text">{$txtError}</span>' +
         '</li>',
     onComplete: function(id, fileName, ret){
         if (ret.success)
@@ -120,10 +128,10 @@ var uploader = new qq.FileUploader({
         fail: 'qq-upload-fail'
     },
     messages: {
-        //serverError: "Some files were not uploaded, please contact support and/or try again.",
-        typeError: "{file} имеет неподходящий тип. Допустимы файлы только следующих типов: {extensions}.",
-        sizeError: "{file} слишком большой, максимальный допустимый размер файла {sizeLimit}.",
-        emptyError: "{file} пуст, пожалуйста, выберите файлы снова без {file}."
+        //serverError: "{$txtServerError}",
+        typeError: "{$txtTypeError}",
+        sizeError: "{$txtSizeError}",
+        emptyError: "{$txtEmptyError}"
     },
     showMessage: function(message) {
         showInfoPanel(message, 10);
@@ -157,5 +165,3 @@ EOD;
         
     }
 }
-
-?>

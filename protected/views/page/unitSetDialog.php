@@ -91,21 +91,21 @@ EOD
 
 ?>
 
-<h3>Размещение блока на страницах:</h3>
-Отметить:
+<h3><?=Yii::t('cms', 'Unit location on pages')?>:</h3>
+<?=Yii::t('cms', 'Check')?>:
 <br />
 <select id="cms-sel-pagemap-select" class="cms-btn-pagemap-select">
-    <option value="all">Все страницы</option>
-    <option value="current">Только текущую страницу</option>
-    <option value="current+children">Только текущую и все дочерние</option>
-    <option value="all-current">Все, кроме текущей</option>
-    <option value="all-current-children">Все, кроме текущей и ее дочерних страниц</option>
-    <option value="none">Ничего</option>
+    <option value="all"><?=Yii::t('cms', 'All pages')?></option>
+    <option value="current"><?=Yii::t('cms', 'Current page only')?></option>
+    <option value="current+children"><?=Yii::t('cms', 'Current and children pages only')?></option>
+    <option value="all-current"><?=Yii::t('cms', 'All pages, except current')?></option>
+    <option value="all-current-children"><?=Yii::t('cms', 'All, except current and children pages')?></option>
+    <option value="none"><?=Yii::t('cms', 'Nothing')?></option>
 </select>
 <input type="button" value="Ок" class="cms-btn-pagemap-select" />
 <br /><br />
 
-<a href="#" class="cms-btn-pagemap-openall">Раскрыть все</a> / <a href="#" class="cms-btn-pagemap-closeall">Скрыть все</a>
+<a href="#" class="cms-btn-pagemap-openall"><?=Yii::t('cms', 'Expand all')?></a> / <a href="#" class="cms-btn-pagemap-closeall"><?=Yii::t('cms', 'Collapse all')?></a>
 <br /><br />
 <?php
     $pages = $unit->pages;
@@ -128,4 +128,4 @@ EOD
     ));
 ?>
 <br />
-<a class="cms-button w400" id="cms-pageunit-set-select-ok" href="#">Разместить блок только на отмеченных страницах</a>
+<a class="cms-button w400" id="cms-pageunit-set-select-ok" href="#"><?=Yii::t('cms', 'Set unit on selected pages only')?></a>

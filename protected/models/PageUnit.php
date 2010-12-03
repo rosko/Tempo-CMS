@@ -32,10 +32,10 @@ class PageUnit extends CActiveRecord
 	{
 		return array(
 //			'id' => 'ID',
-			'page_id' => 'Страница',
-//			'unit_id' => 'Unit',
-			'area' => 'Область страницы',
-//			'order' => 'Order',
+			'page_id' => Yii::t('cms', 'Page'),
+//			'unit_id' => Yii::t('cms', 'Unit'),
+			'area' => Yii::t('cms', 'Page area'),
+//			'order' => Yii::t('cms', 'Order'),
 		);
 	}
 	

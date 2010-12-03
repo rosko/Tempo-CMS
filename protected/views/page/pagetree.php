@@ -6,8 +6,8 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'initially_open'=>array($tree_id.'-1'),
         'animation'=>0,
         'strings'=>array(
-            'loading'=>'Загрузка ...',
-            'new_node'=>'Новая страница'
+            'loading'=>Yii::t('cms', 'Loading ...'),
+            'new_node'=>Yii::t('cms', 'New page'),
         ),
     ),
     'plugins'=>array(
@@ -68,7 +68,7 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'select_node'=>true,
         'items' => array (
             'check_node_all' => array (
-                'label' => "Отметить все дочерние страницы", 
+                'label' => Yii::t('cms', 'Select all children pages'),
                 'icon' => 'create',
                 'action' => <<<EOD
 js:function(obj) {

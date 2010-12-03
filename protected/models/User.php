@@ -25,12 +25,12 @@ class User extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'login' => 'Login',
-			'password' => 'Password',
-			'email' => 'Email',
-			'name' => 'Name',
-			'access' => 'Access',
+			'id' => Yii::t('cms', 'ID'),
+			'login' => Yii::t('cms', 'Username'),
+			'password' => Yii::t('cms', 'Password'),
+			'email' => Yii::t('cms', 'E-mail'),
+			'name' => Yii::t('cms', 'Name'),
+			'access' => Yii::t('cms', 'Access'),
 		);
 	}
 

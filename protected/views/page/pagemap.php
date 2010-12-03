@@ -1,6 +1,6 @@
-<h3>Карта сайта</h3>
-<p>Кликните дважды на нужной странице для перехода.<br />
-<a href="#" class="cms-btn-pagemap-openall">Раскрыть все</a> / <a href="#" class="cms-btn-pagemap-closeall">Скрыть все</a>
+<h3><?=Yii::t('cms', 'Sitemap')?></h3>
+<p><?=Yii::t('cms', 'Click twice on page to go')?><br />
+<a href="#" class="cms-btn-pagemap-openall"><?=Yii::t('cms', 'Expand all')?></a> / <a href="#" class="cms-btn-pagemap-closeall"><?=Yii::t('cms', 'Collapse all')?></a>
 </p>
 <?php
 
@@ -44,8 +44,8 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'initially_open'=>$initially_open,
         'animation'=>0,
         'strings'=>array(
-            'loading'=>'Загрузка ...',
-            'new_node'=>'Новая страница'
+            'loading'=>Yii::t('cms', 'Loading ...'),
+            'new_node'=>Yii::t('cms', 'New page'),
         ),
     ),
     'plugins'=>array(
@@ -130,35 +130,35 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'select_node'=>true,
         'items' => array (
             'create' => array (
-                'label' => "Создать (Ins)", 
+                'label' => Yii::t('cms', 'Create') . " (Ins)",
                 'icon' => 'create',
                 'action' => 'js:function (obj) { this.create(obj, "inside");  }',
                 'separator_after' => true,
             ),
             'rename' => array(
-                'label' => "Переименовать (F2)", 
+                'label' => Yii::t('cms', 'Rename') . " (F2)",
                 'icon' => "rename",
                 'action' => 'js:function (obj) { this.rename(obj); }', 
             ),
             'remove' => array(
-                'label' => "Удалить (Del)",
+                'label' => Yii::t('cms', 'Remove') . " (Del)",
                 'icon' => "remove",
                 'action' => 'js:function (obj) { this.remove(obj); }', 
                 'separator_after' => true,
             ),
             'ccp' => false,
             'cut' => array(
-                'label' => 'Вырезать (Ctrl+X)',
+                'label' => Yii::t('cms', 'Cut') . ' (Ctrl+X)',
                 'icon' => 'cut',                    
                 'action' => 'js:function (obj) { this.cut(obj); }', 
             ),
 //            'copy' => array(
-//                'label' => 'Копировать (Ctrl+C)',
+//                'label' => Yii::t('cms', 'Copy') . ' (Ctrl+C)',
 //                'icon' => 'copy',
 //                'action' => 'js:function (obj) { this.copy(obj); }', 
 //            ),
             'paste' => array(
-                'label' => 'Вставить (Ctrl+V)',
+                'label' => Yii::t('cms', 'Paste') . ' (Ctrl+V)',
                 'icon' => 'paste',                    
                 'action' => 'js:function (obj) { this.paste(obj); }', 
             )

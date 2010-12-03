@@ -73,8 +73,8 @@ EOD
                     array(
                         'name'=>'title',
                         'type'=>'raw',
-                        'header'=>'Название',
-                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"Редактировать", "ondblclick"=>""))',
+                        'header'=>Yii::t('cms', 'Title'),
+                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
                     ),
                 ),
                 $this->columns,
@@ -84,7 +84,7 @@ EOD
                         'template'=>'{view} {update} {del}',
                         'buttons'=>array(
                             'view'=>array(
-                                'label'=>'Перейти на страницу',
+                                'label'=>Yii::t('cms', 'Go to page'),
                                 'url' => '"javascript:gotoRecordPage({$data->id}, \'".get_class($data)."\')"',
                                 'visible' => '$data->unit',
                             ),
@@ -92,7 +92,7 @@ EOD
                                 'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\');"',
                             ),
                             'del'=>array(
-                                'label'=>'Удалить',
+                                'label'=>Yii::t('cms', 'Delete'),
                                 'imageUrl'=>'/images/delete.png',
                                 'url'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\')"',
                             ),
@@ -133,5 +133,3 @@ EOD
 
     }
 }
-
-?>

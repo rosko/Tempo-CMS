@@ -7,10 +7,10 @@
 <input type="hidden" id="<?=$id?>_readonly" value="1" />
 
     <h2><?=$title?></h2> 
-    <h3 id="<?=$id?>_currentfile">Файл: <span></span></h3>
+    <h3 id="<?=$id?>_currentfile"><?=Yii::t('filesEditor', 'File')?>: <span></span></h3>
 
     <?php if ($suggestions != array()) { ?>
-    Переменные: <?php
+    <?=Yii::t('filesEditor', 'Variables')?>: <?php
     $this->widget('ComboBox', array(
         'array' => $suggestions,
         'name' => $id . '_suggestions',
@@ -30,26 +30,26 @@
         <?php foreach ($files as $file) {?>
         <li><a href="#" class="fileitem" rev="<?=$file['name']?>" rel="<?=$file['writable']?>"><?=$file['title']?></a>
             <?php if (!$file['writable']) { ?>
-        <nobr>[только для чтения]</nobr>
+        <nobr>[<?=Yii::t('filesEditor', 'read-only')?>]</nobr>
             <?php } ?>
         </li>
         <?php } ?>
     </ul>
 
-    <a href="#" id="<?=$id?>_create">Создать файл</a>
+    <a href="#" id="<?=$id?>_create"><?=Yii::t('filesEditor', 'Create file')?></a>
     <div id="<?=$id?>_creatediv" style="display:none;">
         <input type="text" id="<?=$id?>_newfilename" />
         <input type="button" id="<?=$id?>_createfile" value="Ok" />
     </div>
     <br /><br /><br />
-    <a style="display:none;" id="<?=$id?>_delete" href="#" title="Удалить">X</a><br />
+    <a style="display:none;" id="<?=$id?>_delete" href="#" title="<?=Yii::t('filesEditor', 'Delete')?>">X</a><br />
 
 </div>
 <br style="clear:both; "/>
-<input type="checkbox" id="<?=$id?>_highlight" checked="true" /><label for="<?=$id?>_highlight">Подсветка кода</label>
+<input type="checkbox" id="<?=$id?>_highlight" checked="true" /><label for="<?=$id?>_highlight"><?=Yii::t('filesEditor', 'Code highlighting')?></label>
 <br /><br />
-<input disabled="true" type="submit" name="apply" value="Сохранить" />
-<input disabled="true" type="submit" name="save" value="Сохранить и закрыть это окно" />
+<input disabled="true" type="submit" name="apply" value="<?=Yii::t('filesEditor', 'Save')?>" />
+<input disabled="true" type="submit" name="save" value="<?=Yii::t('filesEditor', 'Save and close window')?>" />
 </form>
 
 <style type="text/css">
@@ -135,13 +135,13 @@ function isModified()
 
 $('#<?=$id?>').parent().bind('dialogbeforeclose', function (event, ui) {
     if (isModified()) {
-        $('<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 10px 0;"></span>Сохранить?</p>').dialog({
+        $('<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 10px 0;"></span><?=Yii::t('filesEditor', 'Save?')?></p>').dialog({
             resizable: false,
-            title: 'Файл несохранен',
+            title: '<?=Yii::t('filesEditor', 'File is modified')?>',
             modal: true,
             zIndex: 100000,
             buttons: {
-                'Да': function() {
+                '<?=Yii::t('filesEditor', 'Yes')?>': function() {
                     $('#<?=$id?>').attr('rev','apply').submit();
                     if (editor)
                         $('#<?=$id?>_textarea').data('initvalue', editor.getCode());
@@ -150,7 +150,7 @@ $('#<?=$id?>').parent().bind('dialogbeforeclose', function (event, ui) {
                     $('#<?=$id?>').parent().dialog('close');
                     $( this ).dialog( "close" );
                 },
-                'Нет': function() {
+                '<?=Yii::t('filesEditor', 'No')?>': function() {
                     if (editor)
                         $('#<?=$id?>_textarea').data('initvalue', editor.getCode());
                     else
@@ -158,7 +158,7 @@ $('#<?=$id?>').parent().bind('dialogbeforeclose', function (event, ui) {
                     $('#<?=$id?>').parent().dialog('close');
                     $( this ).dialog( "close" );
                 },
-                'Отмена': function() {
+                '<?=Yii::t('filesEditor', 'Cancel')?>': function() {
                     $( this ).dialog( "close" );
                 }
             },
@@ -175,13 +175,13 @@ $('#<?=$id?>').parent().bind('dialogbeforeclose', function (event, ui) {
 function loadFile(file, writable, button)
 {
     if (isModified()) {
-        $('<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 10px 0;"></span>Сохранить?</p>').dialog({
+        $('<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 10px 0;"></span><?=Yii::t('filesEditor', 'Save?')?></p>').dialog({
             resizable: false,
-            title: 'Файл несохранен',
+            title: '<?=Yii::t('filesEditor', 'File is modified')?>',
             modal: true,
             zIndex: 100000,
             buttons: {
-                'Да': function() {
+                '<?=Yii::t('filesEditor', 'Yes')?>': function() {
                     $('#<?=$id?>').attr('rev','apply').submit();
                     if (editor)
                         $('#<?=$id?>_textarea').data('initvalue', editor.getCode());
@@ -190,7 +190,7 @@ function loadFile(file, writable, button)
                     loadFile(file, writable, button);
                     $( this ).dialog( "close" );
                 },
-                'Нет': function() {
+                '<?=Yii::t('filesEditor', 'No')?>': function() {
                     if (editor)
                         $('#<?=$id?>_textarea').data('initvalue', editor.getCode());
                     else
@@ -198,7 +198,7 @@ function loadFile(file, writable, button)
                     loadFile(file, writable, button);
                     $( this ).dialog( "close" );
                 },
-                'Отмена': function() {
+                '<?=Yii::t('filesEditor', 'Cancel')?>': function() {
                     $( this ).dialog( "close" );
                 }
             },
@@ -336,7 +336,7 @@ $('#<?=$id?>_createfile').click(function() {
 });
 
 $('#<?=$id?>_delete').click(function() {
-    if (confirm('Вы действительно хотите удалить этот файл? Удаленный файл нельзя будет восстановить.')) {
+    if (confirm('<?=Yii::t('filesEditor', 'Are you really want to delete file? Deleted files are unrecovered.')?>')) {
         var filename = $('#<?=$id?> input[name=file]:hidden').val();
         $.ajax({
             url: '/?r=filesEditor/delete',

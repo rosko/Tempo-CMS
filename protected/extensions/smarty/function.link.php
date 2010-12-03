@@ -16,7 +16,7 @@
  */
 function smarty_function_link($params, &$smarty){
     if(empty($params['text'])){
-        throw new CException("Function 'text' parameter should be specified.");
+        throw new CException(Yii::t('ESmartyViewRenderer.messages', 'Function "{name}" parameter should be specified.', array('{name}'=>'text')));
     }
     
     $text = empty($params['text']) ? '#' : $params['text'];

@@ -67,7 +67,7 @@ class ESmartyViewRenderer extends CApplicationComponent implements IViewRenderer
 
         // check if view file exists
         if(!is_file($sourceFile) || ($file=realpath($sourceFile))===false)
-            throw new CException(Yii::t('yiiext','View file "{file}" does not exist.', array('{file}'=>$sourceFile)));
+            throw new CException(Yii::t('ESmartyViewRenderer.messages','View file "{file}" does not exist.', array('{file}'=>$sourceFile)));
 
         //assign data
         $tpl = $this->sysAssign($this->smarty->createTemplate($sourceFile));
@@ -77,7 +77,7 @@ class ESmartyViewRenderer extends CApplicationComponent implements IViewRenderer
         try {
             $ret = $tpl->fetch($sourceFile);
         } catch (Exception $e) {
-            $ret = '! Синтаксическая ошибка в шаблоне';
+            $ret = Yii::t('ESmartyViewRenderer.messages', '! Syntax error in template');
         }
 
         return $ret;

@@ -27,22 +27,22 @@ class FileInput extends CInputWidget
 
         $this->registerClientScript();
 
-        print "<ul><li>Ввести адрес ";
+        print "<ul><li>" . Yii::t('cms', 'URL') . " ";
         if($this->hasModel()) 
                 echo CHtml::activeTextField($this->model,$this->attribute,$this->htmlOptions);
         else
                 echo CHtml::textField($name,$this->value,$this->htmlOptions);
         if ($this->showFileManagerButton)
         {
-            print "</li><li>или ";
-            echo CHtml::button('Выбрать из загруженных', array(
+            print "</li><li>" . Yii::t('cms', 'or') . " ";
+            echo CHtml::button(Yii::t('cms', 'Browse uploaded'), array(
                 'id' => $this->htmlOptions['id'] . '_button',
                 'class' => 'cms-button w200',
             ));            
         }
         if ($this->showUploadButton)
         {
-            print "</li><li>или <div id='".$this->htmlOptions['id']."_file'></div>";            
+            print "</li><li" . Yii::t('cms', 'or') . " <div id='".$this->htmlOptions['id']."_file'></div>";
         }
         print "</li></ul>";
         
@@ -72,14 +72,20 @@ EOD;
         if ($this->showUploadButton)
         {
             $cs->registerScriptFile('/3rdparty/file-uploader/client/fileuploader.js');
+            $txtDragHere = Yii::t('cms', 'Drag here');
+            $txtUpload = Yii::t('cms', 'Upload');
+            $txtServerError = Yii::t('cms', 'Some files were not uploaded, please contact support and/or try again.');
+            $txtTypeError = Yii::t('cms', '{file} has wrong type. Allowed only next types: {extensions}.');
+            $txtSizeError = Yii::t('cms', '{file} too big, maximum allowed size is {sizeLimit}.');
+            $txtEmptyError = Yii::t('cms' , '{file} is empty, please, choose files again except {file}.');
             $js .= <<<EOD
 var uploader = new qq.FileUploader({
     element: document.getElementById('{$id}_file'),
     action: '/3rdparty/file-uploader/server/php.php',
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
-                '<div class="cms-drop-area"><span>Для загрузки переместите файл сюда</span></div>' +
-                '<div class="cms-button w200">Загрузить с компьютера</div>' +
+                '<div class="cms-drop-area"><span>{$txtDragHere}</span></div>' +
+                '<div class="cms-button w200">{$txtUpload}</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
              '</div>',
     onComplete: function(id, fileName, ret){
@@ -104,10 +110,10 @@ var uploader = new qq.FileUploader({
         fail: 'qq-upload-fail'
     },
     messages: {
-        //serverError: "Some files were not uploaded, please contact support and/or try again.",
-        typeError: "{file} имеет неподходящий тип. Допустимы файлы только следующих типов: {extensions}.",
-        sizeError: "{file} слишком большой, максимальный допустимый размер файла {sizeLimit}.",
-        emptyError: "{file} пуст, пожалуйста, выберите файлы снова без {file}."
+        //serverError: "{$txtServerError}",
+        typeError: "{$txtTypeError}",
+        sizeError: "{$txtSizeError}",
+        emptyError: "{$txtEmptyError}"
     },
     showMessage: function(message) {
         showInfoPanel(message, 10);
@@ -141,5 +147,3 @@ EOD;
         
     }
 }
-
-?>

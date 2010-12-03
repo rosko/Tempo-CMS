@@ -33,9 +33,9 @@ class Unit extends CActiveRecord
 	{
 		return array(
 //			'id' => 'ID',
-//			'type' => 'Тип',
-			'title' => 'Название',
-            'template' => 'Шаблон',
+//			'type' => Yii::t('cms', 'Type),
+			'title' => Yii::t('cms', 'Title'),
+            'template' => Yii::t('cms', 'Template'),
 		);
 	}
 
@@ -64,20 +64,27 @@ class Unit extends CActiveRecord
      */
     public static function getTypes()
 	{
-		$files = CFileHelper::findFiles(Yii::getPathOfAlias('application.units'),
-			array('fileTypes'=>array('php'),
-				  'level'=>0));
-		$ret = array();
-		foreach ($files as $f) {
-			$p = pathinfo($f);
-            $className = $p['filename'];
+        self::loadTypes();
+        $config = Yii::getPathOfAlias('application.units.config').'.php';
+        $classNames = array_keys(include($config));
+		foreach ($classNames as $className) {
             if (!Yii::app()->settings->getValue('simpleMode') || !$className::HIDDEN)
-                $ret[$className] = $className::NAME;
+                $ret[$className] = $className::name();
             
 		}
         asort($ret);
 		return array_keys($ret);
 	}
+
+    public static function loadTypes()
+    {
+        $config = Yii::getPathOfAlias('application.units.config').'.php';
+        $map = include($config);
+        foreach ($map as $className => $alias) {
+            Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
+        }
+
+    }
 	
 	public function beforeDelete()
 	{

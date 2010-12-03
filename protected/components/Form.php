@@ -24,7 +24,7 @@ EOD;
                 substr($element->content,0,$td_len)==self::TAB_DELIMETER
                     && substr($element->content,-$td_len)==self::TAB_DELIMETER  ){
                 if ($i > 1) {
-                    $title = 'Свойства';
+                    $title = Yii::t('cms', 'Properties');
                     $link = '#cms-form-'.$this->uniqueId.'-tab-'.$t_counter;
                     $output .= '</div><div id="cms-form-'.$this->uniqueId.'-tab-'.$t_counter.'">';
                     $t_counter++;
@@ -82,12 +82,13 @@ EOD;
         if ($t_counter > 0) {
             $preoutput .= '</ul>';
             $output = substr($output,6) . '</div>';
+            $txtLoadError = Yii::t('cms', 'Tab loading error');
             $js .= <<<EOD
 		$("#cms-form-tabs-{$this->uniqueId}").tabs({
             collapsible: true,
 			ajaxOptions: {
 				error: function( xhr, status, index, anchor ) {
-					$( anchor.hash ).html( "Ошибка при загрузке закладки." );
+					$( anchor.hash ).html( "{$txtLoadError}" );
 				}
 			}
         });

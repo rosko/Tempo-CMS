@@ -1,13 +1,13 @@
 <hr />
 <select id="<?=$className;?>_setsize">
-	<option value="">Выберите размер изображения</option>
-	<option value="0x0">Действительный</option>
+	<option value=""><?=Yii::t('UnitImage.unit', 'Select image size')?></option>
+	<option value="0x0"><?=Yii::t('UnitImage.unit', 'Actual')?></option>
 	<option value="88x31">88 x 31</option>
 	<option value="100x100">100 x 100</option>
 	<option value="150x400">150 x 400</option>
 	<option value="200x200">200 x 200</option>
 </select><br />
-<input type="checkbox" id="<?=$className;?>_ratio" checked="checked" /><label style="display:inline;clear:none;" for="<?=$className;?>_ratio"> Сохранять пропорции</label>
+<input type="checkbox" id="<?=$className;?>_ratio" checked="checked" /><label style="display:inline;clear:none;" for="<?=$className;?>_ratio"> <?=Yii::t('UnitImage.unit', 'Aspect ratio')?></label>
 <script type="text/javascript">
 <!--
 //$('.field_title').hide();

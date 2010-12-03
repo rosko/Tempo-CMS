@@ -5,7 +5,7 @@ Yii::import('zii.widgets.jui.CJuiInputWidget');
 class ComboBox extends CJuiInputWidget
 {
     public $array = array();
-    public $empty = '«нет»';
+    public $empty = '«n/a»';
     public $showAllValues = false;
     public $css = array();
     public $canEdit = false;
@@ -24,7 +24,7 @@ class ComboBox extends CJuiInputWidget
             $this->array = $this->model->getAllValuesBy($this->attribute);
             $this->array = array_combine($this->array, $this->array);
         } elseif ($this->empty) {
-                $this->array = array_merge(array('0'=>$this->empty), $this->array);
+                $this->array = array_merge(array('0'=>Yii::t('cms', $this->empty)), $this->array);
         }
 
         list($name,$id)=$this->resolveNameID();
@@ -181,5 +181,3 @@ EOD;
     }
 
 }
-
-?>

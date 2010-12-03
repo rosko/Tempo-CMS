@@ -15,7 +15,7 @@
  */
 function smarty_function_t($params, &$smarty) {
     if (empty($params['text']) || empty($params['cat'])) {
-        throw new CException(Yii::t('yiiext', "You should specify both cat and text parameters."));
+        throw new CException(Yii::t('ESmartyViewRenderer.messages', 'You should specify both "cat" and "text" parameters.'));
     }
 
     $text = $params['text'];

@@ -21,6 +21,7 @@ class Page extends CActiveRecord
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
 			array('path, title, keywords, description, redirect', 'length', 'max'=>255),
             array('theme', 'length', 'max'=>50),
+            array('language', 'length', 'max'=>10),
 		);
 	}
 	
@@ -192,15 +193,16 @@ class Page extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'parent_id' => 'Родительская страница',
-			'title' => 'Заголовок',
-			'keywords' => 'Ключевые слова',
-			'description' => 'Описание',
-			'order' => 'Order',
-			'active' => 'Включено',
-            'redirect' => 'Переадресация',
-            'theme' => 'Тема оформления (дизайн) страницы',
+			'id' => Yii::t('cms', 'ID'),
+			'parent_id' => Yii::t('cms', 'Parent page'),
+			'title' => Yii::t('cms', 'Title'),
+			'keywords' => Yii::t('cms', 'Keywords'),
+			'description' => Yii::t('cms', 'Description'),
+			'order' => Yii::t('cms', 'Order'),
+			'active' => Yii::t('cms', 'Active'),
+            'redirect' => Yii::t('cms', 'Redirect'),
+            'theme' => Yii::t('cms', 'Page graphic theme'),
+            'language' => Yii::t('cms', 'Page language'),
 		);
 	}
 	
@@ -209,7 +211,7 @@ class Page extends CActiveRecord
 		return array(
 //			'title'=>'Свойства страницы',
 			'elements'=>array(
-                Form::tab('Свойства страницы'),
+                Form::tab(Yii::t('cms', 'Page properties')),
 				'title'=>array(
 					'type'=>'text',
 					'maxlength'=>255,
@@ -232,7 +234,7 @@ class Page extends CActiveRecord
 					'rows'=>4,
 					'cols'=>40
 				),
-                Form::tab('Дополнительно'),
+                Form::tab(Yii::t('cms', 'Extra')),
                 'redirect'=>array(
                     'type'=>'Link',
                     'showFileManagerButton'=>false,
@@ -241,12 +243,15 @@ class Page extends CActiveRecord
                 'theme'=>array(
                     'type'=>'ThemeSelect',
                 ),
+                'language'=>array(
+                    'type'=>'LanguageSelect'
+                ),
 			),
 			'buttons'=>array(
 				'save'=>array(
 					'type'=>'submit',
-					'label'=>'Сохранить',
-					'title'=>'Сохранить и закрыть окно'
+					'label'=>Yii::t('cms', 'Save'),
+					'title'=>Yii::t('cms', 'Save and close window')
 				),
 			)
 		);
@@ -293,7 +298,7 @@ class Page extends CActiveRecord
 	public static function defaultObject()
 	{
 		$obj = new self;
-		$obj->title = 'Новая страница созданная ' . date("Y-m-d H:i:s");
+		$obj->title = Yii::t('cms', 'New page createad at {time}', array('{time}' => date("Y-m-d H:i:s")));
 		$obj->active = true;
 		$obj->order = 0;
 		return $obj;

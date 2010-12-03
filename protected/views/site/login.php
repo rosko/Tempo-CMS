@@ -1,8 +1,8 @@
 <?php
-$this->pageTitle= 'Вход';
+$this->pageTitle= Yii::t('cms', 'Login');
 ?>
 
-<h1>Вход</h1>
+<h1><?=Yii::t('cms', 'Login')?></h1>
 
 <div class="form">
 <?php $form=$this->beginWidget('CActiveForm', array(
@@ -30,7 +30,7 @@ $this->pageTitle= 'Вход';
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Войти'); ?>
+		<?php echo CHtml::submitButton(Yii::t('cms', 'Sing in')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

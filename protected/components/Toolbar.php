@@ -146,5 +146,3 @@ class Toolbar extends CWidget
     }
 
 }
-
-?>

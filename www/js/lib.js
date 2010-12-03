@@ -1,3 +1,12 @@
+function t(message, params)
+{
+    for (x in params)
+    {
+        message = message.replace(x, params[x]);
+    }
+    return message;
+}
+
 // =============================================================
 
 // Картинка изображающая процесс загрузки
@@ -82,7 +91,7 @@ function ajaxSaveProcess()
 
 function ajaxSaveDone()
 {
-    showInfoPanel('Сохранено');
+    showInfoPanel(i18n.cms.saved);
     cms_current_command = null;
 }
 
@@ -97,7 +106,7 @@ function ajaxSaveRepeat(timeout)
     cms_save_commands.unshift(cms_current_command);
     cms_current_command = null;
     
-    showInfoPanel('Ошибка при сохранении. Попытка через <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">Повторить сейчас</a>', timeout-1, true);
+    showInfoPanel(i18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+i18n.cms.retryNow+'</a>', timeout-1, true);
     $('#cms-info-button-repeat').click(function() {
         hideInfoPanel();
         cms_save_timer = false;
@@ -350,7 +359,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
         $(this).after('<input class="submit" type="hidden" name="'+$(this).attr('name')+'" value="'+$(this).val()+'" />');
     });
     f.find('input[name=delete]').click(function() {
-        return confirm('Вы действительно хотите удалить? Данные будут удалены безвозвратно.');
+        return confirm(i18n.cms.deleteWarning);
     });
     f.find('input').bind('keydown', 'ctrl+return', function() {
         $(this).after('<input class="submit" type="hidden" name="save" value="save" />');
@@ -417,7 +426,7 @@ function CmsAreaEmptyCheck()
         if ($(this).find('.cms-pageunit').length > 0) {
             $(this).find('.cms-empty-area-buttons').remove();
         } else {
-            var btn = $('<a class="cms-button w200" title="Добавить еще один блок" href="#">Добавить блок</a>')
+            var btn = $('<a class="cms-button w200" title="'+i18n.cms.addAnotherUnit+'" href="#">'+i18n.cms.addUnit+'</a>')
                 .click(function() {
                     pageunitAddForm(this);
                     return false;
@@ -516,7 +525,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
                 });
             }
             else {
-                if (confirm('Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.'))
+                if (confirm(i18n.cms.deleteUnitWarning))
                 {
                     ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
                         $('#cms-pageunit-'+pageunit_id).remove();
@@ -667,7 +676,7 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
         success: function(html) {
             hideInfoPanel();
             if (html == '0') {
-                if (confirm('Вы действительно хотите удалить страницу? Данные на странице будут удалены безвозвратно.'))
+                if (confirm(i18n.cms.deletePageWarning))
                 {
                     // В функции должно быть ручное удаление страницы
                     if ($.isFunction(onOneDelete)) {
@@ -741,7 +750,7 @@ function recordEditForm(id, class_name, unit_id, grid_id)
             var height = $(window).height()-100;
             var width = $(window).width()-200;
             dlg.dialog({
-                title: 'Редактирование',
+                title: i18n.cms.editing,
                 resizable: true,
                 draggable: true,
                 maxHeight: height,
@@ -784,23 +793,23 @@ function recordDelete(id, class_name, unit_id, grid_id)
                         if (ret.page.similarToParent) {
                             recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
                         } else {
+                            var buttons = {};
+                            buttons[i18n.cms.deleteUnitOnly] = function() {
+                                recordDeleteConfirm(unit_id, grid_id);
+                                $(this).dialog('close');
+                            };
+                            buttons[i18n.cms.deleteUnitAndPage] = function() {
+                                recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
+                                $(this).dialog('close');
+                            };
                             var dlg_id = 'UnitDeleteConform_'+unit_id;
                             var dlg = $('#cms-dialog').clone().attr('id', dlg_id).addClass('cms-dialog').appendTo('body');
-                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>На странице (<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>), где размещен удаляемый блок, также присутствуют какие-то другие информационные блоки. Возможно, вы добавили что-то самостоятельно на указанную страницу. Что делать?');
+                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(i18n.cms.deleteUnitRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
                             dlg.dialog({
-                                title: 'Удаление блока',
+                                title: i18n.cms.deletingUnit,
                                 modal: true,
                                 zIndex: 10000,
-                                buttons: {
-                                    "Удалить только блок": function() {
-                                        recordDeleteConfirm(unit_id, grid_id);
-                                        $(this).dialog('close');
-                                    },
-                                    "Удалить и блок, и страницу": function() {
-                                        recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
-                                        $(this).dialog('close');
-                                    }
-                                },
+                                buttons: buttons,
                                 close: function() {
                                     $('#'+dlg_id).remove();
                                 }
@@ -816,7 +825,7 @@ function recordDelete(id, class_name, unit_id, grid_id)
         });
     } else {
         // Удаляем просто запись
-        if (confirm('Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.'))
+        if (confirm(i18n.cms.deleteRecordWarning))
         {
             ajaxSave('/?r=records/delete&id='+id+'&class_name='+class_name, '', 'GET', function(ret) {
                 $.fn.yiiGridView.update(grid_id);
@@ -828,7 +837,7 @@ function recordDelete(id, class_name, unit_id, grid_id)
 function recordDeleteConfirm(unit_id, grid_id, data, str)
 {
     if (str == undefined) {
-        var str = 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.';
+        var str = i18n.cms.deleteRecordWarning;
     }
     if (confirm(str))
     {

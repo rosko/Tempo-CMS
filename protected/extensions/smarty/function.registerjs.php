@@ -2,7 +2,7 @@
 
 function smarty_function_registerjs($params, &$smarty){
     if(empty($params['file']))
-        throw new CException("В функции registercss должен быть указан параметр file");
+        throw new CException(Yii::t('ESmartyViewRenderer.messages', 'Function "{name}" parameter should be specified.', array('{name}'=>'file')));
 
     if((Yii::app()->getViewRenderer())!==null)
         $extension=Yii::app()->getViewRenderer()->fileExtension;

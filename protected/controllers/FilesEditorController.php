@@ -4,6 +4,8 @@ class FilesEditorController extends Controller
 {
 	public $defaultAction = 'form';
 
+    const SUGGESTIONS_SEPARATOR = ' :: ';
+
 	public function filters()
 	{
 		return array(
@@ -32,13 +34,13 @@ class FilesEditorController extends Controller
         $def = 0;
         $suggestions = array(
             ''=>'',
-            '{dateformat pattern="d MMMM yyyy" time=$content.date}'=> 'Функция для отображения времени',
-            '{link text="Ссылка" url="page/view?id=1"}' => 'Функция для отображения ссылки, например на страницу с ID=1',
+            '{dateformat pattern="d MMMM yyyy" time=$content.date}'=> Yii::t('filesEditor', 'Function to show time'),
+            '{link text="'.Yii::t('cms', 'Link').'" url="page/view?id=1"}' => Yii::t('filesEditor', 'Function to show link, i.e. to page with ID=1'),
         );
         if ($type == 'templates') {
             if (class_exists($name)) {
-                $suggestions['{registercss file="file.css"}'] = 'Функция подключения CSS-файла, который размещен в папке ресурсов files текущего блока';
-                $suggestions['{registerjs file="file.js"}'] = 'Функция подключения яваскрипт-файла, который размещен в папке ресурсов files текущего блока';
+                $suggestions['{registercss file="file.css"}'] = Yii::t('filesEditor', 'Function to connect CSS-file');
+                $suggestions['{registerjs file="file.js"}'] = Yii::t('filesEditor', 'Function to connect JavaScript-file');
 
                 if((Yii::app()->getViewRenderer())!==null)
                     $extension=Yii::app()->getViewRenderer()->fileExtension;
@@ -48,7 +50,7 @@ class FilesEditorController extends Controller
                 $data = $name::getTemplates($name, false);
                 $files[] = array(
                     'name' => '',
-                    'title' => '«обычный»',
+                    'title' => Yii::t('filesEditor', '«default»'),
                     'writable' => false,
                 );
                 foreach ($data as $file)
@@ -64,15 +66,15 @@ class FilesEditorController extends Controller
                     }
                 }
 
-                $title = 'Шаблоны блоков &laquo;'.$name::NAME.'&raquo;';
+                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>$name::name()));
 
                 // Формируем подсказки:
-                $suggestions['{$editMode}'] = 'Признак режима редактирования';
+                $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
                 if (method_exists($name, 'templateVars'))
                 {
                     $vars = $name::templateVars();
                     foreach ($vars as $k => $v) {
-                        $suggestions[$k] = 'Блок :: ' . $v;
+                        $suggestions[$k] = Yii::t('filesEditor', 'Unit') . self::SUGGESTIONS_SEPARATOR . $v;
                     }
                 }
 
@@ -83,10 +85,10 @@ class FilesEditorController extends Controller
                     'page'=>'Page',
                 );
                 $names = array(
-                    'unit'=>'Блок',
-                    'content'=>'Блок',
-                    'page'=>'Страница отображения',
-                    'pageunit'=>'Размещение блока',
+                    'unit'=>Yii::t('filesEditor', 'Unit'),
+                    'content'=>Yii::t('filesEditor', 'Unit'),
+                    'page'=>Yii::t('filesEditor', 'Showing page'),
+                    'pageunit'=>Yii::t('filesEditor', 'Unit location'),
                 );
                 foreach ($objs as $param => $obj) {
                     $o= new $obj;
@@ -96,7 +98,7 @@ class FilesEditorController extends Controller
                         foreach ($attrs as $attr => $value) {
                             if (isset($labels[$attr])) {
                                 $k = '{$'.$param.'.'.$attr.'}';
-                                $suggestions[$k] = $names[$param] . ' :: ' . $labels[$attr];
+                                $suggestions[$k] = $names[$param] . self::SUGGESTIONS_SEPARATOR . $labels[$attr];
                             }
                         }
                     }
@@ -104,7 +106,7 @@ class FilesEditorController extends Controller
                 $setts = $name::settings($name);
                 foreach ($setts as $k => $v) {
                     $var = '{$settings.local.'.$k.'}';
-                    $suggestions[$var] = 'Настройки для блоков «'.$name::NAME.'» :: ' . $v['label'];
+                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>$name::name())) . self::SUGGESTIONS_SEPARATOR . $v['label'];
                 }
             }
         } else {
@@ -113,10 +115,10 @@ class FilesEditorController extends Controller
         $setts = SiteSettingsForm::attributeLabels();
         foreach ($setts as $k => $v) {
             $var = '{$settings.global.'.$k.'}';
-            $suggestions[$var] = 'Глобальные настройки :: ' . $v;
+            $suggestions[$var] = Yii::t('filesEditor', 'General settings') . self::SUGGESTIONS_SEPARATOR . $v;
         }
-        $suggestions['{$TIME}'] = 'Затраченное время (в секундах)';
-        $suggestions['{$MEMORY}'] = 'Использованная память (в мегабайтах)';
+        $suggestions['{$TIME}'] = Yii::t('filesEditor', 'Used time (seconds)');
+        $suggestions['{$MEMORY}'] = Yii::t('filesEditor', 'Used memory (megabytes)');
         if (!empty($files)) {
             $id = 'FilesEditor_'.sprintf('%x',crc32(serialize($files).$type.$name));
             $this->render('form', array(
@@ -207,6 +209,4 @@ class FilesEditorController extends Controller
         } 
     }
 
-
 }
-?>

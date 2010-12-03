@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-    'language'=>'ru', // Перенести настройку в БД, когда будем делать мультиязычность
+    'language'=>'ru', // Скопировать эту настройку в БД, когда будем делать мультиязычность
     'defaultController' => 'page',
 
 //	'preload'=>array('log'),
@@ -16,11 +16,15 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
-		'application.units.*',
-        'webroot.units.*',
 		'application.components.inputs.*',
         'application.extensions.yiidebugtb.*',
 	),
+
+    'modules'=>array(
+        'maintain'=>array(
+            'password'=>'admin',
+        ),
+    ),
 
 	// application components
 	'components'=>array(
@@ -71,8 +75,9 @@ return array(
                 '/js/jquery.cookie.js',
                 '/js/jquery.hotkeys.js',
                 '/3rdparty/fancybox/jquery.fancybox-1.3.1.js',
+                '{jsI18N}',
                 '/js/lib.js',
-            )
+            ),
         ),
         'urlManager'=>array(
 //			'urlFormat'=>'path',

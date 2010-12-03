@@ -1,9 +1,9 @@
 <?php
-    $title = $class_name::NAME . ' ' . date('Y-m-d H:i');
+    $title = $class_name::name() . ' ' . date('Y-m-d H:i');
     $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
 ?>
 <div id="<?=$id?>_header">
-    <input type="button" class="<?=$id?>_add" value="Добавить" />
+    <input type="button" class="<?=$id?>_add" value="<?=Yii::t('cms', 'Add')?>" />
 </div>
 
 <?=$records_grid?>
@@ -56,7 +56,7 @@ $('.<?=$id?>_add').click(function() {
             }
         });
     } else {
-        // Инача просто создаем запись
+        // Иначе просто создаем запись
         ajaxSave('/?r=records/create&class_name=<?=$class_name?>&section_id=<?=$section_id?>&foreign_attribute=<?=$foreign_attribute?>', '', 'GET', function(html){
             $.fn.yiiGridView.update('<?=$id?>');
             if (html.substring(0,2) == '{"') {

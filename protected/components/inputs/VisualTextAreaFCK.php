@@ -25,46 +25,9 @@ class VisualTextAreaFCK extends CInputWidget
         $this->registerClientScript();
         
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
-        //echo CHtml::button('Включить редактор', array(
-        //    'id' => $id . '_editorbtn'
-        //));
         echo '<div style="overflow:scroll;width:'.($this->width+20).'px;height:'.$this->height.'px;" id="' . $this->htmlOptions['id'] .'_editor">' . $value  . '</div>';
         echo '<textarea id="' . $this->htmlOptions['id'] .'_value" style="display:none;">' . $value . '</textarea>';
-/*
-        $oFCKeditor = new FCKeditor($this->htmlOptions['name']) ;
-        $basePath = Yii::app()->baseUrl . '/3rdparty/fckeditor/';
-        $oFCKeditor->BasePath = $basePath;
-        $oFCKeditor->Width = $this->width;
-        $oFCKeditor->Height = $this->height;
-        $oFCKeditor->ToolbarSet = $this->toolbarSet;
-        $oFCKeditor->Value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
-        $oFCKeditor->Config["CustomConfigurationsPath"] = Yii::app()->baseUrl."/js/fckconfig.js?" . time();
-        $oFCKeditor->Config["EditorAreaCSS"] = Yii::app()->baseUrl.'/css/main.css';
-        $oFCKeditor->Config['AutoDetectPasteFromWord'] = true;
-        $oFCKeditor->Config['LinkDlgHideTarget'] = true;
-        $oFCKeditor->Config['MaxUndoLevels'] = 100;
-        $oFCKeditor->Config['TemplateReplaceAll'] = false;
-        $oFCKeditor->Config['FontFormats'] = 'p;h1;h2;h3;h4;h5;h6';
-        $oFCKeditor->Config['RemoveFormatTags'] = 'code,del,dfn,div,font,ins,kbd,q,samp,span,tt,var,dl,dt,dd,form,input,button,textarea,label';
-        $oFCKeditor->Config['EnterMode'] = 'p';
-        $oFCKeditor->Config['FillEmptyBlocks'] = true;
-        $oFCKeditor->Config['IgnoreEmptyParagraphValue'] = true;
-        $oFCKeditor->Config['ShiftEnterMode'] = 'br';
-        $oFCKeditor->Config['TabSpaces'] = 4;
-        $oFCKeditor->Config['FlashDlgHideAdvanced'] = true;
-        $oFCKeditor->Config['ImageDlgHideAdvanced'] = true;
-        $oFCKeditor->Config['LinkDlgHideAdvanced'] = true;
-        $oFCKeditor->Config['SkinPath'] = $basePath . 'editor/skins/' . $this->skin . '/';
-        $oFCKeditor->Config['AllowQueryStringDebug'] = false;
-        $oFCKeditor->Config['FirefoxSpellChecker'] = true;
-        $oFCKeditor->Config['DefaultLanguage'] = 'ru';
 
-        foreach ($this->config as $k => $v) {
-            $oFCKeditor->Config[$k] = $v;
-        }
-        
-        $oFCKeditor->Create() ;
-*/
     }
     
     public function registerClientScript()
@@ -77,6 +40,7 @@ class VisualTextAreaFCK extends CInputWidget
         $cs->registerScriptFile('/3rdparty/fckeditor/fckeditor.js');
         $baseUrl = Yii::app()->baseUrl;
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
+        $lang = Yii::app()->language;
         $js = <<<EOD
         
 //$('#{$id}_editorbtn').click(function() {
@@ -109,7 +73,7 @@ class VisualTextAreaFCK extends CInputWidget
         oFCKeditor.Config['SkinPath'] =  basePath+'editor/skins/{$this->skin}/';
         oFCKeditor.Config['AllowQueryStringDebug'] = false;
         oFCKeditor.Config['FirefoxSpellChecker'] = true;
-        oFCKeditor.Config['DefaultLanguage'] = 'ru';
+        oFCKeditor.Config['DefaultLanguage'] = '{$lang}';
 
         var div = document.getElementById('{$id}_editor');
         div.innerHTML = oFCKeditor.CreateHtml();
@@ -151,5 +115,3 @@ EOD;
         
     }
 }
-
-?>

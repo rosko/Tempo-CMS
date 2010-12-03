@@ -3,6 +3,16 @@ class Controller extends CController
 {
 	public $layout='//layouts/main';
 
+    public function init()
+    {
+        $language = 'en';
+        if (Yii::app()->settings->getValue('language'))
+            $language = Yii::app()->settings->getValue('language');
+        Yii::app()->language = $language;
+
+        Unit::loadTypes();
+    }
+
     public function render($view, $data=null, $return = false)
     {
         $theme = Yii::app()->themeManager->themeNames[0];

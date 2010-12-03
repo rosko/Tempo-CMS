@@ -8,11 +8,9 @@ class DatePicker extends CJuiDatePicker
     {
         $this->themeUrl = Yii::app()->params->jui['themeUrl'];
         $this->theme = Yii::app()->params->jui['theme'];
-        $this->language = 'ru';
+        $this->language = Yii::app()->language;
 
         parent::init();
     }
 
 }
-
-?>

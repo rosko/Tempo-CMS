@@ -16,7 +16,7 @@ class PageController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('view', 'unitView'),
+				'actions'=>array('view', 'unitView', 'jsI18N'),
 				'users'=>array('*'),
 			),
 			array('allow',
@@ -68,7 +68,7 @@ class PageController extends Controller
             if (Yii::app()->user->isGuest)
                 $this->redirect($this->_model->redirect);
             else
-                Yii::app()->user->setFlash('redirect-permanent-hint', 'На странице настроена переадресация на <a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">Свойства страницы</a>');
+                Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
         }
 
 		$this->render('view',array(
@@ -84,8 +84,8 @@ class PageController extends Controller
         $form_array['activeForm'] = Form::ajaxify('PageAdd');
 		$form_array['buttons']['go'] = array(
 			'type'=>'submit',
-			'label'=>'Сохранить и перейти',
-			'title'=>'Сохранить и перейти к созданной странице',
+			'label'=>Yii::t('cms', 'Save & Go'),
+			'title'=>Yii::t('cms', 'Save & Go to the new page'),
 		);
 		
 		$form = new Form($form_array);
@@ -107,7 +107,7 @@ class PageController extends Controller
                             'url' => $url,
                             'id' => $page->id,
                         ));
-                        Yii::app()->user->setFlash('add', 'Страница успешно создана');
+                        Yii::app()->user->setFlash('add', 'Page has been created successfully');
 						Yii::app()->end();
 					}
 				}
@@ -168,16 +168,16 @@ class PageController extends Controller
         $form_array['buttons'] = array(
             'refresh'=>array(
                 'type'=>'submit',
-                'label'=>'Сохранить',
-                'title'=>'Сохранить и обновить страницу'
+                'label'=>Yii::t('cms', 'Save'),
+                'title'=>Yii::t('cms', 'Save and reload the page'),
             ),
         );
         $form_array['activeForm'] = Form::ajaxify('PageForm_'.$page->id);
 		if ($page->id != 1) {
 			$form_array['buttons']['deletepage'] = array(
 				'type'=>'submit',
-				'label'=>'Удалить',
-				'title'=>'Удалить страницу',
+				'label'=>Yii::t('cms', 'Delete'),
+				'title'=>Yii::t('cms', 'Delete page'),
 			);
 		}
 		$form = new Form($form_array);
@@ -190,9 +190,9 @@ class PageController extends Controller
 			if ($form->validate()) {
 				$page->path = '';
 				if ($page->save(false))
-                    Yii::app()->user->setFlash('save', 'Свойства страницы успешно сохранены.');
+                    Yii::app()->user->setFlash('save', Yii::t('cms', 'Properties has been saved successfully'));
                 else
-                    Yii::app()->user->setFlash('save-error-permanent', 'При сохранении страницы произошла какая-то ошибка');
+                    Yii::app()->user->setFlash('save-error-permanent', Yii::t('cms', 'There is some error on page saving'));
 			}
 		} elseif ($form->submitted('delete')) {
 			$page = $form->model;
@@ -201,7 +201,7 @@ class PageController extends Controller
 				$parent_id = $page->parent_id ? $page->parent_id : 1;
 				echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$parent_id))));
 				$page->delete();
-                Yii::app()->user->setFlash('delete', 'Страница успешно удалена.');
+                Yii::app()->user->setFlash('delete', Yii::t('cms', 'Page deleted.'));
 				Yii::app()->end();
 			}
 		}
@@ -320,7 +320,7 @@ class PageController extends Controller
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
             $className = Unit::getClassNameByUnitType($_REQUEST['type']);
-			$unit->title = $className::NAME;
+			$unit->title = $className::name();
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
@@ -391,26 +391,26 @@ class PageController extends Controller
 //            $unit_form_array['elements'][] = Form::tab('Размещение', '/?r=page/unitSetDialog&id='.$pageunit->page_id.'&unit_id='.$pageunit->unit_id.'&pageunit_id='.$pageunit->id);
 //        }
 		$form_array = array(
-//			'title'=>$unit_class::NAME,
+//			'title'=>$unit_class::name(),
             'id' => $unit_class.$unit->id,
             'activeForm' => Form::ajaxify('UnitForm'.$unit->id),
             'buttons'=>array(
 				'save'=>array(
 					'type'=>'submit',
-					'label'=>'Сохранить',
-					'title'=>'Сохранить и закрыть окно',
+					'label'=>Yii::t('cms', 'Save'),
+					'title'=>Yii::t('cms', 'Save and close window'),
 				),
 				'apply'=>array(
 					'type'=>'submit',
-					'label'=>'Применить',
-					'title'=>'Сохранить и продолжить редактирование'
+					'label'=>Yii::t('cms', 'Apply'),
+					'title'=>Yii::t('cms', 'Save and continue editing'),
 				),
 			)
 		);
         if (substr($unit_form_array['elements'][0],0,2)!=Form::TAB_DELIMETER
                 || substr($unit_form_array['elements'][0],-2)!=Form::TAB_DELIMETER)
         {
-            $form_array['title']=$unit_class::NAME;
+            $form_array['title']=$unit_class::name();
         }
         if (isset($unit)) {
             $form_array['elements']['unit'] = array(
@@ -427,9 +427,9 @@ class PageController extends Controller
                 $form_array['elements']['unit']['elements']['template'] = array(
                     'type'=>'TemplateSelect',
                     'className'=>$unit_class,
-                    'empty'=>'«согласно общих настроек»',
+                    'empty'=>Yii::t('cms', '«accordingly to general settings»'),
                 );
-                $unit_form_array['elements'][] = Form::tab('Внешний вид');
+                $unit_form_array['elements'][] = Form::tab(Yii::t('cms', 'Appearance'));
             }
         }
         $form_array['elements']['content'] = $unit_form_array;
@@ -553,8 +553,8 @@ class PageController extends Controller
 		$form_array['buttons'] = array(
 				'save'=>array(
 					'type'=>'submit',
-					'label'=>'Сохранить',
-					'title'=>'Сохранить и закрыть окно'
+					'label'=>Yii::t('cms', 'Save'),
+					'title'=>Yii::t('cms', 'Save and close window'),
 				),
 			);
 		$form = new Form($form_array);
@@ -689,6 +689,13 @@ class PageController extends Controller
 		}
 	}
 
+    public function actionJsI18N($language)
+    {
+        header('Content-type: text/javascript');
+        Yii::app()->language = $language;
+        $this->renderPartial('jsI18N');
+    }
+
 	public function loadModel()
 	{
 		if($this->_model===null)
@@ -696,7 +703,11 @@ class PageController extends Controller
 			if(isset($_GET['id']))
 				$this->_model=Page::model()->findbyPk($_GET['id']);
 			if($this->_model===null)
-				throw new CHttpException(404,'The requested page does not exist.');
+				throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
+            else {
+                if ($this->_model->language)
+                    Yii::app()->language = $this->_model->language;
+            }
 		}
 		return $this->_model;
 	}

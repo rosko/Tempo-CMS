@@ -8,7 +8,7 @@ class DateTimePicker extends EJuiDateTimePicker
     {
         $this->themeUrl = Yii::app()->params->jui['themeUrl'];
         $this->theme = Yii::app()->params->jui['theme'];
-        $this->language = 'ru';
+        $this->language = Yii::app()->language;
 
         $defaults = array(
             'dateFormat'=>'yy-mm-dd',
@@ -17,13 +17,13 @@ class DateTimePicker extends EJuiDateTimePicker
             //'hourGrid'=>6,
             //'minuteGrid'=>15,
 
-            'timeOnlyTitle' => 'Выберите время',
-            'timeText' => 'Время',
-            'hourText' => 'Часы',
-            'minuteText' => 'Минуты',
-            'secondText' => 'Секунды',
-            'currentText' => 'Сейчас',
-            'doneText' => 'Оk',
+            'timeOnlyTitle' => Yii::t('cms', 'Choose time'),
+            'timeText' => Yii::t('cms', 'Time'),
+            'hourText' => Yii::t('cms', 'Hours'),
+            'minuteText' => Yii::t('cms', 'Minutes'),
+            'secondText' => Yii::t('cms', 'Seconds'),
+            'currentText' => Yii::t('cms', 'Now'),
+            'doneText' => Yii::t('cms', 'Ok'),
         );
 
         foreach ($defaults as $k => $v)

@@ -88,4 +88,3 @@ class VisualTextAreaRedactor extends CInputWidget
         return $options;
     }
 }
-?>

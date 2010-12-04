@@ -1,5 +1,5 @@
 <?php
-class Content extends CActiveRecord
+class Content extends I18nActiveRecord
 {
 	public static function form()
 	{
@@ -241,6 +241,7 @@ class Content extends CActiveRecord
 
     public function getAllValuesBy($attr)
     {
+        $attr = $this->getI18nFieldName($attr);
         $sql = "SELECT DISTINCT `{$attr}` FROM `" . $this->tableName() . "` ORDER BY `{$attr}` ASC";
         return Yii::app()->db->createCommand($sql)->queryColumn();
     }

@@ -1,6 +1,6 @@
 <?php
 
-class Unit extends CActiveRecord
+class Unit extends I18nActiveRecord
 {
 	public static function model($className=__CLASS__)
 	{
@@ -14,13 +14,18 @@ class Unit extends CActiveRecord
 
 	public function rules()
 	{
-		return array(
+		return $this->localizedRules(array(
 			array('type', 'required'),
 			array('type', 'length', 'max'=>64),
 			array('title', 'length', 'max'=>255),
 			array('template', 'length', 'max'=>32),
-		);
+		));
 	}
+
+    public function i18n()
+    {
+        return array('title');
+    }
 
 	public function relations()
 	{

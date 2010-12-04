@@ -2,7 +2,7 @@
 
 class UnitHtml extends Content
 {
-	const ICON = '/images/icons/iconic/green/read_more_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/html.png';
     const HIDDEN = false;
 
 	public function name()

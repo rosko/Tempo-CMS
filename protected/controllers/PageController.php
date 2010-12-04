@@ -96,7 +96,7 @@ class PageController extends Controller
 		
 		if ($form->submitted('save') || $form->submitted('go')) {
 			$page = $form->model;
-			if ($form->validate()) {
+//			if ($form->validate()) {
 				if ($page->save(false)) {
 					// Проверяем каждую область и вставляем блоки с родительской страницы в сквозных областях
 					$page->fill();
@@ -111,7 +111,7 @@ class PageController extends Controller
 						Yii::app()->end();
 					}
 				}
-			}
+//			}
 		}
         if (isset($_REQUEST['json']) && $_REQUEST['json']) {
             echo CJavaScript::jsonEncode(array(
@@ -120,7 +120,11 @@ class PageController extends Controller
             ));
             Yii::app()->end();
         }
-        $this->render('form', array('form'=>$form));
+        $caption = array(
+            'icon' => Toolbar::getIconUrlByAlias('add', '', 'fatcow', '32x32'),
+            'label' => Yii::t('cms', 'New page'),
+        );
+        $this->render('form', array('form'=>$form, 'caption' => $caption));
 	}
 
 	// Переименовывает название страницы или создает новую
@@ -165,6 +169,7 @@ class PageController extends Controller
 	{
 		$page = $this->loadModel();
 		$form_array = Page::form();
+        $form_array['id'] = sprintf('%x',crc32(serialize(array_keys($page->attributes))));
         $form_array['buttons'] = array(
             'refresh'=>array(
                 'type'=>'submit',
@@ -206,7 +211,14 @@ class PageController extends Controller
 			}
 		}
 
-        $this->render('form', array('form'=>$form));
+		$form = new Form($form_array);
+		$form->model = $page;
+        $caption = array(
+            'icon' => Toolbar::getIconUrlByAlias('edit', '', 'fatcow', '32x32'),
+            'label' => Yii::t('cms', 'Page properties'),
+        );
+
+        $this->render('form', array('form'=>$form, 'caption'=>$caption));
 	}
 	
 	// Удаляет страницу
@@ -320,7 +332,7 @@ class PageController extends Controller
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
             $className = Unit::getClassNameByUnitType($_REQUEST['type']);
-			$unit->title = $className::name();
+			$unit->title = $className::name();            
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
@@ -337,7 +349,7 @@ class PageController extends Controller
 			if (method_exists($className, 'defaultObject')) {
 				$content = $className::defaultObject();
 			} else {
-				$content = new $className;				
+				$content = new $className;
 			}
 			$content->unit_id = $unit->id;
             if (isset($_REQUEST['content_page_id']) && $content->hasAttribute('page_id')) {
@@ -378,8 +390,11 @@ class PageController extends Controller
             }
             
         } else return false;
-		$unit_form_array = $unit_class::form();
+        $id = $unit_class.$unit->id;
+
+        $unit_form_array = $unit_class::form();
 		$unit_form_array['type'] = 'form';
+        $unit_form_array['id'] = $id;
         $show_title = true;
         if (isset($unit_form_array['title'])) {
             if ($unit_form_array['title'] === false)
@@ -391,9 +406,8 @@ class PageController extends Controller
 //            $unit_form_array['elements'][] = Form::tab('Размещение', '/?r=page/unitSetDialog&id='.$pageunit->page_id.'&unit_id='.$pageunit->unit_id.'&pageunit_id='.$pageunit->id);
 //        }
 		$form_array = array(
-//			'title'=>$unit_class::name(),
-            'id' => $unit_class.$unit->id,
-            'activeForm' => Form::ajaxify('UnitForm'.$unit->id),
+            'id' => $id,
+            'activeForm' => Form::ajaxify($id),
             'buttons'=>array(
 				'save'=>array(
 					'type'=>'submit',
@@ -410,11 +424,16 @@ class PageController extends Controller
         if (substr($unit_form_array['elements'][0],0,2)!=Form::TAB_DELIMETER
                 || substr($unit_form_array['elements'][0],-2)!=Form::TAB_DELIMETER)
         {
-            $form_array['title']=$unit_class::name();
+            $form_array['title']='';
         }
+        $caption = array(
+            'icon' => str_replace('16x16', '32x32', $unit_class::ICON),
+            'label' => $unit_class::name(),
+        );
         if (isset($unit)) {
             $form_array['elements']['unit'] = array(
                 'type'=>'form',
+                'id' => $id,
                 'elements'=>array(
                     'title'=>array(
                         'type'=>'text',
@@ -463,7 +482,7 @@ class PageController extends Controller
             $form['unit']->model = $unit;
 		$form['content']->model = $content;
 		
-		$this->render('form', array('form'=>$form, 'show_title'=>$show_title));
+		$this->render('form', array('form'=>$form, 'show_title'=>$show_title, 'caption'=>$caption));
 	}
 	
 	// Удаляет юнит
@@ -548,21 +567,22 @@ class PageController extends Controller
 	{
 		//$settingsForm = ;
 		$form_array = SiteSettingsForm::form();
-//		$form_array['title'] = 'Настройки сайта';
+//		$form_array['title'] = Yii::t('cms', 'General settings');
         $form_array['activeForm'] = Form::ajaxify('SiteSettings');
 		$form_array['buttons'] = array(
-				'save'=>array(
+				'refresh'=>array(
 					'type'=>'submit',
 					'label'=>Yii::t('cms', 'Save'),
-					'title'=>Yii::t('cms', 'Save and close window'),
+					'title'=>Yii::t('cms', 'Save and reload the page'),
 				),
 			);
 		$form = new Form($form_array);
 		$form->model = clone Yii::app()->settings->model;
 
-        $this->performAjaxValidation(Yii::app()->settings->model);
+        $form->loadData();
+        $this->performAjaxValidation($form->model, null, false);
 
-		if ($form->submitted('save')) {
+		if ($form->submitted('refresh')) {
             if ($form->model->validate()) {
                 Yii::app()->settings->saveAll($form->model->getAttributes());
             } else {
@@ -571,7 +591,11 @@ class PageController extends Controller
             }
 		}
 
-		$this->render('form', array('form'=>$form));
+        $caption = array(
+            'icon' => Toolbar::getIconUrlByAlias('settings', '', 'fatcow', '32x32'),
+            'label' => Yii::t('cms', 'Site settings'),
+        );
+		$this->render('form', array('form'=>$form, 'caption'=>$caption));
 		
 	}
 	
@@ -712,12 +736,13 @@ class PageController extends Controller
 		return $this->_model;
 	}
 
-	protected function performAjaxValidation($model)
+	protected function performAjaxValidation($model, $attributes=null, $loadInput=true)
 	{
 		if(isset($_REQUEST['ajax-validate']))
 		{
-            if (!$_REQUEST['delete'] && !$_REQUEST['deletepage'])
-                echo CActiveForm::validate($model);
+            if (!$_REQUEST['delete'] && !$_REQUEST['deletepage']) {
+                echo CActiveForm::validate($model, $attributes, $loadInput);
+            }
 			Yii::app()->end();
 		}
 	}

@@ -18,8 +18,19 @@ class Settings extends CApplicationComponent
         $tmp = $command->queryAll();
         foreach ($tmp as $s)
         {
+            $s['name'] = $this->getI18nFieldName($s['name']);
             $this->model->{$s['name']} = $s['value'];
         }
+    }
+
+    public function getI18nFieldName($attr, $language='')
+    {
+        $className = get_class($this->model);
+        if (!$language)
+            $language = Yii::app()->language;
+        if (in_array($attr, $className::i18n()))
+            $attr = $language . '_' . $attr;
+        return $attr;
     }
 
     public function saveAll($attrs)
@@ -28,13 +39,14 @@ class Settings extends CApplicationComponent
         $params = array();
         foreach ($attrs as $name => $value)
         {
+            $name = $this->getI18nFieldName($name);
             $this->setValue($name, $value);
-        }
-        
+        }        
     }
 
     public function getValue($name)
     {
+        $name = $this->getI18nFieldName($name);
         $value = $this->model->{$name};
         $unser = unserialize($value);
         return $unser===FALSE ? $value : $unser;
@@ -42,6 +54,7 @@ class Settings extends CApplicationComponent
     
     public function setValue($name, $value, $save = true)
     {
+        $name = $this->getI18nFieldName($name);
         $save = $save && ($this->getValue($name) != $value);
         if (is_array($value)) $value = serialize($value);
         $this->model->{$name}  = $value;

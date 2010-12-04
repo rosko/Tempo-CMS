@@ -2,7 +2,7 @@
 
 class UnitSitemap extends Content
 {
-	const ICON = '/images/icons/iconic/green/read_more_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/sitemap_color.png';
     const HIDDEN = true;
 
     public function name()
@@ -84,9 +84,9 @@ class UnitSitemap extends Content
     public static function getTree($id, $params, $recursive=0, $start=false)
     {
         if ($start)
-            $items = Page::model()->order()->selectPage($params['content']->pageNumber, $params['content']->per_page)->childrenPages($id)->getAll();
+            $items = Page::model()->order()->selectPage($params['content']->pageNumber, $params['content']->per_page)->childrenPages($id)->localized()->getAll();
         else
-            $items = Page::model()->order()->childrenPages($id)->getAll();
+            $items = Page::model()->order()->childrenPages($id)->localized()->getAll();
         if ($recursive > 1) {
             foreach ($items as $k => $item)
             {

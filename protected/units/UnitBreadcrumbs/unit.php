@@ -2,7 +2,7 @@
 
 class UnitBreadcrumbs extends Content
 {
-	const ICON = '/images/icons/iconic/green/read_more_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/hand_point.png';
     const HIDDEN = true;
 
     const DEFAULT_SEPARATOR = ' &raquo; ';

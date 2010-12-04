@@ -1,6 +1,6 @@
 <?php
 
-class Page extends CActiveRecord
+class Page extends I18nActiveRecord
 {
 	protected $_path;
 	
@@ -11,20 +11,27 @@ class Page extends CActiveRecord
 
 	public function tableName()
 	{
-		return 'pages';
+		return 'lpages';
 	}
 
 	public function rules()
 	{
-		return array(
+		return $this->localizedRules(array(
 			array('parent_id, title', 'required'),
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
 			array('path, title, keywords, description, redirect', 'length', 'max'=>255),
             array('theme', 'length', 'max'=>50),
             array('language', 'length', 'max'=>10),
-		);
+		));
 	}
-	
+
+    public function i18n()
+    {
+        return array(
+            'title', 'keywords', 'description'
+        );
+    }
+
 	public function relations()
 	{
 		return array(
@@ -89,7 +96,7 @@ class Page extends CActiveRecord
 			if (!is_array($exclude)) $exclude = array($exclude);
 			$criteria['condition'] = '`id` NOT IN ('.implode(',',$exclude).')';
 		}
-		$pages = Page::model()->getAll($criteria);
+		$pages = Page::model()->localized()->getAll($criteria);
 		$tree = array();
 		foreach ($pages as $page) {
 			if ($exclude_children && !empty($exclude))
@@ -209,7 +216,7 @@ class Page extends CActiveRecord
 	public static function form()
 	{
 		return array(
-//			'title'=>'Свойства страницы',
+//			'title'=>Yii::t('cms', 'Page properties'),
 			'elements'=>array(
                 Form::tab(Yii::t('cms', 'Page properties')),
 				'title'=>array(
@@ -243,9 +250,9 @@ class Page extends CActiveRecord
                 'theme'=>array(
                     'type'=>'ThemeSelect',
                 ),
-                'language'=>array(
-                    'type'=>'LanguageSelect'
-                ),
+//                'language'=>array(
+//                    'type'=>'LanguageSelect'
+//                ),
 			),
 			'buttons'=>array(
 				'save'=>array(

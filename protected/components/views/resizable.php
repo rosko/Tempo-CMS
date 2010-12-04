@@ -65,6 +65,8 @@
         'display': 'inline-block',
         'top': '',
         'left': ''
+    }).children('.ui-resizable-handle').css({
+        'z-index':'1'
     });
     $('#cms-pageunit-<?=$pageunit->id?>').find('<?=$selector?>').each(function(){
         if ($(this).attr('align'))

@@ -83,6 +83,7 @@ $(function() {
         return false;
     });
     $('#cms-pageunit-set-select-ok').parents('div:eq(0)').width(440);
+    $('#cms-pageunit-set-select-ok').button().width('90%');
 
 });
 
@@ -90,7 +91,7 @@ EOD
 );
 
 ?>
-
+<img style="float:left;margin-right:1em;" valign="baseline" src="/images/icons/fatcow/32x32/application_cascade.png" />
 <h3><?=Yii::t('cms', 'Unit location on pages')?>:</h3>
 <?=Yii::t('cms', 'Check')?>:
 <br />
@@ -128,4 +129,4 @@ EOD
     ));
 ?>
 <br />
-<a class="cms-button w400" id="cms-pageunit-set-select-ok" href="#"><?=Yii::t('cms', 'Set unit on selected pages only')?></a>
+<a id="cms-pageunit-set-select-ok" href="#"><?=Yii::t('cms', 'Set unit on selected pages only')?></a>

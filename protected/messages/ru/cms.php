@@ -69,7 +69,7 @@ return array(
     'Login error.' => 'Ошибка входа.',
 
     'Parent page' => 'Родительская страница',
-    'Title' => 'Заголовок',
+//    'Title' => 'Заголовок',
     'Keywords' => 'Ключевые слова',
     'Description' => 'Описание',
     'Order' => 'Порядок',

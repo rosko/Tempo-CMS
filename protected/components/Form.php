@@ -4,6 +4,63 @@ class Form extends CForm
 {
     const TAB_DELIMETER = '##';
     const SECTION_DELIMETER = '====';
+    private $_config = array();
+
+	public function configure($config)
+	{
+		if(is_string($config))
+			$config=require(Yii::getPathOfAlias($config).'.php');
+		if(is_array($config))
+		{
+            $this->_config = $config;
+			foreach($config as $name=>$value)
+				$this->$name=$value;
+		}
+	}
+
+	public function render()
+	{
+        $className = get_class($this->getModel(false));
+        $js = <<<EOD
+   <script type="text/javascript">
+        $(function() {
+EOD;
+        if (is_subclass_of($className, 'I18nActiveRecord')) {
+            $langs = array_keys($className::getLangs(Yii::app()->language));
+            foreach ($this->_config['elements'] as $k => $v) {
+                if (in_array($k, $className::i18n()) && is_array($v)) {
+                    $txtButton = Yii::t('languages', 'Translations');
+                    $js .= <<<EOD
+    //$('<br />').appendTo('#{$this->uniqueId} .field_{$k}');
+    button = $('<span></span>').button({
+        text: false,
+        label: '{$txtButton}',
+        icons: {
+            primary: 'ui-icon-script'
+        }
+    }).appendTo('#{$this->uniqueId} .field_{$k}');
+    fieldset = $('<fieldset></fieldset>')
+        .attr('id', '{$this->uniqueId}_field_{$k}')
+        .css('display', 'none')
+        .appendTo('#{$this->uniqueId} .field_{$k}');
+    button.click(function() {
+        $('#{$this->uniqueId}_field_{$k}').slideToggle();
+    });
+    
+EOD;
+                    foreach ($langs as $lang) {
+                        $this->getElements()->add($lang.'_'.$k, $v);
+                        $js .= "$('#{$this->uniqueId} .field_{$lang}_{$k}').appendTo(fieldset);\n";
+                    }
+                }
+            }
+        }
+        $js .= <<<EOD
+        });
+   </script>
+EOD;
+        return parent::render() . $js;
+    }
 
     public function renderElements()
     {
@@ -130,7 +187,7 @@ EOD;
             'class' => 'CActiveForm',
             'enableAjaxValidation' => true,
             'id' => $id,
-// from Yii 1.1.4                'focus' => 'input[type="text"]',
+            'focus' => 'input[type="text"]',
             'clientOptions'=>array(
                 'ajaxVar'=>'ajax-validate',
                 'validateOnSubmit'=>true,

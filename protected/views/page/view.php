@@ -122,7 +122,7 @@ if (!Yii::app()->user->isGuest) {
         })
 
         // Обработчик для выбора типа юнита при создании
-        $('.cms-btn-pageunit-create').click(function() {
+        $('.cms-btn-pageunit-create').live('click', function() {
             var type = $(this).attr('id').replace('cms-button-create-', '');
             var area_name = $(this).attr('rel');
             var pageunit_id = $(this).attr('rev');
@@ -217,7 +217,7 @@ EOD
             ),
             'settings' => array(
                 'icon' => 'settings',
-                'title' => Yii::t('cms', 'Site properties'),
+                'title' => Yii::t('cms', 'Site settings'),
                 'click' => <<<EOD
 js:function(){
             $.ajax({
@@ -410,7 +410,7 @@ EOD
 
 <div class="hidden">
 
-    <div id="cms-pageunit-add" class="cms-splash">
+    <div id="cms-pageunit-add" class="cms-splash cms-pageunit-add">
         <h3><?=Yii::t('cms', 'Add unit')?></h3>
         <ul>
         <?php

@@ -33,6 +33,7 @@ $(function() {
         pageunitSetDialog({$model->id}, {$pageunit_id}, {$unit_id});
         return false;
     });
+    $('.cms-buttons a').button().width('100%');
     
 });
 
@@ -41,9 +42,10 @@ EOD
 
 ?>
 
+<img style="float:left;margin-right:1em;" valign="baseline" src="/images/icons/fatcow/32x32/cross.png" />
 <h3><?=Yii::t('cms', 'Delete unit')?>:</h3>
-<ul>
-    <li><a class="cms-button" id="cms-pageunit-delete-this" href="#"><?=Yii::t('cms', 'On this page')?></a></li>
-    <li><a class="cms-button" id="cms-pageunit-delete-all" href="#"><?=Yii::t('cms', 'On all pages')?></a></li>
-    <li><a class="cms-button" id="cms-pageunit-delete-select" href="#"><?=Yii::t('cms', 'Select')?></a></li>
+<ul class="cms-buttons">
+    <li><a id="cms-pageunit-delete-this" href="#"><?=Yii::t('cms', 'On this page')?></a></li>
+    <li><a id="cms-pageunit-delete-all" href="#"><?=Yii::t('cms', 'On all pages')?></a></li>
+    <li><a id="cms-pageunit-delete-select" href="#"><?=Yii::t('cms', 'Select')?></a></li>
 </ul>

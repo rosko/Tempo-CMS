@@ -2,7 +2,7 @@
 
 class UnitMenu extends Content
 {
-	const ICON = '/images/icons/iconic/green/read_more_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/breeze.png';
     const HIDDEN = true;
 
     public function name()

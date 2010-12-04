@@ -2,7 +2,7 @@
 
 class UnitNewslist extends Content
 {
-	const ICON = '/images/icons/iconic/green/document_fill_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/newspaper_link.png';
     const HIDDEN = true;
 
 	public function name()

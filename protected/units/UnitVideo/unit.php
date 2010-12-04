@@ -2,7 +2,7 @@
 
 class UnitVideo extends Content
 {
-	const ICON = '/images/icons/iconic/green/play_12x16.png';
+	const ICON = '/images/icons/fatcow/16x16/movies.png';
     const HIDDEN = false;
 
     public function name()

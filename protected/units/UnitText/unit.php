@@ -2,7 +2,7 @@
 
 class UnitText extends Content
 {
-	const ICON = '/images/icons/iconic/green/article_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/text_dropcaps.png';
     const HIDDEN = false;
 	
     public function name()
@@ -22,12 +22,17 @@ class UnitText extends Content
 
 	public function rules()
 	{
-		return array(
+		return $this->localizedRules(array(
 			array('unit_id, text', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('author', 'length', 'max'=>64),
-		);
+		));
 	}
+
+    public function i18n()
+    {
+        return array('text', 'author');
+    }
 
 	public function attributeLabels()
 	{

@@ -24,7 +24,7 @@ class ComboBox extends CJuiInputWidget
             $this->array = $this->model->getAllValuesBy($this->attribute);
             $this->array = array_combine($this->array, $this->array);
         } elseif ($this->empty) {
-                $this->array = array_merge(array('0'=>Yii::t('cms', $this->empty)), $this->array);
+            $this->array = array_merge(array('0'=>Yii::t('cms', $this->empty)), $this->array);
         }
 
         list($name,$id)=$this->resolveNameID();

@@ -2,7 +2,7 @@
 
 class UnitImage extends Content
 {
-	const ICON = '/images/icons/iconic/green/image_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/image.png';
     const HIDDEN = false;
 
     public function name()

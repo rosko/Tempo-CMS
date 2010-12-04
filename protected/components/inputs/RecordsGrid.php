@@ -26,8 +26,8 @@ class RecordsGrid extends CInputWidget
             'sort' => array(
                 'attributes' => array(
                     'title'=> array(
-                        'asc' => 'unit.title',
-                        'desc' => 'unit.title DESC',
+                        'asc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit'),
+                        'desc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit').' DESC',
                         'label' => 'Title',
                     ),
                     '*'

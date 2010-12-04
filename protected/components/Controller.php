@@ -8,6 +8,10 @@ class Controller extends CController
         $language = 'en';
         if (Yii::app()->settings->getValue('language'))
             $language = Yii::app()->settings->getValue('language');
+
+        if (isset($_REQUEST['language']) && in_array($_REQUEST['language'], array_keys(I18nActiveRecord::getLangs())))
+            $language = $_REQUEST['language'];
+
         Yii::app()->language = $language;
 
         Unit::loadTypes();

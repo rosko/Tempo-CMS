@@ -5,6 +5,7 @@ return array(
     'UnitHeader' => 'application.units',
     'UnitHtml' => 'application.units',
     'UnitImage' => 'application.units',
+    'UnitLangswitcher' => 'application.units',
     'UnitNewsitem' => 'application.units',
     'UnitNewslist' => 'application.units',
     'UnitNewssection' => 'application.units',

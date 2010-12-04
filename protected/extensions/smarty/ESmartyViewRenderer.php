@@ -77,7 +77,7 @@ class ESmartyViewRenderer extends CApplicationComponent implements IViewRenderer
         try {
             $ret = $tpl->fetch($sourceFile);
         } catch (Exception $e) {
-            $ret = Yii::t('ESmartyViewRenderer.messages', '! Syntax error in template');
+            $ret = Yii::t('ESmartyViewRenderer.messages', '! Syntax error in template') . ' ' . $e->getMessage() . ' ' .$e->getFile() . ':'. $e->getLine();
         }
 
         return $ret;

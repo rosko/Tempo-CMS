@@ -3,7 +3,6 @@
        {if $unit.title} title="{$unit.title}" {/if}
        {if $content.target} target="{$content.target}" {/if}>
 {/if}
-
            <img src="{$content.image}" width="{$content.width}" height="{$content.height}"
      {if $unit.title} alt="{$unit.title}" {/if} />
 

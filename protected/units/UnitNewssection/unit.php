@@ -2,7 +2,7 @@
 
 class UnitNewssection extends Content
 {
-	const ICON = '/images/icons/iconic/cyan/document_fill_16x16.png';
+	const ICON = '/images/icons/fatcow/16x16/newspaper.png';
     const HIDDEN = false;
 
     public function name()
@@ -73,14 +73,15 @@ class UnitNewssection extends Content
 	}
 
     public function getSectionsArray() {
-        $sql = 'SELECT ns.id, u.title FROM `' . Unit::tableName() .'` as u
+        $attr = Unit::getI18nFieldName('title', 'Unit');
+        $sql = 'SELECT ns.`id`, u.`'.$attr.'` FROM `' . Unit::tableName() .'` as u
                 INNER JOIN `' . UnitNewssection::tableName() . '` as ns
                     ON u.id = ns.unit_id
-                WHERE u.`type` = "newssection" ORDER BY u.`title`';
+                WHERE u.`type` = "newssection" ORDER BY u.`'.$attr.'`';
         $result = Yii::app()->db->createCommand($sql)->queryAll();
         $ret = array();
         foreach ($result as $row) {
-            $ret[$row['id']] = $row['title'];
+            $ret[$row['id']] = $row[$attr];
         }
         return $ret;
     }

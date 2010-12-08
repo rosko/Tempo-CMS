@@ -22,7 +22,7 @@ class TemplateSelect extends CInputWidget
         $className = $this->className;
 
         $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
-        $data = $className::getTemplates($className);
+        $data = call_user_func(array($className, 'getTemplates'), $className);
         if ($data != array()) {
             $data = array_merge(array(''=>Yii::t('cms', $this->empty)), $data);
 

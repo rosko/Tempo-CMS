@@ -39,7 +39,7 @@ class RecordsController extends Controller
         {
             $className = $_REQUEST['class_name'];
 			if (method_exists($className, 'defaultObject')) {
-				$model = $className::defaultObject();
+				$model = call_user_func(array($className, 'defaultObject'));
 			} else {
 				$model = new $className;
 			}
@@ -62,7 +62,7 @@ class RecordsController extends Controller
             $className = $_REQUEST['class_name'];
             $ret = true;
             foreach ($ids as $id) {
-                $model = $className::model()->findByPk($_REQUEST['id']);
+                $model = call_user_func(array($className, 'model'))->findByPk($_REQUEST['id']);
                 $ret = $ret && $model->delete();
             }
             echo (int)$ret;

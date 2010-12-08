@@ -46,10 +46,10 @@ class Scopes extends CInputWidget
 
         $className = $this->className;
 
-        $labels = $className::scopesLabels();
-        $hidden = $className::hiddenScopeS();
+        $labels = call_user_func(array($className, 'scopesLabels'));
+        $hidden = call_user_func(array($className, 'hiddenScopes'));
 
-        foreach ($className::scopes() as $k => $scope)
+        foreach (call_user_func(array($className, 'scopes')) as $k => $scope)
         {
             if (in_array($k, $hidden)) continue;
             $_id = __CLASS__ . '_' . $id . '_' . $k;
@@ -58,7 +58,7 @@ class Scopes extends CInputWidget
             echo CHtml::checkBox($k, $value[$k][0], array('id' => $_id, 'rev' => $k, 'class' => $id . '-scope'));
             echo '</div>';
         }
-        foreach ($className::namedScopes() as $k => $scope)
+        foreach (call_user_func(array($className, 'namedScopes')) as $k => $scope)
         {
             if (in_array($k, $hidden)) continue;
             $i=0;
@@ -97,7 +97,7 @@ class Scopes extends CInputWidget
         $className = $this->className;
         $id=$this->htmlOptions['id'];
         $js = "var scopes = {};\n";
-        foreach ($className::namedScopes() as $k => $scope)
+        foreach (call_user_func(array($className, 'namedScopes')) as $k => $scope)
         {
             $fields = array_keys($scope);
             $js .= "scopes['{$k}'] = {" . implode(":true, ",$fields) . ":true};\n";

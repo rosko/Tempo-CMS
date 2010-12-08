@@ -73,8 +73,8 @@ class Unit extends I18nActiveRecord
         $config = Yii::getPathOfAlias('application.units.config').'.php';
         $classNames = array_keys(include($config));
 		foreach ($classNames as $className) {
-            if (!Yii::app()->settings->getValue('simpleMode') || !$className::HIDDEN)
-                $ret[$className] = $className::name();
+            if (!Yii::app()->settings->getValue('simpleMode') || !constant($className.'::HIDDEN'))
+                $ret[$className] = call_user_func(array($className, 'name'));
             
 		}
         asort($ret);

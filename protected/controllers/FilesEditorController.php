@@ -47,7 +47,7 @@ class FilesEditorController extends Controller
                 else
                     $extension='.php';
 
-                $data = $name::getTemplates($name, false);
+                $data = call_user_func(array($name, 'getTemplates'), $name, false);
                 $files[] = array(
                     'name' => '',
                     'title' => Yii::t('filesEditor', '«default»'),
@@ -66,13 +66,13 @@ class FilesEditorController extends Controller
                     }
                 }
 
-                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>$name::name()));
+                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'name'))));
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
                 if (method_exists($name, 'templateVars'))
                 {
-                    $vars = $name::templateVars();
+                    $vars = call_user_func(array($name, 'templateVars'));
                     foreach ($vars as $k => $v) {
                         $suggestions[$k] = Yii::t('filesEditor', 'Unit') . self::SUGGESTIONS_SEPARATOR . $v;
                     }
@@ -103,10 +103,10 @@ class FilesEditorController extends Controller
                         }
                     }
                 }
-                $setts = $name::settings($name);
+                $setts = call_user_func(array($name, 'settings'), $name);
                 foreach ($setts as $k => $v) {
                     $var = '{$settings.local.'.$k.'}';
-                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>$name::name())) . self::SUGGESTIONS_SEPARATOR . $v['label'];
+                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>call_user_func(array($name, 'name')))) . self::SUGGESTIONS_SEPARATOR . $v['label'];
                 }
             }
         } else {
@@ -144,7 +144,7 @@ class FilesEditorController extends Controller
                 else
                     $extension='.php';
 
-                $dirs = $name::getTemplateDirAliases($name);
+                $dirs = call_user_func(array($name, 'getTemplateDirAliases'), $name);
                 foreach ($dirs as $s) {
                     $filename = $file ? Yii::getPathOfAlias($s).'/'.basename($file).$extension
                                       : Yii::getPathOfAlias($s).'/'.$name.$extension;

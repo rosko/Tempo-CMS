@@ -12,7 +12,7 @@ foreach ($units as $unit) {
 
     ?>
 
-    <div <?php if (!Yii::app()->user->isGuest) { ?>title="<?php echo $className::name(); ?>"<?php } ?> id="cms-pageunit-<?=$unit->id?>" class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$unit->unit->type?>" rel="<?=$unit->unit->type?>" rev="<?=$unit->unit->id?>">
+    <div <?php if (!Yii::app()->user->isGuest) { ?>title="<?php echo call_user_func(array($className, 'name')); ?>"<?php } ?> id="cms-pageunit-<?=$unit->id?>" class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$unit->unit->type?>" rel="<?=$unit->unit->type?>" rev="<?=$unit->unit->id?>">
 
         <?=$unit->unit->content->run(array('pageunit'=>$unit));?>
 

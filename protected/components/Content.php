@@ -178,7 +178,7 @@ class Content extends I18nActiveRecord
         $output = Yii::app()->controller->renderPartial($alias,
                            $params, true);
         if (trim($output) == '' && $params['editMode'])  {
-            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => $className::name()));
+            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($className, 'name'))));
         }
 
         if ($return)

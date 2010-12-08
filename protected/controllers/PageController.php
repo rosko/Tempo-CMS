@@ -332,7 +332,7 @@ class PageController extends Controller
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
             $className = Unit::getClassNameByUnitType($_REQUEST['type']);
-			$unit->title = $className::name();            
+			$unit->title = call_user_func(array($className, 'name'));
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
@@ -347,7 +347,7 @@ class PageController extends Controller
             
 			// Заполняем юнит информацией по-умолчанию
 			if (method_exists($className, 'defaultObject')) {
-				$content = $className::defaultObject();
+				$content = call_user_func(array($className, 'defaultObject'));
 			} else {
 				$content = new $className;
 			}

@@ -90,7 +90,7 @@ class I18nActiveRecord extends CActiveRecord
             $className = get_class($this);
         if (!$language)
             $language = Yii::app()->language;
-        if (in_array($attr, $className::i18n()))
+        if (in_array($attr, call_user_func(array($className, 'i18n'))))
             $attr = $language . '_' . $attr;
         return $attr;
     }

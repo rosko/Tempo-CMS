@@ -12,7 +12,7 @@ class RecordsGrid extends CInputWidget
     public function run()
     {
         if($this->hasModel()===false)  {
-            $this->model = $section_type::model()->findByPk($section_id);
+            $this->model = call_user_func(array($section_type, 'model'))->findByPk($section_id);
         }
 
         $dataProvider=new CActiveDataProvider($this->class_name, array(

@@ -51,7 +51,7 @@ class Unit extends I18nActiveRecord
     public function getContent()
 	{
         $tmp_class = Unit::getClassNameByUnitType($this->type);
-		return $tmp_class::model()->find('unit_id=:id', array(':id'=>$this->id));
+		return call_user_func(array($tmp_class, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
     public function getUnitUrl()

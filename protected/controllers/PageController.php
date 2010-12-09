@@ -384,7 +384,7 @@ class PageController extends Controller
             }
         } elseif ($_REQUEST['class_name'] && $_REQUEST['id']) {
             $unit_class = $_REQUEST['class_name'];
-            $content = $unit_class::model()->findByPk($_REQUEST['id']);
+            $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
             if ($content->unit_id) {
                 $unit = $content->unit;
             }
@@ -392,7 +392,7 @@ class PageController extends Controller
         } else return false;
         $id = $unit_class.$unit->id;
 
-        $unit_form_array = $unit_class::form();
+        $unit_form_array = call_user_func(array($unit_class, 'form'));
 		$unit_form_array['type'] = 'form';
         $unit_form_array['id'] = $id;
         $show_title = true;
@@ -427,8 +427,8 @@ class PageController extends Controller
             $form_array['title']='';
         }
         $caption = array(
-            'icon' => str_replace('16x16', '32x32', $unit_class::ICON),
-            'label' => $unit_class::name(),
+            'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
+            'label' => call_user_func(array($unit_class, 'name')),
         );
         if (isset($unit)) {
             $form_array['elements']['unit'] = array(

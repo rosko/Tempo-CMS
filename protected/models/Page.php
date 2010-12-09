@@ -164,7 +164,7 @@ class Page extends I18nActiveRecord
 			{
 				$ids[] = intval($pu['id']);
                 $tmp_class = Unit::getClassNameByUnitType($pu['type']);
-				$tmp_class::model()->deleteAll('unit_id = ' . intval($pu['id']));
+				call_user_func(array($tmp_class, 'model'))->deleteAll('unit_id = ' . intval($pu['id']));
 			}
 			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
 			Yii::app()->db->createCommand($sql)->execute();

@@ -20,7 +20,7 @@ class SiteSettingsForm extends CFormModel
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
             if (method_exists($unit_class, 'settingsRules')) {
-                $rules = $unit_class::settingsRules();
+                $rules = call_user_func(array($unit_class, 'settingsRules'));
                 if (is_array($rules) && !empty($rules)) {
                     foreach ($rules as $rule)
                     {
@@ -52,7 +52,7 @@ class SiteSettingsForm extends CFormModel
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
             if (method_exists($unit_class, 'settings')) {
-                $elems = $unit_class::settings($unit_class);
+                $elems = call_user_func(array($unit_class, 'settings'), $unit_class);
                 if (is_array($elems) && !empty($elems)) {
                     foreach ($elems as $k => $elem) {
                         if ($elem['label'])
@@ -115,9 +115,9 @@ class SiteSettingsForm extends CFormModel
         $ret['elements'][] = Form::tab(Yii::t('cms', 'Units settings'));
         foreach ($unit_types as $unit_class) {
             if (method_exists($unit_class, 'settings')) {
-                $elems = $unit_class::settings($unit_class);
+                $elems = call_user_func(array($unit_class, 'settings'), $unit_class);
                 if (is_array($elems) && !empty($elems)) {
-                    $ret['elements'][] = Form::section($unit_class::name());
+                    $ret['elements'][] = Form::section(call_user_func(array($unit_class, 'name')));
                     foreach ($elems as $k => $elem)
                     {
                         $ret['elements'][$unit_class.'.'.$k] = $elem;

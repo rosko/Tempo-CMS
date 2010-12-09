@@ -1,5 +1,5 @@
 <?php
-    $title = $class_name::name() . ' ' . date('Y-m-d H:i');
+    $title = call_user_func(array($class_name, 'name')) . ' ' . date('Y-m-d H:i');
     $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
 ?>
 <div id="<?=$id?>_header">

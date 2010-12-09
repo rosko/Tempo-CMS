@@ -74,7 +74,7 @@ class RecordsController extends Controller
     {
         if ($_REQUEST['id'] && $_REQUEST['class_name']) {
             $unit_class = $_REQUEST['class_name'];
-            $content = $unit_class::model()->findByPk($_REQUEST['id']);
+            $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
             if ($content->unit_id) {
                 $unit = $content->unit;
                 echo $unit->getUnitUrl();

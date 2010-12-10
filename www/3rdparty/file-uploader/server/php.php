@@ -16,8 +16,10 @@ class UploadFileXhr {
 		return $_GET['qqfile'];
 	}
 	function getSize(){
-		$headers = apache_request_headers();
-		return (int)$headers['Content-Length'];
+        if (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            return (int)$headers['Content-Length'];
+        } else return 1;
 	}
 }
 

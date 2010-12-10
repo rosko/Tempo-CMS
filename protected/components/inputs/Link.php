@@ -80,6 +80,7 @@ EOD;
 
         if ($this->showUploadButton)
         {
+            $cs->registerCssFile('/3rdparty/file-uploader/client/fileuploader.css');            
             $cs->registerScriptFile('/3rdparty/file-uploader/client/jquery.fileuploader.js');
             $txtDragHere = Yii::t('cms', 'Drag here');
             $txtUpload = Yii::t('cms', 'Upload');

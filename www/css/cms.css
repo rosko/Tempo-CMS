@@ -24,6 +24,13 @@
 	opacity:0.95;
 }
 
+.cms-panel ul, .cms-panel ol {
+    padding:0 !important;
+    margin:0 !important;
+    list-style:none !important;
+}
+
+
 #cms-info {
 	padding:0.5em 1em;
 	margin:5px 0;

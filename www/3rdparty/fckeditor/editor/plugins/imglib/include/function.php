@@ -1134,8 +1134,6 @@ function process_upload () {
 		}
 	}
 
-	print_r($upl_files);
-
 	// Process upload for all uploaded files
 	foreach ($upl_files as $key => $upl_file) {
 		// Allow process upload for new file in list
@@ -1192,7 +1190,7 @@ function process_upload () {
 		}
 		$cfgmaxsize = (int) $cfgmaxsize;
 		// Check upload file size
-		if ( ( ($cfgmaxsize > 0) && ($upl_file['size'] > $cfgmaxsize) ) || ($upl_file['size'] > $phpmaxsize) || ($upl_file['size'] > disk_free_space($upl_dir)) ) {
+		if ( ( ($cfgmaxsize > 0) && ($upl_file['size'] > $cfgmaxsize) ) || ($upl_file['size'] > $phpmaxsize) /* || ($upl_file['size'] > disk_free_space($upl_dir)) */ ) {
 			$upload = false;
 		}
 		

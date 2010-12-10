@@ -69,6 +69,15 @@ class SiteSettingsForm extends CFormModel
         return array('sitename');
     }
 
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'name' => 'string',
+            'value' => 'text',
+        );
+    }
+
     public function form()
     {
         // Общие настроки

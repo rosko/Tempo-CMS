@@ -5,6 +5,11 @@ class Controller extends CController
 
     public function init()
     {
+        if (!is_file(Yii::getPathOfAlias('application.config.config').'.php')) {
+            
+            Yii::app()->end();
+        }
+
         $language = 'en';
         if (Yii::app()->settings->getValue('language'))
             $language = Yii::app()->settings->getValue('language');

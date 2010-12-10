@@ -17,7 +17,7 @@ class UnitSitemap extends Content
 
 	public function tableName()
 	{
-		return 'units_sitemap';
+		return Yii::app()->db->tablePrefix . 'units_sitemap';
 	}
 
 	public function rules()
@@ -80,6 +80,19 @@ class UnitSitemap extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'length' => 'integer unsigned',
+            'recursive' => 'integer unsigned',
+            'page_id' => 'integer unsigned',
+            'show_title' => 'boolean',
+            'per_page' => 'integer unsigned',
+        );
+    }
 
     public static function getTree($id, $params, $recursive=0, $start=false)
     {

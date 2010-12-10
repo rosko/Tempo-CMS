@@ -9,8 +9,19 @@ class PageUnit extends CActiveRecord
 
 	public function tableName()
 	{
-		return 'pages_units';
+		return Yii::app()->db->tablePrefix . 'pages_units';
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'page_id' => 'integer unsigned',
+            'unit_id' => 'integer unsigned',
+            'area' => 'char(32)',
+            'order' => 'integer unsigned',
+        );
+    }
 
 	public function rules()
 	{
@@ -46,7 +57,7 @@ class PageUnit extends CActiveRecord
      */
     public static function getUnitIdById($id)
 	{
-		$sql = 'SELECT unit_id FROM {{' . self::tableName() . '}} WHERE id = :id';
+		$sql = 'SELECT unit_id FROM `' . self::tableName() . '` WHERE id = :id';
 		$command = Yii::app()->db->createCommand($sql);
 		$command->bindValue(':id', intval($id), PDO::PARAM_INT);
 		return $command->queryScalar();
@@ -59,7 +70,7 @@ class PageUnit extends CActiveRecord
     public static function checkIntegrity()
     {
 		$sql = 'SELECT `page_id`, `area`, MIN(`order`) as `min`, MAX(`order`) as `max` ,COUNT(`order`) as `count`
-                FROM {{' . self::tableName() . '}}
+                FROM `' . self::tableName() . '`
                 GROUP BY `page_id`, `area`
                 ORDER BY `page_id`, `area`
                 ';

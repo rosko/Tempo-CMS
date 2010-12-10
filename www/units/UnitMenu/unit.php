@@ -17,7 +17,7 @@ class UnitMenu extends Content
 
 	public function tableName()
 	{
-		return 'units_menu';
+		return Yii::app()->db->tablePrefix . 'units_menu';
 	}
 
 	public function rules()
@@ -58,6 +58,16 @@ class UnitMenu extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'recursive' => 'integer unsigned',
+            'items' => 'text',
+        );
+    }
 
     public function templateVars()
     {

@@ -61,7 +61,7 @@
  * For example,
  * <pre>
  * array(
- *      '<_c:(post|comment)>/<id:\d+>/<_a:(create|update|delete)&gt;'=>'<_c>/<_a>',
+ *      '<_c:(post|comment)>/<id:\d+>/<_a:(create|update|delete)>'=>'<_c>/<_a>',
  *      '<_c:(post|comment)>/<id:\d+>'=>'<_a>/view',
  *      '<_c:(post|comment)>s/*'=>'<_a>/list',
  * )
@@ -92,7 +92,7 @@
  * {@link CWebApplication::getUrlManager()}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CUrlManager.php 2561 2010-10-18 12:31:06Z mdomba $
+ * @version $Id: CUrlManager.php 2677 2010-11-24 18:29:54Z keyboard.idol@gmail.com $
  * @package system.web
  * @since 1.0
  */
@@ -465,7 +465,7 @@ class CUrlManager extends CApplicationComponent
  * may have a set of named parameters.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CUrlManager.php 2561 2010-10-18 12:31:06Z mdomba $
+ * @version $Id: CUrlManager.php 2677 2010-11-24 18:29:54Z keyboard.idol@gmail.com $
  * @package system.web
  * @since 1.0
  */

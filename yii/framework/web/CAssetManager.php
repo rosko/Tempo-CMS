@@ -24,7 +24,7 @@
  * the {@link setBasePath basePath}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAssetManager.php 2599 2010-11-01 23:19:19Z qiang.xue $
+ * @version $Id: CAssetManager.php 2665 2010-11-17 19:40:36Z keyboard.idol@gmail.com $
  * @package system.web
  * @since 1.0
  */
@@ -53,6 +53,12 @@ class CAssetManager extends CApplicationComponent
 	 * @since 1.1.5
 	 */
 	public $linkAssets=false;
+	/**
+	 * @var array list of directories and files which should be excluded from the publishing process.
+	 * Defaults to exclude '.svn' files only. This option has no effect if {@link linkAssets} is enabled.	 
+	 * @since 1.1.6
+	 **/
+	public $excludeFiles=array('.svn');
 	/**
 	 * @var string base web accessible path for storing private files
 	 */
@@ -184,7 +190,7 @@ class CAssetManager extends CApplicationComponent
 						symlink($src,$dstDir);
 				}
 				else if(!is_dir($dstDir) || $forceCopy)
-					CFileHelper::copyDirectory($src,$dstDir,array('exclude'=>array('.svn'),'level'=>$level));
+					CFileHelper::copyDirectory($src,$dstDir,array('exclude'=>$this->excludeFiles,'level'=>$level));
 
 				return $this->_published[$path]=$this->getBaseUrl().'/'.$dir;
 			}

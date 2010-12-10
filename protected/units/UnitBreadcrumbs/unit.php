@@ -19,7 +19,7 @@ class UnitBreadcrumbs extends Content
 
 	public function tableName()
 	{
-		return 'units_breadcrumbs';
+		return Yii::app()->db->tablePrefix . 'units_breadcrumbs';
 	}
 
 	public function rules()
@@ -51,6 +51,15 @@ class UnitBreadcrumbs extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'separator' => 'char(32)',
+        );
+    }
 
     public function templateVars()
     {

@@ -17,7 +17,7 @@ class UnitHtml extends Content
 
 	public function tableName()
 	{
-		return 'units_html';
+		return Yii::app()->db->tablePrefix . 'units_html';
 	}
 
 	public function rules()
@@ -50,4 +50,13 @@ class UnitHtml extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'html' => 'text',
+        );
+    }
 }

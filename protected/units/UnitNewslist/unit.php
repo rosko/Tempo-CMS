@@ -17,7 +17,7 @@ class UnitNewslist extends Content
 
 	public function tableName()
 	{
-		return 'units_newslist';
+		return Yii::app()->db->tablePrefix . 'units_newslist';
 	}
 
 	public function rules()
@@ -50,6 +50,14 @@ class UnitNewslist extends Content
 		);
 	}
 
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'rule' => 'string',
+        );
+    }
     public function templateVars()
     {
         return array(

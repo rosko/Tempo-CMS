@@ -16,7 +16,7 @@
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @author Wei Zhuo <weizhuo[at]gmail[dot]com>
- * @version $Id: CMssqlCommandBuilder.php 2634 2010-11-09 17:38:42Z qiang.xue $
+ * @version $Id: CMssqlCommandBuilder.php 2715 2010-12-06 19:36:05Z qiang.xue $
  * @package system.db.schema.mssql
  * @since 1.0.4
  */
@@ -303,5 +303,26 @@ class CMssqlCommandBuilder extends CDbCommandBuilder
 			$criteria->order=is_array($table->primaryKey)?implode(',',$table->primaryKey):$table->primaryKey;
 		}
 		return $criteria;
+	}
+
+	/**
+	 * Generates the expression for selecting rows with specified composite key values.
+	 * @param CDbTableSchema $table the table schema
+	 * @param array $values list of primary key values to be selected within
+	 * @param string $prefix column prefix (ended with dot)
+	 * @return string the expression for selection
+	 * @since 1.0.4
+	 */
+	protected function createCompositeInCondition($table,$values,$prefix)
+	{
+		$vs=array();
+		foreach($values as $value)
+		{
+			$c=array();
+			foreach($value as $k=>$v)
+				$c[]=$prefix.$table->columns[$k]->rawName.'='.$v;
+			$vs[]='('.implode(' AND ',$c).')';
+		}
+		return '('.implode(' OR ',$vs).')';
 	}
 }

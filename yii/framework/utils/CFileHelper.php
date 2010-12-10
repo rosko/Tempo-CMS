@@ -12,7 +12,7 @@
  * CFileHelper provides a set of helper methods for common file system operations.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CFileHelper.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CFileHelper.php 2730 2010-12-08 18:16:40Z alexander.makarow $
  * @package system.utils
  * @since 1.0
  */
@@ -218,7 +218,9 @@ class CFileHelper
 	{
 		if(function_exists('finfo_open'))
 		{
-			$info=$magicFile===null ? finfo_open(FILEINFO_MIME_TYPE) : finfo_open(FILEINFO_MIME_TYPE,$magicFile);
+			$options=defined('FILEINFO_MIME_TYPE') ? FILEINFO_MIME_TYPE : FILEINFO_MIME;
+			$info=$magicFile===null ? finfo_open($options) : finfo_open($options,$magicFile);
+
 			if($info && ($result=finfo_file($info,$file))!==false)
 				return $result;
 		}

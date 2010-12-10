@@ -9,7 +9,7 @@ class User extends CActiveRecord
 
 	public function tableName()
 	{
-		return 'users';
+		return Yii::app()->db->tablePrefix . 'users';
 	}
 
 	public function rules()
@@ -34,4 +34,15 @@ class User extends CActiveRecord
 		);
 	}
 
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'login' => 'char(32)',
+            'password' => 'char(64)',
+            'email' => 'char(64)',
+            'name' => 'char(64)',
+            'access' => 'string',
+        );
+    }
 }

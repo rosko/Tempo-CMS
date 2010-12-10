@@ -109,7 +109,7 @@ class Content extends I18nActiveRecord
 
     public function getUnitUrl()
     {
-        $sql = 'SELECT page_id FROM {{' . PageUnit::tableName() . '}} WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
+        $sql = 'SELECT page_id FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':unit_id', $this->unit_id, PDO::PARAM_INT);
         $page_id = $command->queryScalar();
@@ -242,7 +242,7 @@ class Content extends I18nActiveRecord
     public function getAllValuesBy($attr)
     {
         $attr = $this->getI18nFieldName($attr);
-        $sql = "SELECT DISTINCT `{$attr}` FROM {{" . $this->tableName() . "}} ORDER BY `{$attr}` ASC";
+        $sql = "SELECT DISTINCT `{$attr}` FROM `" . $this->tableName() . "` ORDER BY `{$attr}` ASC";
         return Yii::app()->db->createCommand($sql)->queryColumn();
     }
 

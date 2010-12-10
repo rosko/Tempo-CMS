@@ -13,7 +13,7 @@
  * CDateFormatter provides date/time localization functionalities.
  *
  * CDateFormatter allows you to format dates and times in a locale-sensitive manner.
- * Patterns are interpretted in the locale that the CDateFormatter instance
+ * Patterns are interpreted in the locale that the CDateFormatter instance
  * is associated with. For example, month names and weekday names may vary
  * under different locales, which yields different formatting results.
  * The patterns that CDateFormatter recognizes are as defined in
@@ -30,7 +30,7 @@
  *
  * @author Wei Zhuo <weizhuo[at]gmail[dot]com>
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDateFormatter.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CDateFormatter.php 2716 2010-12-06 21:58:55Z mdomba $
  * @package system.i18n
  * @since 1.0
  */

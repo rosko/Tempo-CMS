@@ -397,6 +397,7 @@ EOD
 js:function() {
             var pageunit = $(this).parents('.cms-pageunit').eq(0);
             fadeIn(pageunit, 'selected');
+            $('#pageunitpanel').appendTo('body');
             pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
             return false;
         }

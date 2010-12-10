@@ -11,8 +11,8 @@ $(function() {
         {
             ajaxSave('/?r=page/unitDelete&pageunit_id[]={$pageunit_id}&unit_id={$unit_id}', '', 'GET', function(ret) {
                 hideSplash();
-                GetOutPageunitPanel();
                 $('#cms-pageunit-{$pageunit_id}').remove();
+                CmsAreaEmptyCheck();
             });
         }
         return false;
@@ -23,8 +23,8 @@ $(function() {
         {
             ajaxSave('/?r=page/unitDelete&pageunit_id=all&unit_id={$unit_id}', '', 'GET', function(ret) {
                 hideSplash();
-                GetOutPageunitPanel();
                 $('.cms-pageunit[rev={$unit_id}]').remove();
+                CmsAreaEmptyCheck();
             });
         }
         return false;

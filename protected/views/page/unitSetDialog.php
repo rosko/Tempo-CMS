@@ -78,7 +78,6 @@ $(function() {
             $('#cms-pageunit-{$pageunit_id}').remove();
         }
         hideSplash();
-        GetOutPageunitPanel();
         CmsAreaEmptyCheck();
         return false;
     });

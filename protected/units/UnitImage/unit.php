@@ -17,7 +17,7 @@ class UnitImage extends Content
 
 	public function tableName()
 	{
-		return 'units_image';
+		return Yii::app()->db->tablePrefix . 'units_image';
 	}
 
 	public function rules()
@@ -133,7 +133,20 @@ EOD;
 		);
 	}
 	
-	public static function defaultObject()
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'image' => 'string',
+            'width' => 'integer unsigned',
+            'height' => 'integer unsigned',
+            'url' => 'string',
+            'target' => 'char(32)',
+        );
+    }
+
+    public static function defaultObject()
 	{
 		$obj = new self;
 		$obj->image = 'image';

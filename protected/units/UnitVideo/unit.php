@@ -17,7 +17,7 @@ class UnitVideo extends Content
 
 	public function tableName()
 	{
-		return 'units_video';
+		return Yii::app()->db->tablePrefix . 'units_video';
 	}
 
 	public function rules()
@@ -125,6 +125,19 @@ EOD;
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'video' => 'string',
+            'width' => 'integer unsigned',
+            'height' => 'integer unsigned',
+            'html' => 'text',
+            'show_link' => 'boolean',
+        );
+    }
 
     public static function defaultObject()
 	{

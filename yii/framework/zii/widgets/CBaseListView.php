@@ -14,7 +14,7 @@
  * CBaseListView implements the common features needed by a view wiget for rendering multiple models.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CBaseListView.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CBaseListView.php 2736 2010-12-10 13:15:24Z qiang.xue $
  * @package zii.widgets
  * @since 1.1
  */
@@ -184,7 +184,7 @@ abstract class CBaseListView extends CWidget
 			'title'=>Yii::app()->getRequest()->getUrl(),
 		));
 		foreach($this->dataProvider->getKeys() as $key)
-			echo "<span>$key</span>";
+			echo "<span>".CHtml::encode($key)."</span>";
 		echo "</div>\n";
 	}
 

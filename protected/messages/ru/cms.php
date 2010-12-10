@@ -1,5 +1,6 @@
 <?php
 return array(
+    'Homepage' => 'Главная страница',
     'Add' => 'Добавить',
     '«n/a»' => '«нет»',
     'Choose time' => 'Выберите время',
@@ -174,5 +175,7 @@ return array(
     'There are some units on page {page} where\'s located this unit.' => 'На странице {page}, где размещен удаляемый блок, также присутствуют какие-то другие информационные блоки. Возможно, вы добавили что-то самостоятельно на указанную страницу. Что делать?',
     'Delete the unit only' => "Удалить только блок",
     'Delete the unit and the whole page (where\'s unit located)' => "Удалить и блок, и страницу",
-    'Are you really want delete this record?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.'
+    'Are you really want delete this record?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.',
+
+    'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.' => 'Ошибка! Проверьте конфигурационный файл "protected/config/config.php", верно ли настроено подключение к БД. Или удалите конфигурационный файл для установки системы заново.',
 );

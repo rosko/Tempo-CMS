@@ -12,7 +12,7 @@
  * CDbCommandBuilder provides basic methods to create query commands for tables.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbCommandBuilder.php 2601 2010-11-02 15:08:56Z qiang.xue $
+ * @version $Id: CDbCommandBuilder.php 2711 2010-12-06 13:20:44Z qiang.xue $
  * @package system.db.schema
  * @since 1.0
  */
@@ -113,7 +113,7 @@ class CDbCommandBuilder extends CComponent
 			$alias=$criteria->alias;
 		$alias=$this->_schema->quoteTableName($alias);
 
-		if(!empty($this->group) || !empty($this->having))
+		if(!empty($criteria->group) || !empty($criteria->having))
 		{
 			$select=is_array($criteria->select) ? implode(', ',$criteria->select) : $criteria->select;
 			if($criteria->alias!='')

@@ -36,7 +36,7 @@ Yii::import('zii.widgets.jui.CJuiInputWidget');
  * for possible options (name-value pairs).
  *
  * @author Sebastian Thierer <sebathi@gmail.com>
- * @version $Id: CJuiDatePicker.php 2595 2010-11-01 17:40:06Z sebathi $
+ * @version $Id: CJuiDatePicker.php 2720 2010-12-07 15:32:56Z sebathi $
  * @package zii.widgets.jui
  * @since 1.1
  */
@@ -45,6 +45,7 @@ class CJuiDatePicker extends CJuiInputWidget
 	/**
 	 * @var string the locale ID (e.g. 'fr', 'de') for the language to be used by the date picker.
 	 * If this property is not set, I18N will not be involved. That is, the date picker will show in English.
+	 * You can force English language by setting the language attribute as '' (empty string)
 	 */
 	public $language;
 
@@ -79,6 +80,8 @@ class CJuiDatePicker extends CJuiInputWidget
 			$this->htmlOptions['id']=$id;
 		if(isset($this->htmlOptions['name']))
 			$name=$this->htmlOptions['name'];
+		else
+			$this->htmlOptions['name']=$name;
 
 		if ($this->flat===false)
 		{
@@ -104,8 +107,8 @@ class CJuiDatePicker extends CJuiInputWidget
 			if (!isset($this->options['onSelect']))
 				$this->options['onSelect']="js:function( selectedDate ) { jQuery('#{$id}').val(selectedDate);}";
 			
-			$this->htmlOptions['id'] = $id =  $this->htmlOptions['id'].'_container';
-			$this->htmlOptions['name']= $name = $this->htmlOptions['name'].'_container';
+			$this->htmlOptions['id'] = $id = $this->htmlOptions['id'].'_container';
+			$this->htmlOptions['name'] = $name = $this->htmlOptions['name'].'_container';
 
 			echo CHtml::tag('div', $this->htmlOptions);
 		}

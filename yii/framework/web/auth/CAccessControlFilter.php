@@ -12,8 +12,12 @@
  * CAccessControlFilter performs authorization checks for the specified actions.
  *
  * By enabling this filter, controller actions can be checked for access permissions.
- * Only when the user is allowed by one of the security rules, will he be able
- * to access the action.
+ * When the user is not denied by one of the security rules or allowed by a rule explicitly,
+ * he will be able to access the action.
+ *
+ * For maximum security consider adding
+ * <pre>array('deny', 'users'=>array('*'))</pre>
+ * as a last rule in a list so all actions will be denied by default.
  *
  * To specify the access rules, set the {@link setRules rules} property, which should
  * be an array of the rules. Each rule is specified as an array of the following structure:
@@ -45,7 +49,7 @@
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAccessControlFilter.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CAccessControlFilter.php 2731 2010-12-08 18:25:02Z alexander.makarow $
  * @package system.web.auth
  * @since 1.0
  */
@@ -159,7 +163,7 @@ class CAccessControlFilter extends CFilter
  * CAccessRule represents an access rule that is managed by {@link CAccessControlFilter}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAccessControlFilter.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CAccessControlFilter.php 2731 2010-12-08 18:25:02Z alexander.makarow $
  * @package system.web.auth
  * @since 1.0
  */

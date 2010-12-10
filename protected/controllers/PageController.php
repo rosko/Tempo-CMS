@@ -149,7 +149,7 @@ class PageController extends Controller
 					foreach ($pages as $order=>$id)
 					{
 						if (!$id) { $id = $page->id; }
-						$sql = 'UPDATE {{' . Page::tableName() . '}} SET `order` = :order WHERE `id` = :id';
+						$sql = 'UPDATE `' . Page::tableName() . '` SET `order` = :order WHERE `id` = :id';
 						$command = Yii::app()->db->createCommand($sql);
 						$command->bindValue(':order', intval($order), PDO::PARAM_INT);
 						$command->bindValue(':id', intval($id), PDO::PARAM_INT);							
@@ -266,7 +266,7 @@ class PageController extends Controller
 				{
 					foreach ($pages as $order=>$id)
 					{
-						$sql = 'UPDATE {{' . Page::tableName() . '}} SET `order` = :order WHERE `id` = :id';
+						$sql = 'UPDATE `' . Page::tableName() . '` SET `order` = :order WHERE `id` = :id';
 						$command = Yii::app()->db->createCommand($sql);
 						$command->bindValue(':order', intval($order), PDO::PARAM_INT);
 						$command->bindValue(':id', intval($id), PDO::PARAM_INT);							
@@ -492,8 +492,8 @@ class PageController extends Controller
 		{
 
             if ($_REQUEST['pageunit_id'] == 'all') {
-                $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE `unit_id` = :unit_id) as pu2
                         ON pu.`page_id` = pu2.`page_id`
                         SET pu.`order` = pu.`order`-1
@@ -505,8 +505,8 @@ class PageController extends Controller
                 $command->execute();
                 PageUnit::model()->deleteAll('unit_id = :unit_id', array(':unit_id' => $_REQUEST['unit_id']));
             } elseif (is_array($_REQUEST['pageunit_id'])) {
-                $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `area`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE `id` IN ("'.implode('","',$_REQUEST['pageunit_id']).'")
                                         AND `unit_id` = :unit_id) as pu2
                         ON pu.`page_id` = pu2.`page_id`
@@ -696,7 +696,7 @@ class PageController extends Controller
 	{
 		if (isset($_REQUEST['unit_id']))
 		{
-			$sql = 'SELECT `id` FROM {{' . PageUnit::tableName() . '}} WHERE `unit_id` = :unit_id';
+			$sql = 'SELECT `id` FROM `' . PageUnit::tableName() . '` WHERE `unit_id` = :unit_id';
 			$command = Yii::app()->db->createCommand($sql);
 			$command->bindValue(':unit_id', intval($_REQUEST['unit_id']), PDO::PARAM_INT);
 			$ids = $command->queryColumn();

@@ -3,7 +3,9 @@
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
-$config = require(dirname(__FILE__).DIRECTORY_SEPARATOR.'config.php');
+$config = dirname(__FILE__).DIRECTORY_SEPARATOR.'config.php';
+
+$config = is_file($config) ? require($config) : array();
 
 return CMap::mergeArray(array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
@@ -32,6 +34,9 @@ return CMap::mergeArray(array(
 		),
         'settings'=>array(
             'class'=>'Settings'
+        ),
+        'installer'=>array(
+            'class'=>'Installer',
         ),
         'viewRenderer'=>array(
             'class'=>'application.extensions.smarty.ESmartyViewRenderer',

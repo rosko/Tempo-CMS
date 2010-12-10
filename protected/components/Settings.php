@@ -7,8 +7,21 @@ class Settings extends CApplicationComponent
 
     public function init()
     {
+        $this->tableName = Yii::app()->db->tablePrefix . $this->tableName;            
         $this->model = new SiteSettingsForm;
-        $this->loadAll();
+        try
+        {
+            $this->loadAll();
+        }
+        catch(Exception $e)
+        {
+            if (Yii::app()->db->active) {
+                Yii::app()->installer->installTable('SiteSettingsForm', $this->tableName);
+                Yii::app()->installer->installAll();
+                $this->loadAll();
+            } else
+                echo Yii::t('cms', 'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.');
+        }
     }
     
     public function loadAll()

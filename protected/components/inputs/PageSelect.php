@@ -183,9 +183,11 @@ EOD;
         }
         else
         {
-            $checked = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checked);
+            $checked = '';
+            if (!empty($this->checked)) {
+                $checked = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checked);
+            }
             if (!empty($this->checkedOnly)) {
-                $checked = '';
                 $checkedOnly = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checkedOnly);
             }
 

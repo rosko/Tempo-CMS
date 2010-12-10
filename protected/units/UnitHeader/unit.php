@@ -17,7 +17,7 @@ class UnitHeader extends Content
 
 	public function tableName()
 	{
-		return 'units_header';
+		return Yii::app()->db->tablePrefix . 'units_header';
 	}
 
 	public function rules()
@@ -54,4 +54,12 @@ class UnitHeader extends Content
 		);
 	}
 
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'header' => 'char(32)',
+        );
+    }
 }

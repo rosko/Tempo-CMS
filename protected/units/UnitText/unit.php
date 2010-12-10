@@ -17,7 +17,7 @@ class UnitText extends Content
 	
 	public function tableName()
 	{
-		return 'units_text';
+		return Yii::app()->db->tablePrefix . 'units_text';
 	}
 
 	public function rules()
@@ -59,6 +59,16 @@ class UnitText extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'text' => 'text',
+            'author' => 'string',
+        );
+    }
 
     public function resizableObjects()
     {

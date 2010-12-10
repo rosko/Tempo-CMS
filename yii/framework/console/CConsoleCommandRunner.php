@@ -12,7 +12,7 @@
  * CConsoleCommandRunner manages commands and executes the requested command.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CConsoleCommandRunner.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CConsoleCommandRunner.php 2684 2010-11-28 23:07:10Z qiang.xue $
  * @package system.console
  * @since 1.0
  */
@@ -59,6 +59,7 @@ class CConsoleCommandRunner extends CComponent
 
 		if(($command=$this->createCommand($name))===null)
 			$command=$this->createCommand('help');
+		$command->init();
 		$command->run($args);
 	}
 

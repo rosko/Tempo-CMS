@@ -14,7 +14,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
- * @version $Id: CMssqlSchema.php 2497 2010-09-23 13:28:52Z mdomba $
+ * @version $Id: CMssqlSchema.php 2681 2010-11-28 02:49:35Z qiang.xue $
  * @package system.db.schema.mssql
  * @since 1.0.4
  */
@@ -22,28 +22,45 @@ class CMssqlSchema extends CDbSchema
 {
 	const DEFAULT_SCHEMA='dbo';
 
+	/**
+	 * @var array the abstract column types mapped to physical column types.
+	 * @since 1.1.6
+	 */
+    public $columnTypes=array(
+        'pk' => 'int IDENTITY PRIMARY KEY',
+        'string' => 'varchar(255)',
+        'text' => 'text',
+        'integer' => 'int',
+        'float' => 'float',
+        'decimal' => 'decimal',
+        'datetime' => 'datetime',
+        'timestamp' => 'timestamp',
+        'time' => 'time',
+        'date' => 'date',
+        'binary' => 'binary',
+        'boolean' => 'bit',
+    );
 
 	/**
 	 * Quotes a table name for use in a query.
+	 * A simple table name does not schema prefix.
 	 * @param string $name table name
 	 * @return string the properly quoted table name
+	 * @since 1.1.6
 	 */
-	public function quoteTableName($name)
+	public function quoteSimpleTableName($name)
 	{
-		if (strpos($name,'.')===false)
-			return '['.$name.']';
-		$names=explode('.',$name);
-		foreach ($names as &$n)
-			$n = '['.$n.']';
-		return implode('.',$names);
+		return '['.$name.']';
 	}
 
 	/**
 	 * Quotes a column name for use in a query.
+	 * A simple column name does not contain prefix.
 	 * @param string $name column name
 	 * @return string the properly quoted column name
+	 * @since 1.1.6
 	 */
-	public function quoteColumnName($name)
+	public function quoteSimpleColumnName($name)
 	{
 		return '['.$name.']';
 	}
@@ -64,11 +81,11 @@ class CMssqlSchema extends CDbSchema
 	}
 
 	/**
-	 * Creates a table instance representing the metadata for the named table.
+	 * Loads the metadata for the specified table.
 	 * @param string $name table name
 	 * @return CMssqlTableSchema driver dependent table metadata. Null if the table does not exist.
 	 */
-	protected function createTable($name)
+	protected function loadTable($name)
 	{
 		$table=new CMssqlTableSchema;
 		$this->resolveTableNames($table,$name);
@@ -308,5 +325,49 @@ EOD;
 	protected function createCommandBuilder()
 	{
 		return new CMssqlCommandBuilder($this);
+	}
+
+	/**
+	 * Builds a SQL statement for renaming a DB table.
+	 * @param string $table the table to be renamed. The name will be properly quoted by the method.
+	 * @param string $newName the new table name. The name will be properly quoted by the method.
+	 * @return string the SQL statement for renaming a DB table.
+	 * @since 1.1.6
+	 */
+	public function renameTable($table, $newName)
+	{
+		return "sp_rename '$table', '$newName'";
+	}
+
+	/**
+	 * Builds a SQL statement for renaming a column.
+	 * @param string $table the table whose column is to be renamed. The name will be properly quoted by the method.
+	 * @param string $name the old name of the column. The name will be properly quoted by the method.
+	 * @param string $newName the new name of the column. The name will be properly quoted by the method.
+	 * @return string the SQL statement for renaming a DB column.
+	 * @since 1.1.6
+	 */
+	public function renameColumn($table, $name, $newName)
+	{
+		return "sp_rename '$table.$name', '$table.$newName'";
+	}
+
+	/**
+	 * Builds a SQL statement for changing the definition of a column.
+	 * @param string $table the table whose column is to be changed. The table name will be properly quoted by the method.
+	 * @param string $column the name of the column to be changed. The name will be properly quoted by the method.
+	 * @param string $type the new column type. The {@link getColumnType} method will be invoked to convert abstract column type (if any)
+	 * into the physical one. Anything that is not recognized as abstract type will be kept in the generated SQL.
+	 * For example, 'string' will be turned into 'varchar(255)', while 'string not null' will become 'varchar(255) not null'.
+	 * @return string the SQL statement for changing the definition of a column.
+	 * @since 1.1.6
+	 */
+	public function alterColumn($table, $column, $type)
+	{
+		$type=$this->getColumnType($type);
+		$sql='ALTER TABLE ' . $this->quoteTableName($table) . ' ALTER COLUMN '
+			. $this->quoteColumnName($column) . ' '
+			. $this->getColumnType($type);
+		return $sql;
 	}
 }

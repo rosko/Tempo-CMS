@@ -17,7 +17,7 @@ class UnitNewssection extends Content
 
 	public function tableName()
 	{
-		return 'units_newssection';
+		return Yii::app()->db->tablePrefix . 'units_newssection';
 	}
 
 	public function rules()
@@ -72,10 +72,20 @@ class UnitNewssection extends Content
 		);
 	}
 
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'per_page' => 'integer unsigned',
+            'items' => 'integer unsigned',
+        );
+    }
+
     public function getSectionsArray() {
         $attr = Unit::getI18nFieldName('title', 'Unit');
-        $sql = 'SELECT ns.`id`, u.`'.$attr.'` FROM {{' . Unit::tableName() .'}} as u
-                INNER JOIN {{' . UnitNewssection::tableName() . '}} as ns
+        $sql = 'SELECT ns.`id`, u.`'.$attr.'` FROM `' . Unit::tableName() .'` as u
+                INNER JOIN `' . UnitNewssection::tableName() . '` as ns
                     ON u.id = ns.unit_id
                 WHERE u.`type` = "newssection" ORDER BY u.`'.$attr.'`';
         $result = Yii::app()->db->createCommand($sql)->queryAll();

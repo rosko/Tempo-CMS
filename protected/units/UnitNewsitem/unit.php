@@ -17,7 +17,7 @@ class UnitNewsitem extends Content
 
 	public function tableName()
 	{
-		return 'units_newsitem';
+		return Yii::app()->db->tablePrefix . 'units_newsitem';
 	}
 
 	public function rules()
@@ -81,6 +81,20 @@ class UnitNewsitem extends Content
 			),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+            'text' => 'text',
+            'date' => 'datetime',
+            'source' => 'string',
+            'url' => 'string',
+            'page_id' => 'integer unsigned',
+            'newssection_id' => 'integer unsigned',
+        );
+    }
 
     public function scopesLabels()
     {

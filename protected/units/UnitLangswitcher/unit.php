@@ -17,7 +17,7 @@ class UnitLangswitcher extends Content
 
 	public function tableName()
 	{
-		return 'units_langswitcher';
+		return Yii::app()->db->tablePrefix . 'units_langswitcher';
 	}
 
 	public function rules()
@@ -33,5 +33,13 @@ class UnitLangswitcher extends Content
         $params = parent::prepare($params);
         $params['languages'] = I18nActiveRecord::getLangs();
         return $params;
+    }
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'unit_id' => 'integer unsigned',
+        );
     }
 }

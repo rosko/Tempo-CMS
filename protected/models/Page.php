@@ -11,7 +11,7 @@ class Page extends I18nActiveRecord
 
 	public function tableName()
 	{
-		return 'pages';
+		return Yii::app()->db->tablePrefix . 'pages';
 	}
 
 	public function rules()
@@ -153,8 +153,8 @@ class Page extends I18nActiveRecord
 		PageUnit::model()->deleteAll('page_id = :page_id', array(':page_id' => $this->id));
 		
 		// Удаляем все блоки, которые больше нигде не размещены
-		$sql = 'SELECT `unit`.`id`, `unit`.`type`  FROM {{' . Unit::tableName() . '}} as `unit`
-				LEFT JOIN {{' . PageUnit::tableName() . '}} as `pageunit` ON (`unit`.`id` = `pageunit`.`unit_id`)
+		$sql = 'SELECT `unit`.`id`, `unit`.`type`  FROM `' . Unit::tableName() . '` as `unit`
+				LEFT JOIN `' . PageUnit::tableName() . '` as `pageunit` ON (`unit`.`id` = `pageunit`.`unit_id`)
 				WHERE `pageunit`.`id` IS NULL';
 		$pus = Yii::app()->db->createCommand($sql)->queryAll();
 		$ids = array();
@@ -166,7 +166,7 @@ class Page extends I18nActiveRecord
                 $tmp_class = Unit::getClassNameByUnitType($pu['type']);
 				call_user_func(array($tmp_class, 'model'))->deleteAll('unit_id = ' . intval($pu['id']));
 			}
-			$sql = 'DELETE FROM {{' . Unit::tableName() . '}} WHERE `id` IN (' . implode(',',$ids) . ')';
+			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
 			Yii::app()->db->createCommand($sql)->execute();
 		}
 	}
@@ -212,6 +212,33 @@ class Page extends I18nActiveRecord
             'language' => Yii::t('cms', 'Page language'),
 		);
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'parent_id' => 'integer unsigned',
+            'path' => 'string',
+            'title' => 'string',
+            'keywords' => 'string',
+            'description' => 'string',
+            'order' => 'integer unsigned',
+            'active' => 'boolean',
+            'redirect' => 'string',
+            'theme' => 'char(32)',
+            'language' => 'char(32)',
+        );
+    }
+
+    public function install()
+    {
+        $obj = new self;
+        $obj->title = Yii::t('cms', 'Homepage');
+        $obj->active = true;
+        $obj->parent_id = 0;
+        $obj->order = 0;
+        $obj->save(false);
+    }
 	
 	public static function form()
 	{
@@ -267,7 +294,7 @@ class Page extends I18nActiveRecord
     public function isSimilarTo($page, $areas=array(), $unit_id=0)
     {
         $id = is_object($page) ? $page->id : $page;
-        $sql = 'SELECT `unit_id` FROM {{' . PageUnit::tableName() . '}}
+        $sql = 'SELECT `unit_id` FROM `' . PageUnit::tableName() . '`
                 WHERE `page_id` = :id
                       AND `area` ' . (!empty($areas) ? (is_array($areas) ? 'IN ('.implode(',',$areas).')' : ' = `area`') : 'NOT LIKE "main%"').'
                       '.($unit_id ? ' AND `unit_id` != '.intval($unit_id) : '');
@@ -284,13 +311,13 @@ class Page extends I18nActiveRecord
 	// Проверяем каждую область и вставляем блоки с родительской страницы со всех областей, кроме main
 	public function fill()
 	{
-        $sql = 'SELECT * FROM {{' . PageUnit::tableName() . '}} WHERE `page_id` = :page_id AND `area` NOT LIKE "main%"';
+        $sql = 'SELECT * FROM `' . PageUnit::tableName() . '` WHERE `page_id` = :page_id AND `area` NOT LIKE "main%"';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':page_id', $this->parent_id, PDO::PARAM_INT);
         $pus = $command->queryAll();
         if ($pus && is_array($pus))
         {
-            $sql = 'INSERT INTO {{' . PageUnit::tableName() . '}} (`page_id`, `unit_id`, `order`, `area`) VALUES ';
+            $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
             $sql_arr = array();
             foreach ($pus as $pu)
             {

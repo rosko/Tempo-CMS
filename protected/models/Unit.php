@@ -9,8 +9,20 @@ class Unit extends I18nActiveRecord
 
 	public function tableName()
 	{
-		return 'units';
+		return Yii::app()->db->tablePrefix . 'units';
 	}
+
+    public function scheme()
+    {
+        return array(
+            'id' => 'pk',
+            'type' => 'char(64)',
+            'title' => 'string',
+            'template' => 'char(32)',
+            'create' => 'datetime',
+            'modify' => 'datetime',
+        );
+    }
 
 	public function rules()
 	{
@@ -30,7 +42,7 @@ class Unit extends I18nActiveRecord
 	public function relations()
 	{
 		return array(
-			'pages' => array(self::MANY_MANY, 'Page', 'pages_units(unit_id,page_id)')
+			'pages' => array(self::MANY_MANY, 'Page', Yii::app()->db->tablePrefix.'pages_units(unit_id,page_id)')
 		);
 	}
 
@@ -56,7 +68,7 @@ class Unit extends I18nActiveRecord
 
     public function getUnitUrl()
     {
-        $sql = 'SELECT page_id FROM {{' . PageUnit::tableName() . '}} WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
+        $sql = 'SELECT page_id FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
         $page_id = $command->queryScalar();
@@ -107,7 +119,7 @@ class Unit extends I18nActiveRecord
     public function setOnPage($page_id, $area, $order)
     {
         // Раздвигаем последующие юниты
-        $sql = 'UPDATE {{' . PageUnit::tableName() . '}} SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
+        $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':page_id', intval($page_id), PDO::PARAM_INT);
         $command->bindValue(':area', $area, PDO::PARAM_STR);
@@ -142,7 +154,7 @@ class Unit extends I18nActiveRecord
                     $page_ids = array($pageunit->page_id);
                 }
 
-                $sql = 'SELECT `page_id` FROM {{' . PageUnit::tableName() . '}} WHERE unit_id = :unit_id';
+                $sql = 'SELECT `page_id` FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id';
                 $command = Yii::app()->db->createCommand($sql);
                 $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
                 $cur_page_ids = $command->queryColumn();
@@ -150,12 +162,12 @@ class Unit extends I18nActiveRecord
                 // Удаляем лишние pageunit`ы
                 $del_page_ids = array_diff($cur_page_ids, $page_ids);
                 if (!empty($del_page_ids)) {
-                    $sql = 'DELETE FROM {{' . PageUnit::tableName() . '}} WHERE unit_id = :unit_id AND `page_id` IN (' . implode(', ',$del_page_ids) . ')';
+                    $sql = 'DELETE FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id AND `page_id` IN (' . implode(', ',$del_page_ids) . ')';
                     $command = Yii::app()->db->createCommand($sql);
                     $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
                     $command->execute();
 
-                    $sql = 'UPDATE {{' . PageUnit::tableName() . '}} SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $del_page_ids).') AND `area` = :area AND `order` > :order';
+                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $del_page_ids).') AND `area` = :area AND `order` > :order';
                     $command = Yii::app()->db->createCommand($sql);
                     $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
                     $command->bindValue(':order', $pageunit->order, PDO::PARAM_INT);
@@ -165,13 +177,13 @@ class Unit extends I18nActiveRecord
                 // Добавляем необходимые pageunit`ы
                 $add_page_ids = array_diff($page_ids, $cur_page_ids);
                 if (!empty($add_page_ids)) {
-                    $sql = 'UPDATE {{' . PageUnit::tableName() . '}} SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $add_page_ids).') AND `area` = :area AND `order` >= :order';
+                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $add_page_ids).') AND `area` = :area AND `order` >= :order';
                     $command = Yii::app()->db->createCommand($sql);
                     $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
                     $command->bindValue(':order', $pageunit->order, PDO::PARAM_INT);
                     $command->execute();
 
-                    $sql = 'INSERT INTO {{' . PageUnit::tableName() . '}} (`page_id`, `unit_id`, `order`, `area`) VALUES ';
+                    $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
                     $sql_arr = array();
                     foreach ($add_page_ids as $id)
                     {
@@ -205,8 +217,8 @@ class Unit extends I18nActiveRecord
             // Если разместить блок вверху
             if ($on_top) {
                 // Оставить блок вверху, а то, что нужно подвинуть вниз
-                $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                        INNER JOIN (SELECT `order`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE
                                         `page_id` IN ('.implode(', ', $page_ids) .')
                                         AND `area` = :area
@@ -225,8 +237,8 @@ class Unit extends I18nActiveRecord
                 $command->execute();
             } else {
                 // Иначе, опустить блок вниз
-                $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                        INNER JOIN (SELECT MAX(`order`) as `m`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                        INNER JOIN (SELECT MAX(`order`) as `m`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE
                                         `page_id` IN ('.implode(', ', $page_ids) .')
                                     AND `area` = :area
@@ -260,7 +272,7 @@ class Unit extends I18nActiveRecord
             $is_new_area = $pageunit->area != $area;
 
             // Переносим блок в нужное место и сбрасываем сортировку
-            $sql = 'UPDATE {{' . PageUnit::tableName() . '}} SET `area` = :area, `order` = 0
+            $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area, `order` = 0
                     WHERE `unit_id` = :unit_id';
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(':area', $area, PDO::PARAM_STR);
@@ -268,8 +280,8 @@ class Unit extends I18nActiveRecord
             $command->execute();
 
             // Двигаем блоки на освободившееся место
-            $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                    INNER JOIN ( SELECT `page_id` FROM {{' . PageUnit::tableName() . '}}
+            $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                    INNER JOIN ( SELECT `page_id` FROM `' . PageUnit::tableName() . '`
                                 WHERE `unit_id` = :unit_id ) as pu2
                     ON pu.`page_id` = pu2.`page_id`
                     SET pu.`order`= pu.`order`-1
@@ -289,7 +301,7 @@ class Unit extends I18nActiveRecord
                 if ($pageunit_id == $id) { $pageunit_order = $i; }
             }
             $ids = array_flip($pageunit_ids);
-            $sql = 'SELECT `unit_id`, `id` FROM {{' . PageUnit::tableName() . '}}
+            $sql = 'SELECT `unit_id`, `id` FROM `' . PageUnit::tableName() . '`
                     WHERE `id` IN (' . implode(', ', $pageunit_ids) . ')';
             $result = Yii::app()->db->createCommand($sql)->queryAll();
             $unit_ids = array();
@@ -319,9 +331,9 @@ class Unit extends I18nActiveRecord
             }
 
             // Находим страницы, где нужно правильно разместить перемещаемый блок
-            $sql = 'SELECT * FROM {{' . PageUnit::tableName() . '}}
+            $sql = 'SELECT * FROM `' . PageUnit::tableName() . '`
                     WHERE
-                        `page_id` IN  ( SELECT `page_id` FROM {{' . PageUnit::tableName() . '}}
+                        `page_id` IN  ( SELECT `page_id` FROM `' . PageUnit::tableName() . '`
                                         WHERE `unit_id` = :unit_id )
                          AND `area` = :area
                          AND `unit_id` != :unit_id
@@ -376,8 +388,8 @@ class Unit extends I18nActiveRecord
                     // Если юнит размещен на какой-то странице
                     if (isset($units[$id]) && !empty($units[$id]) && is_array($units[$id])) {
                         // Подвинем соседей
-                        $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                                INNER JOIN (SELECT `order`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                        $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
                                             WHERE
                                                 `page_id` IN ('.implode(', ', $units[$id]).')
                                             AND `unit_id` = :sibling_unit_id
@@ -395,8 +407,8 @@ class Unit extends I18nActiveRecord
                         $command->execute();
 
                         // Установка перемещаемого блока в нужное место
-                        $sql = 'UPDATE {{' . PageUnit::tableName() . '}} as pu
-                                INNER JOIN (SELECT `order`, `page_id` FROM {{' . PageUnit::tableName() . '}}
+                        $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
+                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
                                             WHERE
                                                 `page_id` IN ('.implode(', ', $units[$id]).')
                                             AND `unit_id` = :sibling_unit_id

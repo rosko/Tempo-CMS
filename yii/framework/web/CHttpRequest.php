@@ -22,7 +22,7 @@
  * accessed via {@link CWebApplication::getRequest()}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CHttpRequest.php 2607 2010-11-02 20:35:59Z qiang.xue $
+ * @version $Id: CHttpRequest.php 2680 2010-11-27 18:34:52Z alexander.makarow $
  * @package system.web
  * @since 1.0
  */
@@ -322,20 +322,23 @@ class CHttpRequest extends CApplicationComponent
 	{
 		if($this->_pathInfo===null)
 		{
-			$requestUri=urldecode($this->getRequestUri());
+			$pathInfo=$this->getRequestUri();
+
+			if(($pos=strpos($pathInfo,'?'))!==false)
+			   $pathInfo=substr($pathInfo,0,$pos);
+
+			$pathInfo=urldecode($pathInfo);
+
 			$scriptUrl=$this->getScriptUrl();
 			$baseUrl=$this->getBaseUrl();
-			if(strpos($requestUri,$scriptUrl)===0)
-				$pathInfo=substr($requestUri,strlen($scriptUrl));
-			else if($baseUrl==='' || strpos($requestUri,$baseUrl)===0)
-				$pathInfo=substr($requestUri,strlen($baseUrl));
+			if(strpos($pathInfo,$scriptUrl)===0)
+				$pathInfo=substr($pathInfo,strlen($scriptUrl));
+			else if($baseUrl==='' || strpos($pathInfo,$baseUrl)===0)
+				$pathInfo=substr($pathInfo,strlen($baseUrl));
 			else if(strpos($_SERVER['PHP_SELF'],$scriptUrl)===0)
 				$pathInfo=substr($_SERVER['PHP_SELF'],strlen($scriptUrl));
 			else
 				throw new CException(Yii::t('yii','CHttpRequest is unable to determine the path info of the request.'));
-
-			if(($pos=strpos($pathInfo,'?'))!==false)
-				$pathInfo=substr($pathInfo,0,$pos);
 
 			$this->_pathInfo=trim($pathInfo,'/');
 		}
@@ -737,7 +740,7 @@ class CHttpRequest extends CApplicationComponent
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CHttpRequest.php 2607 2010-11-02 20:35:59Z qiang.xue $
+ * @version $Id: CHttpRequest.php 2680 2010-11-27 18:34:52Z alexander.makarow $
  * @package system.web
  * @since 1.0
  */

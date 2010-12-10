@@ -6,7 +6,7 @@
  * @link http://www.yiiframework.com/
  * @copyright Copyright &copy; 2008-2010 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: YiiBase.php 2653 2010-11-14 14:23:12Z qiang.xue $
+ * @version $Id: YiiBase.php 2693 2010-11-30 03:12:29Z qiang.xue $
  * @package system
  * @since 1.0
  */
@@ -49,7 +49,7 @@ defined('YII_ZII_PATH') or define('YII_ZII_PATH',YII_PATH.DIRECTORY_SEPARATOR.'z
  * you can customize methods of YiiBase.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: YiiBase.php 2653 2010-11-14 14:23:12Z qiang.xue $
+ * @version $Id: YiiBase.php 2693 2010-11-30 03:12:29Z qiang.xue $
  * @package system
  * @since 1.0
  */
@@ -74,7 +74,7 @@ class YiiBase
 	 */
 	public static function getVersion()
 	{
-		return '1.1.5';
+		return '1.1.6-dev';
 	}
 
 	/**
@@ -623,6 +623,7 @@ class YiiBase
 		'CDbConnection' => '/db/CDbConnection.php',
 		'CDbDataReader' => '/db/CDbDataReader.php',
 		'CDbException' => '/db/CDbException.php',
+		'CDbMigration' => '/db/CDbMigration.php',
 		'CDbTransaction' => '/db/CDbTransaction.php',
 		'CActiveFinder' => '/db/ar/CActiveFinder.php',
 		'CActiveRecord' => '/db/ar/CActiveRecord.php',

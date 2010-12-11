@@ -43,7 +43,7 @@ class ClientScript extends CClientScript
             '{core}' => $this->getCoreScriptUrl(),
             '{juiThemeUrl}' => Yii::app()->params->jui['themeUrl'],
             '{juiTheme}' => Yii::app()->params->jui['theme'],
-            '{jsI18N}' => Yii::app()->controller->createUrl('page/jsI18N', array('language'=>Yii::app()->language)),
+            '{jsI18N}' => '/?r=page/jsI18N&language='.Yii::app()->language,
         ));
     }
 }

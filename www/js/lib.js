@@ -315,6 +315,22 @@ function getAreaName(area)
     return $(area).attr('id').replace('cms-area-', '');
 }
 
+function sanitizeAlias(str)
+{
+    str = str.replace(/[\s\:\.]/gi, '-')
+    while (str.indexOf('--')>-1) {
+        str = str.replace(/\-\-/gi, '-');
+    }
+    return str.replace(/[^0-9A-Za-zА-Яа-я-]*/gi, '');
+}
+
+function makeUrl(alias, oldurl)
+{
+    var p = oldurl.split('/');
+    p[p.length-1] = alias;
+    return p.join('/');
+}
+
 // =============================================================
 
 
@@ -562,8 +578,9 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 function updatePageunit(pageunit_id, selector, onSuccess)
 {
     var page_id = $('body').attr('rel');
+    var language = $('body').data('language');
     $.ajax({
-        url: '/?r=page/unitView&pageunit_id='+pageunit_id+'&id='+page_id,
+        url: '/?r=page/unitView&pageunit_id='+pageunit_id+'&id='+page_id+'&language='+language,
         async: false,
         cache: false,
         success: function(html) {

@@ -81,6 +81,8 @@ return array(
     'New page createad at {time}' => 'Новая страница созданная {time}',
     'Page' => 'Страница',
     'Page area' => 'Область страницы',
+    'Page alias' => 'Псевдоним в адресе страницы',
+    'Page url' => 'Полный адрес страницы',
 
     'General settings' => 'Общие настройки',
     'Units settings' => 'Настройки блоков',
@@ -178,4 +180,7 @@ return array(
     'Are you really want delete this record?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.',
 
     'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.' => 'Ошибка! Проверьте конфигурационный файл "protected/config/config.php", верно ли настроено подключение к БД. Или удалите конфигурационный файл для установки системы заново.',
+    'CUrlManager.UrlFormat must be either "path", "get" or "mix".'=>'Параметр CUrlManager.UrlFormat может принимать только значения "path", "get" или "mix".',
+
+    'URL' => 'Адрес',
 );

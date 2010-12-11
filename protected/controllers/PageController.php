@@ -61,7 +61,16 @@ class PageController extends Controller
         }
 */
 		if (!isset($_GET['id'])) {
-			$_GET['id'] = 1;
+            $lang = Yii::app()->language;
+            if (!empty($_GET['alias'])) {
+                $page = Page::model()->getAll("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
+                if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_alias']==$_GET['alias']))
+                    $_GET['id'] = $page[0]['id'];
+            } elseif (!empty($_GET['url'])) {
+                $page = Page::model()->getAll("`{$lang}_url` = :url", array(':url'=> '/'.$_GET['url']));
+                if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_url']=='/'.$_GET['url']))
+                    $_GET['id'] = $page[0]['id'];
+            } else $_GET['id'] = 1;
 		}
         $this->loadModel();
         if ($this->_model->redirect) {
@@ -80,7 +89,20 @@ class PageController extends Controller
 	public function actionPageAdd()
 	{
 		$page = Page::defaultObject();
-		$form_array = Page::form();
+        if (isset($_POST['Page'])) {
+            $page->parent_id = $_POST['Page']['parent_id'];
+            $_POST['Page']['url'] = $page->parent->url . '/' . $_POST['Page']['alias'];
+            $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+            foreach ($langs as $lang) {
+                $alias_param = $lang.'_alias';
+                $url_param = $lang.'_url';
+                if (isset($_POST['Page'][$alias_param])) {
+                    $_POST['Page'][$url_param] = $page->parent->$url_param . '/' . $_POST['Page'][$alias_param];
+                }
+            }
+        }
+
+        $form_array = Page::form();
         $form_array['activeForm'] = Form::ajaxify('PageAdd');
 		$form_array['buttons']['go'] = array(
 			'type'=>'submit',
@@ -102,7 +124,8 @@ class PageController extends Controller
 					$page->fill();
 					
 					if ($form->submitted('go')) {
-                        $url = $this->createAbsoluteUrl('page/view', array('id'=>$page->id));
+                        $alias_param = Yii::app()->language . '_alias';
+                        $url = $this->createAbsoluteUrl('page/view', array('id'=>$page->id, 'alias'=>$page->{$alias_param}, 'url'=>$page->generateUrl(true,$alias_param)));
 						echo CJavaScript::jsonEncode(array(
                             'url' => $url,
                             'id' => $page->id,
@@ -204,7 +227,12 @@ class PageController extends Controller
 			if ($page->id != 1)
 			{
 				$parent_id = $page->parent_id ? $page->parent_id : 1;
-				echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$parent_id))));
+                $params = array('id'=>$parent_id);
+                if ($page->parent_id) {
+                    $params['url'] = $page->parent->url;
+                    $params['alias'] = $page->parent->url;
+                }
+				echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', $params)));
 				$page->delete();
                 Yii::app()->user->setFlash('delete', Yii::t('cms', 'Page deleted.'));
 				Yii::app()->end();
@@ -243,7 +271,8 @@ class PageController extends Controller
 				}
 			$page->delete();
 		}
-		echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$page_id))));
+        $page = Page::model()->findByPk($page_id);
+		echo CJavaScript::jsonEncode(array('url' => $this->createAbsoluteUrl('page/view', array('id'=>$page->id, 'alias'=>$page->alias, 'url'=>$page->url))));
 		Yii::app()->end();
 	}
 
@@ -553,7 +582,7 @@ class PageController extends Controller
                 if ($p && $pu) {
                     $ret['page'] = array(
                         'title' => $p->title,
-                        'url' => $this->createAbsoluteUrl('view', array('id'=>$p->id)),
+                        'url' => $this->createAbsoluteUrl('view', array('id'=>$p->id, 'alias'=>$p->alias, 'url'=>$p->url)),
                         'similarToParent' => $p->isSimilarTo($p->parent_id, 'all', $unit->id),
                     );
                 }
@@ -688,7 +717,8 @@ class PageController extends Controller
     // Возвращает ссылку по id страницы
 	public function actionGetUrl()
 	{
-		echo $this->createAbsoluteUrl('page/view', array('id'=>intval($_GET['id'])));
+        $model = $this->loadModel();
+		echo $this->createAbsoluteUrl('page/view', array('id'=>$model->id, 'alias'=>$model->alias, 'url'=>$model->url));
 	}
 
 	// Возвращает размещения юнитов по юниту

@@ -37,6 +37,5 @@ function smarty_function_link($params, &$smarty){
             $url = $params['url'];
         }        
     }     
-     
     return CHtml::link($text, $url, $options);
 }

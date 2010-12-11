@@ -96,6 +96,8 @@ class Installer extends CApplicationComponent
             if (strpos($column->dbType, 'unsigned')!==false) {
                 $type .= ' unsigned';
             }
+            if ($column->isPrimaryKey)
+                $type = 'pk';
             $ret[$column->name] = $type;
         }
         return $ret;

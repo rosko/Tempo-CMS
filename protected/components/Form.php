@@ -27,10 +27,11 @@ class Form extends CForm
 EOD;
         if (is_subclass_of($className, 'I18nActiveRecord')) {
             $langs = array_keys(call_user_func(array($className, 'getLangs'), Yii::app()->language));
-            foreach ($this->_config['elements'] as $k => $v) {
-                if (in_array($k, call_user_func(array($className, 'i18n'))) && is_array($v)) {
-                    $txtButton = Yii::t('languages', 'Translations');
-                    $js .= <<<EOD
+            if (!empty($langs)) {
+                foreach ($this->_config['elements'] as $k => $v) {
+                    if (in_array($k, call_user_func(array($className, 'i18n'))) && is_array($v)) {
+                        $txtButton = Yii::t('languages', 'Translations');
+                        $js .= <<<EOD
     //$('<br />').appendTo('#{$this->uniqueId} .field_{$k}');
     button = $('<span></span>').button({
         text: false,
@@ -48,9 +49,10 @@ EOD;
     });
     
 EOD;
-                    foreach ($langs as $lang) {
-                        $this->getElements()->add($lang.'_'.$k, $v);
-                        $js .= "$('#{$this->uniqueId} .field_{$lang}_{$k}').appendTo(fieldset);\n";
+                        foreach ($langs as $lang) {
+                            $this->getElements()->add($lang.'_'.$k, $v);
+                            $js .= "$('#{$this->uniqueId} .field_{$lang}_{$k}').appendTo(fieldset);\n";
+                        }
                     }
                 }
             }

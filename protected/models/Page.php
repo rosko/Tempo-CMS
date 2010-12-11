@@ -3,6 +3,7 @@
 class Page extends I18nActiveRecord
 {
 	protected $_path;
+    protected $_url = array();
 	
 	public static function model($className=__CLASS__)
 	{
@@ -19,16 +20,19 @@ class Page extends I18nActiveRecord
 		return $this->localizedRules(array(
 			array('parent_id, title', 'required'),
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
-			array('path, title, keywords, description, redirect', 'length', 'max'=>255),
+			array('path, title, keywords, description, redirect, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('theme', 'length', 'max'=>50),
             array('language', 'length', 'max'=>10),
+            array('alias', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
+            array('alias', 'match', 'pattern'=>'/^'.Yii::app()->params['aliasPattern'].'$/u'),
+            array('url', 'PageUrlValidator'),
 		));
 	}
 
     public function i18n()
     {
         return array(
-            'title', 'keywords', 'description'
+            'title', 'keywords', 'description', 'alias', 'url',
         );
     }
 
@@ -132,6 +136,15 @@ class Page extends I18nActiveRecord
 		if ($this->_path != $newpath) {
 			$this->path = $newpath;
 		}
+        $langs = array_keys(self::getLangs());
+        foreach ($langs as $lang) {
+            $param = $lang.'_url';
+            $this->_url[$lang] = $this->$param;
+            $newurl = $this->generateUrl(true, $lang.'_alias');
+            if ($this->_url[$lang] != $newurl) {
+                $this->$param = $newurl;
+            }
+        }
 		return true;
 	}
 	
@@ -145,6 +158,18 @@ class Page extends I18nActiveRecord
 				$page->save(false);
 			}
 		}
+        $langs = array_keys(self::getLangs());
+        foreach ($langs as $lang) {
+            $param = $lang.'_url';
+    		if ($this->_url[$lang] != $this->$param)
+        	{
+            	$children = $this->children;
+                foreach ($children as $page) {
+                    $page->$param = $page->generateUrl(true, $lang.'_alias');
+    				$page->save(false);
+        		}
+            }
+        }
 		return true;
 	}
 	
@@ -197,6 +222,19 @@ class Page extends I18nActiveRecord
 		return implode(',',$ret);
 	}
 
+    public function generateUrl($full=false, $param='alias')
+    {
+		$ret = array();
+		if ($this->parent_id > 0) {
+			if ($full) {
+				$ret[] = $this->parent->generateUrl($full, $param);
+			} else
+				$ret[] = $this->parent->$param;
+			$ret[] = $this->$param;
+		}
+		return implode('/',$ret);
+    }
+
 	public function attributeLabels()
 	{
 		return array(
@@ -210,6 +248,8 @@ class Page extends I18nActiveRecord
             'redirect' => Yii::t('cms', 'Redirect'),
             'theme' => Yii::t('cms', 'Page graphic theme'),
             'language' => Yii::t('cms', 'Page language'),
+            'alias' => Yii::t('cms', 'Page alias'),
+            'url' => Yii::t('cms', 'Page url'),
 		);
 	}
 
@@ -227,6 +267,8 @@ class Page extends I18nActiveRecord
             'redirect' => 'string',
             'theme' => 'char(32)',
             'language' => 'char(32)',
+            'alias' => 'char(64)',
+            'url'=>'string',
         );
     }
 
@@ -268,6 +310,17 @@ class Page extends I18nActiveRecord
 					'rows'=>4,
 					'cols'=>40
 				),
+                Form::tab(Yii::t('cms', 'URL')),
+                'alias'=>array(
+                    'type'=>'text',
+                    'maxlength'=>64,
+                    'size'=>32,
+                ),
+                'url'=>array(
+                    'type'=>'text',
+                    'readonly'=>true,
+                    'size'=>55,
+                ),
                 Form::tab(Yii::t('cms', 'Extra')),
                 'redirect'=>array(
                     'type'=>'Link',
@@ -333,10 +386,28 @@ class Page extends I18nActiveRecord
 	{
 		$obj = new self;
 		$obj->title = Yii::t('cms', 'New page createad at {time}', array('{time}' => date("Y-m-d H:i:s")));
+        $obj->alias = self::sanitizeAlias($obj->title);
+        $obj->url = '/'.$obj->alias;
 		$obj->active = true;
 		$obj->order = 0;
 		return $obj;
 	}
+
+    public static function sanitizeAlias($str)
+    {
+        $pattern = Yii::app()->params['aliasPattern'];
+        $pattern = '[^' . substr($pattern,1,-1);
+        $str = str_replace(array(' ', ':', '.'), '-', $str);
+        $str = preg_replace('/'.$pattern.'/u', '', $str);
+        while (strpos($str,'--')!==false) {
+            $str = str_replace('--', '-', $str);
+        }
+		if(function_exists('mb_strlen'))
+			$str=mb_substr($str,0,64,'UTF-8');
+		else
+			$str=substr($str,0,64);
+        return $str;
+    }
 
     public function getAll($condition = '', $params = array())
     {

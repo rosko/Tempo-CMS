@@ -1,5 +1,6 @@
 <?php
 $this->pageTitle = $model->title;
+$language = Yii::app()->language;
 
 $cs=Yii::app()->getClientScript();
 
@@ -69,6 +70,7 @@ if (!Yii::app()->user->isGuest) {
 
         $('body').attr('rel', {$model->id});
         $.data(document.body, 'title', '{$model->title}');
+        $.data(document.body, 'language', '{$language}');
 
         // Настройки и обработчики перещения юнитов на странице
         $('.cms-area').sortable({
@@ -139,7 +141,7 @@ if (!Yii::app()->user->isGuest) {
                 pageunit.after('<div id="cms-pageunit-'+id.pageunit_id+'" class="cms-pageunit cms-unit-'+type+'" rel="'+type+'" rev="'+id.unit_id+'"></div>');
                 
                 var orig_bg = $('#cms-pageunit-'+id.pageunit_id).css('backgroundColor');
-                $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id, function() {
+                $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id+'&language={$language}', function() {
                     CmsAreaEmptyCheck();
                 }).css('backgroundColor', '#FFFF00');
                 $('#cms-pageunit-'+id.pageunit_id).animate({
@@ -174,8 +176,6 @@ if (!Yii::app()->user->isGuest) {
             });
         }
         
-
-
 EOD
 , CClientScript::POS_READY);
 

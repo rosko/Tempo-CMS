@@ -11,12 +11,19 @@ class Controller extends CController
         }
 
         $language = 'en';
+        $langs = array_keys(I18nActiveRecord::getLangs());
+        if (Yii::app()->request->preferredLanguage && in_array(Yii::app()->request->preferredLanguage, $langs))
+            $language = Yii::app()->request->preferredLanguage;
+
         if (Yii::app()->settings->getValue('language'))
             $language = Yii::app()->settings->getValue('language');
 
-        if (isset($_REQUEST['language']) && in_array($_REQUEST['language'], array_keys(I18nActiveRecord::getLangs())))
+        if (isset($_REQUEST['language']) && in_array($_REQUEST['language'], $langs))
             $language = $_REQUEST['language'];
 
+        if (!in_array($language, $langs)) {
+            $language = $langs[0];
+        }
         Yii::app()->language = $language;
 
         Unit::loadTypes();

@@ -9,6 +9,51 @@ if ($show_title === false) {
     $cs->registerScript('move_title', $js, CClientScript::POS_READY);
 }
 
+if (get_class($form->model)=='Page') {
+    $js = '';
+    if ($form->model->id == 1) {
+        $js .= <<<EOD
+            $('#{$form->uniqueId} .field_alias').hide();
+            $('#{$form->uniqueId} .field_url').hide();
+EOD;
+    } else {
+        if ($form->model->isNewRecord) {
+            $js .= <<<EOD
+            $('#{$form->uniqueId} .field_url').hide();
+            $('#{$form->uniqueId} #Page_title').bind('keyup change',function() {
+                $('#{$form->uniqueId} #Page_alias').val(sanitizeAlias($(this).val()));
+                $('#{$form->uniqueId} #Page_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
+            });
+EOD;
+            $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+            foreach ($langs as $lang) {
+                $js .= <<<EOD
+                $('#{$form->uniqueId} #Page_{$lang}_title').bind('keyup change',function() {
+                    $('#{$form->uniqueId} #Page_{$lang}_alias').val(sanitizeAlias($(this).val()));
+                    $('#{$form->uniqueId} #Page_{$lang}_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_{$lang}_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
+                });
+EOD;
+            }
+        }
+        $js .= <<<EOD
+        $('#{$form->uniqueId} #Page_alias').bind('keyup change',function() {
+            $(this).val(sanitizeAlias($(this).val()));
+            $('#{$form->uniqueId} #Page_url').val(makeUrl(sanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_url').val()));
+        });
+EOD;
+        $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+        foreach ($langs as $lang) {
+            $js .= <<<EOD
+            $('#{$form->uniqueId} #Page_{$lang}_alias').bind('keyup change',function() {
+                $(this).val(sanitizeAlias($(this).val()));
+                $('#{$form->uniqueId} #Page_{$lang}_url').val(makeUrl(sanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_{$lang}_url').val()));
+            });
+EOD;
+        }
+    }
+    $cs->registerScript('page_js', $js, CClientScript::POS_READY);
+}
+
 $js = '';
 
 if (Yii::app()->settings->getValue('showUnitAppearance') && $form['unit']->model) {

@@ -68,11 +68,11 @@ class Unit extends I18nActiveRecord
 
     public function getUnitUrl()
     {
-        $sql = 'SELECT page_id FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id ORDER BY id LIMIT 1';
+        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-        $page_id = $command->queryScalar();
-        return Yii::app()->controller->createUrl('page/view', array('id'=>$page_id));
+        $page = $command->queryRow();
+        return Yii::app()->controller->createUrl('page/view', array('id'=>$page['id'], 'alias'=>$page[Yii::app()->language.'_alias'], 'url'=>$page[Yii::app()->language.'_url']));
     }
 
     /**

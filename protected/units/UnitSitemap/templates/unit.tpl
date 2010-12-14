@@ -4,7 +4,7 @@
 <ul>
 
     {foreach $items as $item}
-
+    {if !$item.virtual}
     <li>{link text=$item.title url="page/view?id={$item.id}&alias={$item.alias}&url={$item.url}"}
 
         {if $item.description && $content.length}
@@ -15,7 +15,7 @@
         {/if}
         
     </li>
-
+    {/if}
     {/foreach}
 
 </ul>

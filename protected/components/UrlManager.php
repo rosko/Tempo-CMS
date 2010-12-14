@@ -38,5 +38,28 @@ class UrlManager extends CUrlManager
         return $ret;
     }
 
+	public function parsePathInfo($pathInfo)
+	{
+        parent::parsePathInfo($pathInfo);
+        if (isset($_GET['language'])) {
+            $langs = I18nActiveRecord::getLangs();
+            if (!isset($langs[$_GET['language']])) {
+                if (isset($_GET['url'])) {
+                    $_REQUEST['url']=$_GET['url'] = $_GET['language'] . '/' . $_GET['url'];
+                } elseif (isset($_GET['alias'])) {
+                    $_REQUEST['url']=$_GET['url'] = $_GET['language'] . '/' . $_GET['alias'];
+                    unset($_GET['alias']);
+                    unset($_REQUEST['alias']);
+                } else {
+                    if ($this->fullUrl)
+                        $_REQUEST['url']=$_GET['url'] = $_GET['language'];
+                    else
+                        $_REQUEST['alias']=$_GET['alias'] = $_GET['language'];
+                }
+                unset($_GET['language']);
+                unset($_REQUEST['language']);
+            }
+        }        
+    }
 }
 

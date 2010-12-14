@@ -15,10 +15,6 @@
  * @return string
  */
 function smarty_function_link($params, &$smarty){
-    if(empty($params['text'])){
-        throw new CException(Yii::t('ESmartyViewRenderer.messages', 'Function "{name}" parameter should be specified.', array('{name}'=>'text')));
-    }
-    
     $text = empty($params['text']) ? '#' : $params['text'];
     $options = empty($params['options']) ? array() : $params['options'];    
     $url = '';
@@ -37,5 +33,11 @@ function smarty_function_link($params, &$smarty){
             $url = $params['url'];
         }        
     }     
-    return CHtml::link($text, $url, $options);
+    if (empty($params['text'])) {
+        if (is_array($url))
+            return Yii::app()->controller->createAbsoluteUrl($url[0],array_slice($url,1));
+        else
+            return $url;
+    } else
+        return CHtml::link($text, $url, $options);
 }

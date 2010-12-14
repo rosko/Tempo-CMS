@@ -5,6 +5,6 @@
 {$content.text}
 
 {if $content.author}
-    <p>{t text='Author' cat='UnitText.unit'}: {$content.author}</p>
+    <p>{t text='Author'}: {$content.author}</p>
 {/if}
 

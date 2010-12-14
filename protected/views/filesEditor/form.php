@@ -1,4 +1,6 @@
-<?php $js = ''; ?>
+<?php $js = '';
+$codemirrorPath=Yii::app()->params['_path']['codemirror'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.codemirror'));
+?>
 <form id="<?=$id?>" method="POST" action="<?=$this->createAbsoluteUrl('filesEditor/save', array(
     'type' => $type,
     'name' => $name,
@@ -90,7 +92,7 @@ ul.files li {
 }
 
 </style>
-<script src="/3rdparty/codemirror/js/codemirror.js" type="text/javascript"></script>
+<script src="<?=$codemirrorPath?>/js/codemirror.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 var editor = null;
@@ -102,8 +104,8 @@ function HighlightEnable(writable) {
             height: $('#<?=$id?>_textarea').height()+'px',
             width: $('#<?=$id?>_textarea').width()+'px',
             parserfile: ["parsexml.js", "parsecss.js", "tokenizejavascript.js", "parsejavascript.js", "parsehtmlmixed.js"],
-            stylesheet: ["/3rdparty/codemirror/css/xmlcolors.css", "/3rdparty/codemirror/css/jscolors.css", "/3rdparty/codemirror/css/csscolors.css"],
-            path: "/3rdparty/codemirror/js/",
+            stylesheet: ["<?=$codemirrorPath?>/css/xmlcolors.css", "<?=$codemirrorPath?>/css/jscolors.css", "<?=$codemirrorPath?>/css/csscolors.css"],
+            path: "<?=$codemirrorPath?>/js/",
             continuousScanning: 100,
             enterMode: 'indent',
             tabMode: 'spaces',

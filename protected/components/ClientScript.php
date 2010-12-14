@@ -39,11 +39,30 @@ class ClientScript extends CClientScript
 
     private function strtr($str)
     {
+        if (strpos($str, '{jnotify}')!==false) {
+            $jnotifyPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.jnotify'));
+        }
+        if (strpos($str, '{fancybox}')!==false) {
+            $fancyboxPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.fancybox'));
+        }
+        if (strpos($str, '{js}')!==false) {
+            $jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
+        }
+        if (strpos($str, '{css}')!==false) {
+            $cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css'));
+        }
+        if (strpos($str, '{juiThemeUrl}')!==false) {
+            $juiThemeUrl=Yii::app()->params['juiThemeUrl'] = Yii::app()->params['juiThemeUrl'] ? Yii::app()->params['juiThemeUrl'] : Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css.jui'));
+        }
         return strtr($str, array(
             '{core}' => $this->getCoreScriptUrl(),
-            '{juiThemeUrl}' => Yii::app()->params->jui['themeUrl'],
-            '{juiTheme}' => Yii::app()->params->jui['theme'],
+            '{juiThemeUrl}' => $juiThemeUrl,
+            '{juiTheme}' => Yii::app()->params['juiTheme'],
             '{jsI18N}' => '/?r=page/jsI18N&language='.Yii::app()->language,
+            '{jnotify}' => $jnotifyPath,
+            '{fancybox}' => $fancyboxPath,
+            '{js}' => $jsPath,
+            '{css}' => $cssPath,
         ));
     }
 }

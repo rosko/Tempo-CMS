@@ -46,7 +46,7 @@ class I18nActiveRecord extends CActiveRecord
 
     public static function getLangs($language='')
     {
-        $langs = include(Yii::getPathOfAlias('application.messages.config').'.php');
+        $langs = Language::loadConfig();
         if ($language)
             unset($langs['languages'][$language]);
         return $langs['languages'];

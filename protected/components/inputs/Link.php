@@ -63,13 +63,15 @@ class Link extends CInputWidget
         $id=$this->htmlOptions['id'];
         $extensions = CJavaScript::jsonEncode($this->extensions);
         $cs=Yii::app()->getClientScript();
+        $am=Yii::app()->getAssetManager();
+        $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
         $js = '';
         if ($this->showFileManagerButton)
         {
             $js .= <<<EOD
 
 $('#{$id}_button').click(function() {
-	var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html#returnto={$id}';
+	var url = '{$fckeditorPath}/editor/plugins/imglib/index.html#returnto={$id}';
 	window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
 });
 $('#{$id}').dblclick(function() {
@@ -80,8 +82,9 @@ EOD;
 
         if ($this->showUploadButton)
         {
-            $cs->registerCssFile('/3rdparty/file-uploader/client/fileuploader.css');            
-            $cs->registerScriptFile('/3rdparty/file-uploader/client/jquery.fileuploader.js');
+            $fileuploaderPath=Yii::app()->params['_path']['file-uploader'] = $am->publish(Yii::getPathOfAlias('application.vendors.file-uploader'));
+            $cs->registerCssFile($fileuploaderPath.'/client/fileuploader.css');
+            $cs->registerScriptFile($fileuploaderPath.'/client/jquery.fileuploader.js');
             $txtDragHere = Yii::t('cms', 'Drag here');
             $txtUpload = Yii::t('cms', 'Upload');
             $txtCancel = Yii::t('cms', 'Cancel');
@@ -93,7 +96,7 @@ EOD;
             $js .= <<<EOD
 var uploader = new qq.FileUploader({
     element: $('#{$id}_file')[0],
-    action: '/3rdparty/file-uploader/server/php.php',
+    action: '{$fileuploaderPath}/server/php.php',
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
                 '<div class="cms-drop-area {$id}_drop"><span>{$txtDragHere}</span></div>' +

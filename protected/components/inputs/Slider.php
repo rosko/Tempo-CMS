@@ -6,8 +6,8 @@ class Slider extends CJuiSliderInput
 {
     public function init()
     {
-        $this->themeUrl = Yii::app()->params->jui['themeUrl'];
-        $this->theme = Yii::app()->params->jui['theme'];
+        $this->themeUrl = Yii::app()->params['juiThemeUrl'];
+        $this->theme = Yii::app()->params['juiTheme'];
     }
 
     public function run()

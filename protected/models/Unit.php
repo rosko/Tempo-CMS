@@ -56,6 +56,102 @@ class Unit extends I18nActiveRecord
 		);
 	}
 
+    public function unitsDirsAliases()
+    {
+        return array(
+            'application.units',
+            'local.units'
+        );
+    }
+
+    public function configFilename()
+    {
+        return Yii::getPathOfAlias('config.units').'.php';
+    }
+
+    public function loadConfig()
+    {
+        return include(self::configFilename());
+    }
+
+    public function getAllUnits()
+    {
+        $installed = array_keys(self::loadConfig());
+
+        $aliases = self::unitsDirsAliases();
+        $_units = array();
+        $units = array();
+        $u = array();
+        foreach ($aliases as $alias) {
+            $dirs = CFileHelper::findFiles(Yii::getPathOfAlias($alias), array(
+                'fileTypes'=>array('php'),
+                'level'=>1
+            ));
+            foreach ($dirs as $dir) {
+                if (basename($dir)=='unit.php') {
+                    $dir = dirname($dir);
+                    if (is_dir($dir)) {
+                        $className = basename($dir);
+                        Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
+                        $u[$className] = call_user_func(array($className, 'name'));
+                        $_units[$className] = array(
+                            'name' => $u[$className],
+                            'dir_alias' => $alias,
+                            'icon' => constant($className.'::ICON'),
+                            'installed' => in_array($className, $installed),
+                        );
+                    }
+                }
+            }
+        }
+        asort($u);
+        foreach ($u as $className => $name) {
+            $units[$className] = $_units[$className];
+        }
+        return $units;
+    }
+
+    public function install($classNames)
+    {
+        $config = self::loadConfig();
+        if (!is_array($classNames)) {
+            $classNames = array($classNames);
+        }
+        if (empty($classNames)) return false;
+        $units = self::getAllUnits();
+        foreach ($classNames as $className) {
+            Yii::app()->installer->installTable($className);
+            $config[$className] = $units[$className]['dir_alias'];
+        }
+        self::saveConfig($config);
+    }
+
+    public function uninstall($classNames)
+    {
+        $config = self::loadConfig();
+        if (!is_array($classNames)) {
+            $classNames = array($classNames);
+        }
+        if (empty($classNames)) return false;
+        foreach ($classNames as $className) {
+            if (isset($config[$className]))
+                unset($config[$className]);
+        }
+        self::saveConfig($config);
+    }
+
+    public function saveConfig($config)
+    {
+        if (is_array($config) && !empty($config)) {
+            $contents = "<?php\nreturn array(\n";
+            foreach ($config as $k => $v) {
+                $contents .= "\t'{$k}'=>'{$v}',\n";
+            }
+            $contents .= ");\n";
+            file_put_contents(self::configFilename(), $contents);
+        }
+    }
+
 	/**
      * Возвращает объект содержащий контент блока
      * @return mixed объект содержащий контент блока
@@ -82,8 +178,7 @@ class Unit extends I18nActiveRecord
     public static function getTypes()
 	{
         self::loadTypes();
-        $config = Yii::getPathOfAlias('application.units.config').'.php';
-        $classNames = array_keys(include($config));
+        $classNames = array_keys(self::loadConfig());
 		foreach ($classNames as $className) {
             if (!Yii::app()->settings->getValue('simpleMode') || !constant($className.'::HIDDEN'))
                 $ret[$className] = call_user_func(array($className, 'name'));
@@ -95,12 +190,9 @@ class Unit extends I18nActiveRecord
 
     public static function loadTypes()
     {
-        $config = Yii::getPathOfAlias('application.units.config').'.php';
-        $map = include($config);
-        foreach ($map as $className => $alias) {
+        foreach (self::loadConfig() as $className => $alias) {
             Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
         }
-
     }
 	
 	public function beforeDelete()

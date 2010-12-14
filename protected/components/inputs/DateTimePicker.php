@@ -6,8 +6,8 @@ class DateTimePicker extends EJuiDateTimePicker
 {
     public function init()
     {
-        $this->themeUrl = Yii::app()->params->jui['themeUrl'];
-        $this->theme = Yii::app()->params->jui['theme'];
+        $this->themeUrl = Yii::app()->params['juiThemeUrl'];
+        $this->theme = Yii::app()->params['juiTheme'];
         $this->language = Yii::app()->language;
 
         $defaults = array(

@@ -2,10 +2,7 @@
 
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
-
-$config = dirname(__FILE__).DIRECTORY_SEPARATOR.'config.php';
-
-$config = is_file($config) ? require($config) : array();
+$config = is_file($GLOBALS['local']) ? require($GLOBALS['local']) : array();
 
 return CMap::mergeArray(array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
@@ -15,14 +12,18 @@ return CMap::mergeArray(array(
 		'application.models.*',
 		'application.components.*',
 		'application.components.inputs.*',
-        'application.extensions.yiidebugtb.*',
 	),
 
     'components'=>array(
 		'user'=>array(
 			'allowAutoLogin'=>true,
             'loginUrl'=>array('site/login'),
+            'returnUrl'=>array('page/view'),
 		),
+        'request'=>array(
+            'enableCookieValidation'=>true,
+            'enableCsrfValidation'=>true,
+        ),
         'settings'=>array(
             'class'=>'Settings'
         ),
@@ -46,26 +47,34 @@ return CMap::mergeArray(array(
             ),
             'neededCssFiles' => array(
                 '{juiThemeUrl}/{juiTheme}/jquery-ui.css',
-                '/3rdparty/jnotify/jquery.jnotify.css',
+                '{jnotify}/jquery.jnotify.css',
             ),
             'neededScriptFiles' => array(
-                '/3rdparty/jnotify/jquery.jnotify.js',                
+                '{jnotify}/jquery.jnotify.js',
             ),
             'neededAdminCoreScripts' => array(
                 'yiiactiveform',
             ),
             'neededAdminCssFiles' => array(
-                '/3rdparty/fancybox/jquery.fancybox-1.3.1.css',
-                '/css/cms.css',
+                '{fancybox}/jquery.fancybox-1.3.1.css',
+                '{css}/cms.css',
             ),
             'neededAdminScriptFiles' => array(
                 '{core}/jui/js/jquery-ui-i18n.min.js',
-                '/js/jquery.scrollTo.js',
-                '/js/jquery.cookie.js',
-                '/js/jquery.hotkeys.js',
-                '/3rdparty/fancybox/jquery.fancybox-1.3.1.js',
+                '{js}/jquery.scrollTo.js',
+                '{js}/jquery.cookie.js',
+                '{js}/jquery.hotkeys.js',
+                '{fancybox}/jquery.fancybox-1.3.1.js',
                 '{jsI18N}',
-                '/js/lib.js',
+                '{js}/lib.js',
+            ),
+        ),
+        'urlManager'=>array(
+            'rules'=>array(
+                "site/login"=>'site/login',
+                "site/logout"=>'site/logout',
+                'filesEditor/save'=>'filesEditor/save',
+
             ),
         ),
 		'errorHandler'=>array(

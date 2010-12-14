@@ -1,8 +1,10 @@
 <?php
+echo $unitContent;
 $this->pageTitle = $model->title;
 $language = Yii::app()->language;
 
 $cs=Yii::app()->getClientScript();
+$am=Yii::app()->getAssetManager();
 
 $cs->registerScript('all', <<<EOD
 
@@ -66,11 +68,15 @@ if (!Yii::app()->user->isGuest) {
     $baseUrl = Yii::app()->getAssetManager()->publish($dir);
     $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
 		
+    $csrfTokenName = Yii::app()->getRequest()->csrfTokenName;
+    $csrfToken = Yii::app()->getRequest()->getCsrfToken();
     $cs->registerScript('cms-area', <<<EOD
 
         $('body').attr('rel', {$model->id});
         $.data(document.body, 'title', '{$model->title}');
         $.data(document.body, 'language', '{$language}');
+        $.data(document.body, 'csrfTokenName', '{$csrfTokenName}');
+        $.data(document.body, 'csrfToken', '{$csrfToken}');
 
         // Настройки и обработчики перещения юнитов на странице
         $('.cms-area').sortable({
@@ -197,6 +203,7 @@ EOD
  * Общая панель инструментов для всего сайта
  */
     $txtSureExit = Yii::t('cms', 'Really exit from site edit mode?');
+    $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
     $this->widget('Toolbar', array(
         'id' => 'toolbar',
         'location' => array(
@@ -252,6 +259,35 @@ EOD
                 'title' => Yii::t('cms', 'Create new page'),
                 'click' => 'js:function() { pageAddForm(); return false; }',
             ),
+            'units'=>array(
+                'icon' => 'large_tiles',
+                'title' => Yii::t('cms', 'Units'),
+                'click' => <<<EOD
+js:function() {
+            
+            $.ajax({
+                url: '/?r=page/unitsInstall',
+                type: 'GET',
+                cache: false,
+                beforeSend: function() {
+                    showInfoPanel(cms_html_loading_image, 0);
+                },
+                success: function(html) {
+                    hideInfoPanel();
+                    $('#cms-page-edit').html(html);
+                    AjaxifyForm('#cms-page-edit', $('#cms-page-edit').find('form').eq(0), null, null, function(html) {
+                        location.reload();
+                    });
+                    showSplash($('#cms-page-edit'), {
+                        resizable: true,
+                        draggable: true
+                    });
+                }
+            });
+            return false;
+        }
+EOD
+            ),
             'sitemap' => array(
                 'icon' => 'sitemap',
                 'title' => Yii::t('cms', 'Sitemap'),
@@ -283,7 +319,7 @@ EOD
                 'title' => Yii::t('cms', 'File manager'),
                 'click' => <<<EOD
 js:function(){
-            var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html';
+            var url = '{$fckeditorPath}/editor/plugins/imglib/index.html';
             window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
             return false;
 }

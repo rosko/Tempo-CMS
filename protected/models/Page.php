@@ -269,6 +269,7 @@ class Page extends I18nActiveRecord
             'language' => 'char(32)',
             'alias' => 'char(64)',
             'url'=>'string',
+            'virtual'=>'boolean',
         );
     }
 

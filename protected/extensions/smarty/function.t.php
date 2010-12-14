@@ -14,10 +14,12 @@
  * @return string
  */
 function smarty_function_t($params, &$smarty) {
-    if (empty($params['text']) || empty($params['cat'])) {
+    if (empty($params['text'])) {
         throw new CException(Yii::t('ESmartyViewRenderer.messages', 'You should specify both "cat" and "text" parameters.'));
     }
-
+    if (empty($params['cat'])) {
+        $params['cat'] = $smarty->getTemplateVars('className') .'.unit';
+    }
     $text = $params['text'];
     $category = $params['cat'];
     $source = !empty($params['src']) ? $params['src'] : null;

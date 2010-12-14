@@ -14,7 +14,7 @@ class UserIdentity extends CUserIdentity
 		$user=User::model()->find('`login`= :username OR `email`= :username',array('username'=>$this->username));
 		if($user===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		else if(self::hash($this->password)!==$user->password)
+		else if(User::hash($this->password)!==$user->password)
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else {
             $this->_id = $user->id;
@@ -24,9 +24,4 @@ class UserIdentity extends CUserIdentity
 		return !$this->errorCode;
 	}
 
-	public function hash($string)
-	{
-        return sha1(md5($string) . Yii::app()->params['hashSalt']);
-	}
-	
 }

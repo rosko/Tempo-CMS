@@ -16,7 +16,7 @@ class SiteController extends Controller
 	public function actionLogin()
 	{
 		if (!Yii::app()->user->isGuest) {
-			if ($_SERVER['HTTP_REFERER'])
+			if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],'/site/login')===false)
 				$this->redirect($_SERVER['HTTP_REFERER']);
 			else
 				$this->redirect(Yii::app()->homeUrl);
@@ -29,8 +29,8 @@ class SiteController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
-		if ($_POST['url']) {
-			$url = $_POST['url'];
+		if ($_POST['backurl']) {
+			$url = $_POST['backurl'];
 		} else {
 			$url = $_SERVER['HTTP_REFERER'];
 		}

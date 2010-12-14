@@ -67,7 +67,7 @@ class Content extends I18nActiveRecord
         $params['className'] = $className;
         $files = array(
             'application.units.' . $className . '.' . $viewFile,
-            'webroot.units.' . $className . '.' . $viewFile,
+            'local.units.' . $className . '.' . $viewFile,
         );
         foreach ($files as $file) {
             if (is_file(Yii::getPathOfAlias($file).'.php'))
@@ -194,8 +194,8 @@ class Content extends I18nActiveRecord
             $className = get_class($this);
         $pathes = array(
             'application.units.'.$className.'.templates',
-            'webroot.units.'.$className.'.templates',
-            'webroot.templates.'.$className,
+            'local.units.'.$className.'.templates',
+            'local.templates.'.$className,
         );
         return $pathes;
     }

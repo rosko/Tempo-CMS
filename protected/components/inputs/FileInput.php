@@ -57,10 +57,12 @@ class FileInput extends CInputWidget
         $js = '';
         if ($this->showFileManagerButton)
         {
+            $am=Yii::app()->getAssetManager();
+            $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
             $js .= <<<EOD
 
 $('#{$id}_button').click(function() {
-	var url = '/3rdparty/fckeditor/editor/plugins/imglib/index.html#returnto={$id}';
+	var url = '{$fckeditorPath}/editor/plugins/imglib/index.html#returnto={$id}';
 	window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
 });
 $('#{$id}').dblclick(function() {
@@ -71,7 +73,9 @@ EOD;
 
         if ($this->showUploadButton)
         {
-            $cs->registerScriptFile('/3rdparty/file-uploader/client/fileuploader.js');
+            $fileuploaderPath=Yii::app()->params['_path']['file-uploader'] = $am->publish(Yii::getPathOfAlias('application.vendors.file-uploader'));
+            $cs->registerCssFile($fileuploaderPath.'/client/fileuploader.css');
+            $cs->registerScriptFile($fileuploaderPath.'/client/jquery.fileuploader.js');
             $txtDragHere = Yii::t('cms', 'Drag here');
             $txtUpload = Yii::t('cms', 'Upload');
             $txtServerError = Yii::t('cms', 'Some files were not uploaded, please contact support and/or try again.');
@@ -81,13 +85,20 @@ EOD;
             $js .= <<<EOD
 var uploader = new qq.FileUploader({
     element: document.getElementById('{$id}_file'),
-    action: '/3rdparty/file-uploader/server/php.php',
+    action: '{$fileuploaderPath}/server/php.php',
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
                 '<div class="cms-drop-area"><span>{$txtDragHere}</span></div>' +
                 '<div class="cms-button w200">{$txtUpload}</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
              '</div>',
+    fileTemplate: '<li>' +
+            '<span class="qq-upload-file"></span>' +
+            '<span class="cms-upload-spinner"></span>' +
+            '<span class="qq-upload-size"></span>' +
+            '<a class="qq-upload-cancel" href="#">{$txtCancel}</a>' +
+            '<span class="qq-upload-failed-text">{$txtError}</span>' +
+        '</li>',
     onComplete: function(id, fileName, ret){
         if (ret.success)
         {

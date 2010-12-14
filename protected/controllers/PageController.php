@@ -25,20 +25,22 @@ class PageController extends Controller
 			),
 			array('allow',
 				'actions'=>array(
-                     'unitAdd', 'unitForm',
-                     'unitSetDialog', 'unitSet', 'unitMove',
-                     'unitDeleteDialog','unitDelete', 'unitCheck',
+                    'unitAdd', 'unitForm',
+                    'unitSetDialog', 'unitSet', 'unitMove',
+                    'unitDeleteDialog','unitDelete', 'unitCheck',
 
                     'unitAjax',
 
-                     'pageAdd', 'pageForm',
-                     'pageRename', 'pageFill', 'pagesSort',
-                     'pageDeleteDialog', 'pageDelete',
+                    'pageAdd', 'pageForm',
+                    'pageRename', 'pageFill', 'pagesSort',
+                    'pageDeleteDialog', 'pageDelete',
 
-                     'pageTree',
+                    'pageTree',
 
-                     'hasChildren', 'siteSettings',
-                     'siteMap', 'getUrl',
+                    'hasChildren', 'siteSettings',
+                    'siteMap', 'getUrl',
+
+                    'unitsInstall',
                 ),
 				'users'=>array('admin'),
 			),
@@ -59,8 +61,9 @@ class PageController extends Controller
             print_r ($ret);
             echo '</pre>';
         }
-*/
+ */
 		if (!isset($_GET['id'])) {
+            // Поиск страницы
             $lang = Yii::app()->language;
             if (!empty($_GET['alias'])) {
                 $page = Page::model()->getAll("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
@@ -71,7 +74,25 @@ class PageController extends Controller
                 if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_url']=='/'.$_GET['url']))
                     $_GET['id'] = $page[0]['id'];
             } else $_GET['id'] = 1;
-		}
+		} else {
+            // Сделать переадрессацию, если страница запрошена по id без указания адреса
+            // и при этом режим редактирования отключен
+            if (Yii::app()->user->isGuest && 
+                (Yii::app()->getUrlManager()->getUrlFormat()==UrlManager::PATH_FORMAT) &&
+                !$_GET['alias'] && !$_GET['url']) {
+                $page = Page::model()->findByPk(intval($_GET['id']));
+                if (Yii::app()->getUrlManager()->fullUrl && $page->url) {
+                    $this->redirect($this->createAbsoluteUrl('page/view',array(
+                        'url'=>$page->url,
+                    )));
+                } elseif (!Yii::app()->getUrlManager()->fullUrl && $page->alias) {
+                    $this->redirect($this->createAbsoluteUrl('page/view',array(
+                        'alias'=>$page->alias,
+                        'id'=>$page->id,
+                    )));
+                }
+            }
+        }        
         $this->loadModel();
         if ($this->_model->redirect) {
             if (Yii::app()->user->isGuest)
@@ -80,8 +101,17 @@ class PageController extends Controller
                 Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
         }
 
+        $unitContent = '';
+        if (isset($_GET['i'])) {
+            $className = Unit::getClassNameByUnitType($_GET['i']);
+            if (class_exists($className) && method_exists($className, 'content')) {
+                $unitContent = call_user_func(array($className, 'content'));
+            }
+        }
+
 		$this->render('view',array(
-			'model'=>$this->_model
+			'model'=>$this->_model,
+            'unitContent' => $unitContent,
 		));
 	}
 
@@ -382,7 +412,12 @@ class PageController extends Controller
 			}
 			$content->unit_id = $unit->id;
             if (isset($_REQUEST['content_page_id']) && $content->hasAttribute('page_id')) {
-                $content->page_id = intval($_REQUEST['content_page_id']);
+                $page = Page::model()->findByPk(intval($_REQUEST['content_page_id']));
+                if ($page) {
+                    $page->virtual = true;
+                    $page->save(false);
+                    $content->page_id = intval($_REQUEST['content_page_id']);
+                }
             }
             if (isset($_REQUEST['section_id']) && isset($_REQUEST['foreign_attribute'])
                 && $content->hasAttribute($_REQUEST['foreign_attribute'])    ) {
@@ -502,6 +537,18 @@ class PageController extends Controller
         			$unit->modify = new CDbExpression('NOW()');
             		if ($unit->save(false)) {
                 		$content->save(false);
+                        if ($content->hasAttribute('page_id')) {
+                            $p = Page::model()->findByPk($content->page_id);
+                            if ($p) {
+                                $p->title = $unit->title;
+                                $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+                                foreach ($langs as $lang) {
+                                    $param = $lang.'_title';
+                                    $p->$param = $unit->$param;
+                                }
+                                $p->save(false);
+                            }
+                        }
                     }
                 } else $content->save(false);
 			}
@@ -748,6 +795,34 @@ class PageController extends Controller
         header('Content-type: text/javascript');
         Yii::app()->language = $language;
         $this->renderPartial('jsI18N');
+    }
+
+    public function actionUnitsInstall()
+    {
+        $all_units = Unit::getAllUnits();
+        $errors = array();
+        if (isset($_POST['Units'])) {
+            $units = array_keys($_POST['Units']);
+            Unit::install($units);
+            $uninstall = array_diff(array_keys($all_units), $units);
+            foreach ($uninstall as $i=>$className) {
+                $sql = 'SELECT count(*) FROM `' . Unit::tableName() . '` WHERE `type` = :type';
+                $command = Yii::app()->db->createCommand($sql);
+                $command->bindValue(':type', Unit::getUnitTypeByClassName($className), PDO::PARAM_STR);
+                $exists = $command->queryScalar();
+                if ($exists) {
+                    unset($uninstall[$i]);
+                    $errors[] = Yii::t('cms', 'Can\`t unistall "{name}"', array('{name}'=>$all_units[$className]['name']));
+                }
+            }
+            Unit::uninstall($uninstall);
+            $all_units = Unit::getAllUnits();
+        }
+        
+        $this->render('unitsInstall', array(
+            'units' => $all_units,
+            'errors' => $errors,
+        ));
     }
 
 	public function loadModel()

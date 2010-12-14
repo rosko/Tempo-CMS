@@ -31,4 +31,7 @@ return array(
     'Cancel' => 'Отмена',
 
     'Are you really want to delete file? Deleted files are unrecovered.' => 'Вы действительно хотите удалить этот файл? Удаленный файл нельзя будет восстановить.',
+
+    'Publish and return some file (i.e. image files)' => 'Публикует файл и выводит его адрес (например, изображение)',
+    'Generate form tag' => 'Функция для генерация тега form',
 );

@@ -18,7 +18,7 @@ class LanguageSelect extends CInputWidget
         else
             $this->htmlOptions['name']=$name;
 
-        $l = include(Yii::getPathOfAlias('application.messages.config').'.php');
+        $l = Language::loadConfig();
         $data = array();
         foreach ($l['languages'] as $k => $v) {
             $data[$k] = Yii::t('languages', $v);

@@ -20,8 +20,6 @@ class VisualTextAreaFCK extends CInputWidget
         else
             $this->htmlOptions['name']=$name;
 
-        //include_once Yii::app()->basePath . '/../www/3rdparty/fckeditor/fckeditor.php';
-
         $this->registerClientScript();
         
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
@@ -37,7 +35,9 @@ class VisualTextAreaFCK extends CInputWidget
 
         $cs=Yii::app()->getClientScript();
 
-        $cs->registerScriptFile('/3rdparty/fckeditor/fckeditor.js');
+        $am=Yii::app()->getAssetManager();
+        $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
+        $cs->registerScriptFile($fckeditorPath.'/fckeditor.js');
         $baseUrl = Yii::app()->baseUrl;
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
         $lang = Yii::app()->language;
@@ -47,7 +47,7 @@ class VisualTextAreaFCK extends CInputWidget
 //$(function(){
 
         var oFCKeditor = new FCKeditor('{$name}') ;
-        var basePath = '{$baseUrl}/3rdparty/fckeditor/';
+        var basePath = '{$fckeditorPath}/';
         oFCKeditor.BasePath = basePath;
         oFCKeditor.Width = '{$this->width}';
         oFCKeditor.Height = '{$this->height}';

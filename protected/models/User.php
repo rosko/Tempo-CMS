@@ -2,6 +2,10 @@
 
 class User extends CActiveRecord
 {
+    const ACCESS_ADMINISTRATOR = 'administrator';
+    const ACCESS_EDITOR = 'editor';
+    const ACCESS_USER = 'user';
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -45,4 +49,20 @@ class User extends CActiveRecord
             'access' => 'string',
         );
     }
+
+    public function install()
+    {
+        $user = new self;
+        $user->login = 'admin';
+        $user->name = Yii::app()->params['admin']['name'];
+        $user->email = Yii::app()->params['admin']['email'];
+        $user->password = self::hash(Yii::app()->params['admin']['password']);
+        $user->access = self::ACCESS_ADMINISTRATOR;
+        $user->save(false);
+    }
+
+    public static function hash($string)
+	{
+        return sha1(md5($string) . Yii::app()->params['hashSalt']);
+	}
 }

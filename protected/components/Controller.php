@@ -5,7 +5,7 @@ class Controller extends CController
 
     public function init()
     {
-        if (!is_file(Yii::getPathOfAlias('application.config.config').'.php')) {
+        if (!is_file(Yii::getPathOfAlias('config.general').'.php')) {
             
             Yii::app()->end();
         }
@@ -54,6 +54,8 @@ class Controller extends CController
     		$vars['title'] .=  ' - ' . $vars['sitename'];
         }
         $vars['themeBaseUrl'] = Yii::app()->theme->getBaseUrl();
+        $vars['cssUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css'));
+        $vars['jsUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         if (isset(Yii::app()->controller->_model))
             $vars['page'] = Yii::app()->controller->loadModel();
         $vars['editMode'] = !Yii::app()->user->isGuest;

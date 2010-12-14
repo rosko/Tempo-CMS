@@ -41,6 +41,8 @@ class FilesEditorController extends Controller
             if (class_exists($name)) {
                 $suggestions['{registercss file="file.css"}'] = Yii::t('filesEditor', 'Function to connect CSS-file');
                 $suggestions['{registerjs file="file.js"}'] = Yii::t('filesEditor', 'Function to connect JavaScript-file');
+                $suggestions['{publish file="file.js"}'] = Yii::t('filesEditor', 'Publish and return some file (i.e. image files)');
+                $suggestions['{form action="/" method="POST" id="form-id" target="_blank"}'] = Yii::t('filesEditor', 'Generate form tag');
 
                 if((Yii::app()->getViewRenderer())!==null)
                     $extension=Yii::app()->getViewRenderer()->fileExtension;
@@ -186,7 +188,7 @@ class FilesEditorController extends Controller
 
             if ($type == 'templates') {
                 if (class_exists($name))
-                    $filename = Yii::getPathOfAlias('webroot.templates.'.$name).DIRECTORY_SEPARATOR.$file.$extension;
+                    $filename = Yii::getPathOfAlias('local.templates.'.$name).DIRECTORY_SEPARATOR.$file.$extension;
             }
             if ($filename) {
                 if (!is_dir(dirname($filename))) {

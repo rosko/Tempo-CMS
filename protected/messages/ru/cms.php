@@ -183,4 +183,8 @@ return array(
     'CUrlManager.UrlFormat must be either "path", "get" or "mix".'=>'Параметр CUrlManager.UrlFormat может принимать только значения "path", "get" или "mix".',
 
     'URL' => 'Адрес',
+    'Units installation' => 'Установка типов блоков',
+    'Submit' => 'Отправить',
+    'Can\`t unistall "{name}"' => 'Невозможно удалить тип блоков "{name}". Удалите со всех страниц блоки этого типа перед удалением.',
+    'Units' => 'Блоки',
 );

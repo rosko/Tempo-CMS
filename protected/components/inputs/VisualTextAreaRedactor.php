@@ -57,9 +57,11 @@ class VisualTextAreaRedactor extends CInputWidget
         $options=$rOptions===array()?'{}' : CJavaScript::encode($rOptions);
 
         $cs=Yii::app()->getClientScript();
+        $am=Yii::app()->getAssetManager();
         $cs->registerCoreScript('jquery');
-        $cs->registerScriptFile('/3rdparty/redactor/redactor/redactor.js',CClientScript::POS_END);
-        $cs->registerCssFile('/3rdparty/redactor/redactor/css/redactor.css');
+        $redactorPath=Yii::app()->params['_path']['redactor'] = $am->publish(Yii::getPathOfAlias('application.vendors.redactor'));
+        $cs->registerScriptFile($redactorPath.'/redactor/redactor.js',CClientScript::POS_END);
+        $cs->registerCssFile($redactorPath.'/redactor/css/redactor.css');
         
         $cs->registerScript('Yii.VisualTextAreaRedactor#'.$id,"jQuery(\"#{$id}\").redactor({$options});");
         

@@ -19,7 +19,7 @@
 	<![endif]-->
 
     <link rel="stylesheet" type="text/css" href="{$themeBaseUrl}/css/main.css" />
-	<link rel="stylesheet" type="text/css" href="/css/form.css" />
+	<link rel="stylesheet" type="text/css" href="{$cssUrl}/form.css" />
 
 </head>
 

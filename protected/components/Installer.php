@@ -56,7 +56,7 @@ class Installer extends CApplicationComponent
         Unit::loadTypes();
         $classNames = array_merge(
             array('Page', 'PageUnit', 'Unit', 'User'),
-            array_keys(include(Yii::getPathOfAlias('application.units.config').'.php'))
+            array_keys(Unit::loadConfig())
         );
         foreach ($classNames as $className) {
             $this->installTable($className);

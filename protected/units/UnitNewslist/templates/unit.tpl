@@ -11,6 +11,6 @@
 
 {else}
 
-    <h2>{t text='empty' cat='UnitNewslist.unit'}</h2>
+    <h2>{t text='empty'}</h2>
 
 {/if}

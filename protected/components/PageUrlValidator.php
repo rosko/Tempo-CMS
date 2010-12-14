@@ -4,6 +4,14 @@ class PageUrlValidator extends CUniqueValidator
 {
 	public $encoding=false;
 
+    public function restrictedUrls()
+    {
+        return array(
+            '/site/login',
+            '/site/logout',
+        );
+    }
+
     protected function validateAttribute($object,$attribute)
 	{
         if ($object->id == 1) $this->allowEmpty = true;
@@ -18,7 +26,8 @@ class PageUrlValidator extends CUniqueValidator
             $value = $object->{$this->attributeName};
             $p = explode('/', $value);
 
-            if (!$this->allowEmpty && ($value == '' || empty($p[count($p)-1]))) {
+            if ((!$this->allowEmpty && ($value == '' || empty($p[count($p)-1]))) ||
+                 in_array($value, $this->restrictedUrls())) {
                 $this->addError(
                     $object, $attribute,
                     Yii::t('yii','{attribute} is invalid.')

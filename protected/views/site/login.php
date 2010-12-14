@@ -9,7 +9,7 @@ $this->pageTitle= Yii::t('cms', 'Login');
 	'id'=>'login-form',
 	'enableAjaxValidation'=>true,
 )); ?>
-<?=CHtml::hiddenField('url', $url)?>
+<?=CHtml::hiddenField('backurl', $url)?>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'username'); ?>

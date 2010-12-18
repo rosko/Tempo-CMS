@@ -13,7 +13,6 @@ class Installer extends CApplicationComponent
             $tableName = call_user_func(array($className, 'tableName'));
         if (method_exists($className, 'scheme') && $tableName) {
             $scheme = call_user_func(array($className, 'scheme'));
-            $className::scheme();
             if (method_exists($className, 'i18n')) {
                 $i18n_columns = call_user_func(array($className, 'i18n'));
                 $langs = array_keys(I18nActiveRecord::getLangs());
@@ -51,16 +50,13 @@ class Installer extends CApplicationComponent
         }
     }
 
-    public function installAll()
+    public function installAll($withUnits=true)
     {
-        Unit::loadTypes();
-        $classNames = array_merge(
-            array('Page', 'PageUnit', 'Unit', 'User'),
-            array_keys(Unit::loadConfig())
-        );
-        foreach ($classNames as $className) {
+        $classNames = array('Page', 'PageUnit', 'Unit', 'User');
+        foreach ($classNames as $className)
             $this->installTable($className);
-        }
+        if ($withUnits)
+            Unit::install(array_keys(Unit::getAllUnits()));
     }
 
     protected static function getSimpleScheme($tableSchema) {

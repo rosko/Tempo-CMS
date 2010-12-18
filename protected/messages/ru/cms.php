@@ -127,6 +127,7 @@ return array(
     'Paste' => 'Вставить',
 
     'Select all children pages' => 'Отметить все дочерние страницы',
+    'Deselect all children pages' => 'Снять отметки со всех дочернии страниц',
     'Do you really want to delete this unit?' => 'Вы действительно хотите удалить этот блок?',
     'Do you really want to delete this unit everywhere?' => 'Удаляемая информация будет безвозвратно потеряна.',
     'Delete unit' => 'Удалить блок',

@@ -58,13 +58,14 @@ class PageSelect extends CInputWidget
     public function registerClientScript()
     {
         $id=$this->htmlOptions['id'];
+        $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
         
         $textLinkJs = '';
         if ($this->textLinkId)
         {
             $textLinkJs = <<<EOD
 $.ajax({
-    url: '/?r=page/getUrl&id='+id,
+    url: '/?r=page/getUrl&id='+id+'&language='+$.data(document.body, 'language'),
     cache: false,
     beforeSend: function() {
         showInfoPanel(cms_html_loading_image, 0);
@@ -135,7 +136,7 @@ $('#{$id}_title').click(function() {
     if ($('#{$id}_dialog').html() == '') {
         $('#{$id}_dialog').html('{$txtLoading}...');
         $.ajax({
-            url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=0',
+            url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=0&language='+$.data(document.body, 'language'),
             data: {$ajax_data},
             method: 'POST',
             cache: false,
@@ -163,8 +164,8 @@ $('#{$id}_title').click(function() {
                    }
                 });
                 setTimeout(function() {
-                  //$('#pagetree_{$id}').jstree('select_node', '#pagetree_{$id}-1');
-                  $('#pagetree_{$id}-1').children("a:eq(0)").click();
+                  //$('#pagetree_{$id}').jstree('select_node', '#pagetree_{$id}-{$value}');
+                  $('#pagetree_{$id}-{$value}').children("a:eq(0)").click();
                   $('#{$id}_dialog').click();
                 }, 100);
                 $('#{$id}_dialog').blur(function(e){
@@ -195,7 +196,7 @@ EOD;
 
 $(function() {
     $.ajax({
-        url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=1',
+        url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=1&language='+$.data(document.body, 'language'),
         cache: false,
         data: {$ajax_data},
         method: 'POST',

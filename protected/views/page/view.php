@@ -161,7 +161,7 @@ if (!Yii::app()->user->isGuest) {
         });
         
         // Отображение диалога "Заполнить страницу" на пустой странице
-        if ($('.pageunit').length == 0)
+        if ($('.pageunit').length == -1)
         {
             var page_id = $('body').attr('rel');
             $.ajax({
@@ -228,7 +228,7 @@ EOD
                 'click' => <<<EOD
 js:function(){
             $.ajax({
-                url: '/?r=page/siteSettings',
+                url: '/?r=page/siteSettings&language={$language}',
                 type: 'GET',
                 cache: false,
                 beforeSend: function() {
@@ -266,7 +266,7 @@ EOD
 js:function() {
             
             $.ajax({
-                url: '/?r=page/unitsInstall',
+                url: '/?r=page/unitsInstall&language={$language}',
                 type: 'GET',
                 cache: false,
                 beforeSend: function() {
@@ -295,7 +295,7 @@ EOD
 js:function(){
             var page_id = {$model->id};
             $.ajax({
-                url: '/?r=page/siteMap&id='+page_id,
+                url: '/?r=page/siteMap&id='+page_id+'&language={$language}',
                 type: 'GET',
                 cache: false,
                 beforeSend: function() {

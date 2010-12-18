@@ -5,9 +5,9 @@ class UnitVideo extends Content
 	const ICON = '/images/icons/fatcow/16x16/movies.png';
     const HIDDEN = false;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitVideo.unit', 'Video');
+        return Yii::t('UnitVideo.unit', 'Video', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)

@@ -138,6 +138,31 @@ class Content extends I18nActiveRecord
     {
         $params = $this->prepare($params);
 
+        $output = '';
+        if ($params['editMode'] && method_exists($this, 'form') && $arr = $this->form()) {
+            if (is_array($arr))
+            foreach ($arr['elements'] as $i => $elem) {
+                if (is_array($elem) && $elem['type']=='RecordsGrid') {
+                    $output .= Yii::app()->controller->renderPartial('application.components.inputs.views.RecordsGrid', array(
+                        'id' => __CLASS__.'_'.get_class($this).'_'.$this->id,
+                        'foreign_attribute' => $elem['foreign_attribute'],
+                        'addButtonTitle' => $elem['addButtonTitle'],
+                        'page_id' => $params['page']->id,
+                        'area' => $params['pageunit']->area,
+                        'type' => Unit::getUnitTypeByClassName($elem['class_name']),
+                        'class_name' => $elem['class_name'],
+                        'section_id' => $this->id,
+                        'section_type' => get_class($this),
+                        'pageunit_id' => $params['pageunit']->id,
+                        'unit_id' => $params['unit']->id,
+                    ), true);
+                }
+            }
+            if ($output) {
+                $output .= '<hr />';
+            }
+        }
+
         $output2 = '';
         if ($params['editMode'])
         {
@@ -175,7 +200,7 @@ class Content extends I18nActiveRecord
                 $params[$k] = $v->getAttributes();
         }
 
-        $output = Yii::app()->controller->renderPartial($alias,
+        $output .= Yii::app()->controller->renderPartial($alias,
                            $params, true);
         if (trim($output) == '' && $params['editMode'])  {
             $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($className, 'name'))));

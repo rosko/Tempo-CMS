@@ -5,9 +5,9 @@ class UnitSearch extends Content
 	const ICON = '/images/icons/fatcow/16x16/find.png';
     const HIDDEN = true;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitSearch.unit', 'Search');
+        return Yii::t('UnitSearch.unit', 'Search', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -64,6 +64,9 @@ class UnitSearch extends Content
     public function content()
     {
         // TODO сделать поиск
+        // 1. Собрать все поля string и text для блоков и страниц (в Page, Unit, Unit...)
+        // 2. Произвести поиск по полям
+        // 3. Вывести результаты
         return Yii::t('UnitSearch.unit', 'Search').': '.$_GET['q'];
     }
 

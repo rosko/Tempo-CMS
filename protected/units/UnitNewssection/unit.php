@@ -5,9 +5,9 @@ class UnitNewssection extends Content
 	const ICON = '/images/icons/fatcow/16x16/newspaper.png';
     const HIDDEN = false;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitNewssection.unit', 'News section');
+        return Yii::t('UnitNewssection.unit', 'News section', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -54,6 +54,7 @@ class UnitNewssection extends Content
                     'type'=>'RecordsGrid',
                     'class_name' => 'UnitNewsitem',
                     'foreign_attribute' => 'newssection_id',
+                    'addButtonTitle'=>Yii::t('UnitNewssection.unit', 'Create news entry'),
                     'columns' => array(
                         'date',
                     ),

@@ -5,9 +5,9 @@ class UnitMenu extends Content
 	const ICON = '/images/icons/fatcow/16x16/breeze.png';
     const HIDDEN = true;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitMenu.unit', 'Menu');
+        return Yii::t('UnitMenu.unit', 'Menu', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)

@@ -6,4 +6,5 @@ return array(
     'If zero choosed, accordingly site\'s general settings' => 'Если выбран 0, то согласно общих настроек сайта.',
     'News entries' => 'Массив новостей',
     'Pager' => 'Список страниц (если производится разбиение списка на страницы)',
+    'Create news entry' => 'Добавить новость',
 );

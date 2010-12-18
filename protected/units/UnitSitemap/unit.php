@@ -5,9 +5,9 @@ class UnitSitemap extends Content
 	const ICON = '/images/icons/fatcow/16x16/sitemap_color.png';
     const HIDDEN = true;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitSitemap.unit', 'Sitemap');
+        return Yii::t('UnitSitemap.unit', 'Sitemap', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)

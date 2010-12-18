@@ -14,6 +14,10 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'html_data', 'themes', 'ui', 'crrm', 'hotkeys', 'cookie', 'types',
         ($multiple ? 'checkbox' : ''), ($multiple ? 'contextmenu' : '')
     ),
+    'checkbox' => ($multiple ? array(
+        'checked_parent_open' => true,
+        'two_state' => true,
+    ) : null),
     'themes' => array(
         'dots'=>true,
         'theme'=>'default'
@@ -65,14 +69,24 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         }'),
     ),
     'contextmenu'=> ($multiple ? array(
-        'select_node'=>true,
+        'select_node'=>false,
         'items' => array (
             'check_node_all' => array (
                 'label' => Yii::t('cms', 'Select all children pages'),
                 'icon' => 'create',
                 'action' => <<<EOD
 js:function(obj) {
-    $(obj).children('a:eq(0)').dblclick();
+    this.check_node_all(obj);
+}
+EOD
+,
+            ),
+            'uncheck_node_all' => array (
+                'label' => Yii::t('cms', 'Deselect all children pages'),
+                'icon' => 'create',
+                'action' => <<<EOD
+js:function(obj) {
+    this.uncheck_node_all(obj);
 }
 EOD
 ,
@@ -101,6 +115,12 @@ EOD
             'default'=>array(
                 'valid_children'=>array('default'),
                 'hover_node'=>($multiple ? true : false),
+                'select_node'=> <<<EOD
+js:function(obj) {
+    this.change_state(obj);
+}
+EOD
+,
             ),
             'mainpage'=>array(
                 "valid_children"=>array('default'),
@@ -112,20 +132,9 @@ EOD
             )
         )
     ),
-/*    'events'=>array(
-        'loaded.jstree'=> <<<EOD
-js:function(e) {
-    alert('d');
-//    var id = $(e.target).attr('rel');
-//    var title = $(e.target).text();
-//    alert(title);
-//    alert(data.rslt.obj.attr("id"));
-//    e.stopImmediatePropagation(); return false;
-}
-EOD
-,
-    )*/
-    ));?>
+//    'events'=>array(
+//    )
+        ));?>
 <?php
 function showBranch($tree, $path, $tree_id, $enabledOnly, $disabled) {
     if ($tree)

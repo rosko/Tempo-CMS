@@ -388,10 +388,14 @@ class PageController extends Controller
 		if (isset($_REQUEST['pageunit_id']) && isset($_REQUEST['area']) && isset($_REQUEST['type']) && isset($_REQUEST['page_id']))
 		{
             // Создаем юнит
+            $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
             $className = Unit::getClassNameByUnitType($_REQUEST['type']);
 			$unit->title = call_user_func(array($className, 'name'));
+            foreach ($langs as $lang) {
+                $unit->{$lang.'_title'} = call_user_func(array($className, 'name'), $lang);
+            }
 			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
@@ -415,6 +419,10 @@ class PageController extends Controller
                 $page = Page::model()->findByPk(intval($_REQUEST['content_page_id']));
                 if ($page) {
                     $page->virtual = true;
+                    $page->title = $unit->title;
+                    foreach ($langs as $lang) {
+                        $page->{$lang.'_title'} = $unit->{$lang.'_title'};
+                    }
                     $page->save(false);
                     $content->page_id = intval($_REQUEST['content_page_id']);
                 }
@@ -661,6 +669,7 @@ class PageController extends Controller
 		if ($form->submitted('refresh')) {
             if ($form->model->validate()) {
                 Yii::app()->settings->saveAll($form->model->getAttributes());
+                Yii::app()->installer->installAll(false);
             } else {
                 echo '0';
                 Yii::app()->end();

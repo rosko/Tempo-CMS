@@ -37,6 +37,9 @@ class VisualTextAreaFCK extends CInputWidget
 
         $am=Yii::app()->getAssetManager();
         $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
+        $jsUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
+        $themeBaseUrl = Yii::app()->theme->baseUrl;
+
         $cs->registerScriptFile($fckeditorPath.'/fckeditor.js');
         $baseUrl = Yii::app()->baseUrl;
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
@@ -54,8 +57,8 @@ class VisualTextAreaFCK extends CInputWidget
         oFCKeditor.ToolbarSet = '{$this->toolbarSet}';
         var value = document.getElementById('{$id}_value');
         oFCKeditor.Value = value.value;
-        oFCKeditor.Config["CustomConfigurationsPath"] = "{$baseUrl}/js/fckconfig.js";
-        oFCKeditor.Config["EditorAreaCSS"] = '{$baseUrl}/css/main.css';
+        oFCKeditor.Config["CustomConfigurationsPath"] = "{$jsUrl}/fckconfig.js";
+        oFCKeditor.Config["EditorAreaCSS"] = '{$themeBaseUrl}/css/main.css';
         oFCKeditor.Config['AutoDetectPasteFromWord'] = true;
         oFCKeditor.Config['LinkDlgHideTarget'] = true;
         oFCKeditor.Config['MaxUndoLevels'] = 100;

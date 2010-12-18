@@ -17,6 +17,7 @@ class Settings extends CApplicationComponent
         {
             if (Yii::app()->db->active) {
                 Yii::app()->installer->installTable('SiteSettingsForm', $this->tableName);
+                $this->saveAll(SiteSettingsForm::defaults());
                 Yii::app()->installer->installAll();
                 $this->loadAll();
             } else

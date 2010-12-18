@@ -2,6 +2,7 @@
 
 class RecordsGrid extends CInputWidget
 {
+    public $addButtonTitle;
     public $class_name;
     public $foreign_attribute;
     public $section_type='';
@@ -105,16 +106,23 @@ EOD
         $page_id = 0;
         $area = '';
         $type = '';
+        $pageunit_id = 0;
+        $unit_id = 0;
         if ($this->model->unit_id) {
             $pageunit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
-            $page_id = $pageunit->page_id;
-            $area = $pageunit->area;
-            $type = Unit::getUnitTypeByClassName($this->class_name);
+            if ($pageunit) {
+                $pageunit_id = $pageunit->id;
+                $unit_id = $this->model->unit_id;
+                $page_id = $pageunit->page_id;
+                $area = $pageunit->area;
+                $type = Unit::getUnitTypeByClassName($this->class_name);
+            }
         }
 
         $this->render('RecordsGrid', array(
             'id' => $id,
             'foreign_attribute' => $this->foreign_attribute,
+            'addButtonTitle' => $this->addButtonTitle,
             'page_id' => $page_id,
             'area' => $area,
             'type' => $type,
@@ -122,6 +130,8 @@ EOD
             'records_grid' => $records_grid,
             'section_id' => $this->model->id,
             'section_type' => get_class($this->model),
+            'pageunit_id' => $pageunit_id,
+            'unit_id' => $unit_id,
         ));
 
     }

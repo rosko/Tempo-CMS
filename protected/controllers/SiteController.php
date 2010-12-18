@@ -16,7 +16,8 @@ class SiteController extends Controller
 	public function actionLogin()
 	{
 		if (!Yii::app()->user->isGuest) {
-			if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],'/site/login')===false)
+			if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],'/site/login')===false &&
+                 strpos($_SERVER['HTTP_REFERER'],'://'.$_SERVER['HTTP_HOST'])===false)
 				$this->redirect($_SERVER['HTTP_REFERER']);
 			else
 				$this->redirect(Yii::app()->homeUrl);

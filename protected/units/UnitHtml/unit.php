@@ -5,9 +5,9 @@ class UnitHtml extends Content
 	const ICON = '/images/icons/fatcow/16x16/html.png';
     const HIDDEN = false;
 
-	public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitHtml.unit', 'HTML');
+        return Yii::t('UnitHtml.unit', 'HTML', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)

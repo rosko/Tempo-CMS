@@ -152,6 +152,11 @@ div.cms-button, input.cms-button {
 	width:196px;
 	text-align: center;
 }
+
+.w100p {
+    width:100%;
+}
+
 .w400 {
 	width:396px;
 	text-align: center;

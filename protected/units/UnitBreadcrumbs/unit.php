@@ -7,9 +7,9 @@ class UnitBreadcrumbs extends Content
 
     const DEFAULT_SEPARATOR = ' &raquo; ';
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitBreadcrumbs.unit', 'Breadcrumbs');
+        return Yii::t('UnitBreadcrumbs.unit', 'Breadcrumbs', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -89,7 +89,7 @@ class UnitBreadcrumbs extends Content
         $links = array();
         foreach ($ids as $id) {
             if ($id == 0 || $id == 1) continue;
-            $links[$parents[$id]->title] = array('page/view', 'id'=>$parents[$id]->id);
+            $links[$parents[$id]->title] = array('page/view', 'id'=>$parents[$id]->id, 'alias'=>$parents[$id]->alias, 'url'=>$parents[$id]->url);
         }
         if ($params['page']->id != 1)
             $links[] = $params['page']->title;
@@ -99,7 +99,7 @@ class UnitBreadcrumbs extends Content
 
         $params['separator'] = $params['content']->separator ? $params['content']->separator : self::DEFAULT_SEPARATOR;
 
-        $params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('page/view', 'id'=>$parents[1]->id)) : $params['page']->title);
+        $params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('page/view', 'id'=>$parents[1]->id, 'alias'=>$parents[1]->alias, 'url'=>$parents[1]->url)) : $params['page']->title);
 
         return $params;
     }

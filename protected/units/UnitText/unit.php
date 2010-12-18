@@ -5,9 +5,9 @@ class UnitText extends Content
 	const ICON = '/images/icons/fatcow/16x16/text_dropcaps.png';
     const HIDDEN = false;
 	
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitText.unit', 'Text');
+        return Yii::t('UnitText.unit', 'Text', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)

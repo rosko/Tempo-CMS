@@ -2,7 +2,8 @@
 
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
-$config = is_file($GLOBALS['local']) ? require($GLOBALS['local']) : array();
+
+$config = is_file($GLOBALS['local_config']) ? require($GLOBALS['local_config']) : array();
 
 return CMap::mergeArray(array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',

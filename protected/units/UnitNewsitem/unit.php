@@ -5,9 +5,9 @@ class UnitNewsitem extends Content
 	const ICON = '/images/icons/fatcow/16x16/newspaper_add.png';
     const HIDDEN = true;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitNewsitem.unit', 'News entry');
+        return Yii::t('UnitNewsitem.unit', 'News entry', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)

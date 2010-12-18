@@ -3,7 +3,7 @@
     $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
 ?>
 <div id="<?=$id?>_header">
-    <input type="button" class="<?=$id?>_add" value="<?=Yii::t('cms', 'Add')?>" />
+    <input type="button" class="<?=$id?>_add" value="<?=$addButtonTitle ? $addButtonTitle : Yii::t('cms', 'Add')?>" />
 </div>
 
 <?=$records_grid?>
@@ -40,11 +40,19 @@ $('.<?=$id?>_add').click(function() {
                                 if (ret) {
                                     new_page_id = ret.id;
                                     ajaxSave('/?r=page/unitAdd', 'pageunit_id=0&area=<?=$area?>&page_id='+new_page_id+'&type=<?=$type?>&section_id=<?=$section_id?>&foreign_attribute=<?=$foreign_attribute?>&content_page_id='+new_page_id, 'GET', function(html) {
-                                        $.fn.yiiGridView.update('<?=$id?>');
+                                        if ($.fn.yiiGridView)
+                                            $.fn.yiiGridView.update('<?=$id?>');
                                         if (html.substring(0,2) == '{"') {
                                             var ret = jQuery.parseJSON(html);
                                             if (ret) {
-                                                recordEditForm(ret.content_id, '<?=$class_name?>', ret.unit_id, '<?=$id?>');
+                                                if ($.fn.yiiGridView) {
+                                                    recordEditForm(ret.content_id, '<?=$class_name?>', ret.unit_id, '<?=$id?>');
+                                                } else {
+                                                    recordEditForm(ret.content_id, '<?=$class_name?>', ret.unit_id);
+                                                    $('#recordEditForm<?=$class_name?>_'+ret.content_id).live('dialogbeforeclose', function() {
+                                                        updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
+                                                    });
+                                                }
                                             }
                                         }
                                     });
@@ -62,7 +70,14 @@ $('.<?=$id?>_add').click(function() {
             if (html.substring(0,2) == '{"') {
                 var ret = jQuery.parseJSON(html);
                 if (ret) {
-                    recordEditForm(ret.id, '<?=$class_name?>', '', '<?=$id?>');
+                    if ($.fn.yiiGridView) {
+                        recordEditForm(ret.id, '<?=$class_name?>', '', '<?=$id?>');
+                    } else {
+                        recordEditForm(ret.id, '<?=$class_name?>', '');
+                        $('#recordEditForm<?=$class_name?>_'+ret.id).live('dialogbeforeclose', function() {
+                            updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
+                        });
+                    }
                 }
             }
         });

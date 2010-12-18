@@ -14,6 +14,10 @@ class UrlManager extends CUrlManager
                 unset($params['language']);
         }
 
+        if (isset($params['id']) && $params['id']==1) {
+            return Yii::app()->homeUrl;
+        }
+
         if (!isset($params['alias']) && isset($params['id'])) {
             $params['alias'] = ''; 
         }
@@ -25,6 +29,10 @@ class UrlManager extends CUrlManager
 
         if (!empty($params['url'])) {
             $params['url'] = substr($params['url'],1);
+            $tmp = explode('/',$params['url']);
+            if ($tmp[count($tmp)-1] == '') {
+                unset($params['url']);
+            }
         }
         if ($this->fullUrl && !empty($params['url'])) {
             unset($params['alias']);

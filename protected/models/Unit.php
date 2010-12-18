@@ -111,13 +111,13 @@ class Unit extends I18nActiveRecord
         return $units;
     }
 
-    public function install($classNames)
+    public function install($classNames=null)
     {
+        if (empty($classNames)) return false;
         $config = self::loadConfig();
         if (!is_array($classNames)) {
             $classNames = array($classNames);
         }
-        if (empty($classNames)) return false;
         $units = self::getAllUnits();
         foreach ($classNames as $className) {
             Yii::app()->installer->installTable($className);

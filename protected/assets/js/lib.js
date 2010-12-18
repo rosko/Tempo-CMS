@@ -109,8 +109,9 @@ function ajaxSaveRepeat(timeout)
     cms_save_commands.unshift(cms_current_command);
     cms_current_command = null;
     
+    hideInfoPanel();
     showInfoPanel(i18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+i18n.cms.retryNow+'</a>', timeout-1, true);
-    $('#cms-info-button-repeat').click(function() {
+    $('#cms-info-button-repeat').unbind('click').bind('click',function() {
         hideInfoPanel();
         cms_save_timer = false;
         clearTimeout(cms_saveprocess_timer);
@@ -418,7 +419,7 @@ function ajaxSubmitForm(form, data, hasError, events)
                 }
             }
             if (btn_name == 'refresh') {
-                location.reload();
+                location.href = '/?r=page/view&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language');
             } else if (btn_name != 'apply') {
                 if ($(form).parents('#fancybox-wrap').length) {
                     $(form).remove();
@@ -463,7 +464,7 @@ function CmsAreaEmptyCheck()
         if ($(this).find('.cms-pageunit').length > 0) {
             $(this).find('.cms-empty-area-buttons').remove();
         } else {
-            var btn = $('<a class="cms-button w200" title="'+i18n.cms.addAnotherUnit+'" href="#">'+i18n.cms.addUnit+'</a>')
+            var btn = $('<a class="cms-button w100p" title="'+i18n.cms.addAnotherUnit+'" href="#">'+i18n.cms.addUnit+'</a>')
                 .click(function() {
                     pageunitAddForm(this);
                     return false;
@@ -495,11 +496,12 @@ function pageunitAddForm(t)
 function pageunitEditForm(t)
 {
     var pageunit = $(t);
+    if (pageunit.hasClass('selected')) { return; }
     fadeIn(pageunit, 'selected');
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
     $.ajax({
-        url:'/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id,
+        url:'/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
         cache: false,
         pageunit: pageunit,
         pageunit_id: pageunit_id,
@@ -534,7 +536,7 @@ function pageunitEditForm(t)
 function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 {
     $.ajax({
-        url: '/?r=page/getPageunitsByUnit&unit_id='+unit_id,
+        url: '/?r=page/getPageunitsByUnit&unit_id='+unit_id+'&language='+$.data(document.body, 'language'),
         pageunit_id: pageunit_id,
         unit_id: unit_id,
         page_id: page_id,
@@ -549,7 +551,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
             if (ids.length > 1)
             {
                 $.ajax({
-                    url: '/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
+                    url: '/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
                     type: 'GET',
                     cache: false,
                     beforeSend: function() {
@@ -565,7 +567,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
             else {
                 if (confirm(i18n.cms.deleteUnitWarning))
                 {
-                    ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id, '', 'GET', function(ret) {
+                    ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
                         $('#cms-pageunit-'+pageunit_id).remove();
                         CmsAreaEmptyCheck();
                     });
@@ -599,7 +601,7 @@ function updatePageunit(pageunit_id, selector, onSuccess)
 function pageunitSetDialog(page_id, pageunit_id, unit_id)
 {
     $.ajax({
-        url: '/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id,
+        url: '/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
         type: 'GET',
         cache: false,
         beforeSend: function() {
@@ -621,7 +623,7 @@ function pageAddForm()
 {
     var page_id = $('body').attr('rel');
     $.ajax({
-        url:'/?r=page/pageAdd&id='+page_id,
+        url:'/?r=page/pageAdd&id='+page_id+'&language='+$.data(document.body, 'language'),
         cache: false,
         beforeSend: function() {
             showInfoPanel(cms_html_loading_image, 0);                    
@@ -653,7 +655,7 @@ function pageEditForm()
 {
     var page_id = $('body').attr('rel');
     $.ajax({
-        url:'/?r=page/pageForm&id='+page_id,
+        url:'/?r=page/pageForm&id='+page_id+'&language='+$.data(document.body, 'language'),
         cache: false,
         beforeSend: function() {
             showInfoPanel(cms_html_loading_image, 0);                    
@@ -704,7 +706,7 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
         page_id = $('body').attr('rel');
     }
     $.ajax({
-        url:'/?r=page/hasChildren&id='+page_id,
+        url:'/?r=page/hasChildren&id='+page_id+'&language='+$.data(document.body, 'language'),
         cache: false,
         page_id: page_id,
         onChildrenDelete: onChildrenDelete,
@@ -728,7 +730,7 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
                 }
             } else {
                 $.ajax({
-                    url:'/?r=page/pageDeleteDialog&id='+page_id,
+                    url:'/?r=page/pageDeleteDialog&id='+page_id+'&language='+$.data(document.body, 'language'),
                     cache: false,
                     onChildrenDelete: onChildrenDelete,
                     onCancel: onCancel,
@@ -766,7 +768,7 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
 function recordEditForm(id, class_name, unit_id, grid_id)
 {
     $.ajax({
-        url:'/?r=page/unitForm&class_name='+class_name+'&id='+id,
+        url:'/?r=page/unitForm&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
         cache: false,
         id: id,
         class_name: class_name,
@@ -776,6 +778,7 @@ function recordEditForm(id, class_name, unit_id, grid_id)
         success: function(html) {
             hideInfoPanel();
             var dlg_id = 'recordEditForm'+class_name+'_'+id;
+            if ($('#'+dlg_id).length) { return; }
             var dlg_class = 'recordEditForm-'+class_name;
             var dlg = $('#cms-dialog').clone().attr('id', dlg_id).addClass(dlg_class).addClass('cms-dialog').appendTo('body').hide();
             dlg.html(html);
@@ -816,7 +819,7 @@ function recordDelete(id, class_name, unit_id, grid_id)
     if (unit_id) {
         // Удаляем юнит
         $.ajax({
-            url:'/?r=page/unitCheck&unit_id='+unit_id+'&class_name='+class_name+'&id='+id,
+            url:'/?r=page/unitCheck&unit_id='+unit_id+'&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
             cache: false,
             id: id,
             class_name: class_name,
@@ -866,7 +869,7 @@ function recordDelete(id, class_name, unit_id, grid_id)
         // Удаляем просто запись
         if (confirm(i18n.cms.deleteRecordWarning))
         {
-            ajaxSave('/?r=records/delete&id='+id+'&class_name='+class_name, '', 'GET', function(ret) {
+            ajaxSave('/?r=records/delete&id='+id+'&class_name='+class_name+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
                 $.fn.yiiGridView.update(grid_id);
             });
         }
@@ -880,7 +883,7 @@ function recordDeleteConfirm(unit_id, grid_id, data, str)
     }
     if (confirm(str))
     {
-        ajaxSave('/?r=page/unitDelete&unit_id='+unit_id+'&pageunit_id=all'+data, '', 'GET', function(ret) {
+        ajaxSave('/?r=page/unitDelete&unit_id='+unit_id+'&pageunit_id=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
             $.fn.yiiGridView.update(grid_id);
         });
     }
@@ -889,7 +892,7 @@ function recordDeleteConfirm(unit_id, grid_id, data, str)
 function gotoRecordPage(id, class_name)
 {
     $.ajax({
-        url:'/?r=records/getUrl&class_name='+class_name+'&id='+id,
+        url:'/?r=records/getUrl&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
         cache: false,
         id: id,
         class_name: class_name,

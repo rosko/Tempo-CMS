@@ -55,7 +55,30 @@ class CJsTree extends CWidget
         $options=$this->getClientOptions();
         $options=$options===array()?'{}' : CJavaScript::encode($options);
 		$events = $this->getClientEvents();
-        $cs->registerScript('Yii.CJsTree#'.$id,"jQuery(function () { jQuery(\"#{$id}\").jstree($options)$events; });");
+        $cs->registerScript('Yii.CJsTree#'.$id, <<<EOD
+jQuery(function () { 
+    jQuery("#{$id}").jstree({$options}){$events};
+    jQuery.jstree._fn.check_node_all = function(obj) {
+        obj = this._get_node(obj);
+        var coll = false, rc = this._get_settings().checkbox.real_checkboxes;
+        coll = obj.find("li").andSelf();
+        if(!coll.filter(".jstree-unchecked, .jstree-undetermined").length) { return false; }
+        coll.removeClass("jstree-unchecked jstree-undetermined").addClass("jstree-checked");
+        if(rc) { coll.children(":checkbox").attr("checked","checked"); }
+        if(this.data.ui) { this.data.ui.last_selected = obj; }
+        this.data.checkbox.last_selected = obj;
+    }
+    jQuery.jstree._fn.uncheck_node_all = function(obj) {
+        obj = this._get_node(obj);
+        var coll = false, rc = this._get_settings().checkbox.real_checkboxes;
+        coll = obj.find("li").andSelf();
+        if(!coll.filter(".jstree-checked, .jstree-undetermined").length) { return false; }
+        coll.removeClass("jstree-checked jstree-undetermined").addClass("jstree-unchecked");
+        if(rc) { coll.children(":checkbox").removeAttr("checked"); }
+    }
+});
+EOD
+);
         if($this->cssFile !== null && $this->cssFile !== false)
             $cs->registerCssFile($this->cssFile);
 			

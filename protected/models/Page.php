@@ -92,14 +92,18 @@ class Page extends I18nActiveRecord
 		));
 	}
 
-	public static function getTree($exclude=array(),$exclude_children=true)
+	public static function getTree($exclude=array(),$exclude_children=true,$exclude_virtual=true)
 	{
 		$criteria['order'] = '`order`';
+        $criteria['condition'] = '1';
 		if (!empty($exclude))
 		{
 			if (!is_array($exclude)) $exclude = array($exclude);
-			$criteria['condition'] = '`id` NOT IN ('.implode(',',$exclude).')';
+			$criteria['condition'] .= ' AND `id` NOT IN ('.implode(',',$exclude).')';
 		}
+        if ($exclude_virtual) {
+            $criteria['condition'] .= ' AND (`virtual` IS NULL or `virtual` != 1)';
+        }
 		$pages = Page::model()->localized()->getAll($criteria);
 		$tree = array();
 		foreach ($pages as $page) {
@@ -277,6 +281,10 @@ class Page extends I18nActiveRecord
     {
         $obj = new self;
         $obj->title = Yii::t('cms', 'Homepage');
+        $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+        foreach ($langs as $lang) {
+            $obj->{$lang.'_title'} = Yii::t('cms', 'Homepage', array(), null, $lang);
+        }
         $obj->active = true;
         $obj->parent_id = 0;
         $obj->order = 0;
@@ -386,9 +394,16 @@ class Page extends I18nActiveRecord
 	public static function defaultObject()
 	{
 		$obj = new self;
-		$obj->title = Yii::t('cms', 'New page createad at {time}', array('{time}' => date("Y-m-d H:i:s")));
-        $obj->alias = self::sanitizeAlias($obj->title);
+        $d = date("Y-m-d H:i:s");
+		$obj->title = Yii::t('cms', 'New page createad at {time}', array('{time}' => $d));
+        $obj->alias = self::sanitizeAlias(date("Ymd Hi"));
         $obj->url = '/'.$obj->alias;
+        $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+        foreach ($langs as $lang) {
+            $obj->{$lang.'_title'} = Yii::t('cms', 'New page createad at {time}', array('{time}' => $d), null, $lang);
+            $obj->{$lang.'_alias'} = self::sanitizeAlias(date("Ymd Hi"));
+            $obj->{$lang.'_url'} = '/'.$obj->{$lang.'_alias'};
+        }
 		$obj->active = true;
 		$obj->order = 0;
 		return $obj;

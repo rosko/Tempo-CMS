@@ -113,6 +113,7 @@ $b = $config['location']['show'] == 'always' ? 'window' : "'body'";
 $js .= <<<EOD
     function location{$id}(hoster)
     {
+        if ($(hoster).length == 0) { return; }
         var bw = $({$b}).width();
         var bh = $({$b}).height();
         var w = $(hoster).width();

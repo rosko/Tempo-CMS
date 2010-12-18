@@ -5,9 +5,9 @@ class UnitHeader extends Content
 	const ICON = '/images/icons/fatcow/16x16/text_heading_1.png';
     const HIDDEN = false;
 
-    public function name()
+    public function name($language=null)
     {
-        return Yii::t('UnitHeader.unit', 'Header');
+        return Yii::t('UnitHeader.unit', 'Header', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)

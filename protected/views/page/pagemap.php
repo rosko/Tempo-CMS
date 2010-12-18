@@ -80,6 +80,62 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
             e.stopImmediatePropagation();
             return false; 
         }',
+        'ctrl+up' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_prev(obj))
+                this.move_node(obj, this._get_prev(obj), "before");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'ctrl+down' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_next(obj))
+                this.move_node(obj, this._get_next(obj), "after");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'shift+up' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_prev(obj))
+                this.move_node(obj, this._get_prev(obj), "before");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'shift+down' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_next(obj))
+                this.move_node(obj, this._get_next(obj), "after");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'ctrl+left' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_parent(obj))
+                this.move_node(obj, this._get_parent(obj), "after");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'ctrl+right' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_prev(obj))
+                this.move_node(obj, this._get_prev(obj), "inside");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'shift+left' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_parent(obj))
+                this.move_node(obj, this._get_parent(obj), "after");
+            e.stopImmediatePropagation();
+            return false;
+        }',
+        'shift+right' => 'js:function (e) {
+            var obj = this.data.ui.hovered || this.data.ui.last_selected || -1;
+            if (this._get_prev(obj))
+                this.move_node(obj, this._get_prev(obj), "inside");
+            e.stopImmediatePropagation();
+            return false;
+        }',
         'del' => 'js:function(e) {
             this.remove(this.data.ui.last_selected);
             e.stopImmediatePropagation();
@@ -89,19 +145,21 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
             var id = $(this.data.ui.last_selected).find("a").eq(0).attr("rel");
             var title = $(e.target).text();
             if (id) {
-                location.href = "/?r=page/view&id="+id;
+                location.href = "/?r=page/view&id="+id+"&language="+$.data(document.body, "language");
             }
             e.stopImmediatePropagation(); return false;
         }',
         "up" => 'js:function (e) { 
             var o = this.data.ui.last_selected || -1;
-            this._get_prev(o).children("a:eq(0)").click();
+            if (this._get_prev(o))
+                this._get_prev(o).children("a:eq(0)").click();
             e.stopImmediatePropagation();
             return false; 
         }',
         "down" => 'js:function (e) { 
             var o = this.data.ui.last_selected || -1;
-            this._get_next(o).children("a:eq(0)").click();
+            if (this._get_next(o))
+                this._get_next(o).children("a:eq(0)").click();
             e.stopImmediatePropagation();
             return false;
         }',
@@ -203,7 +261,7 @@ js:function(e) {
     var id = $(e.target).attr('rel');
     if (id) {
         var title = $(e.target).text();
-        location.href = '/?r=page/view&id='+id;
+        location.href = '/?r=page/view&id='+id+'&language='+$.data(document.body, 'language');
     }
     e.stopImmediatePropagation();
     return false;
@@ -218,7 +276,7 @@ js:function(e, data) {
     $(data.rslt.o).parent().children().each(function () {
         siblings.push($(this).children('a:eq(0)').attr('rel'));
     });
-    var url = '/?r=page/pagesSort&id='+id;
+    var url = '/?r=page/pagesSort&id='+id+'&language='+$.data(document.body, 'language');
     var params = 'parent_id='+parent_id+'&'+decodeURIComponent($.param({'order': siblings}));
     ajaxSave(url, params, 'POST');
 }
@@ -234,7 +292,7 @@ js:function(e, data) {
     });
     var title = $(data.rslt.obj).children('a:eq(0)').text();
     
-    var url = '/?r=page/pageRename&id='+id;
+    var url = '/?r=page/pageRename&id='+id+'&language='+$.data(document.body, 'language');
     var params = 'parent_id='+parent_id+'&title='+trim(title)+'&'+decodeURIComponent($.param({'order': siblings}));
     ajaxSave(url, params, 'POST', function(html) {
         if (html != 0 && !id) {
@@ -265,7 +323,7 @@ js:function(e, data) {
 //            var id = $(data.args[0]).children('a:eq(0)').attr('rel');
             var id = $(data.rslt.obj).children('a:eq(0)').attr('rel');
             pageDeleteDialog(id, function() {
-                var url = '/?r=page/pageDelete&id='+id;
+                var url = '/?r=page/pageDelete&id='+id+'&language='+$.data(document.body, 'language');
                 var params = 'deletechildren=1';
                 ajaxSave(url, params, 'GET');
             }, function(html) {

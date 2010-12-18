@@ -64,6 +64,15 @@ class SiteSettingsForm extends CFormModel
         return self::localizedLabels($ret);
 	}
 
+    public static function defaults()
+    {
+        return array(
+            'adminEmail'=>Yii::app()->params['admin']['email'],
+            'defaultsPerPage'=>10,
+            'language'=>Yii::app()->language,
+        );
+    }
+
     public function i18n()
     {
         return array('sitename');

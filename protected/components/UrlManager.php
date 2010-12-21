@@ -15,7 +15,13 @@ class UrlManager extends CUrlManager
         }
 
         if (isset($params['id']) && $params['id']==1) {
-            return Yii::app()->homeUrl;
+            $tmp = $params;
+            unset($tmp['id'], $tmp['language'], $tmp['alias'], $tmp['url']);
+            if (empty($tmp) ) {
+                return Yii::app()->homeUrl;
+            } else {
+                $params = $tmp;
+            }
         }
 
         if (!isset($params['alias']) && isset($params['id'])) {
@@ -48,7 +54,6 @@ class UrlManager extends CUrlManager
 
 	public function parsePathInfo($pathInfo)
 	{
-        parent::parsePathInfo($pathInfo);
         if (isset($_GET['language'])) {
             $langs = I18nActiveRecord::getLangs();
             if (!isset($langs[$_GET['language']])) {

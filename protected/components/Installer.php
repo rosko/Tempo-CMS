@@ -7,7 +7,7 @@ class Installer extends CApplicationComponent
         if (!is_object($className) && !class_exists($className))
             return false;
 
-        $options = 'ENGINE=InnoDB';
+        $options = ' ENGINE=InnoDB  DEFAULT CHARSET=utf8 ';
 
         if (!$tableName && method_exists($className, 'tableName'))
             $tableName = call_user_func(array($className, 'tableName'));

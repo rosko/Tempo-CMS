@@ -58,7 +58,7 @@ $('.<?=$id?>_add').click(function() {
                                     });
                                 }
                             }
-                        });
+                        }, true);
                     }
                 }
             }

@@ -12,7 +12,7 @@ class SiteSettingsForm extends CFormModel
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('simpleMode, autoSave, showUnitAppearance', 'boolean'),
+			array('simpleMode, autoSave, showUnitAppearance, ajaxPager, ajaxPagerScroll', 'boolean'),
             array('theme', 'length', 'max'=>100),
             array('language', 'length', 'max'=>10),
         );
@@ -48,6 +48,8 @@ class SiteSettingsForm extends CFormModel
             'showUnitAppearance' => Yii::t('cms', 'Show "Appearance" tab for units'),
             'theme' => Yii::t('cms', 'Graphic theme'),
             'language' => Yii::t('cms', 'Main language'),
+            'ajaxPager' => Yii::t('cms', 'Load pages in block without reloading whole web-page'),
+            'ajaxPagerScroll' => Yii::t('cms', 'Scroll to block when navigate by pages'),
 		);
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
@@ -109,6 +111,12 @@ class SiteSettingsForm extends CFormModel
                     'empty'=>null,
                 ),
                 'autoSave'=>array(
+                    'type'=>'checkbox'
+                ),
+                'ajaxPager'=>array(
+                    'type'=>'checkbox'
+                ),
+                'ajaxPagerScroll'=>array(
                     'type'=>'checkbox'
                 ),
                 Form::tab(Yii::t('cms', 'Appearance')),

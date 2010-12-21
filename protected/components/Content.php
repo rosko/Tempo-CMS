@@ -86,23 +86,37 @@ class Content extends I18nActiveRecord
         return intval($_GET[$this->getPageVar()]);
     }
 
-    public function renderPager($showedCount, $itemCount, $currentPage, $pageSize=0, $page_id=0)
+    public function renderPager($showedCount, $itemCount, $currentPage, $pageSize=0, $page_id=0, $pagerCssClass='')
     {
         if ($showedCount < $itemCount) {
+            foreach ($_GET as $k => $v) {
+                if (substr($k,-5)=='_page' && !isset($_REQUEST[$k])) {
+                    unset($_GET[$k]);
+                }
+            }
             $pagination = new CPagination($itemCount);
             if ($pageSize < 1)
                 $pageSize = Yii::app()->settings->getValue('defaultsPerPage');
             $pagination->pageVar = $this->getPageVar();
             $pagination->pageSize = $pageSize;
             $pagination->currentPage = $currentPage-1;
+            $pagination->route = 'page/view';
+            $params = $_GET;
             if (Yii::app()->controller->action->id == 'unitView') {
-                $pagination->route = 'page/view';
-                $pagination->params = array(
-                    'id' => Yii::app()->controller->_model->id
-                );
+                unset($params['pageunit_id']);
+                unset($params['_']);
             }
+            $pagination->params = array_merge($params, array(
+                'id' => Yii::app()->controller->_model->id,
+                'alias' => Yii::app()->controller->_model->alias,
+                'url' => Yii::app()->controller->_model->url,
+            ));
+            $pagerCssClass .= Yii::app()->settings->getValue('ajaxPager') ? ' ajaxPager ' : '';
             return Yii::app()->controller->widget('CLinkPager', array(
                 'pages'=>$pagination,
+                'htmlOptions'=>array(
+                    'class'=> 'yiiPager ' . $pagerCssClass,
+                ),
                 'maxButtonCount'=>5), true);
         }
     }

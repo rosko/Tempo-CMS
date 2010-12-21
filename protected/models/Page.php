@@ -53,6 +53,9 @@ class Page extends I18nActiveRecord
             'order' => array(
                 'order'=>'`order`',
             ),
+            'real' => array(
+                'condition'=> '`virtual` IS NULL or `virtual` != 1',
+            ),
 		);
 	}
 

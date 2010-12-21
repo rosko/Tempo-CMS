@@ -52,6 +52,8 @@ return CMap::mergeArray(array(
             ),
             'neededScriptFiles' => array(
                 '{jnotify}/jquery.jnotify.js',
+                '{js}/jquery.scrollTo.js',
+                '{js}/lib.js',
             ),
             'neededAdminCoreScripts' => array(
                 'yiiactiveform',
@@ -62,12 +64,11 @@ return CMap::mergeArray(array(
             ),
             'neededAdminScriptFiles' => array(
                 '{core}/jui/js/jquery-ui-i18n.min.js',
-                '{js}/jquery.scrollTo.js',
                 '{js}/jquery.cookie.js',
                 '{js}/jquery.hotkeys.js',
                 '{fancybox}/jquery.fancybox-1.3.1.js',
                 '{jsI18N}',
-                '{js}/lib.js',
+                '{js}/cms.js',
             ),
         ),
         'urlManager'=>array(

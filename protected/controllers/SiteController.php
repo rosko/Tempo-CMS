@@ -2,6 +2,8 @@
 
 class SiteController extends Controller
 {
+    public $defaultAction = 'login';
+    
 	public function actionError()
 	{
 	    if($error=Yii::app()->errorHandler->error)

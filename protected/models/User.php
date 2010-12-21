@@ -19,10 +19,10 @@ class User extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('login, password, email, name, access', 'required'),
-			array('login, email', 'length', 'max'=>32),
+			array('login, email, name', 'required'),
+            array('password', 'required', 'on'=>'register'),
+			array('login, email, access', 'length', 'max'=>32),
 			array('name', 'length', 'max'=>64),
-			array('access', 'length', 'max'=>13),
 		);
 	}
 
@@ -46,7 +46,16 @@ class User extends CActiveRecord
             'password' => 'char(64)',
             'email' => 'char(64)',
             'name' => 'char(64)',
-            'access' => 'string',
+            'access' => 'char(32)',
+        );
+    }
+
+    public function form()
+    {
+        return array(
+            'elements'=>array(
+                
+            ),
         );
     }
 

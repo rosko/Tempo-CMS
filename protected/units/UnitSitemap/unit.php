@@ -24,7 +24,7 @@ class UnitSitemap extends Content
 	{
 		return array(
 			array('unit_id', 'required'),
-			array('unit_id, length, recursive, page_id, per_page', 'numerical', 'integerOnly'=>true),
+			array('unit_id, length, recursive, page, per_page', 'numerical', 'integerOnly'=>true),
             array('show_title', 'boolean'),
 		);
 	}
@@ -36,7 +36,7 @@ class UnitSitemap extends Content
 //			'unit_id' => 'Unit',
 			'length' => Yii::t('UnitSitemap.unit', 'Descriptions\' length'),
             'recursive' => Yii::t('UnitSitemap.unit', 'Levels depth'),
-            'page_id' => Yii::t('UnitSitemap.unit', 'Parent page'),
+            'page' => Yii::t('UnitSitemap.unit', 'Parent page'),
             'show_title' => Yii::t('UnitSitemap.unit', 'Show header'),
 			'per_page' => Yii::t('UnitSitemap.unit', 'Entries per page'),
 		);
@@ -73,7 +73,7 @@ class UnitSitemap extends Content
 					)
 				),
                 Yii::t('UnitSitemap.unit', 'If zero choosed, accordingly site\'s general settings'),
-				'page_id'=>array(
+				'page'=>array(
 					'type'=>'PageSelect',
                     'excludeCurrent'=>false,
 				),
@@ -88,7 +88,7 @@ class UnitSitemap extends Content
             'unit_id' => 'integer unsigned',
             'length' => 'integer unsigned',
             'recursive' => 'integer unsigned',
-            'page_id' => 'integer unsigned',
+            'page' => 'integer unsigned',
             'show_title' => 'boolean',
             'per_page' => 'integer unsigned',
         );
@@ -97,9 +97,9 @@ class UnitSitemap extends Content
     public static function getTree($id, $params, $recursive=0, $start=false)
     {
         if ($start)
-            $items = Page::model()->order()->selectPage($params['content']->pageNumber, $params['content']->per_page)->childrenPages($id)->localized()->getAll();
+            $items = Page::model()->order()->real()->selectPage($params['content']->pageNumber, $params['content']->per_page)->childrenPages($id)->localized()->getAll();
         else
-            $items = Page::model()->order()->childrenPages($id)->localized()->getAll();
+            $items = Page::model()->order()->real()->childrenPages($id)->localized()->getAll();
         if ($recursive > 1) {
             foreach ($items as $k => $item)
             {
@@ -122,7 +122,7 @@ class UnitSitemap extends Content
     public function prepare($params)
     {
         $params = parent::prepare($params);
-        $model = $params['content']->page_id ? Page::model()->findByPk($params['content']->page_id) : $params['page'];
+        $model = $params['content']->page ? Page::model()->findByPk($params['content']->page) : $params['page'];
         $params['title'] = $params['unit']->title ? $params['unit']->title : $model->title;
 
         $id = $params['content']->recursive ? $model->id : $model->parent_id;

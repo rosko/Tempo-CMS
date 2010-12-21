@@ -363,11 +363,13 @@ class PageController extends Controller
 	// Отображает юнит
 	public function actionUnitView()
 	{
-		$unit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
-        $className = Unit::getClassNameByUnitType($unit->unit->type);
-        $unit->unit->content->run(array(
-            'pageunit'=>$unit
-        ));
+		$pageunit = PageUnit::model()->with('unit')->findByPk($_REQUEST['pageunit_id']);
+        if ($pageunit) {
+            $className = Unit::getClassNameByUnitType($pageunit->unit->type);
+            $pageunit->unit->content->run(array(
+                'pageunit'=>$pageunit
+            ));
+        }
 	}
 
     public function actionUnitAjax($unit_id)

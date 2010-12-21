@@ -98,7 +98,7 @@ class EJuiDateTimePicker extends CJuiInputWidget
 		if(isset($this->timePickerOnly))
 			$js = "jQuery('#{$id}').timepicker($options);";
 		else
-			$js = "jQuery('#{$id}').datetimepicker($options);";		
+			$js = "jQuery('#{$id}').datetimepicker($options);";
 		
 		if (isset($this->language)){
 			$this->registerScriptFile($this->i18nScriptFile);
@@ -110,6 +110,7 @@ class EJuiDateTimePicker extends CJuiInputWidget
 //                $js .= "\njQuery('#{$id}').datetimepicker('option', jQuery.datepicker.regional['{$this->language}']);";
 				
 		}
+        $js .= "setTimeout(function() { jQuery('.ui-datepicker').hide();}, 100);";
 		Yii::app()->getClientScript()->registerScript(__CLASS__.'#'.$id, $js);
 	}
 }

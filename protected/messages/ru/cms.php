@@ -188,4 +188,7 @@ return array(
     'Submit' => 'Отправить',
     'Can\`t unistall "{name}"' => 'Невозможно удалить тип блоков "{name}". Удалите со всех страниц блоки этого типа перед удалением.',
     'Units' => 'Блоки',
+
+    'Load pages in block without reloading whole web-page' => 'Перемещение по страницам списка без перезагрузки всей веб-страницы',
+    'Scroll to block when navigate by pages' => 'Прокрутить к блоку при навигации по страницам списка',
 );

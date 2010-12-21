@@ -6,7 +6,18 @@ $language = Yii::app()->language;
 $cs=Yii::app()->getClientScript();
 $am=Yii::app()->getAssetManager();
 
+$csrfTokenName = Yii::app()->getRequest()->csrfTokenName;
+$csrfToken = Yii::app()->getRequest()->getCsrfToken();
+
 $cs->registerScript('all', <<<EOD
+
+        $('body').attr('rel', {$model->id});
+        $.data(document.body, 'title', '{$model->title}');
+        $.data(document.body, 'language', '{$language}');
+        $.data(document.body, 'csrfTokenName', '{$csrfTokenName}');
+        $.data(document.body, 'csrfToken', '{$csrfToken}');
+
+        window.setInterval(function() { processLocationHash(); }, 100);
 
         $('<div id="cms-statusbar"></div>').prependTo('body');
         $('<div id="cms-notification"></div>').prependTo('body');
@@ -57,6 +68,32 @@ foreach ($flashes as $k => $flash)
 if ($js)
     $cs->registerScript('flashes', $js, CClientScript::POS_READY);
 
+if (Yii::app()->settings->getValue('ajaxPagerScroll')) {
+    $addjs = "$('body').scrollTo(pageunit, 800);";
+} else {
+    $addjs = '';
+}
+
+$js = <<<EOD
+$('.ajaxPager a').live('click', function() {
+    var pageunit = $(this).parents('.pageunit').eq(0);
+    if (pageunit.length) {
+        var pos = $(this).attr('href').indexOf('?');
+        var data = '';
+        if (pos > -1) {
+            data = $(this).attr('href').substr(pos+1);
+        }
+        var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+        addToLocationHash(data, false, pageunit.attr('rel')+pageunit.attr('content_id')+'_page');
+        $('#pageunitpanel').appendTo('body');
+        updatePageunit(pageunit_id, '.pageunit[rev='+pageunit.attr('rev')+']', function() {
+            {$addjs}
+        }, '&'+data);
+    }
+    return false;
+});
+EOD;
+$cs->registerScript('ajaxPager', $js, CClientScript::POS_READY);
 
 if (!Yii::app()->user->isGuest) {
 
@@ -68,15 +105,16 @@ if (!Yii::app()->user->isGuest) {
     $baseUrl = Yii::app()->getAssetManager()->publish($dir);
     $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
 		
-    $csrfTokenName = Yii::app()->getRequest()->csrfTokenName;
-    $csrfToken = Yii::app()->getRequest()->getCsrfToken();
     $cs->registerScript('cms-area', <<<EOD
 
-        $('body').attr('rel', {$model->id});
-        $.data(document.body, 'title', '{$model->title}');
-        $.data(document.body, 'language', '{$language}');
-        $.data(document.body, 'csrfTokenName', '{$csrfTokenName}');
-        $.data(document.body, 'csrfToken', '{$csrfToken}');
+        var currentScrollPos = $(window).scrollTop();
+        $(window).scroll(function(e) {
+            if ($('.cms-dialog').length) {
+                $(window).scrollTop(currentScrollPos);
+                return false;
+            }
+            var currentScrollPos = $(window).scrollTop();
+        });
 
         // Настройки и обработчики перещения юнитов на странице
         $('.cms-area').sortable({
@@ -245,8 +283,7 @@ js:function(){
                     });
                     showSplash($('#cms-page-edit'), {
                         draggable: true,
-                        resizable: true,
-                        centerOnScroll: true
+                        resizable: true
                     });
                 }
             });

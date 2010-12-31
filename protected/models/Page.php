@@ -71,6 +71,17 @@ class Page extends I18nActiveRecord
         );
     }
 
+    public function cacheParams()
+    {
+        $cacheParams = array(
+            'language'=>Yii::app()->language,
+        );
+        foreach (Page::defaultAccess() as $o => $r) {
+            $cacheParams[$o.'Page'] = Yii::app()->user->checkAccess($o.'Page');
+        }
+        return $cacheParams;
+    }
+
     public function childrenPages($id=0)
     {
         if ($id == 0)

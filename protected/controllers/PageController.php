@@ -9,6 +9,16 @@ class PageController extends Controller
 	{
 		return array(
 			'accessControl',
+            array(
+                'COutputCache + view',
+                'duration'=>3600,
+                'id'=>serialize(Page::cacheParams()),
+                'varyByParam'=>array('id','language','alias','url'),
+                'dependency'=>array(
+                    'class'=>'CDbCacheDependency',
+                    'sql'=>'SELECT CONCAT(MAX(`create`),MAX(`modify`)) FROM `'.Unit::tableName().'`',
+                ),
+            ),
 		);
 	}
 
@@ -126,7 +136,7 @@ class PageController extends Controller
                     )));
                 }
             }
-        }        
+        }                
         $this->loadModel();
         if ($this->_model->redirect) {
             if (!Yii::app()->user->checkAccess('updatePage'))
@@ -391,6 +401,8 @@ class PageController extends Controller
         {
             $unit = Unit::model()->findByPk(PageUnit::getUnitIdById($_REQUEST['pageunit_id']));
             echo $unit->move($_REQUEST['area'], $_REQUEST['cms-pageunit'], $_REQUEST['pageunit_id']);
+            // TODO: Улучшить этот момент, чтобы не очищался весь кеш
+            Yii::app()->cache->flush();
         }
 	}
 	

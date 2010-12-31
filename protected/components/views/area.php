@@ -8,13 +8,31 @@ if (get_class($this->controller) == 'PageController' && $this->controller->_mode
 $pageunits = $this->controller->_model->getUnits($name);
 foreach ($pageunits as $pageunit) {
 
-    $id = $pageunit->unit->id . '_' . $pageunit->unit->modify;
-    foreach (Page::defaultAccess() as $o => $r) {
-        $id .= '_'.Yii::app()->user->checkAccess($o.'Page');
+    $className = Unit::getClassNameByUnitType($pageunit->unit->type);
+    
+    $cacheParams = array(
+        'id'=>$pageunit->unit->id,
+        'modify'=>$pageunit->unit->modify,
+        'language'=>Yii::app()->language,
+    );
+    if (method_exists($className, 'cacheParams')) {
+        $p = call_user_func(array($className, 'cacheParams'));
+        if (is_array($p))
+            $cacheParams = array_merge($cacheParams, $p);        
     }
-    if($this->beginCache($id, array('duration'=>3600))) {
+    if (method_exists($className, 'defaultAccess')) {
+        foreach(call_user_func(array($className, 'defaultAccess')) as $o => $r) {
+            $cacheParams[$o.$className] = Yii::app()->user->checkAccess($o.$className);
+        }
+    }
+    foreach (Page::defaultAccess() as $o => $r) {
+        $cacheParams[$o.'Page'] = Yii::app()->user->checkAccess($o.'Page');
+    }
+    foreach (Unit::defaultAccess() as $o => $r) {
+        $cacheParams[$o.'Unit'] = Yii::app()->user->checkAccess($o.'Unit');
+    }
+    if($this->beginCache(serialize($cacheParams), array('duration'=>3600))) {
 
-        $className = Unit::getClassNameByUnitType($pageunit->unit->type);
         $content = $pageunit->unit->content;
 
     ?>

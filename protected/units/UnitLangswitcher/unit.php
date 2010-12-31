@@ -42,4 +42,10 @@ class UnitLangswitcher extends Content
             'unit_id' => 'integer unsigned',
         );
     }
+    public function cacheParams()
+    {
+        return array(
+            'page_id' => Yii::app()->controller->_model->id,
+        );
+    }
 }

@@ -61,6 +61,13 @@ class UnitBreadcrumbs extends Content
         );
     }
 
+    public function cacheParams()
+    {
+        return array(
+            'page_id' => Yii::app()->controller->_model->id,
+        );
+    }
+
     public function templateVars()
     {
         return array(

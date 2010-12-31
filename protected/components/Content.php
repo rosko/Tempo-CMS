@@ -46,7 +46,12 @@ class Content extends I18nActiveRecord
             array('template', 'length', 'max'=>32),
         );
     }
-    
+
+    public function cacheParams()
+    {
+        return array();
+    }
+
     public function selectPage($number, $per_page=0)
     {
         if ($per_page<1)

@@ -94,6 +94,13 @@ class UnitSitemap extends Content
         );
     }
 
+    public function cacheParams()
+    {
+        return array(
+            'page_id' => Yii::app()->controller->_model->id,
+        );
+    }
+
     public static function getTree($id, $params, $recursive=0, $start=false)
     {
         if ($start)

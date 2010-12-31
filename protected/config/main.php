@@ -21,6 +21,14 @@ return CMap::mergeArray(array(
             'loginUrl'=>array('site/login'),
             'returnUrl'=>array('page/view'),
 		),
+        'authManager'=>array(
+            'class'=>'AuthManager',
+            'connectionID'=>'db',
+            'defaultRoles'=>array('guest','authenticated'),
+            'itemTable'=>$config['components']['db']['tablePrefix'].'auth_item',
+            'itemChildTable'=>$config['components']['db']['tablePrefix'].'auth_itemchild',
+            'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
+        ),
         'request'=>array(
             'enableCookieValidation'=>true,
             'enableCsrfValidation'=>true,
@@ -73,9 +81,12 @@ return CMap::mergeArray(array(
         ),
         'urlManager'=>array(
             'rules'=>array(
+                'page/unitForm'=>'page/unitForm',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
                 'filesEditor/save'=>'filesEditor/save',
+                'users'=>'user/index',
+                
 
             ),
         ),

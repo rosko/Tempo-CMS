@@ -66,6 +66,7 @@ return array(
 
     'Username or e-mail' => 'Имя пользователя или e-mail',
     'Password' => 'Пароль',
+    'Repeat password'=>'Повторите пароль',
     'Remember me' => 'Запомнить',
     'Login error.' => 'Ошибка входа.',
 
@@ -191,4 +192,7 @@ return array(
 
     'Load pages in block without reloading whole web-page' => 'Перемещение по страницам списка без перезагрузки всей веб-страницы',
     'Scroll to block when navigate by pages' => 'Прокрутить к блоку при навигации по страницам списка',
+    'Users' => 'Пользователи',
+    'New user'=>'Новый пользователь',
+    'Super administrator'=>'Супер-пользователь',
 );

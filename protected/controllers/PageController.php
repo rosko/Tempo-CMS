@@ -8,46 +8,80 @@ class PageController extends Controller
 	public function filters()
 	{
 		return array(
-			'accessControl', // perform access control for CRUD operations
+			'accessControl',
 		);
 	}
 
 	public function accessRules()
 	{
-		return array(
+		$ret = array(
+            array('allow',
+                'actions'=>array(
+                    'pageAdd',
+                ),
+                'roles'=>array('createPage'),
+            ),
 			array('allow',
-				'actions'=>array('view', 'unitView', 'jsI18N'),
-				'users'=>array('*'),
-			),
-			array('allow',
-				'actions'=>array('getPageunitsByUnit'),
-				'users'=>array('@'),
+				'actions'=>array(
+                    'view', 'unitView', 'jsI18N',
+                    'unitAjax',
+                    'pageTree',
+                    'getUrl',
+                ),
+				'roles'=>array('readPage'),
 			),
 			array('allow',
 				'actions'=>array(
+                    'getPageunitsByUnit',
                     'unitAdd', 'unitForm',
                     'unitSetDialog', 'unitSet', 'unitMove',
                     'unitDeleteDialog','unitDelete', 'unitCheck',
 
-                    'unitAjax',
-
-                    'pageAdd', 'pageForm',
+                    'pageForm',
                     'pageRename', 'pageFill', 'pagesSort',
+                ),
+				'roles'=>array('updatePage'),
+			),
+            array('allow',
+                'actions'=>array(
+                    'siteMap',
+                ),
+                'roles'=>array('createPage', 'updatePage', 'deletePage'),
+            ),
+            array('allow',
+                'actions'=>array(
+                    'hasChildren',
                     'pageDeleteDialog', 'pageDelete',
-
-                    'pageTree',
-
-                    'hasChildren', 'siteSettings',
-                    'siteMap', 'getUrl',
-
+                ),
+                'roles'=>array('deletePage'),
+            ),
+			array('allow',
+				'actions'=>array(
+                    'siteSettings',
+                ),
+				'roles'=>array('updateSettings'),
+			),
+			array('allow',
+				'actions'=>array(
                     'unitsInstall',
                 ),
-				'users'=>array('admin'),
+				'roles'=>array('manageUnit'),
 			),
 			array('deny',
 				'users'=>array('*'),
 			),
 		);
+        $actions = array();
+        foreach ($ret as $r) {
+            if (is_array($r['actions']))
+                $actions = array_merge($actions, $r['actions']);
+        }
+        $ret = CMap::mergeArray(array(array(
+            'allow',
+            'actions'=>$actions,
+            'users'=>array('admin'),
+        )), $ret);
+        return $ret;
 	}
 
 	// Отображает страницу
@@ -77,7 +111,7 @@ class PageController extends Controller
 		} else {
             // Сделать переадрессацию, если страница запрошена по id без указания адреса
             // и при этом режим редактирования отключен
-            if (Yii::app()->user->isGuest && 
+            if (!Yii::app()->user->checkAccess('updatePage') &&
                 (Yii::app()->getUrlManager()->getUrlFormat()==UrlManager::PATH_FORMAT) &&
                 !$_GET['alias'] && !$_GET['url']) {
                 $page = Page::model()->findByPk(intval($_GET['id']));
@@ -95,7 +129,7 @@ class PageController extends Controller
         }        
         $this->loadModel();
         if ($this->_model->redirect) {
-            if (Yii::app()->user->isGuest)
+            if (!Yii::app()->user->checkAccess('updatePage'))
                 $this->redirect($this->_model->redirect);
             else
                 Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
@@ -456,10 +490,20 @@ class PageController extends Controller
                 $unit = new Unit;
                 $content = new $unit_class;
             }
-        } elseif ($_REQUEST['class_name'] && $_REQUEST['id']) {
+            $content->scenario = 'edit';
+        } elseif ($_REQUEST['class_name']) {
             $unit_class = $_REQUEST['class_name'];
-            $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
-            if ($content->unit_id) {
+            if ($_REQUEST['id']) {
+                $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
+                $content->scenario = 'edit';
+            } elseif (method_exists($unit_class, 'defaultObject')) {
+				$content = call_user_func(array($nit_class, 'defaultObject'));
+			} else {
+				$content = new $unit_class;
+                $content->scenario = 'add';
+			}
+
+            if (isset($content->unit_id)) {
                 $unit = $content->unit;
             }
             
@@ -500,10 +544,20 @@ class PageController extends Controller
         {
             $form_array['title']='';
         }
-        $caption = array(
-            'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
-            'label' => call_user_func(array($unit_class, 'name')),
-        );
+        if (method_exists($unit_class, 'name')) {
+            if (is_subclass_of($unit_class, 'Content')) {
+                $caption = array(
+                    'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
+                    'label' => call_user_func(array($unit_class, 'name')),
+                );
+            } else {
+                $caption = array(
+                    'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
+                    'label' => $content->name(),
+                );
+            }
+        } else {
+        }
         if (isset($unit)) {
             $form_array['elements']['unit'] = array(
                 'type'=>'form',

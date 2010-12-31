@@ -7,40 +7,59 @@ class RecordsGrid extends CInputWidget
     public $foreign_attribute;
     public $section_type='';
     public $section_id=0;
-    public $columns;
+    public $columns=array();
     public $order;
 
     public function run()
     {
-        if($this->hasModel()===false)  {
-            $this->model = call_user_func(array($section_type, 'model'))->findByPk($section_id);
+        if($this->hasModel()===false && $this->section_type)  {
+            $this->model = call_user_func(array($this->section_type, 'model'))->findByPk($this->section_id);
         }
 
-        $dataProvider=new CActiveDataProvider($this->class_name, array(
-            'criteria'=> array(
-                'condition'=> $this->foreign_attribute . ' = :id',
-                'with' => 'unit',
-                'params'=>array(
-                    ':id' => $this->model->id
-                ),
-            ),
-            'sort' => array(
-                'attributes' => array(
-                    'title'=> array(
-                        'asc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit'),
-                        'desc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit').' DESC',
-                        'label' => 'Title',
-                    ),
-                    '*'
-                ),
-                'defaultOrder' => $this->order,
-            ),
-            'pagination'=> array(
-                'pageSize' => Yii::app()->settings->getValue('defaultsPerPage')
-            ),
-        ));
+        if ($this->model instanceof Content) {
 
-        $id = __CLASS__.'_'.get_class($this->model).'_'.$this->model->id;
+            $dataProvider=new CActiveDataProvider($this->class_name, array(
+                'criteria'=> array(
+                    'condition'=> $this->foreign_attribute . ' = :id',
+                    'with' => 'unit',
+                    'params'=>array(
+                        ':id' => $this->model->id
+                    ),
+                ),
+                'sort' => array(
+                    'attributes' => array(
+                        'title'=> array(
+                            'asc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit'),
+                            'desc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit').' DESC',
+                            'label' => 'Title',
+                        ),
+                        '*'
+                    ),
+                    'defaultOrder' => $this->order,
+                ),
+                'pagination'=> array(
+                    'pageSize' => Yii::app()->settings->getValue('defaultsPerPage')
+                ),
+            ));
+
+        } else {
+            
+            $dataProvider=new CActiveDataProvider($this->class_name, array(
+                'sort' => array(
+                    'defaultOrder' => $this->order,
+                ),
+                'pagination'=> array(
+                    'pageSize' => Yii::app()->settings->getValue('defaultsPerPage')
+                ),
+            ));
+
+        }
+
+        if ($this->model) {
+            $id = __CLASS__.'_'.get_class($this->model).'_'.$this->model->id;
+        } else {
+            $id = __CLASS__.$this->class_name;
+        }
 
         $this->registerClientScript();
 
@@ -70,14 +89,14 @@ EOD
                         'id'=>$id.'_check',
                     )
                 ),
-                array(
+                $this->model instanceof Content ? array(
                     array(
                         'name'=>'title',
                         'type'=>'raw',
                         'header'=>Yii::t('cms', 'Title'),
                         'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
                     ),
-                ),
+                ) : array(),
                 $this->columns,
                 array(
                     array(
@@ -87,15 +106,15 @@ EOD
                             'view'=>array(
                                 'label'=>Yii::t('cms', 'Go to page'),
                                 'url' => '"javascript:gotoRecordPage({$data->id}, \'".get_class($data)."\')"',
-                                'visible' => '$data->unit',
+                                'visible' => 'isset($data->unit)',
                             ),
                             'update'=>array(
-                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\');"',
+                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\');"',
                             ),
                             'del'=>array(
                                 'label'=>Yii::t('cms', 'Delete'),
                                 'imageUrl'=>'/images/delete.png',
-                                'url'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\')"',
+                                'url'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\')"',
                             ),
                         ),
                     ),

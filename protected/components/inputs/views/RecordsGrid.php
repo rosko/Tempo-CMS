@@ -1,5 +1,5 @@
 <?php
-    $title = call_user_func(array($class_name, 'name')) . ' ' . date('Y-m-d H:i');
+    $title = (property_exists($class_name, 'name') ? call_user_func(array($class_name, 'name')) . ' ' : '') . date('Y-m-d H:i');
     $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
 ?>
 <div id="<?=$id?>_header">
@@ -65,23 +65,25 @@ $('.<?=$id?>_add').click(function() {
         });
     } else {
         // Иначе просто создаем запись
+        if ($.fn.yiiGridView) {
+            recordEditForm(0, '<?=$class_name?>', '', '<?=$id?>');
+        } else {
+            recordEditForm(0, '<?=$class_name?>', '');
+            $('#recordEditForm<?=$class_name?>_0').live('dialogbeforeclose', function() {
+                updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
+            });
+        }
+
+/*
         ajaxSave('/?r=records/create&class_name=<?=$class_name?>&section_id=<?=$section_id?>&foreign_attribute=<?=$foreign_attribute?>', '', 'GET', function(html){
             $.fn.yiiGridView.update('<?=$id?>');
             if (html.substring(0,2) == '{"') {
                 var ret = jQuery.parseJSON(html);
                 if (ret) {
-                    if ($.fn.yiiGridView) {
-                        recordEditForm(ret.id, '<?=$class_name?>', '', '<?=$id?>');
-                    } else {
-                        recordEditForm(ret.id, '<?=$class_name?>', '');
-                        $('#recordEditForm<?=$class_name?>_'+ret.id).live('dialogbeforeclose', function() {
-                            updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
-                        });
-                    }
                 }
             }
         });
-        
+*/
     }
 
 

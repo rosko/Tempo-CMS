@@ -35,7 +35,7 @@ class RecordsController extends Controller
 
     public function actionCreate()
     {
-        if ($_REQUEST['class_name'] && $_REQUEST['foreign_attribute'] && $_REQUEST['section_id'])
+        if ($_REQUEST['class_name'])
         {
             $className = $_REQUEST['class_name'];
 			if (method_exists($className, 'defaultObject')) {
@@ -43,7 +43,7 @@ class RecordsController extends Controller
 			} else {
 				$model = new $className;
 			}
-            if ($model->hasAttribute($_REQUEST['foreign_attribute']))
+            if ($_REQUEST['foreign_attribute'] && $_REQUEST['section_id'] && $model->hasAttribute($_REQUEST['foreign_attribute']))
             {
                 $model->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['section_id']);
             }
@@ -62,8 +62,8 @@ class RecordsController extends Controller
             $className = $_REQUEST['class_name'];
             $ret = true;
             foreach ($ids as $id) {
-                $model = call_user_func(array($className, 'model'))->findByPk($_REQUEST['id']);
-                $ret = $ret && $model->delete();
+                $model = call_user_func(array($className, 'model'))->findByPk($id);
+                $ret = $model->delete() && $ret;
             }
             echo (int)$ret;
         } else

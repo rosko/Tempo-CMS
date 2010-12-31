@@ -56,6 +56,13 @@ class Unit extends I18nActiveRecord
 		);
 	}
 
+    public function defaultAccess()
+    {
+        return array(
+            'manage'=>'superadmin',
+        );
+    }
+
     public function unitsDirsAliases()
     {
         return array(

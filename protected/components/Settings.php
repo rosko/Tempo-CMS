@@ -25,6 +25,13 @@ class Settings extends CApplicationComponent
         }
     }
     
+    public function defaultAccess()
+    {
+        return array(
+            'update'=>'superadmin',
+        );
+    }
+
     public function loadAll()
     {
         $sql = 'SELECT * FROM `' . $this->tableName . '`';

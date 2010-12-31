@@ -674,7 +674,7 @@ function recordEditForm(id, class_name, unit_id, grid_id)
 
 function recordDelete(id, class_name, unit_id, grid_id)
 {
-    if (unit_id) {
+    if (unit_id > 0) {
         // Удаляем юнит
         $.ajax({
             url:'/?r=page/unitCheck&unit_id='+unit_id+'&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
@@ -739,10 +739,15 @@ function recordDeleteConfirm(unit_id, grid_id, data, str)
     if (str == undefined) {
         var str = i18n.cms.deleteRecordWarning;
     }
+    if (data == undefined) {
+        var data = '';
+    }
     if (confirm(str))
     {
         ajaxSave('/?r=page/unitDelete&unit_id='+unit_id+'&pageunit_id=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
-            $.fn.yiiGridView.update(grid_id);
+            if (grid_id !== undefined) {
+                $.fn.yiiGridView.update(grid_id);
+            }
         });
     }
 }

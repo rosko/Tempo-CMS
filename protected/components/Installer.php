@@ -52,11 +52,12 @@ class Installer extends CApplicationComponent
 
     public function installAll($withUnits=true)
     {
-        $classNames = array('Page', 'PageUnit', 'Unit', 'User');
+        $classNames = array('User', 'AuthItem', 'AuthItemChild', 'AuthAssignment', 'Page', 'PageUnit', 'Unit');
         foreach ($classNames as $className)
             $this->installTable($className);
         if ($withUnits)
             Unit::install(array_keys(Unit::getAllUnits()));
+
     }
 
     protected static function getSimpleScheme($tableSchema) {

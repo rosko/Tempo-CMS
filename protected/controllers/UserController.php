@@ -1,10 +1,10 @@
 <?php
 
-class SiteController extends Controller
+class UserController extends Controller
 {
     
     public function actionIndex()
     {
-
+        $this->render('index');
     }
 }

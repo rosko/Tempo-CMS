@@ -136,7 +136,7 @@ class Content extends I18nActiveRecord
         $params['unit'] = $this->unit;
         $params['content'] = $this;
         $params['page'] = Yii::app()->controller->loadModel();
-        $params['editMode'] = !Yii::app()->user->isGuest;
+        $params['editMode'] = Yii::app()->user->checkAccess('updatePage');
         $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
         $len = strlen($params['className']);
         foreach ($params['settings']['global'] as $k => $v) {

@@ -81,7 +81,10 @@ $js .= <<<EOD
         save: 'ui-icon-check',
         apply: 'ui-icon-bullet'
     };
-    $('input[type=submit]').button();
+    $('input[type=submit]').each(function() {
+        $(this).button({icons: {primary: ics[$(this).attr('name')]} });
+    });
+
 
 EOD;
 

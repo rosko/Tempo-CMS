@@ -44,6 +44,8 @@ class Page extends I18nActiveRecord
                 'order'=>'`order`'
             ),
 			'childrenCount'=>array(self::STAT, 'Page', 'parent_id'),
+            'author'=>array(self::BELONGS_TO, 'User', 'author_id'),
+            'lastEditor'=>array(self::BELONGS_TO, 'User', 'editor_id'),
 		);
 	}
 
@@ -58,6 +60,16 @@ class Page extends I18nActiveRecord
             ),
 		);
 	}
+
+    public function defaultAccess()
+    {
+        return array(
+            'create'=>'superadmin',
+            'read'=>array('guest','authenticated'),
+            'update'=>'superadmin',
+            'delete'=>'superadmin',
+        );
+    }
 
     public function childrenPages($id=0)
     {
@@ -277,6 +289,10 @@ class Page extends I18nActiveRecord
             'alias' => 'char(64)',
             'url'=>'string',
             'virtual'=>'boolean',
+            'author_id'=>'integer unsigned',
+            'editor_id'=>'integer unsigned',
+            'create'=>'datetime',
+            'modify'=>'datetime',
         );
     }
 
@@ -289,6 +305,8 @@ class Page extends I18nActiveRecord
             $obj->{$lang.'_title'} = Yii::t('cms', 'Homepage', array(), null, $lang);
         }
         $obj->active = true;
+        $obj->author_id = User::getAdmin()->id;
+        $obj->create = new CDbExpression('NOW()');
         $obj->parent_id = 0;
         $obj->order = 0;
         $obj->save(false);

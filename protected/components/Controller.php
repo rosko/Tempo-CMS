@@ -58,7 +58,7 @@ class Controller extends CController
         $vars['jsUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         if (isset(Yii::app()->controller->_model))
             $vars['page'] = Yii::app()->controller->loadModel();
-        $vars['editMode'] = !Yii::app()->user->isGuest;
+        $vars['editMode'] = Yii::app()->user->checkAccess('updatePage');
         $vars['settings']['global'] = Yii::app()->settings->model->getAttributes();
 
 

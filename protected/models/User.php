@@ -2,14 +2,22 @@
 
 class User extends CActiveRecord
 {
-    const ACCESS_ADMINISTRATOR = 'administrator';
-    const ACCESS_EDITOR = 'editor';
-    const ACCESS_USER = 'user';
+	const ICON = '/images/icons/fatcow/16x16/user.png';
+
+    const ADMIN_LOGIN = 'admin';
+    private static $_admin;
+
+    public $password_repeat='';
 
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
+
+    public function name($language=null)
+    {
+        return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
+    }
 
 	public function tableName()
 	{
@@ -19,9 +27,14 @@ class User extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('login, email, name', 'required'),
-            array('password', 'required', 'on'=>'register'),
-			array('login, email, access', 'length', 'max'=>32),
+            array('login, password', 'required', 'on'=>'add'),
+            array('login', 'unique'),
+			array('email, name', 'required'),
+			array('login, email', 'length', 'max'=>32),
+            array('email', 'email'),
+            array('password', 'compare', 'compareAttribute'=>'password_repeat'),
+            array('password, password_repeat', 'safe'),
+            array('login', 'unsafe', 'on'=>'edit'),
 			array('name', 'length', 'max'=>64),
 		);
 	}
@@ -32,9 +45,9 @@ class User extends CActiveRecord
 			'id' => Yii::t('cms', 'ID'),
 			'login' => Yii::t('cms', 'Username'),
 			'password' => Yii::t('cms', 'Password'),
+            'password_repeat' => Yii::t('cms', 'Repeat password'),
 			'email' => Yii::t('cms', 'E-mail'),
 			'name' => Yii::t('cms', 'Name'),
-			'access' => Yii::t('cms', 'Access'),
 		);
 	}
 
@@ -46,7 +59,6 @@ class User extends CActiveRecord
             'password' => 'char(64)',
             'email' => 'char(64)',
             'name' => 'char(64)',
-            'access' => 'char(32)',
         );
     }
 
@@ -54,19 +66,43 @@ class User extends CActiveRecord
     {
         return array(
             'elements'=>array(
-                
+                'login'=>array(
+                    'type'=>'text',
+                ),
+                'name'=>array(
+                    'type'=>'text',
+                ),
+                'email'=>array(
+                    'type'=>'text',
+                ),
+                'password'=>array(
+                    'type'=>'password',
+                    'value'=>'',
+                ),
+                'password_repeat'=>array(
+                    'type'=>'password',
+                ),
             ),
+        );
+    }
+
+    public function defaultAccess()
+    {
+        return array(
+            'create'=>'superadmin',
+            'read'=>'authenticated',
+            'update'=>'superadmin',
+            'delete'=>'superadmin',
         );
     }
 
     public function install()
     {
         $user = new self;
-        $user->login = 'admin';
+        $user->login = self::ADMIN_LOGIN;
         $user->name = Yii::app()->params['admin']['name'];
         $user->email = Yii::app()->params['admin']['email'];
         $user->password = self::hash(Yii::app()->params['admin']['password']);
-        $user->access = self::ACCESS_ADMINISTRATOR;
         $user->save(false);
     }
 
@@ -74,4 +110,34 @@ class User extends CActiveRecord
 	{
         return sha1(md5($string) . Yii::app()->params['hashSalt']);
 	}
+
+    public function beforeSave()
+    {
+        if (!$this->password) {
+            unset($this->password);
+        } else {
+            $this->password = self::hash($this->password);
+        }
+        return parent::beforeSave();
+    }
+
+    public function beforeDelete()
+    {
+        if ($this->id == 1 || $this->login == self::ADMIN_LOGIN) {
+            return false;
+        }
+        return parent::beforeDelete();
+    }
+
+    public static function getByLogin($login)
+    {
+        return self::$_admin = self::model()->find('`login` = :login', array(':login'=>$login));
+    }
+
+    public static function getAdmin()
+    {
+		if(self::$_admin===null)
+            self::$_admin = self::getByLogin(self::ADMIN_LOGIN);
+        return self::$_admin;
+    }
 }

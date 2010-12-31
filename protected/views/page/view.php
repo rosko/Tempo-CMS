@@ -23,7 +23,7 @@ $cs->registerScript('all', <<<EOD
         $('<div id="cms-notification"></div>').prependTo('body');
             $('#cms-statusbar').jnotifyInizialize({
                 oneAtTime: true
-            })
+            });
             $('#cms-notification')
                 .jnotifyInizialize({
                     oneAtTime: false,
@@ -95,7 +95,9 @@ $('.ajaxPager a').live('click', function() {
 EOD;
 $cs->registerScript('ajaxPager', $js, CClientScript::POS_READY);
 
-if (!Yii::app()->user->isGuest) {
+if (Yii::app()->user->checkAccess('createPage') || 
+    Yii::app()->user->checkAccess('updatePage') ||
+    Yii::app()->user->checkAccess('deletePage')) {
 
     if (!$model->active) {
         $this->pageTitle = '['.Yii::t('cms', 'Page unactive').'] ' . $this->pageTitle;
@@ -104,137 +106,131 @@ if (!Yii::app()->user->isGuest) {
     $dir = Yii::getPathOfAlias('ext.jsTree.source');
     $baseUrl = Yii::app()->getAssetManager()->publish($dir);
     $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
-		
-    $cs->registerScript('cms-area', <<<EOD
 
-        var currentScrollPos = $(window).scrollTop();
-        $(window).scroll(function(e) {
-            if ($('.cms-dialog').length) {
-                $(window).scrollTop(currentScrollPos);
-                return false;
-            }
-            var currentScrollPos = $(window).scrollTop();
-        });
+    if (Yii::app()->user->checkAccess('updatePage')) {
+        $cs->registerScript('cms-area', <<<EOD
 
-        // Настройки и обработчики перещения юнитов на странице
-        $('.cms-area').sortable({
-            connectWith: '.cms-area',
-            placeholder: 'cms-pageunit-highlight',
-            revert: true,
-            opacity:1,
-            forcePlaceholderSize:true,
-            cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
-            update:function(event, ui) {
-                var pageunit_id = $(ui.item).attr('id').replace('cms-pageunit-','');
-                var area_name = getAreaNameByPageunit(ui.item);
-                if (ui.sender) {
-                    // Запрос на обновление предыдущей области + перемещенному элементу указывается новое значение в area
-//                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
-//                    ajaxSaveArea($(ui.sender), area_name, {$model->id}, 'pageunit_id='+pageunit_id+'&old_area='+old_area);
+            // Настройки и обработчики перещения юнитов на странице
+            $('.cms-area').sortable({
+                connectWith: '.cms-area',
+                placeholder: 'cms-pageunit-highlight',
+                revert: true,
+                opacity:1,
+                forcePlaceholderSize:true,
+                cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
+                update:function(event, ui) {
+                    var pageunit_id = $(ui.item).attr('id').replace('cms-pageunit-','');
+                    var area_name = getAreaNameByPageunit(ui.item);
+                    if (ui.sender) {
+                        // Запрос на обновление предыдущей области + перемещенному элементу указывается новое значение в area
+    //                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
+    //                    ajaxSaveArea($(ui.sender), area_name, {$model->id}, 'pageunit_id='+pageunit_id+'&old_area='+old_area);
 
-                } else {
-                    // Запрос на обновление текущей области
-                    ajaxSaveArea(getAreaByPageunit(ui.item), area_name, {$model->id}, 'pageunit_id='+pageunit_id);
-                }
-            },
-            start:function(event, ui) {
-                $(ui.helper).find('.cms-panel').hide();
-                $('.cms-area').addClass('potential');
-                $('.cms-area').each(function() {
-                    if ($(this).find('.cms-pageunit').length == 0)
-                        $(this).addClass('cms-empty-area');
-                });
-                CmsAreaEmptyCheck();
-            },
-            stop:function(event, ui) {
-                $('.cms-area').removeClass('potential').removeClass('cms-empty-area');
-                CmsAreaEmptyCheck();
-            }
-        }).disableSelection();
-        
-        $('.cms-pageunit').css('cursor', 'move');
-        
-        CmsAreaEmptyCheck();
-        $('.cms-pageunit').live('mouseenter', function() {
-            $(this).addClass('hover');
-        }).live('mouseleave', function() {
-            $(this).removeClass('hover');
-        });
-
-        $('.cms-pageunit').live('dblclick', function() {
-            clearSelection();
-            pageunitEditForm(this);
-            return false;
-        })
-
-        // Обработчик для выбора типа юнита при создании
-        $('.cms-btn-pageunit-create').live('click', function() {
-            var type = $(this).attr('id').replace('cms-button-create-', '');
-            var area_name = $(this).attr('rel');
-            var pageunit_id = $(this).attr('rev');
-            var page_id = {$model->id};
-            var url = '/?r=page/unitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
-            ajaxSave(url, '', 'GET', function(id) {
-                hideSplash();
-                id = jQuery.parseJSON(id);
-                if (pageunit_id != '0') {
-                    var pageunit = $('#cms-pageunit-'+pageunit_id);
-                } else {
-                    var pageunit = $('#cms-area-'+area_name).find('.cms-empty-area-buttons').eq(0);
-                }
-                pageunit.after('<div id="cms-pageunit-'+id.pageunit_id+'" class="cms-pageunit cms-unit-'+type+'" rel="'+type+'" rev="'+id.unit_id+'"></div>');
-                
-                var orig_bg = $('#cms-pageunit-'+id.pageunit_id).css('backgroundColor');
-                $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id+'&language={$language}', function() {
-                    CmsAreaEmptyCheck();
-                }).css('backgroundColor', '#FFFF00');
-                $('#cms-pageunit-'+id.pageunit_id).animate({
-                    backgroundColor: orig_bg
-                }, 2500);
-                $.scrollTo('#cms-pageunit-'+id.pageunit_id, 'normal', {
-                    offset: -10
-                });
-            });
-            return false;
-        });
-        
-        // Отображение диалога "Заполнить страницу" на пустой странице
-        if ($('.pageunit').length == -1)
-        {
-            var page_id = $('body').attr('rel');
-            $.ajax({
-                url: '/?r=page/pageFill&id='+page_id,
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);                    
+                    } else {
+                        // Запрос на обновление текущей области
+                        ajaxSaveArea(getAreaByPageunit(ui.item), area_name, {$model->id}, 'pageunit_id='+pageunit_id);
+                    }
                 },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-fill').html(html);
-                    AjaxifyForm('#cms-page-fill', $('#cms-page-fill').find('form').eq(0), function(f) {
-                    }, function (html) {
+                start:function(event, ui) {
+                    $(ui.helper).find('.cms-panel').hide();
+                    $('.cms-area').addClass('potential');
+                    $('.cms-area').each(function() {
+                        if ($(this).find('.cms-pageunit').length == 0)
+                            $(this).addClass('cms-empty-area');
                     });
-                    showSplash($('#cms-page-fill'));
+                    CmsAreaEmptyCheck();
+                },
+                stop:function(event, ui) {
+                    $('.cms-area').removeClass('potential').removeClass('cms-empty-area');
+                    CmsAreaEmptyCheck();
                 }
+            }).disableSelection();
+
+            $('.cms-pageunit').css('cursor', 'move');
+
+            CmsAreaEmptyCheck();
+            $('.cms-pageunit').live('mouseenter', function() {
+                $(this).addClass('hover');
+            }).live('mouseleave', function() {
+                $(this).removeClass('hover');
             });
-        }
+
+            $('.cms-pageunit').live('dblclick', function() {
+                clearSelection();
+                pageunitEditForm(this);
+                return false;
+            })
+
+            // Обработчик для выбора типа юнита при создании
+            $('.cms-btn-pageunit-create').live('click', function() {
+                var type = $(this).attr('id').replace('cms-button-create-', '');
+                var area_name = $(this).attr('rel');
+                var pageunit_id = $(this).attr('rev');
+                var page_id = {$model->id};
+                var url = '/?r=page/unitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
+                ajaxSave(url, '', 'GET', function(id) {
+                    hideSplash();
+                    id = jQuery.parseJSON(id);
+                    if (pageunit_id != '0') {
+                        var pageunit = $('#cms-pageunit-'+pageunit_id);
+                    } else {
+                        var pageunit = $('#cms-area-'+area_name).find('.cms-empty-area-buttons').eq(0);
+                    }
+                    pageunit.after('<div id="cms-pageunit-'+id.pageunit_id+'" class="cms-pageunit cms-unit-'+type+'" rel="'+type+'" rev="'+id.unit_id+'"></div>');
+
+                    var orig_bg = $('#cms-pageunit-'+id.pageunit_id).css('backgroundColor');
+                    $('#cms-pageunit-'+id.pageunit_id).load('/?r=page/unitView&pageunit_id='+id.pageunit_id+'&id='+page_id+'&language={$language}', function() {
+                        CmsAreaEmptyCheck();
+                    }).css('backgroundColor', '#FFFF00');
+                    $('#cms-pageunit-'+id.pageunit_id).animate({
+                        backgroundColor: orig_bg
+                    }, 2500);
+                    $.scrollTo('#cms-pageunit-'+id.pageunit_id, 'normal', {
+                        offset: -10
+                    });
+                });
+                return false;
+            });
+
+            // Отображение диалога "Заполнить страницу" на пустой странице
+            if ($('.pageunit').length == -1)
+            {
+                var page_id = $('body').attr('rel');
+                $.ajax({
+                    url: '/?r=page/pageFill&id='+page_id,
+                    type: 'GET',
+                    cache: false,
+                    beforeSend: function() {
+                        showInfoPanel(cms_html_loading_image, 0);
+                    },
+                    success: function(html) {
+                        hideInfoPanel();
+                        $('#cms-page-fill').html(html);
+                        AjaxifyForm('#cms-page-fill', $('#cms-page-fill').find('form').eq(0), function(f) {
+                        }, function (html) {
+                        });
+                        showSplash($('#cms-page-fill'));
+                    }
+                });
+            }
         
 EOD
-, CClientScript::POS_READY);
+    , CClientScript::POS_READY);
 
 
-    if (Yii::app()->settings->getValue('autoSave')) {
+        if (Yii::app()->settings->getValue('autoSave')) {
 
-        $cs->registerScript('autoSave', <<<EOD
-            setInterval(function() {
-                $('form input[name=apply]:submit').each(function() {
-                    $(this).parents('form').attr('rev', 'apply').trigger('submit');
-                });
-            }, 30000);
+            $cs->registerScript('autoSave', <<<EOD
+                setInterval(function() {
+                    $('form input[name=apply]:submit').each(function() {
+                        $(this).parents('form').attr('rev', 'apply').trigger('submit');
+                    });
+                }, 30000);
 EOD
-        , CClientScript::POS_READY);
-    
+            , CClientScript::POS_READY);
+
+        }
+
     }
 
 /*
@@ -255,12 +251,12 @@ EOD
         'vertical'=>true,
         'rows'=>2,
         'buttons'=>array(
-            'edit' => array(
+            'edit' => Yii::app()->user->checkAccess('updatePage') ? array(
                 'icon' => 'edit',
                 'title' => Yii::t('cms', 'Page properties'),
                 'click' => 'js:function(){ pageEditForm(); return false; }',
-            ),
-            'settings' => array(
+            ):null,
+            'settings' => Yii::app()->user->checkAccess('updateSettings') ? array(
                 'icon' => 'settings',
                 'title' => Yii::t('cms', 'Site settings'),
                 'click' => <<<EOD
@@ -290,13 +286,13 @@ js:function(){
             return false;
         }
 EOD
-            ),
-            'pageadd' => array(
+            ):null,
+            'pageadd' => Yii::app()->user->checkAccess('createPage')?array(
                 'icon' => 'add',
                 'title' => Yii::t('cms', 'Create new page'),
                 'click' => 'js:function() { pageAddForm(); return false; }',
-            ),
-            'units'=>array(
+            ):null,
+            'units'=> Yii::app()->user->checkAccess('manageUnit')?array(
                 'icon' => 'large_tiles',
                 'title' => Yii::t('cms', 'Units'),
                 'click' => <<<EOD
@@ -324,8 +320,8 @@ js:function() {
             return false;
         }
 EOD
-            ),
-            'sitemap' => array(
+            ):null,
+            'sitemap' =>  Yii::app()->user->checkAccess('createPage')&&Yii::app()->user->checkAccess('updatePage')&&Yii::app()->user->checkAccess('deletePage')?array(
                 'icon' => 'sitemap',
                 'title' => Yii::t('cms', 'Sitemap'),
                 'click' => <<<EOD
@@ -350,7 +346,7 @@ js:function(){
             return false;
         }
 EOD
-            ),
+            ):null,
             'filemanager' => array(
                 'icon' => 'files',
                 'title' => Yii::t('cms', 'File manager'),
@@ -362,6 +358,31 @@ js:function(){
 }
 EOD
             ),
+            'users' =>  Yii::app()->user->checkAccess('updateUser')?array(
+                'icon' => 'user',
+                'title' => Yii::t('cms', 'Users'),
+                'click' => <<<EOD
+js:function() {
+            $.ajax({
+                url: '/?r=user/index&language={$language}',
+                type: 'GET',
+                cache: false,
+                beforeSend: function() {
+                    showInfoPanel(cms_html_loading_image, 0);
+                },
+                success: function(html) {
+                    hideInfoPanel();
+                    $('#cms-page-edit').html(html);
+                    showSplash($('#cms-page-edit'), {
+                        resizable: true,
+                        draggable: true
+                    });
+                }
+            });
+            return false;
+        }
+EOD
+            ):null,
             'exit' => array(
                 'icon' => 'exit',
                 'title' => Yii::t('cms', 'Exit'),
@@ -380,105 +401,107 @@ EOD
 /*
  * Панель инструментов для блоков
  */
-    $this->widget('Toolbar', array(
-        'id' => 'pageunitpanel',
-        'location' => array(
-            'selector' => '.cms-pageunit',
-            'position' => array('outter', 'left', 'top'),
-            'show' => 'hover',
-            'draggable' => false,
-            //'resizable' => true,
-            //'save' => true,
-        ),
-        'zIndex' => 1010,
-        'iconSize' => '32x32',
-        'vertical'=>true,
-        'rows'=>1,
-        'dblclick' => 'js:function() { return false; }',
-        'buttons'=>array(
-            'add' => array(
-                'icon' => 'add',
-                'title' => Yii::t('cms', 'Add another unit'),
-                'click' => <<<EOD
-js:function() {
-            pageunitAddForm(this);
-            return false;
-        }
-EOD
-            ),
-            'edit' => array(
-                'icon' => 'edit',
-                'title' => Yii::t('cms', 'Edit'),
-                'click' => <<<EOD
-js:function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            pageunitEditForm(pageunit);
-            return false;
-        }
-EOD
-            ),
-            'move' => array(
-                'icon' => 'move',
-                'title' => Yii::t('cms', 'Unit location on pages'),
-                'click' => <<<EOD
-js:function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            fadeIn(pageunit, 'selected');
-            var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-            var unit_id = pageunit.attr('rev');
-            pageunitSetDialog({$model->id}, pageunit_id, unit_id);
-            return false;
-        }
-EOD
-            ),
-            'up' => array(
-                'icon' => 'up',
-                'title' => Yii::t('cms', 'Move up'),
-                'click' => <<<EOD
-js:function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            if (pageunit.prev().length) {
-                pageunit.insertBefore(pageunit.prev());
-                area = getAreaByPageunit(pageunit);
-                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
-            }
-            return false;
-        }
-EOD
-            ),
-            'down' => array(
-                'icon' => 'down',
-                'title' => Yii::t('cms', 'Move down'),
-                'click' => <<<EOD
-js:function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            if (pageunit.next().length) {
-                pageunit.insertAfter(pageunit.next());
-                area = getAreaByPageunit(pageunit);
-                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
-            }
-            return false;
-        }
-EOD
-            ),
-            'delete' => array(
-                'icon' => 'delete',
-                'title' => Yii::t('cms', 'Delete the unit'),
-                'click' => <<<EOD
-js:function() {
-            var pageunit = $(this).parents('.cms-pageunit').eq(0);
-            fadeIn(pageunit, 'selected');
-            $('#pageunitpanel').appendTo('body');
-            pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
-            return false;
-        }
-EOD
-            ),
-        )
-    ));
+    if (Yii::app()->user->checkAccess('updatePage')) {
 
+        $this->widget('Toolbar', array(
+            'id' => 'pageunitpanel',
+            'location' => array(
+                'selector' => '.cms-pageunit',
+                'position' => array('outter', 'left', 'top'),
+                'show' => 'hover',
+                'draggable' => false,
+                //'resizable' => true,
+                //'save' => true,
+            ),
+            'zIndex' => 1010,
+            'iconSize' => '32x32',
+            'vertical'=>true,
+            'rows'=>1,
+            'dblclick' => 'js:function() { return false; }',
+            'buttons'=>array(
+                'add' => array(
+                    'icon' => 'add',
+                    'title' => Yii::t('cms', 'Add another unit'),
+                    'click' => <<<EOD
+js:function() {
+                pageunitAddForm(this);
+                return false;
+            }
+EOD
+                ),
+                'edit' => array(
+                    'icon' => 'edit',
+                    'title' => Yii::t('cms', 'Edit'),
+                    'click' => <<<EOD
+js:function() {
+                var pageunit = $(this).parents('.cms-pageunit').eq(0);
+                pageunitEditForm(pageunit);
+                return false;
+            }
+EOD
+                ),
+                'move' => array(
+                    'icon' => 'move',
+                    'title' => Yii::t('cms', 'Unit location on pages'),
+                    'click' => <<<EOD
+js:function() {
+                var pageunit = $(this).parents('.cms-pageunit').eq(0);
+                fadeIn(pageunit, 'selected');
+                var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                var unit_id = pageunit.attr('rev');
+                pageunitSetDialog({$model->id}, pageunit_id, unit_id);
+                return false;
+            }
+EOD
+                ),
+                'up' => array(
+                    'icon' => 'up',
+                    'title' => Yii::t('cms', 'Move up'),
+                    'click' => <<<EOD
+js:function() {
+                var pageunit = $(this).parents('.cms-pageunit').eq(0);
+                if (pageunit.prev().length) {
+                    pageunit.insertBefore(pageunit.prev());
+                    area = getAreaByPageunit(pageunit);
+                    var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                    ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
+                }
+                return false;
+            }
+EOD
+                ),
+                'down' => array(
+                    'icon' => 'down',
+                    'title' => Yii::t('cms', 'Move down'),
+                    'click' => <<<EOD
+js:function() {
+                var pageunit = $(this).parents('.cms-pageunit').eq(0);
+                if (pageunit.next().length) {
+                    pageunit.insertAfter(pageunit.next());
+                    area = getAreaByPageunit(pageunit);
+                    var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+                    ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageunit_id='+pageunit_id);
+                }
+                return false;
+            }
+EOD
+                ),
+                'delete' => array(
+                    'icon' => 'delete',
+                    'title' => Yii::t('cms', 'Delete the unit'),
+                    'click' => <<<EOD
+js:function() {
+                var pageunit = $(this).parents('.cms-pageunit').eq(0);
+                fadeIn(pageunit, 'selected');
+                $('#pageunitpanel').appendTo('body');
+                pageunitDeleteDialog(pageunit.attr('rev'), pageunit.attr('id').replace('cms-pageunit-',''), {$model->id});
+                return false;
+            }
+EOD
+                ),
+            )
+        ));
+    }
 
 ?>
 

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -12,7 +12,7 @@
  * CSqliteSchema is the class for retrieving metadata information from a SQLite (2/3) database.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CSqliteSchema.php 2707 2010-12-02 17:28:00Z qiang.xue $
+ * @version $Id: CSqliteSchema.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.db.schema.sqlite
  * @since 1.0
  */
@@ -176,6 +176,17 @@ class CSqliteSchema extends CDbSchema
 		$c->isForeignKey=false;
 		$c->init(strtolower($column['type']),$column['dflt_value']);
 		return $c;
+	}
+
+	/**
+	 * Builds a SQL statement for truncating a DB table.
+	 * @param string $table the table to be truncated. The name will be properly quoted by the method.
+	 * @return string the SQL statement for truncating a DB table.
+	 * @since 1.1.6
+	 */
+	public function truncateTable($table)
+	{
+		return "DELETE FROM ".$this->quoteTableName($table);
 	}
 
 	/**

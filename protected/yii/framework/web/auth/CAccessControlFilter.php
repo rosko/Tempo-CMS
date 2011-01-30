@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -49,7 +49,7 @@
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAccessControlFilter.php 2731 2010-12-08 18:25:02Z alexander.makarow $
+ * @version $Id: CAccessControlFilter.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.web.auth
  * @since 1.0
  */
@@ -163,7 +163,7 @@ class CAccessControlFilter extends CFilter
  * CAccessRule represents an access rule that is managed by {@link CAccessControlFilter}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAccessControlFilter.php 2731 2010-12-08 18:25:02Z alexander.makarow $
+ * @version $Id: CAccessControlFilter.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.web.auth
  * @since 1.0
  */

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -37,7 +37,7 @@
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CConsoleApplication.php 2690 2010-11-29 17:16:44Z qiang.xue $
+ * @version $Id: CConsoleApplication.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.console
  * @since 1.0
  */

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -39,7 +39,7 @@
  * </pre>
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbCommand.php 2710 2010-12-04 19:59:53Z qiang.xue $
+ * @version $Id: CDbCommand.php 2819 2011-01-06 16:57:10Z qiang.xue $
  * @package system.db
  * @since 1.0
  */
@@ -197,20 +197,23 @@ class CDbCommand extends CComponent
 	 * the form :name. For a prepared statement using question mark
 	 * placeholders, this will be the 1-indexed position of the parameter.
 	 * @param mixed $value Name of the PHP variable to bind to the SQL statement parameter
-	 * @param int $dataType SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
-	 * @param int $length length of the data type
+	 * @param integer $dataType SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
+	 * @param integer $length length of the data type
+	 * @param mixed $driverOptions the driver-specific options (this is available since version 1.1.6)
 	 * @return CDbCommand the current command being executed (this is available since version 1.0.8)
 	 * @see http://www.php.net/manual/en/function.PDOStatement-bindParam.php
 	 */
-	public function bindParam($name, &$value, $dataType=null, $length=null)
+	public function bindParam($name, &$value, $dataType=null, $length=null, $driverOptions=null)
 	{
 		$this->prepare();
 		if($dataType===null)
 			$this->_statement->bindParam($name,$value,$this->_connection->getPdoType(gettype($value)));
 		else if($length===null)
 			$this->_statement->bindParam($name,$value,$dataType);
-		else
+		else if($driverOptions===null)
 			$this->_statement->bindParam($name,$value,$dataType,$length);
+		else
+			$this->_statement->bindParam($name,$value,$dataType,$length,$driverOptions);
 		if($this->_connection->enableParamLogging)
 			$this->_paramLog[$name]=&$value;
 		return $this;
@@ -223,7 +226,7 @@ class CDbCommand extends CComponent
 	 * the form :name. For a prepared statement using question mark
 	 * placeholders, this will be the 1-indexed position of the parameter.
 	 * @param mixed $value The value to bind to the parameter
-	 * @param int $dataType SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
+	 * @param integer $dataType SQL data type of the parameter. If null, the type is determined by the PHP type of the value.
 	 * @return CDbCommand the current command being executed (this is available since version 1.0.8)
 	 * @see http://www.php.net/manual/en/function.PDOStatement-bindValue.php
 	 */
@@ -1191,6 +1194,21 @@ class CDbCommand extends CComponent
 	}
 
 	/**
+	 * Builds and executes a SQL statement for truncating a DB table.
+	 * @param string $table the table to be truncated. The name will be properly quoted by the method.
+	 * @return integer number of rows affected by the execution.
+	 * @since 1.1.6
+	 */
+	public function truncateTable($table)
+	{
+		$schema=$this->getConnection()->getSchema();
+		$n=$this->setText($schema->truncateTable($table))->execute();
+		if(strncasecmp($this->getConnection()->getDriverName(),'sqlite',6)===0)
+			$schema->resetSequence($table);
+		return $n;
+	}
+
+	/**
 	 * Builds and executes a SQL statement for adding a new DB column.
 	 * @param string $table the table that the new column will be added to. The table name will be properly quoted by the method.
 	 * @param string $column the name of the new column. The name will be properly quoted by the method.
@@ -1366,10 +1384,7 @@ class CDbCommand extends CComponent
 			}
 			$expressions=array();
 			foreach($values as $value)
-			{
-				$value=$this->_connection->quoteValue('%'.strtr($value,array('%'=>'\%', '_'=>'\_')).'%');
-				$expressions[]=$column.' '.$operator.' '.$value;
-			}
+				$expressions[]=$column.' '.$operator.' '.$this->_connection->quoteValue($value);
 			return implode($andor,$expressions);
 		}
 

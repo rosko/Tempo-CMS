@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -16,7 +16,7 @@
  * authored by Pieter Claerhout.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: MigrateCommand.php 2709 2010-12-02 18:31:29Z qiang.xue $
+ * @version $Id: MigrateCommand.php 2850 2011-01-13 19:46:40Z qiang.xue $
  * @package system.cli.commands
  * @since 1.1.6
  */
@@ -51,6 +51,11 @@ class MigrateCommand extends CConsoleCommand
 	 * @var string the default command action. It defaults to 'up'.
 	 */
 	public $defaultAction='up';
+	/**
+	 * @var boolean whether to execute the migration in an interactive mode. Defaults to true.
+	 * Set this to false when performing migration in a cron job or background process.
+	 */
+	public $interactive=true;
 
 	public function beforeAction($action,$params)
 	{
@@ -314,6 +319,8 @@ class MigrateCommand extends CConsoleCommand
 
 	protected function confirm($message)
 	{
+		if(!$this->interactive)
+			return true;
 		echo $message.' [yes|no] ';
 		return !strncasecmp(trim(fgets(STDIN)),'y',1);
 	}
@@ -432,25 +439,35 @@ DESCRIPTION
 EXAMPLES
  * yiic migrate
    Applies ALL new migrations. This is equivalent to 'yiic migrate to'.
+
+ * yiic migrate create create_user_table
+   Creates a new migration named 'create_user_table'.
+
  * yiic migrate up 3
    Applies the next 3 new migrations.
+
  * yiic migrate down
    Reverts the last applied migration.
+
  * yiic migrate down 3
    Reverts the last 3 applied migrations.
+
  * yiic migrate to 101129_185401
    Migrates up or down to version 101129_185401.
+
  * yiic migrate mark 101129_185401
    Modifies the migration history up or down to version 101129_185401.
    No actual migration will be performed.
- * yiic migrate create create_user_table
-   Creates a new migration named 'create_user_table'.
+
  * yiic migrate history
    Shows all previously applied migration information.
+
  * yiic migrate history 10
    Shows the last 10 applied migrations.
+
  * yiic migrate new
    Shows all new migrations.
+
  * yiic migrate new 10
    Shows the next 10 migrations that have not been applied.
 

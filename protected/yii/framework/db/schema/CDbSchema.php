@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -12,7 +12,7 @@
  * CDbSchema is the base class for retrieving metadata information.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbSchema.php 2705 2010-12-02 17:23:27Z qiang.xue $
+ * @version $Id: CDbSchema.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.db.schema
  * @since 1.0
  */
@@ -68,7 +68,7 @@ abstract class CDbSchema extends CComponent
 			return $this->_tables[$name];
 		else
 		{
-			if($this->_connection->tablePrefix!='' && strpos($name,'{{')!==false)
+			if($this->_connection->tablePrefix!==null && strpos($name,'{{')!==false)
 				$realName=preg_replace('/\{\{(.*?)\}\}/',$this->_connection->tablePrefix.'$1',$name);
 			else
 				$realName=$name;
@@ -253,7 +253,6 @@ abstract class CDbSchema extends CComponent
 	 */
 	public function resetSequence($table,$value=null)
 	{
-		throw new CDbException(Yii::t('yii','Resetting PK sequence is not supported.'));
 	}
 
 	/**
@@ -264,7 +263,6 @@ abstract class CDbSchema extends CComponent
 	 */
 	public function checkIntegrity($check=true,$schema='')
 	{
-		throw new CDbException(Yii::t('yii','Setting integrity check is not supported.'));
 	}
 
 	/**
@@ -384,6 +382,17 @@ abstract class CDbSchema extends CComponent
 	public function dropTable($table)
 	{
 		return "DROP TABLE ".$this->quoteTableName($table);
+	}
+
+	/**
+	 * Builds a SQL statement for truncating a DB table.
+	 * @param string $table the table to be truncated. The name will be properly quoted by the method.
+	 * @return string the SQL statement for truncating a DB table.
+	 * @since 1.1.6
+	 */
+	public function truncateTable($table)
+	{
+		return "TRUNCATE TABLE ".$this->quoteTableName($table);
 	}
 
 	/**

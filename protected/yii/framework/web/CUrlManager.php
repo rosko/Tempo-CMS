@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -92,7 +92,7 @@
  * {@link CWebApplication::getUrlManager()}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CUrlManager.php 2677 2010-11-24 18:29:54Z keyboard.idol@gmail.com $
+ * @version $Id: CUrlManager.php 2834 2011-01-10 15:09:59Z qiang.xue $
  * @package system.web
  * @since 1.0
  */
@@ -251,7 +251,12 @@ class CUrlManager extends CApplicationComponent
 		foreach($this->_rules as $rule)
 		{
 			if(($url=$rule->createUrl($this,$route,$params,$ampersand))!==false)
-				return $rule->hasHostInfo ? $url.$anchor : $this->getBaseUrl().'/'.$url.$anchor;
+			{
+				if($rule->hasHostInfo)
+					return $url==='' ? '/'.$anchor : $url.$anchor;
+				else
+					return $this->getBaseUrl().'/'.$url.$anchor;
+			}
 		}
 		return $this->createUrlDefault($route,$params,$ampersand).$anchor;
 	}
@@ -465,7 +470,7 @@ class CUrlManager extends CApplicationComponent
  * may have a set of named parameters.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CUrlManager.php 2677 2010-11-24 18:29:54Z keyboard.idol@gmail.com $
+ * @version $Id: CUrlManager.php 2834 2011-01-10 15:09:59Z qiang.xue $
  * @package system.web
  * @since 1.0
  */

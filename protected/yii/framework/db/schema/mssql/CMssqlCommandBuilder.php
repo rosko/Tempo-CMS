@@ -6,7 +6,7 @@
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @author Wei Zhuo <weizhuo[at]gmail[dot]com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -16,7 +16,7 @@
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @author Wei Zhuo <weizhuo[at]gmail[dot]com>
- * @version $Id: CMssqlCommandBuilder.php 2715 2010-12-06 19:36:05Z qiang.xue $
+ * @version $Id: CMssqlCommandBuilder.php 2821 2011-01-06 17:41:53Z qiang.xue $
  * @package system.db.schema.mssql
  * @since 1.0.4
  */
@@ -199,8 +199,8 @@ class CMssqlCommandBuilder extends CDbCommandBuilder
 		$fetch = $limit+$offset;
 		$sql = preg_replace('/^([\s(])*SELECT( DISTINCT)?(?!\s*TOP\s*\()/i',"\\1SELECT\\2 TOP $fetch", $sql);
 		$ordering = $this->findOrdering($sql);
-		$orginalOrdering = $this->joinOrdering($ordering, '[__inner__]');
-		$reverseOrdering = $this->joinOrdering($this->reverseDirection($ordering), '[__outer__]');
+		$orginalOrdering = $this->joinOrdering($ordering, '[__outer__]');
+		$reverseOrdering = $this->joinOrdering($this->reverseDirection($ordering), '[__inner__]');
 		$sql = "SELECT * FROM (SELECT TOP {$limit} * FROM ($sql) as [__inner__] {$reverseOrdering}) as [__outer__] {$orginalOrdering}";
 		return $sql;
 	}
@@ -230,7 +230,14 @@ class CMssqlCommandBuilder extends CDbCommandBuilder
 				{
 					if(count($subs) > 1 && count($subs[2]) > 0)
 					{
-						$ordering[$subs[1][0]] = $subs[2][0];
+						$name='';
+						foreach(explode('.', $subs[1][0]) as $p)
+						{
+							if($name!=='')
+								$name.='.';
+							$name.='[' . trim($p, '[]') . ']';
+						}
+						$ordering[$name] = $subs[2][0];
 					}
 					//else what?
 				}

@@ -5,7 +5,7 @@
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -14,7 +14,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @author Christophe Boulain <Christophe.Boulain@gmail.com>
- * @version $Id: CMssqlSchema.php 2681 2010-11-28 02:49:35Z qiang.xue $
+ * @version $Id: CMssqlSchema.php 2816 2011-01-04 15:14:18Z qiang.xue $
  * @package system.db.schema.mssql
  * @since 1.0.4
  */
@@ -78,6 +78,48 @@ class CMssqlSchema extends CDbSchema
 		$name1=str_replace(array('[',']'),'',$name1);
 		$name2=str_replace(array('[',']'),'',$name2);
 		return parent::compareTableNames(strtolower($name1),strtolower($name2));
+	}
+
+	/**
+	 * Resets the sequence value of a table's primary key.
+	 * The sequence will be reset such that the primary key of the next new row inserted
+	 * will have the specified value or 1.
+	 * @param CDbTableSchema $table the table schema whose primary key sequence will be reset
+	 * @param mixed $value the value for the primary key of the next new row inserted. If this is not set,
+	 * the next new row's primary key will have a value 1.
+	 * @since 1.1.6
+	 */
+	public function resetSequence($table,$value=null)
+	{
+		if($table->sequenceName!==null)
+		{
+			$db=$this->getDbConnection();
+			if($value===null)
+				$value=$db->createCommand("SELECT MAX(`{$table->primaryKey}`) FROM {$table->rawName}")->queryScalar();
+			$value=(int)$value;
+			$name=strtr($table->rawName,array('['=>'',']'=>''));
+			$db->createCommand("DBCC CHECKIDENT ('$name', RESEED, $value)")->execute();
+		}
+	}
+
+	private $_normalTables=array();  // non-view tables
+	/**
+	 * Enables or disables integrity check.
+	 * @param boolean $check whether to turn on or off the integrity check.
+	 * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
+	 * @since 1.1.6
+	 */
+	public function checkIntegrity($check=true,$schema='')
+	{
+		$enable=$check ? 'CHECK' : 'NOCHECK';
+		if(!isset($this->_normalTables[$schema]))
+			$this->_normalTables[$schema]=$this->findTableNames($schema,false);
+		$db=$this->getDbConnection();
+		foreach($this->_normalTables[$schema] as $tableName)
+		{
+			$tableName=$this->quoteTableName($tableName);
+			$db->createCommand("ALTER TABLE $tableName $enable CONSTRAINT ALL")->execute();
+		}
 	}
 
 	/**
@@ -291,16 +333,21 @@ EOD;
 	 * Returns all table names in the database.
 	 * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema.
 	 * If not empty, the returned table names will be prefixed with the schema name.
+	 * @param boolean $includeViews whether to include views in the result. Defaults to true.
 	 * @return array all table names in the database.
 	 * @since 1.0.4
 	 */
-	protected function findTableNames($schema='')
+	protected function findTableNames($schema='',$includeViews=true)
 	{
 		if($schema==='')
 			$schema=self::DEFAULT_SCHEMA;
+		if($includeViews)
+			$condition="TABLE_TYPE in ('BASE TABLE','VIEW')";
+		else
+			$condition="TABLE_TYPE='BASE TABLE'";
 		$sql=<<<EOD
 SELECT TABLE_NAME, TABLE_SCHEMA FROM [INFORMATION_SCHEMA].[TABLES]
-WHERE TABLE_SCHEMA=:schema
+WHERE TABLE_SCHEMA=:schema AND $condition
 EOD;
 		$command=$this->getDbConnection()->createCommand($sql);
 		$command->bindParam(":schema", $schema);

@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -114,7 +114,7 @@
  * you should design your own lightweight AJAX validation.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CActiveForm.php 2732 2010-12-08 22:10:37Z keyboard.idol@gmail.com $
+ * @version $Id: CActiveForm.php 2809 2011-01-03 19:12:46Z qiang.xue $
  * @package system.web.widgets
  * @since 1.1.1
  */
@@ -271,7 +271,8 @@ class CActiveForm extends CWidget
 	 */
 	public function init()
 	{
-		$this->htmlOptions['id']=$this->id;
+		if(!isset($this->htmlOptions['id']))
+			$this->htmlOptions['id']=$this->id;
 		if($this->stateful)
 			echo CHtml::statefulForm($this->action, $this->method, $this->htmlOptions);
 		else

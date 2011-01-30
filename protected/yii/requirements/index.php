@@ -8,9 +8,9 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: index.php 2667 2010-11-18 00:05:48Z keyboard.idol@gmail.com $
+ * @version $Id: index.php 2800 2011-01-01 19:36:52Z qiang.xue $
  * @package system
  * @since 1.0
  */

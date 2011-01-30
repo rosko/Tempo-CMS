@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -12,7 +12,7 @@
  * CMysqlSchema is the class for retrieving metadata information from a MySQL database (version 4.1.x and 5.x).
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CMysqlSchema.php 2705 2010-12-02 17:23:27Z qiang.xue $
+ * @version $Id: CMysqlSchema.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.db.schema.mysql
  * @since 1.0
  */

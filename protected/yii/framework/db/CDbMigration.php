@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -28,7 +28,7 @@
  * applying migrations.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbMigration.php 2705 2010-12-02 17:23:27Z qiang.xue $
+ * @version $Id: CDbMigration.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.db
  * @since 1.1.6
  */
@@ -49,7 +49,7 @@ abstract class CDbMigration extends CComponent
 	 */
 	public function down()
 	{
-		throw new CException(Yii::t('yii', 'Unable to remove migration {class}', array('{class}'=>get_class($this))));
+		throw new CException(Yii::t('yii', 'Unable to remove migration {class}.', array('{class}'=>get_class($this))));
 	}
 
 	/**
@@ -75,7 +75,7 @@ abstract class CDbMigration extends CComponent
 	/**
 	 * Sets the currently active database connection.
 	 * The database connection will be used by the methods such as {@link insert}, {@link createTable}.
-	 * @param CDbConnection the database connection component
+	 * @param CDbConnection $db the database connection component
 	 */
 	public function setDbConnection($db)
 	{
@@ -173,6 +173,18 @@ abstract class CDbMigration extends CComponent
 		echo "    > drop table $table ...";
 		$time=microtime(true);
 		$this->getDbConnection()->createCommand()->dropTable($table);
+		echo " done (time: ".sprintf('%.3f', microtime(true)-$time)."s)\n";
+	}
+
+	/**
+	 * Builds and executes a SQL statement for truncating a DB table.
+	 * @param string $table the table to be truncated. The name will be properly quoted by the method.
+	 */
+	public function truncateTable($table)
+	{
+		echo "    > truncate table $table ...";
+		$time=microtime(true);
+		$this->getDbConnection()->createCommand()->truncateTable($table);
 		echo " done (time: ".sprintf('%.3f', microtime(true)-$time)."s)\n";
 	}
 

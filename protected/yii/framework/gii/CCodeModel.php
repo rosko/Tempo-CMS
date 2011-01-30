@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -27,7 +27,7 @@
  * the validator name being "sticky".
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CCodeModel.php 2687 2010-11-29 14:52:08Z qiang.xue $
+ * @version $Id: CCodeModel.php 2799 2011-01-01 19:31:13Z qiang.xue $
  * @package system.gii
  * @since 1.1.2
  */
@@ -439,6 +439,7 @@ abstract class CCodeModel extends CFormModel
 			'new',
 			'old_function',
 			'or',
+			'parent',
 			'php_user_filter',
 			'print',
 			'private',

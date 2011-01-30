@@ -4,7 +4,7 @@
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @link http://www.yiiframework.com/
- * @copyright Copyright &copy; 2008-2010 Yii Software LLC
+ * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
 
@@ -24,7 +24,7 @@
  * the {@link setBasePath basePath}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CAssetManager.php 2665 2010-11-17 19:40:36Z keyboard.idol@gmail.com $
+ * @version $Id: CAssetManager.php 2846 2011-01-13 08:33:10Z keyboard.idol@gmail.com $
  * @package system.web
  * @since 1.0
  */
@@ -165,7 +165,14 @@ class CAssetManager extends CApplicationComponent
 				if($this->linkAssets)
 				{
 					if(!is_file($dstFile))
+					{
+						if(!is_dir($dstDir))
+						{
+							mkdir($dstDir);
+							@chmod($dstDir,0777);
+						}
 						symlink($src,$dstFile);
+					}
 				}
 				else if(@filemtime($dstFile)<@filemtime($src) || $forceCopy)
 				{

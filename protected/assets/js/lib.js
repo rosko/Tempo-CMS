@@ -249,7 +249,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
                     if ($.isFunction(onClose)) {
                         onClose(html);
                     } else
-                        hideSplash();
+                        closeDialog();
                 } else {
                     if (!validate) {
                         $(container).html(html);
@@ -282,71 +282,3 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
 
 // =============================================================
 
-function loadDialog(opts)
-{
-    if (opts == undefined) return false;
-    $.ajax({
-        url:opts.url,
-        cache: false,
-        opts: opts,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
-        },
-        success: function(html) {
-            hideInfoPanel();
-            if ($.isFunction(opts.onLoad)) {
-                opts.onLoad(html);
-            }
-            var dlg = $('#cms-dialog').clone()
-                .attr('id', opts.id)
-                .addClass(opts.className)
-                .addClass('cms-dialog')
-                .appendTo('body');
-            dlg.html(html);
-            dlg.find('form').find('input[type="submit"]').click(function() {
-                $(this).parents('form').attr('rev', $(this).attr('name'));
-            });
-            dlg.find('form').submit(function(){
-                if ($.isFunction(opts.onSubmit)) {
-                    opts.onSubmit(this);
-                }
-                ajaxSubmitForm($(this), null, null, {
-                    onSuccess: function(html) {
-                        if ($.isFunction(opts.onSave)) {
-                            opts.onSave(html);
-                        }
-                    }
-                });
-                return false;
-            });
-
-            var height = $(window).height()-25;
-            var width = $(window).width()-50;
-            dlg.dialog({
-                title: opts.title,
-                resizable: opts.resizable,
-                draggable: opts.draggable,
-                height: opts.height,
-                width: opts.width,
-                zIndex: 10000,
-                modal:true,
-                closeOnEscape: false,
-                open: function(event, ui) {
-                    $('#'+opts.id).find('input,textarea,select').eq(0).focus();
-                    if ($.isFunction(opts.onOpen)) {
-                        opts.onOpen(event, ui);
-                    }
-                },
-                close: function() {
-                    if ($.isFunction(opts.onClose)) {
-                        opts.onClose();
-                    }
-                    $('#'+opts.id).html('');
-                    $('#'+opts.id).remove();
-                }
-            });
-            dlg.parents('.ui-dialog').css('position', 'fixed');
-        }
-    });
-
-}

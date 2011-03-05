@@ -9,6 +9,7 @@ return array(
     'Unit &laquo;{name}&raquo; templates' => 'Шаблоны блоков &laquo;{name}&raquo;',
     'Edit mode flag' => 'Признак режима редактирования',
     'Unit' => 'Блок',
+    'User' => 'Пользователь',
     'Showing page' => 'Страница отображения',
     'Unit location' => 'Размещение блока',
     'Settings for units «{name}»' => 'Настройки для блоков «{name}»',
@@ -34,4 +35,5 @@ return array(
 
     'Publish and return some file (i.e. image files)' => 'Публикует файл и выводит его адрес (например, изображение)',
     'Generate form tag' => 'Функция для генерация тега form',
+    'Is user is a guest mode flag' => 'Признак, что посетитель не является зарегистрированным пользователем',
 );

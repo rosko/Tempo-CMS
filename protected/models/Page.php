@@ -118,7 +118,7 @@ class Page extends I18nActiveRecord
 		));
 	}
 
-	public static function getTree($exclude=array(),$exclude_children=true,$exclude_virtual=true)
+	public static function getTree($exclude=array(),$exclude_children=true,$exclude_virtual=false)
 	{
 		$criteria['order'] = '`order`';
         $criteria['condition'] = '1';

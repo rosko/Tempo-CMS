@@ -140,6 +140,10 @@ class Content extends I18nActiveRecord
         $params['className'] = get_class($this);
         $params['unit'] = $this->unit;
         $params['content'] = $this;
+        $params['isGuest'] = Yii::app()->user->isGuest;
+        if (!$params['isGuest']) {
+            $params['user'] = User::model()->findByPk(Yii::app()->user->id);
+        }
         $params['page'] = Yii::app()->controller->loadModel();
         $params['editMode'] = Yii::app()->user->checkAccess('updatePage');
         $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
@@ -295,7 +299,7 @@ class Content extends I18nActiveRecord
     {
         $unit = Unit::model()->findByPk($vars['unit_id']);
         $content = $unit->content;
-        if ($content) {
+        if ($content && Yii::app()->user->checkAccess('updatePage')) {
             if (isset($vars['Content'])) {
                 $content->attributes=$vars['Content'];
             }

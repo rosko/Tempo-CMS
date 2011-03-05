@@ -72,6 +72,7 @@ class FilesEditorController extends Controller
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
+                $suggestions['{$isGuest}'] = Yii::t('filesEditor', 'Is user is a guest mode flag');
                 if (method_exists($name, 'templateVars'))
                 {
                     $vars = call_user_func(array($name, 'templateVars'));
@@ -85,12 +86,14 @@ class FilesEditorController extends Controller
                     'unit'=>'Unit',
                     'pageunit'=>'PageUnit',
                     'page'=>'Page',
+                    'user'=>'User',
                 );
                 $names = array(
                     'unit'=>Yii::t('filesEditor', 'Unit'),
                     'content'=>Yii::t('filesEditor', 'Unit'),
                     'page'=>Yii::t('filesEditor', 'Showing page'),
                     'pageunit'=>Yii::t('filesEditor', 'Unit location'),
+                    'user'=>Yii::t('filesEditor', 'User'),
                 );
                 foreach ($objs as $param => $obj) {
                     $o= new $obj;

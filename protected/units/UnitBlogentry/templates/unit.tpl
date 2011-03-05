@@ -19,14 +19,14 @@
 
 {if $content.source || $content.url}
     <li>
-        {if $content.source}{t text='News source'}:{/if}
+        {if $content.source}{t text='Source'}:{/if}
 
         {if $content.url}<a href="{$content.url}">{/if}
 
         {if $content.source}
             {$content.source}
         {else}
-            {t text='News source'}
+            {t text='Source'}
         {/if}
 
         {if $content.url}</a>{/if}

@@ -1,5 +1,7 @@
+<div  class="cms-caption">
 <img style="float:left;margin-right:1em;" valign="baseline" src="/images/icons/fatcow/32x32/sitemap.png" />
 <h3><?=Yii::t('cms', 'Sitemap')?></h3>
+</div>
 <p><?=Yii::t('cms', 'Click twice on page to go')?><br />
 <a href="#" class="cms-btn-pagemap-openall"><?=Yii::t('cms', 'Expand all')?></a> / <a href="#" class="cms-btn-pagemap-closeall"><?=Yii::t('cms', 'Collapse all')?></a>
 </p>
@@ -327,7 +329,7 @@ js:function(e, data) {
                 var params = 'deletechildren=1';
                 ajaxSave(url, params, 'GET');
             }, function(html) {
-                hideSplash();
+                closeDialog();
                 {$jsChildrenDelete}
             }, function() {
                 $.jstree.rollback(data.rlbk);

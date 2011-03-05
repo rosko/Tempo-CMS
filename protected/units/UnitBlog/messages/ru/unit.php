@@ -1,10 +1,10 @@
 <?php
 return array(
-    'News section' => 'Раздел новостей',
+    'Blog/news section' => 'Блог/новости',
     'Entries per page' => 'Новостей на одной странице',
     'Settings' => 'Настройки',
     'If zero choosed, accordingly site\'s general settings' => 'Если выбран 0, то согласно общих настроек сайта.',
-    'News entries' => 'Массив новостей',
+    'Entries' => 'Записи',
     'Pager' => 'Список страниц (если производится разбиение списка на страницы)',
-    'Create news entry' => 'Добавить новость',
+    'Create entry' => 'Добавить запись',
 );

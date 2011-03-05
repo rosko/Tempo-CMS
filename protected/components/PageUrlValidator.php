@@ -9,6 +9,7 @@ class PageUrlValidator extends CUniqueValidator
         return array(
             '/site/login',
             '/site/logout',
+            '/login',
         );
     }
 

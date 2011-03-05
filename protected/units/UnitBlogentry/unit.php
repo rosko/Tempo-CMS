@@ -1,13 +1,13 @@
 <?php
 
-class UnitNewsitem extends Content
+class UnitBlogentry extends Content
 {
 	const ICON = '/images/icons/fatcow/16x16/newspaper_add.png';
     const HIDDEN = true;
 
     public function name($language=null)
     {
-        return Yii::t('UnitNewsitem.unit', 'News entry', array(), null, $language);
+        return Yii::t('UnitBlogentry.unit', 'Blog/news entry', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -17,14 +17,14 @@ class UnitNewsitem extends Content
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_newsitem';
+		return Yii::app()->db->tablePrefix . 'units_blogentry';
 	}
 
 	public function rules()
 	{
 		return array(
 			array('unit_id, text, date', 'required'),
-			array('unit_id, page_id, newssection_id', 'numerical', 'integerOnly'=>true),
+			array('unit_id, page_id, blog_id', 'numerical', 'integerOnly'=>true),
 			array('source', 'length', 'max'=>64),
 			array('url', 'length', 'max'=>255),
 		);
@@ -35,24 +35,24 @@ class UnitNewsitem extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'text' => Yii::t('UnitNewsitem.unit', 'Content'),
-			'date' => Yii::t('UnitNewsitem.unit', 'Date'),
-			'source' => Yii::t('UnitNewsitem.unit', 'Source'),
-			'url' => Yii::t('UnitNewsitem.unit', 'Link to source'),
-            'newssection_id' => Yii::t('UnitNewsitem.unit', 'News section'),
+			'text' => Yii::t('UnitBlogentry.unit', 'Content'),
+			'date' => Yii::t('UnitBlogentry.unit', 'Date'),
+			'source' => Yii::t('UnitBlogentry.unit', 'Source'),
+			'url' => Yii::t('UnitBlogentry.unit', 'Link to source'),
+            'blog_id' => Yii::t('UnitBlogentry.unit', 'Blog/news section'),
 		);
 	}
 
     public function relations()
     {
         return array_merge(parent::relations(), array(
-			'section'=>array(self::BELONGS_TO, 'UnitNewssection', 'newssection_id'),
+			'section'=>array(self::BELONGS_TO, 'UnitBlog', 'blog_id'),
         ));
     }
 
 	public static function form()
 	{
-        $newsArray = UnitNewssection::getSectionsArray();
+        $sectionsArray = UnitBlog::getSectionsArray();
 
 		return array(
 			'elements'=>array(
@@ -60,14 +60,14 @@ class UnitNewsitem extends Content
 				'text'=>array(
 					'type'=>'VisualTextAreaFCK',
 				),
-                'newssection_id'=> !empty($newsArray) ? array(
+                'blog_id'=> !empty($sectionsArray) ? array(
                     'type'=>'ComboBox',
-                    'array'=>$newsArray,
+                    'array'=>$sectionsArray,
                 ) : '',
 				'date'=>array(
 					'type'=>'DateTimePicker',
 				),
-                Form::tab(Yii::t('UnitNewsitem.unit', 'News source')),
+                Form::tab(Yii::t('UnitBlogentry.unit', 'Source')),
 				'source'=>array(
 					'type'=>'text',
 					'maxlength'=>64
@@ -92,22 +92,22 @@ class UnitNewsitem extends Content
             'source' => 'string',
             'url' => 'string',
             'page_id' => 'integer unsigned',
-            'newssection_id' => 'integer unsigned',
+            'blog_id' => 'integer unsigned',
         );
     }
 
     public function scopesLabels()
     {
         return array(
-            'public' => Yii::t('UnitNewsitem.unit', 'Published only'),
-            'imported' => Yii::t('UnitNewsitem.unit', 'With source'),
+            'public' => Yii::t('UnitBlogentry.unit', 'Published only'),
+            'imported' => Yii::t('UnitBlogentry.unit', 'With source'),
             'recently' => array(
-                Yii::t('UnitNewsitem.unit', 'Recent'),
-                'limit' => Yii::t('UnitNewsitem.unit', 'Quantity'),
+                Yii::t('UnitBlogentry.unit', 'Recent'),
+                'limit' => Yii::t('UnitBlogentry.unit', 'Quantity'),
              ),
             'section' => array(
-                Yii::t('UnitNewsitem.unit', 'From news section'),
-                'newssection_id' => ''
+                Yii::t('UnitBlogentry.unit', 'From section'),
+                'blog_id' => ''
             )
         );
     }
@@ -143,9 +143,9 @@ class UnitNewsitem extends Content
 				)
 			),
 			'section'=>array(
-				'newssection_id'=>array(
+				'blog_id'=>array(
 					'type'=>'ComboBox',
-                    'array'=>UnitNewssection::getSectionsArray(),
+                    'array'=>UnitBlog::getSectionsArray(),
 				)
 			)
 		);
@@ -162,7 +162,7 @@ class UnitNewsitem extends Content
     public function section($id=0)
     {
 		$this->getDbCriteria()->mergeWith(array(
-			'condition'=>'newssection_id = :id',
+			'condition'=>'blog_id = :id',
             'params' => array(':id' => $id),
 		));
 		return $this;
@@ -171,9 +171,9 @@ class UnitNewsitem extends Content
     public function templateVars()
     {
         return array(
-            '{$unitUrl}' => Yii::t('UnitNewsitem.unit', 'Link to news entry (in case, when news entry showed as a part of list or news section)'),
-            '{$sectionUrl}' => Yii::t('UnitNewsitem.unit', 'Link to news section'),
-            '{$sectionTitle}' => Yii::t('UnitNewsitem.unit', 'Name of news section'),
+            '{$unitUrl}' => Yii::t('UnitBlogentry.unit', 'Link to blog/news entry (in case, when blog/news entry showed as a part of list or blog/news section)'),
+            '{$sectionUrl}' => Yii::t('UnitBlogentry.unit', 'Link to blog/news section'),
+            '{$sectionTitle}' => Yii::t('UnitBlogentry.unit', 'Name of blog/news section'),
         );
     }
 

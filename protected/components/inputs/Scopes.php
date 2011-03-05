@@ -3,6 +3,7 @@
 class Scopes extends CInputWidget
 {
     public $className;
+    public $classNameAttribute;
 
     public function run()
     {
@@ -44,7 +45,11 @@ class Scopes extends CInputWidget
             }
         }
 
+        if (!$this->className) {
+            !$this->className = $this->model->{$this->classNameAttribute};
+        }
         $className = $this->className;
+        if (!Yii::$classMap[$className] || !method_exists($className, 'scopesLabels') || !method_exists($className, 'hiddenScopes') || !method_exists($className, 'scopes')) return;
 
         $labels = call_user_func(array($className, 'scopesLabels'));
         $hidden = call_user_func(array($className, 'hiddenScopes'));
@@ -94,7 +99,11 @@ class Scopes extends CInputWidget
 
     public function registerClientScript()
     {
+        if (!$this->className) {
+            !$this->className = $this->model->{$this->classNameAttribute};
+        }
         $className = $this->className;
+        if (!Yii::$classMap[$className]) return;
         $id=$this->htmlOptions['id'];
         $js = "var scopes = {};\n";
         foreach (call_user_func(array($className, 'namedScopes')) as $k => $scope)

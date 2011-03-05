@@ -169,7 +169,7 @@ if (Yii::app()->user->checkAccess('createPage') ||
                 var page_id = {$model->id};
                 var url = '/?r=page/unitAdd&page_id='+page_id+'&pageunit_id='+pageunit_id+'&area='+area_name+'&type='+type;
                 ajaxSave(url, '', 'GET', function(id) {
-                    hideSplash();
+                    closeDialog();
                     id = jQuery.parseJSON(id);
                     if (pageunit_id != '0') {
                         var pageunit = $('#cms-pageunit-'+pageunit_id);
@@ -196,21 +196,8 @@ if (Yii::app()->user->checkAccess('createPage') ||
             if ($('.pageunit').length == -1)
             {
                 var page_id = $('body').attr('rel');
-                $.ajax({
-                    url: '/?r=page/pageFill&id='+page_id,
-                    type: 'GET',
-                    cache: false,
-                    beforeSend: function() {
-                        showInfoPanel(cms_html_loading_image, 0);
-                    },
-                    success: function(html) {
-                        hideInfoPanel();
-                        $('#cms-page-fill').html(html);
-                        AjaxifyForm('#cms-page-fill', $('#cms-page-fill').find('form').eq(0), function(f) {
-                        }, function (html) {
-                        });
-                        showSplash($('#cms-page-fill'));
-                    }
+                loadDialog('/?r=page/pageFill&id='+page_id, {
+                    ajaxify: true
                 });
             }
         
@@ -261,28 +248,7 @@ EOD
                 'title' => Yii::t('cms', 'Site settings'),
                 'click' => <<<EOD
 js:function(){
-            $.ajax({
-                url: '/?r=page/siteSettings&language={$language}',
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit')
-                        .html(html)
-                        .width(Math.ceil($(window).width()*0.9))
-                        .height(Math.ceil($(window).height()*0.85));
-                    $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
-                        $(this).parents('form').attr('rev', $(this).attr('name'));
-                    });
-                    showSplash($('#cms-page-edit'), {
-                        draggable: true,
-                        resizable: true
-                    });
-                }
-            });
+            loadDialog('/?r=page/siteSettings&language={$language}');
             return false;
         }
 EOD
@@ -297,24 +263,10 @@ EOD
                 'title' => Yii::t('cms', 'Units'),
                 'click' => <<<EOD
 js:function() {
-            
-            $.ajax({
-                url: '/?r=page/unitsInstall&language={$language}',
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit').html(html);
-                    AjaxifyForm('#cms-page-edit', $('#cms-page-edit').find('form').eq(0), null, null, function(html) {
-                        location.reload();
-                    });
-                    showSplash($('#cms-page-edit'), {
-                        resizable: true,
-                        draggable: true
-                    });
+            loadDialog('/?r=page/unitsInstall&language={$language}', {
+                ajaxify: true,
+                onSave: function() {
+                    location.reload();
                 }
             });
             return false;
@@ -327,21 +279,9 @@ EOD
                 'click' => <<<EOD
 js:function(){
             var page_id = {$model->id};
-            $.ajax({
-                url: '/?r=page/siteMap&id='+page_id+'&language={$language}',
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit').html(html);
-                    showSplash($('#cms-page-edit'), {
-                        resizable: true,
-                        draggable: true
-                    });
-                }
+            loadDialog('/?r=page/siteMap&id='+page_id+'&language={$language}', {
+                height: Math.ceil($(window).height()*0.5),
+                width: 400
             });
             return false;
         }
@@ -363,21 +303,8 @@ EOD
                 'title' => Yii::t('cms', 'Users'),
                 'click' => <<<EOD
 js:function() {
-            $.ajax({
-                url: '/?r=user/index&language={$language}',
-                type: 'GET',
-                cache: false,
-                beforeSend: function() {
-                    showInfoPanel(cms_html_loading_image, 0);
-                },
-                success: function(html) {
-                    hideInfoPanel();
-                    $('#cms-page-edit').html(html);
-                    showSplash($('#cms-page-edit'), {
-                        resizable: true,
-                        draggable: true
-                    });
-                }
+            loadDialog('/?r=user/index&language={$language}', {
+                simpleClose: true
             });
             return false;
         }

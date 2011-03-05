@@ -47,8 +47,11 @@ class ClientScript extends CClientScript
         if (strpos($str, '{fancybox}')!==false) {
             $fancyboxPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.fancybox'));
         }
+        if (strpos($str, '{topbox}')!==false) {
+            $topboxPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.topbox'));
+        }
         if (strpos($str, '{js}')!==false) {
-            $jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
+            $jsPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'),false,-1,true);
         }
         if (strpos($str, '{css}')!==false) {
             $cssPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css'));
@@ -63,6 +66,7 @@ class ClientScript extends CClientScript
             '{jsI18N}' => '/?r=page/jsI18N&language='.Yii::app()->language,
             '{jnotify}' => $jnotifyPath,
             '{fancybox}' => $fancyboxPath,
+            '{topbox}' => $topboxPath,
             '{js}' => $jsPath,
             '{css}' => $cssPath,
         ));

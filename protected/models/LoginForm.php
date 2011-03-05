@@ -26,7 +26,24 @@ class LoginForm extends CFormModel
 		);
 	}
 
-	public function authenticate($attribute,$params)
+	public static function form()
+	{
+		return array(
+			'elements'=>array(
+				'username'=>array(
+					'type'=>'text',
+				),
+				'password'=>array(
+					'type'=>'password',
+				),
+                'rememberMe'=>array(
+                    'type'=>'checkbox',
+                ),
+			),
+		);
+	}
+
+    public function authenticate($attribute,$params)
 	{
 		$this->_identity=new UserIdentity($this->username,$this->password);
 		if(!$this->_identity->authenticate())

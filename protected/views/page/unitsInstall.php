@@ -1,4 +1,4 @@
-<h2><?=Yii::t('cms', 'Units installation')?></h2>
+<h2 class="cms-caption"><?=Yii::t('cms', 'Units installation')?></h2>
 <div>
 <?=CHtml::form()?>
 <?php foreach($errors as $error) { ?>

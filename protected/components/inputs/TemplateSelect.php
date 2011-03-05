@@ -45,16 +45,12 @@ EOD;
         $txtTemplateEditor = Yii::t('cms', 'Template editor');
 
         $js = <<<EOD
-js:loadDialog({
-        url: '/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escaped_id}').val(),
+js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escaped_id}').val(), {
         title: '{$txtTemplateEditor}',
         id: 'filesEditor',
         className: 'filesEditor',
         width: $(window).width()-200,
         height: 'auto',
-        onSubmit: function() {
-            return false;
-        },
         onSave: function(html) {
             {$injs}
             if ($('#filesEditor ul.files a.fileitem').length) {

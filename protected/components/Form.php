@@ -20,6 +20,7 @@ class Form extends CForm
 
 	public function render()
 	{
+        $this->title = null;
         $className = get_class($this->getModel(false));
         $js = <<<EOD
    <script type="text/javascript">
@@ -144,7 +145,6 @@ EOD;
             $txtLoadError = Yii::t('cms', 'Tab loading error');
             $js .= <<<EOD
 		$("#cms-form-tabs-{$this->uniqueId}").tabs({
-            collapsible: true,
 			ajaxOptions: {
 				error: function( xhr, status, index, anchor ) {
 					$( anchor.hash ).html( "{$txtLoadError}" );

@@ -13,7 +13,7 @@ class ComboBox extends CJuiInputWidget
 
     public function init()
     {
-        $this->themeUrl = Yii::app()->params['juiThemeUrl'];
+        $this->themeUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css.jui'));
         $this->theme = Yii::app()->params['juiTheme'];
         parent::init();
     }

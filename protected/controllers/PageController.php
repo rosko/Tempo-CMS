@@ -15,8 +15,11 @@ class PageController extends Controller
                 'id'=>serialize(Page::cacheParams()),
                 'varyByParam'=>array('id','language','alias','url'),
                 'dependency'=>array(
-                    'class'=>'CDbCacheDependency',
-                    'sql'=>'SELECT CONCAT(MAX(`create`),MAX(`modify`)) FROM `'.Unit::tableName().'`',
+                    'class'=> 'CChainedCacheDependency',
+                    'dependencies'=>array(
+                        new CFileCacheDependency(Unit::configFilename()),
+                        new CDbCacheDependency('SELECT CONCAT(MAX(`create`),MAX(`modify`)) FROM `'.Unit::tableName().'`'),
+                    )
                 ),
             ),
 		);
@@ -757,7 +760,7 @@ class PageController extends Controller
 	{
 		$tree = Page::model()->getTree();
 		$initially_open = array();
-		$opened_levels = Yii::app()->request->isAjaxRequest ? 2 : 3;
+		$opened_levels = Yii::app()->request->isAjaxRequest ? 1 : 2;
 		foreach ($tree as $pages)
 		{
 			foreach ($pages as $p)

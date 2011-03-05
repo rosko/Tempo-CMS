@@ -135,62 +135,6 @@ function showInfoPanelTimer(timeout)
     }
 }
 
-// Диалоговое окно
-
-function showSplash(elem, options) {
-    if (options == null) {
-        options = {};
-    }
-
-    $.fancybox(elem, {
-        showNavArrows: false,
-        autoDimensions: true,
-        autoScale: true,
-        centerOnScroll: true,
-        hideOnOverlayClick: !options.withConfirm,
-        onComplete: function() {
-            $(document).unbind('keydown.fb');
-            $.fancybox.resize();
-            if (options.resizable) {
-                $('#fancybox-outer').resizable({
-                    alsoResize: '#fancybox-inner'
-                });
-            }
-            if (options.draggable) {
-                $('#fancybox-wrap').draggable({
-                    handle: '.ui-tabs-nav, .cms-caption'
-                });
-            }
-            if ($.isFunction(options.onComplete)) {
-                options.onComplete(this);
-            }
-        },
-        onClosed: function() {
-            hideSplash();
-            elem.width('auto').height('auto').html('');
-            if ($.isFunction(options.onClose)) {
-                options.onClose(this);
-            }
-        }
-    });
-
-}
-
-function resizeSplash()
-{
-    $.fancybox.resize();
-}
-
-function hideSplash()
-{
-    fadeOut('.selected', 'selected');
-    $('#fancybox-outer, #fancybox-inner').resizable("destroy");
-    $('#fancybox-outer').removeAttr('style');
-    $('#fancybox-wrap').draggable("destroy");
-    $.fancybox.resize();
-    $.fancybox.close();
-}
-
 function fadeIn(selector, className)
 {
     $(selector).removeClass('hover').addClass(className);
@@ -296,14 +240,12 @@ function ajaxSubmitForm(form, data, hasError, events)
             if (btn_name == 'refresh') {
                 location.href = '/?r=page/view&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language');
             } else if (btn_name != 'apply') {
-                if ($(form).parents('#fancybox-wrap').length) {
-                    $(form).remove();
-                    hideSplash();
-                } else {
+                if ($(form).parents('.cms-dialog').length) {
                     var dlg = $(form).parents('.cms-dialog');
-                    $(form).remove();
                     $(dlg).dialog('close');
                 }
+                $(form).remove();
+                closeDialog();
             }
 
         });
@@ -362,7 +304,7 @@ function pageunitAddForm(t)
     pageunitadd = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
     pageunitadd.find('.cms-btn-pageunit-create').attr('rel', area_name);
     pageunitadd.find('.cms-btn-pageunit-create').attr('rev', pageunit_id);
-    showSplash(pageunitadd);
+    openDialog(pageunitadd);
 }
 
 // =============================================================
@@ -375,37 +317,14 @@ function pageunitEditForm(t)
     fadeIn(pageunit, 'selected');
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
-    $.ajax({
-        url:'/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
-        cache: false,
+    loadDialog('/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'), {
         pageunit: pageunit,
         pageunit_id: pageunit_id,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);                    
-        },
-        success: function(html) {
-            hideInfoPanel();
-            $('#cms-pageunit-edit').html(html);
-            $('#cms-pageunit-edit').find('form').eq(0).attr('rel', pageunit_id);
-            $('#cms-pageunit-edit').find('form').find('input[type="submit"]').click(function() {
-                $(this).parents('form').attr('rev', $(this).attr('name'));
-            });
-
-            showSplash($('#cms-pageunit-edit'), {
-                resizable: true,
-                draggable: true,
-                withConfirm: true,
-                onComplete: function() {
-                    if ($('#Unit_title').length)
-                        $('#Unit_title').get(0).focus();
-                },
-                onClose: function() {
-                    $('#cms-pageunit-edit').html('');
-                    updatePageunit(pageunit_id, '.cms-pageunit[rev='+pageunit.attr('rev')+']');
-                }
-            });
+        simpleClose: false,
+        onClose: function() {
+            updatePageunit(pageunit_id, '.cms-pageunit[rev='+pageunit.attr('rev')+']');
         }
-    });    
+    });
 }
 
 function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
@@ -425,19 +344,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
             var ids = jQuery.parseJSON(html);
             if (ids.length > 1)
             {
-                $.ajax({
-                    url: '/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
-                    type: 'GET',
-                    cache: false,
-                    beforeSend: function() {
-                        showInfoPanel(cms_html_loading_image, 0);
-                    },
-                    success: function(html) {
-                        hideInfoPanel();
-                        $('#cms-pageunit-delete').html(html);
-                        showSplash($('#cms-pageunit-delete'));
-                    }
-                });
+                loadDialog('/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'));
             }
             else {
                 if (confirm(i18n.cms.deleteUnitWarning))
@@ -457,20 +364,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 
 function pageunitSetDialog(page_id, pageunit_id, unit_id)
 {
-    $.ajax({
-        url: '/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'),
-        type: 'GET',
-        cache: false,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
-        },
-        success: function(html) {
-            hideInfoPanel();
-            $('#cms-pageunit-set').html(html);
-            showSplash($('#cms-pageunit-set'));
-        }
-    });
-
+    loadDialog('/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'));
 }
 
 // =============================================================
@@ -478,83 +372,52 @@ function pageunitSetDialog(page_id, pageunit_id, unit_id)
 
 function pageAddForm()
 {
-    var page_id = $('body').attr('rel');
-    $.ajax({
-        url:'/?r=page/pageAdd&id='+page_id+'&language='+$.data(document.body, 'language'),
-        cache: false,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);                    
-        },
-        success: function(html) {
-            hideInfoPanel();
-            $('#cms-page-edit').html(html);
-            $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
-                $(this).parents('form').attr('rev', $(this).attr('name'));
-            });
-
-            showSplash($('#cms-page-edit'), {
-                draggable: true,
-                resizable: true,
-                withConfirm: true,
-                onComplete: function() {
-                    $('#Page_title').get(0).focus();
-                    $('#Page_parent_id').val($('body').attr('rel'));
-                    $('#Page_parent_id_title').val($.data(document.body, 'title'));
-                }
-            });
+    loadDialog('/?r=page/pageAdd&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language'), {
+        simpleClose: false,
+        ajaxify: true,
+        onOpen: function() {
+            $('#Page_title').focus();
+            $('#Page_parent_id').val($('body').attr('rel'));
+            $('#Page_parent_id_title').val($.data(document.body, 'title'));
         }
-    });    
-
+    });
 }
 
 
 function pageEditForm()
 {
     var page_id = $('body').attr('rel');
-    $.ajax({
-        url:'/?r=page/pageForm&id='+page_id+'&language='+$.data(document.body, 'language'),
-        cache: false,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);                    
-        },
-        success: function(html) {
-            hideInfoPanel();
-            $('#cms-page-edit').html(html);
-            $('#cms-page-edit').find('form').find('input[type="submit"]').click(function() {
-                $(this).parents('form').attr('rev', $(this).attr('name'));
-            });
-
-            showSplash($('#cms-page-edit'), {
-                withConfirm: true,
-                onComplete: function() {
-                    $('#Page_title').get(0).focus();
-                    $('input[name=deletepage]').unbind('click').click(function() {
-                        pageDeleteDialog(null, function() {
-                            ajaxSave($('#cms-page-edit').find('form:eq(0)').attr('action'), $('#cms-page-edit').find('form:eq(0)').serialize()+'&delete=1', 'POST', function(html) {
-                                if (html.substring(0,2) == '{"') {
-                                    var ret = jQuery.parseJSON(html);
-                                    if (ret) {
-                                      location.href = ret.url;
-                                    }
-                                } 
-                            });
-                        }, function(html) {
-                            if (html.substring(0,2) == '{"') {
-                                var ret = jQuery.parseJSON(html);
-                                if (ret) {
-                                  location.href = ret.url;
-                                }
-                            } else
-                            if ($(html).find('form').eq(0).find('.errorMessage').length == 0) {
-                                location.reload();
+    loadDialog('/?r=page/pageForm&id='+page_id+'&language='+$.data(document.body, 'language'), {
+        simpleClose: false,
+        ajaxify: true,
+        onOpen: function(html) {
+            $('#Page_title').focus();
+            var form_id = $(html).find('form').attr('id');
+            $('input[name=deletepage]').unbind('click').click(function() {
+                pageDeleteDialog(null, function() {
+                    ajaxSave($('#'+form_id).attr('action'), $('#'+form_id).serialize()+'&delete=1', 'POST', function(html) {
+                        if (html.substring(0,2) == '{"') {
+                            var ret = jQuery.parseJSON(html);
+                            if (ret) {
+                              location.href = ret.url;
                             }
-                        });
-                        return false;
+                        }
                     });
-                }
+                }, function(html) {
+                    if (html.substring(0,2) == '{"') {
+                        var ret = jQuery.parseJSON(html);
+                        if (ret) {
+                          location.href = ret.url;
+                        }
+                    } else
+                    if ($(html).find('form').eq(0).find('.errorMessage').length == 0) {
+                        location.reload();
+                    }
+                });
+                return false;
             });
         }
-    });    
+    });
 }
 
 function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
@@ -586,32 +449,17 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
                     }                                        
                 }
             } else {
-                $.ajax({
-                    url:'/?r=page/pageDeleteDialog&id='+page_id+'&language='+$.data(document.body, 'language'),
-                    cache: false,
-                    onChildrenDelete: onChildrenDelete,
-                    onCancel: onCancel,
-                    page_id: page_id,
-                    beforeSend: function() {
-                        showInfoPanel(cms_html_loading_image, 0);                    
+                loadDialog('/?r=page/pageDeleteDialog&id='+page_id+'&language='+$.data(document.body, 'language'), {
+                    ajaxify: true,
+                    onClose: function() {
+                        if ($.isFunction(onCancel)) {
+                            onCancel(this);
+                        }
                     },
-                    success: function(html) {
-                        hideInfoPanel();
-                        $('#cms-page-delete').html(html);
-                        AjaxifyForm('#cms-page-delete', $('#cms-page-delete').find('form').eq(0), function(f) {
-                        }, function (html) {
-                            // В функции должны быть описаны действия после уже совершенного удаления
-                            if ($.isFunction(onChildrenDelete)) {
-                                onChildrenDelete(html);
-                            }                    
-                        });
-                        showSplash($('#cms-page-delete'), {
-                            onClose: function() {
-                                if ($.isFunction(onCancel)) {
-                                    onCancel(this);
-                                }
-                            }
-                        });
+                    onSave: function(html) {
+                        if ($.isFunction(onChildrenDelete)) {
+                            onChildrenDelete(html);
+                        }
                     }
                 });
             }
@@ -624,52 +472,17 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
 
 function recordEditForm(id, class_name, unit_id, grid_id)
 {
-    $.ajax({
-        url:'/?r=page/unitForm&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
-        cache: false,
-        id: id,
-        class_name: class_name,
-        beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
-        },
-        success: function(html) {
-            hideInfoPanel();
-            var dlg_id = 'recordEditForm'+class_name+'_'+id;
-            if ($('#'+dlg_id).length) { return; }
-            var dlg_class = 'recordEditForm-'+class_name;
-            var dlg = $('#cms-dialog').clone().attr('id', dlg_id).addClass(dlg_class).addClass('cms-dialog').appendTo('body').hide();
-            dlg.html(html);
-            if (grid_id !== undefined) {
-                dlg.find('form').data('grid_id', grid_id);
-            }
-            dlg.find('form').find('input[type="submit"]').click(function() {
-                $(this).parents('form').attr('rev', $(this).attr('name'));
-            });
-
-            var height = $(window).height()-50;
-            var width = $(window).width()-100;
-            dlg.dialog({
-                title: i18n.cms.editing,
-                resizable: true,
-                draggable: true,
-                maxHeight: height,
-                maxWidth: width,
-                height: height,
-                width: width,
-                zIndex: 10000,
-                modal:true,
-                closeOnEscape: false,
-                open: function(event, ui) {
-                    $('#'+dlg_id).find('label[for="Unit_title"]:eq(0)').next().focus();
-                },
-                close: function() {
-                    $('#'+dlg_id).remove();
-                }
-            });
-            dlg.parents('.ui-dialog').css('position', 'fixed');
+    var dlg_id = 'recordEditForm'+class_name+'_'+id;
+    loadDialog('/?r=page/unitForm&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'), {
+        simpleClose: false,
+        id: dlg_id,
+        className: 'recordEditForm-'+class_name,
+        title: i18n.cms.editing,
+        onOpen: function() {
+            $('#'+dlg_id).find('form').data('grid_id', grid_id);
+            $('#'+dlg_id).find('label[for="Unit_title"]:eq(0)').next().focus();
         }
     });
-
 }
 
 function recordDelete(id, class_name, unit_id, grid_id)

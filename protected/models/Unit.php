@@ -184,15 +184,20 @@ class Unit extends I18nActiveRecord
      */
     public static function getTypes()
 	{
+		return array_keys(self::getTypeNames());
+	}
+
+    public static function getTypeNames()
+	{
         self::loadTypes();
         $classNames = array_keys(self::loadConfig());
 		foreach ($classNames as $className) {
             if (!Yii::app()->settings->getValue('simpleMode') || !constant($className.'::HIDDEN'))
                 $ret[$className] = call_user_func(array($className, 'name'));
-            
+
 		}
         asort($ret);
-		return array_keys($ret);
+		return $ret;
 	}
 
     public static function loadTypes()

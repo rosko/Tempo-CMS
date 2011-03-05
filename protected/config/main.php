@@ -16,6 +16,9 @@ return CMap::mergeArray(array(
 	),
 
     'components'=>array(
+        'assetManager'=>array(
+            'linkAssets'=>true,
+        ),
 		'user'=>array(
 			'allowAutoLogin'=>true,
             'loginUrl'=>array('site/login'),
@@ -62,26 +65,28 @@ return CMap::mergeArray(array(
                 '{jnotify}/jquery.jnotify.js',
                 '{js}/jquery.scrollTo.js',
                 '{js}/lib.js',
+                '{jsI18N}',
             ),
             'neededAdminCoreScripts' => array(
                 'yiiactiveform',
             ),
             'neededAdminCssFiles' => array(
-                '{fancybox}/jquery.fancybox-1.3.1.css',
+                '{topbox}/css/topbox.css',
                 '{css}/cms.css',
             ),
             'neededAdminScriptFiles' => array(
                 '{core}/jui/js/jquery-ui-i18n.min.js',
                 '{js}/jquery.cookie.js',
                 '{js}/jquery.hotkeys.js',
-                '{fancybox}/jquery.fancybox-1.3.1.js',
-                '{jsI18N}',
+                '{topbox}/js/topbox.js',
+                '{js}/dialogs.js',
                 '{js}/cms.js',
             ),
         ),
         'urlManager'=>array(
             'rules'=>array(
                 'page/unitForm'=>'page/unitForm',
+                'login'=>'site/login',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
                 'filesEditor/save'=>'filesEditor/save',

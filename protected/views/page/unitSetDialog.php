@@ -40,10 +40,8 @@ $(function() {
 
     $('#cms-pageunit-set-select').toggle(function() {
         $('#cms-dlg-select-set-page').show();
-        resizeSplash();
     }, function () {
         $('#cms-dlg-select-set-page').hide();
-        resizeSplash();
     });
 
     $('.cms-btn-pagemap-openall').click(function() {
@@ -55,7 +53,7 @@ $(function() {
         return false;
     });
 
-    $('#cms-pageunit-set-select-ok').click(function() {
+    $('#cms-pageunit-set-select-ok').submit(function() {
         var checked = $('#pagetree_{$page_select_name}').jstree('get_checked');
         var ids = new Array();
         var cur_page = true;
@@ -77,12 +75,11 @@ $(function() {
         if (cur_page) {
             $('#cms-pageunit-{$pageunit_id}').remove();
         }
-        hideSplash();
+        closeDialog();
         CmsAreaEmptyCheck();
         return false;
     });
     $('#cms-pageunit-set-select-ok').parents('div:eq(0)').width(440);
-    $('#cms-pageunit-set-select-ok').button().width('90%');
 
 });
 
@@ -90,8 +87,10 @@ EOD
 );
 
 ?>
+<div class="cms-caption">
 <img style="float:left;margin-right:1em;" valign="baseline" src="/images/icons/fatcow/32x32/application_cascade.png" />
 <h3><?=Yii::t('cms', 'Unit location on pages')?>:</h3>
+</div>
 <?=Yii::t('cms', 'Check')?>:
 <br />
 <select id="cms-sel-pagemap-select" class="cms-btn-pagemap-select">
@@ -128,4 +127,6 @@ EOD
     ));
 ?>
 <br />
-<a id="cms-pageunit-set-select-ok" href="#"><?=Yii::t('cms', 'Set unit on selected pages only')?></a>
+<form id="cms-pageunit-set-select-ok">
+<input type="submit" value="<?=Yii::t('cms', 'Set unit on selected pages only')?>" />
+</form>

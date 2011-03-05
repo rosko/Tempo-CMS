@@ -72,6 +72,9 @@ EOD;
 
 }
 
+/*
+Меняет внешний вид кнопок согласно jqueryUI
+
 $js .= <<<EOD
 
     var ics = {
@@ -86,6 +89,15 @@ $js .= <<<EOD
     });
 
 
+EOD;
+*/
+
+$js .= <<<EOD
+    $('#{$form->uniqueId} .ui-tabs-panel').each(function() {
+        if ($(this).height() > $(window).height()*0.65) {
+            $(this).height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
+        }
+    });
 EOD;
 
 if ($js)

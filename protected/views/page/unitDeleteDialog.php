@@ -10,7 +10,7 @@ $(function() {
         if (confirm('{$txtAreYouSure}'))
         {
             ajaxSave('/?r=page/unitDelete&pageunit_id[]={$pageunit_id}&unit_id={$unit_id}', '', 'GET', function(ret) {
-                hideSplash();
+                closeDialog();
                 $('#cms-pageunit-{$pageunit_id}').remove();
                 CmsAreaEmptyCheck();
             });
@@ -22,7 +22,7 @@ $(function() {
         if (confirm('{$txtAreYouSureDeleteEverywhere}'))
         {
             ajaxSave('/?r=page/unitDelete&pageunit_id=all&unit_id={$unit_id}', '', 'GET', function(ret) {
-                hideSplash();
+                closeDialog();
                 $('.cms-pageunit[rev={$unit_id}]').remove();
                 CmsAreaEmptyCheck();
             });

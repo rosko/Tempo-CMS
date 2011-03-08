@@ -36,7 +36,7 @@ class Toolbar extends CWidget
     // Количество рядов или столбцов
     public $rows = 1;
     // Уровень слоя
-    public $zIndex = 1000;
+    public $zIndex = 900;
     // Функции отображения и скрытия
     public $functionShow = "show()";
     public $functionHide = "hide()";

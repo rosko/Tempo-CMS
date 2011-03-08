@@ -62,37 +62,81 @@ class UnitLogin extends Content
                 'title'=>Yii::t('UnitLogin.unit', 'Login'),
             ),
         );
+        $params['doRemember'] = isset($_POST['RememberForm']);
 
-        if(isset($_POST['logout'])) {
-            Yii::app()->user->logout();
-            Yii::app()->controller->refresh();
+        if ($this->proccessRequest()) {
+            if($params['doRemember']) {
+                $params['doneRemember'] = true;
+                
+            } else
+                Yii::app()->controller->refresh();
         }
-        $model=new LoginForm;
-		if(isset($_POST['LoginForm']))
-		{
-			$model->attributes=$_POST['LoginForm'];
-			if($model->validate() && $model->login()) {
-               Yii::app()->controller->refresh();
-			}
-		}
+        if ($_REQUEST['authcode']) {
+            $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
+            if ($user) {
+                $identity = new AuthCodeIdentity($_REQUEST['authcode']);
+                $identity->authenticate();
+                if($identity->errorCode===UserIdentity::ERROR_NONE) {
+                    Yii::app()->user->login($identity);
+                }
+                $user->saveAttributes(array(
+                    'authcode'=>'',
+                    'askfill'=>true,
+                ));
+                Yii::app()->controller->refresh();
+            }
+        }
         return $params;
     }
 
-    public function ajax($vars)
+    protected function proccessRequest()
     {
-        $model=new LoginForm;
-		if(isset($_REQUEST['ajax-validate']))
-		{
-            echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
+        if(isset($_POST['logout'])) {
+            Yii::app()->user->logout();
+            Yii::app()->controller->refresh();
+            return true;
+        }
 		if(isset($_POST['LoginForm']))
 		{
+            $model=new LoginForm;
 			$model->attributes=$_POST['LoginForm'];
 			if($model->validate() && $model->login()) {
-                echo '1';
+                return true;
 			}
 		}
+        if(isset($_POST['RememberForm']))
+        {
+            $model=new RememberForm;
+            $model->attributes=$_POST['RememberForm'];
+            if($model->validate()) {
+
+                $user = User::model()->find('`login` = :username OR `email` = :username', array('username'=>$model->username));
+                if ($user) {
+                    $user->saveAttributes(array(
+                        'authcode'=>User::hash($user->id.$user->email.time().rand())
+                    ));
+                    $cfg = Unit::loadConfig();
+                    $viewFileDir = $cfg['UnitLogin'].'.UnitLogin.templates.mail.';
+                    $tpldata['model'] = $user;
+                    $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
+                    $tpldata['page'] = $this->getUnitPageArray();
+                    // send 'to_user_confirm' mail
+                    Yii::app()->messenger->send(
+                        'email',
+                        $user->email,
+                        Yii::t('UnitLogin.unit', 'Password reset'),
+                        Yii::app()->controller->renderPartial(
+                            $viewFileDir.'password_reset',
+                            $tpldata,
+                            true
+                        )
+                    );
+                    return true;
+                }
+            }            
+        }
+        return false;
+
     }
 
 }

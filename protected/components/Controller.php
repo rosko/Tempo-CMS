@@ -29,12 +29,24 @@ class Controller extends CController
         Unit::loadTypes();
     }
 
-    public function render($view, $data=null, $return = false)
+    public function setTheme()
     {
         $theme = Yii::app()->themeManager->themeNames[0];
-        if (Yii::app()->settings->getValue('theme') 
+        if (Yii::app()->settings->getValue('theme')
             && in_array(Yii::app()->settings->getValue('theme'), Yii::app()->themeManager->themeNames))
             $theme = Yii::app()->settings->getValue('theme');
+        if (isset($this->_model)) {
+            if ($this->_model->theme
+                && in_array($this->_model->theme, Yii::app()->themeManager->themeNames))
+                $theme = $this->_model->theme;
+        }
+        Yii::app()->theme = $theme;
+    }
+
+    public function render($view, $data=null, $return = false)
+    {
+        if (!Yii::app()->theme)
+            $this->setTheme();
 
         $vars = array();
         $vars['title'] = $this->pageTitle;
@@ -44,11 +56,7 @@ class Controller extends CController
             $vars['title'] = $this->_model->title;
             $vars['keywords'] = $this->_model->keywords;
             $vars['description'] = $this->_model->description;
-            if ($this->_model->theme 
-                && in_array($this->_model->theme, Yii::app()->themeManager->themeNames))
-                $theme = $this->_model->theme;
         }
-        Yii::app()->theme = $theme;
 
         if ($vars['sitename']) {
     		$vars['title'] .=  ' - ' . $vars['sitename'];

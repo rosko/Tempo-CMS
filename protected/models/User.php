@@ -6,6 +6,8 @@ class User extends CActiveRecord
 
     const ADMIN_LOGIN = 'admin';
     private static $_admin;
+    public $rules;
+    public $captcha;
 
     public $password_repeat='';
 
@@ -26,16 +28,32 @@ class User extends CActiveRecord
 
 	public function rules()
 	{
+        // add, edit - действия администратора
+        // register, update - действия пользователя
+        if ($this->rules) return $this->rules;
 		return array(
+            array('login, password, password_repeat', 'filter', 'filter'=>'strtolower'),
+            array('login, password, password_repeat', 'filter', 'filter'=>'trim'),
             array('login, password', 'required', 'on'=>'add'),
-            array('login', 'unique'),
+            array('login, password', 'required', 'on'=>'register'),
+			array('login, email, password', 'length', 'max'=>32, 'min'=>5, 'encoding'=>'UTF-8'),
+            //array('login', 'match', 'not'=>true, 'pattern'=>'/^[0-9]*/u'),
+            array('login, email', 'unique'),
 			array('email, name', 'required'),
-			array('login, email', 'length', 'max'=>32),
+            array('login', 'match', 'pattern'=>'/^[a-z]+[a-z0-9-]*[a-z0-9]+$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers. And it can not start with a digit or sign')),
+            array('password', 'match', 'pattern'=>'/^[[:graph:]]*$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers')),
             array('email', 'email'),
             array('password', 'compare', 'compareAttribute'=>'password_repeat'),
-            array('password, password_repeat', 'safe'),
+            array('password, password_repeat, authcode', 'safe'),
             array('login', 'unsafe', 'on'=>'edit'),
-			array('name', 'length', 'max'=>64),
+			array('name', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
+            array('active, askfill', 'unsafe', 'on'=>'register'),
+            array('active, askfill, agreed', 'unsafe', 'on'=>'update'),
+            array('active, askfill, agreed', 'boolean'),
+            array('captcha', 'captcha', 'on'=>'register',
+                'allowEmpty'=>!CCaptcha::checkRequirements() || !Yii::app()->user->isGuest,
+                'captchaAction'=>'site/captcha'),
+            //array('agreed', 'safe', 'on'=>'register'),
 		);
 	}
 
@@ -48,6 +66,10 @@ class User extends CActiveRecord
             'password_repeat' => Yii::t('cms', 'Repeat password'),
 			'email' => Yii::t('cms', 'E-mail'),
 			'name' => Yii::t('cms', 'Name'),
+            'active' => Yii::t('cms', 'Active'),
+            'captcha'=> Yii::t('cms', 'Verify code'),
+            'agreed'=> Yii::t('cms', 'I agree with the agreement'),
+            'askfill'=>Yii::t('cms', 'Ask the user to fill out profile'),
 		);
 	}
 
@@ -59,6 +81,10 @@ class User extends CActiveRecord
             'password' => 'char(64)',
             'email' => 'char(64)',
             'name' => 'char(64)',
+            'active'=>'boolean',
+            'authcode' => 'char(64)',
+            'agreed'=>'boolean',
+            'askfill'=>'boolean',
         );
     }
 
@@ -82,6 +108,23 @@ class User extends CActiveRecord
                 'password_repeat'=>array(
                     'type'=>'password',
                 ),
+                'active'=>array(
+                    'type'=>'checkbox',
+                ),
+                'captcha'=>array(
+                    'type'=>'text',
+                    'label'=>Yii::app()->controller->widget("CCaptcha", array(
+                        'captchaAction'=>'site/captcha',
+                        'clickableImage'=>true,
+
+                    ), true) . '<br />'. Yii::t('cms', 'Verify code'),
+                ),
+                'agreed'=>array(
+                    'type'=>'radio',
+                ),
+                'askfill'=>array(
+                    'type'=>'checkbox',
+                ),
             ),
         );
     }
@@ -103,6 +146,7 @@ class User extends CActiveRecord
         $user->name = Yii::app()->params['admin']['name'];
         $user->email = Yii::app()->params['admin']['email'];
         $user->password = self::hash(Yii::app()->params['admin']['password']);
+        $user->active = true;
         $user->save(false);
     }
 
@@ -110,6 +154,13 @@ class User extends CActiveRecord
 	{
         return sha1(md5($string) . Yii::app()->params['hashSalt']);
 	}
+
+    public static function generatePassword($length=8)
+    {
+        $chars = array_merge(range(0,9), range('a','z'), range('A','Z'));
+        shuffle($chars);
+        return implode(array_slice($chars, 0, $length));
+    }
 
     public function beforeSave()
     {

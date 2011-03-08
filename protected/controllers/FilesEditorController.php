@@ -122,6 +122,7 @@ class FilesEditorController extends Controller
             $var = '{$settings.global.'.$k.'}';
             $suggestions[$var] = Yii::t('filesEditor', 'General settings') . self::SUGGESTIONS_SEPARATOR . $v;
         }
+        $suggestions['{$userHostAddress}'] = Yii::t('filesEditor', 'User IP address');
         $suggestions['{$TIME}'] = Yii::t('filesEditor', 'Used time (seconds)');
         $suggestions['{$MEMORY}'] = Yii::t('filesEditor', 'Used memory (megabytes)');
         if (!empty($files)) {

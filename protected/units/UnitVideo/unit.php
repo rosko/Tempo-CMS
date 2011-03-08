@@ -25,8 +25,8 @@ class UnitVideo extends Content
 		return array(
 			array('unit_id', 'required'),
 			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
-			array('video', 'length', 'max'=>255),
-            array('html', 'length', 'max'=>3000),
+			array('video', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
+            array('html', 'length', 'max'=>3000, 'encoding'=>'UTF-8'),
             array('show_link', 'boolean')
 		);
 	}

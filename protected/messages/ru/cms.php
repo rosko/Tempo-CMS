@@ -195,4 +195,11 @@ return array(
     'Users' => 'Пользователи',
     'New user'=>'Новый пользователь',
     'Super administrator'=>'Супер-пользователь',
+
+    'Verify code' => 'Код для проверки',
+    'I agree with the agreement' => 'Я согласен с пользовательским соглашением',
+    '{attribute} can only contain letters and numbers' => '{attribute} может содержать только буквы латинского алфавита и цифры',
+    '{attribute} can only contain letters and numbers. And it can not start with a digit or sign' => '{attribute} может содержать только буквы латинского алфавита и цифры. И не может начинаться с цифры или другого знака',
+    'Ask the user to fill out profile' => 'Попросить пользователя заполнить профиль',
 );
+

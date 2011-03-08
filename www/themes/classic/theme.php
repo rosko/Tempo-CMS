@@ -2,19 +2,21 @@
 
 return array(
     'theme' => 'classic', // идентификатор темы
-    'name' => 'Обычная', 
     'screenshot' => null,
     'layouts' => array(
-        'column1' => array(
-            'name' => 'В одну колонку',
-            'screenshot' => null,
-            'columns' => '100',
-        ),
-        'column2' => array(
-            'name' => 'В две колонки',
+        'main' => array(
             'screenshot' => null,
             'columns' => '80+20',
         ),
+        'column1' => array(
+            'screenshot' => null,
+            'columns' => '100',
+        ),
+    ),
+    'areas'=>array(
+        'top',
+        'main',
+        'right',
     ),
     'colors' => array(
         'white',

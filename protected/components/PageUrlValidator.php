@@ -7,6 +7,7 @@ class PageUrlValidator extends CUniqueValidator
     public function restrictedUrls()
     {
         return array(
+            '/site/captcha',
             '/site/login',
             '/site/logout',
             '/login',

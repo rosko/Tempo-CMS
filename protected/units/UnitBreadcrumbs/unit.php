@@ -27,7 +27,7 @@ class UnitBreadcrumbs extends Content
 		return array(
 			array('unit_id', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
-			array('separator', 'length', 'max'=>16),
+			array('separator', 'length', 'max'=>16, 'encoding'=>'UTF-8'),
 		);
 	}
 

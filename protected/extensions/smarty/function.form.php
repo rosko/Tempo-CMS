@@ -3,7 +3,12 @@
 function smarty_function_form($params, &$smarty)
 {
     if(!empty($params['className']) && method_exists($params['className'], 'form')) {
-        $form_array = call_user_func(array($params['className'], 'form'));
+        $f = call_user_func(array($params['className'], 'form'));
+        if (!empty($params['elements'])) {
+            $form_array['elements'] = $params['elements'];
+        } else {
+            $form_array['elements'] = $f['elements'];
+        }
         $id = $params['className'].$params['id'];
         $form_array['id'] = $id;
 
@@ -17,7 +22,10 @@ function smarty_function_form($params, &$smarty)
             $pageunit = $smarty->getTemplateVars('pageunit');
             unset($form_array['activeForm']['focus']);
             $form_array['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitAjax&unit_id='.$unit['id'];
-            $form_array['activeForm']['clientOptions']['afterValidate'] = <<<EOD
+            if ($params['enableAjax'] == 'validate') {
+                $form_array['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
+            } else {
+                $form_array['activeForm']['clientOptions']['afterValidate'] = <<<EOD
 js:function(f,d,h){
     if (!h) {
         var params = f.serialize();
@@ -28,6 +36,7 @@ js:function(f,d,h){
 }
 EOD
 ;
+            }
         }
 
         $form_array['type'] = 'form';
@@ -44,6 +53,9 @@ EOD
         }
         $form = new Form($form_array);
         $form->model = new $params['className'];
+        $form->model->scenario = $params['scenario'];
+        if (!empty($params['rules']))
+            $form->model->rules = $params['rules'];
 
         $buttons = array_keys($form_array['buttons']);
         $submitted = false;

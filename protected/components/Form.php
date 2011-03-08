@@ -149,7 +149,12 @@ EOD;
 				error: function( xhr, status, index, anchor ) {
 					$( anchor.hash ).html( "{$txtLoadError}" );
 				}
-			}
+			},
+            show: function(event, ui) {
+                if ($(ui.panel).height() > $(window).height()*0.65) {
+                    $(ui.panel).height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
+                }
+            }
         });
    	});
     </script>

@@ -25,7 +25,7 @@ class UnitList extends Content
 		return array(
 			array('unit_id, class_name', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
-			array('rule', 'length', 'max'=>255),
+			array('rule', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
 		);
 	}
 

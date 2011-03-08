@@ -239,9 +239,14 @@ class SiteSettingsForm extends CFormModel
 		return true;
 	}
 	
-	public function getAttributes()
+	public function getAttributes($names=null)
 	{
-		return $this->_attributes;
+        $ret = parent::getAttributes($names);
+        foreach ($this->i18n() as $field) {
+            $ret[$field] = $this->$field;
+        }
+        return $ret;
+		//return $this->_attributes;
 	}
 	
 }

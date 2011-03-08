@@ -36,4 +36,6 @@ return array(
     'Publish and return some file (i.e. image files)' => 'Публикует файл и выводит его адрес (например, изображение)',
     'Generate form tag' => 'Функция для генерация тега form',
     'Is user is a guest mode flag' => 'Признак, что посетитель не является зарегистрированным пользователем',
+
+    'User IP address' => 'IP-адрес посетителя',
 );

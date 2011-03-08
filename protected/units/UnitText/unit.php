@@ -25,7 +25,7 @@ class UnitText extends Content
 		return $this->localizedRules(array(
 			array('unit_id, text', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
-			array('author', 'length', 'max'=>64),
+			array('author', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
 		));
 	}
 

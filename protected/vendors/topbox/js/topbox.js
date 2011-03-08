@@ -105,7 +105,7 @@
                 //focus
                 if(box.find(":input:first").length) {
                     box.find(":input:first").focus();
-                }
+                }                
                 $this.options.onShow.apply(this);
             
             });

@@ -340,7 +340,7 @@ EOD
                 //'resizable' => true,
                 //'save' => true,
             ),
-            'zIndex' => 1010,
+            'zIndex' => 900,
             'iconSize' => '32x32',
             'vertical'=>true,
             'rows'=>1,

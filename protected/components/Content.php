@@ -1,6 +1,8 @@
 <?php
 class Content extends I18nActiveRecord
 {
+    const EXCLUSIVE = false; // Разрешает создавать только один экземпляр юнита и только в одном месте
+
 	public static function form()
 	{
 		return array();
@@ -126,13 +128,24 @@ class Content extends I18nActiveRecord
         }
     }
 
-    public function getUnitUrl()
+    public function getUnitPageArray()
     {
         $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':unit_id', $this->unit_id, PDO::PARAM_INT);
         $page = $command->queryRow();
-        return Yii::app()->controller->createUrl('page/view', array('id'=>$page['id'], 'alias'=>$page[Yii::app()->language.'_alias'], 'url'=>$page[Yii::app()->language.'_url']));
+        $page['alias'] = $page[Yii::app()->language.'_alias'];
+        $page['url'] = $page[Yii::app()->language.'_url'];
+        return $page;
+    }
+
+    public function getUnitUrl($absolute=false)
+    {
+        $page = $this->getUnitPageArray();
+        if ($absolute)
+            return Yii::app()->controller->createAbsoluteUrl('page/view', array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']));
+        else
+            return Yii::app()->controller->createUrl('page/view', array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']));
     }
 
     public function prepare($params)

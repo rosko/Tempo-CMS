@@ -21,6 +21,7 @@ return CMap::mergeArray(array(
         ),
 		'user'=>array(
 			'allowAutoLogin'=>true,
+            'autoRenewCookie'=>true,
             'loginUrl'=>array('site/login'),
             'returnUrl'=>array('page/view'),
 		),
@@ -87,6 +88,7 @@ return CMap::mergeArray(array(
             'rules'=>array(
                 'page/unitForm'=>'page/unitForm',
                 'login'=>'site/login',
+                'site/captcha'=>'site/captcha',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
                 'filesEditor/save'=>'filesEditor/save',

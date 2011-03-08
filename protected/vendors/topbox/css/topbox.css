@@ -79,7 +79,7 @@
 }
 
 #topbox-overlay {
-    z-index: 999;
+    z-index: 1000;
     background: #222d3f;
     opacity: 0.5;
     filter:Alpha(Opacity=50);

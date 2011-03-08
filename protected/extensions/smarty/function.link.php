@@ -33,11 +33,10 @@ function smarty_function_link($params, &$smarty){
             $url = $params['url'];
         }        
     }     
-    if (empty($params['text'])) {
-        if (is_array($url))
-            return Yii::app()->controller->createAbsoluteUrl($url[0],array_slice($url,1));
-        else
-            return $url;
-    } else
+    if (is_array($url))
+        $url = Yii::app()->controller->createAbsoluteUrl($url[0],array_slice($url,1));
+    if (empty($params['text']))
+        return $url;
+    else
         return CHtml::link($text, $url, $options);
 }

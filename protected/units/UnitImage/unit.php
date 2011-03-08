@@ -25,8 +25,8 @@ class UnitImage extends Content
 		return array(
 			array('unit_id, image, width, height', 'required'),
 			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
-			array('image, url', 'length', 'max'=>255),
-            array('target', 'length', 'max'=>50)
+			array('image, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
+            array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8')
 		);
 	}
 

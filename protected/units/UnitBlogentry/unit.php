@@ -25,8 +25,8 @@ class UnitBlogentry extends Content
 		return array(
 			array('unit_id, text, date', 'required'),
 			array('unit_id, page_id, blog_id', 'numerical', 'integerOnly'=>true),
-			array('source', 'length', 'max'=>64),
-			array('url', 'length', 'max'=>255),
+			array('source', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
+			array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
 		);
 	}
 

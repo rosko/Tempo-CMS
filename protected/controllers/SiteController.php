@@ -3,6 +3,15 @@
 class SiteController extends Controller
 {
     public $defaultAction = 'login';
+
+    public function actions()
+    {
+        return array(
+            'captcha'=>array(
+                'class'=>'CCaptchaAction',
+            ),
+        );
+    }
     
 	public function actionError()
 	{

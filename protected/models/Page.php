@@ -371,9 +371,9 @@ class Page extends I18nActiveRecord
                 'theme'=>array(
                     'type'=>'ThemeSelect',
                 ),
-//                'language'=>array(
-//                    'type'=>'LanguageSelect'
-//                ),
+                'language'=>array(
+                    'type'=>'LanguageSelect'
+                ),
 			),
 			'buttons'=>array(
 				'save'=>array(

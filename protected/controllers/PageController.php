@@ -180,7 +180,8 @@ class PageController extends Controller
         }
 
         $form_array = Page::form();
-        $form_array['activeForm'] = Form::ajaxify('PageAdd');
+        $form_array['id'] = 'PageAdd';
+        $form_array['activeForm'] = Form::ajaxify($form_array['id']);
 		$form_array['buttons']['go'] = array(
 			'type'=>'submit',
 			'label'=>Yii::t('cms', 'Save & Go'),
@@ -188,8 +189,8 @@ class PageController extends Controller
 		);
 		
 		$form = new Form($form_array);
+        $form->id = $form_array['id'];
 		$form->model = $page;
-        $form->id = sprintf('%x',crc32(serialize(array_keys($form->getElements()->toArray()))));
 
         $this->performAjaxValidation($page);
 		
@@ -277,7 +278,7 @@ class PageController extends Controller
                 'title'=>Yii::t('cms', 'Save and reload the page'),
             ),
         );
-        $form_array['activeForm'] = Form::ajaxify('PageForm_'.$page->id);
+        $form_array['activeForm'] = Form::ajaxify($form_array['id']);
 		if ($page->id != 1) {
 			$form_array['buttons']['deletepage'] = array(
 				'type'=>'submit',
@@ -723,7 +724,8 @@ class PageController extends Controller
 		//$settingsForm = ;
 		$form_array = SiteSettingsForm::form();
 //		$form_array['title'] = Yii::t('cms', 'General settings');
-        $form_array['activeForm'] = Form::ajaxify('SiteSettings');
+        $form_array['id'] = 'SiteSettings';
+        $form_array['activeForm'] = Form::ajaxify($form_array['id']);
 		$form_array['buttons'] = array(
 				'refresh'=>array(
 					'type'=>'submit',
@@ -732,6 +734,7 @@ class PageController extends Controller
 				),
 			);
 		$form = new Form($form_array);
+        $form->id = $form_array['id'];
 		$form->model = clone Yii::app()->settings->model;
 
         $form->loadData();
@@ -741,10 +744,11 @@ class PageController extends Controller
             if ($form->model->validate()) {
                 Yii::app()->settings->saveAll($form->model->getAttributes());
                 Yii::app()->installer->installAll(false);
+                echo '1';
             } else {
                 echo '0';
-                Yii::app()->end();
             }
+            Yii::app()->end();
 		}
 
         $caption = array(

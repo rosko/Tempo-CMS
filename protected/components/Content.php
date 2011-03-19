@@ -157,7 +157,8 @@ class Content extends I18nActiveRecord
         if (!$params['isGuest']) {
             $params['user'] = User::model()->findByPk(Yii::app()->user->id);
         }
-        $params['page'] = Yii::app()->controller->loadModel();
+        if(isset($_GET['id']))
+            $params['page'] = Yii::app()->controller->loadModel();
         $params['editMode'] = Yii::app()->user->checkAccess('updatePage');
         $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
         $len = strlen($params['className']);

@@ -47,15 +47,25 @@ class User extends CActiveRecord
             array('password, password_repeat, authcode', 'safe'),
             array('login', 'unsafe', 'on'=>'edit'),
 			array('name', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
-            array('active, askfill', 'unsafe', 'on'=>'register'),
+            array('active, askfill, show_email, send_message', 'unsafe', 'on'=>'register'),
             array('active, askfill, agreed', 'unsafe', 'on'=>'update'),
             array('active, askfill, agreed', 'boolean'),
+            array('extra_fields', 'safe'),
             array('captcha', 'captcha', 'on'=>'register',
                 'allowEmpty'=>!CCaptcha::checkRequirements() || !Yii::app()->user->isGuest,
                 'captchaAction'=>'site/captcha'),
-            //array('agreed', 'safe', 'on'=>'register'),
 		);
 	}
+
+    public function behaviors()
+    {
+        return array(
+            'CSerializeBehavior' => array(
+                'class' => 'application.behaviors.CSerializeBehavior',
+                'serialAttributes' => array('extra_fields'),
+            )
+        );
+    }
 
 	public function attributeLabels()
 	{
@@ -70,6 +80,9 @@ class User extends CActiveRecord
             'captcha'=> Yii::t('cms', 'Verify code'),
             'agreed'=> Yii::t('cms', 'I agree with the agreement'),
             'askfill'=>Yii::t('cms', 'Ask the user to fill out profile'),
+            'show_email'=>Yii::t('cms', 'Who can see your email address'),
+            'send_message'=>Yii::t('cms', 'Who can send you an email through the site'),
+            'extra_fields'=>Yii::t('cms', 'Extra fields'),
 		);
 	}
 
@@ -85,6 +98,18 @@ class User extends CActiveRecord
             'authcode' => 'char(64)',
             'agreed'=>'boolean',
             'askfill'=>'boolean',
+            'show_email'=>'char(32)',
+            'send_message'=>'char(32)',
+            'extra_fields'=>'text',
+        );
+    }
+
+    public function userCategories()
+    {
+        return array(
+            'all'=>Yii::t('cms', 'All visitors'),
+            'registered'=>Yii::t('cms', 'Registered users'),
+            'none'=>Yii::t('cms', 'Nobody'),
         );
     }
 
@@ -125,6 +150,18 @@ class User extends CActiveRecord
                 'askfill'=>array(
                     'type'=>'checkbox',
                 ),
+                'show_email'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>User::userCategories(),
+                ),
+                'send_message'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>User::userCategories(),
+                ),
+                'extra_fields'=>array(
+                    'type'=>'Fields',
+                    'config'=>Yii::app()->settings->getValue('userExtraFields'),
+                )
             ),
         );
     }
@@ -169,6 +206,12 @@ class User extends CActiveRecord
         } else {
             $this->password = self::hash($this->password);
         }
+        if (!$this->show_email) {
+            $this->show_email = Yii::app()->settings->getValue('defaultsShowEmail');
+        }
+        if (!$this->send_message) {
+            $this->send_message = Yii::app()->settings->getValue('defaultsSendMessage');
+        }
         return parent::beforeSave();
     }
 
@@ -190,5 +233,20 @@ class User extends CActiveRecord
 		if(self::$_admin===null)
             self::$_admin = self::getByLogin(self::ADMIN_LOGIN);
         return self::$_admin;
+    }
+
+    public function getExtraFields($what=null)
+    {
+        $ef = Yii::app()->settings->getValue('userExtraFields');
+        $lang = Yii::app()->language;
+        if (!$what) {
+            $ret = $ef;
+        } elseif ($what == 'labels') {
+            $ret = array();
+            foreach ($ef as $k => $v) {
+                $ret[$v['name']] = $v['label'][$lang];
+            }
+        }
+        return $ret;
     }
 }

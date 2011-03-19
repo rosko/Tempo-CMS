@@ -11,6 +11,7 @@ class PageUrlValidator extends CUniqueValidator
             '/site/login',
             '/site/logout',
             '/login',
+            '/users',
         );
     }
 

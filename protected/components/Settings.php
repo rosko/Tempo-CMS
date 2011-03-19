@@ -69,15 +69,17 @@ class Settings extends CApplicationComponent
     {
         $name = $this->getI18nFieldName($name);
         $value = $this->model->{$name};
-        $unser = unserialize($value);
+            $unser = unserialize($value);
         return $unser===FALSE ? $value : $unser;
-    }    
+        }
     
     public function setValue($name, $value, $save = true)
     {
         $name = $this->getI18nFieldName($name);
-        $save = $save && ($this->getValue($name) != $value);
-        if (is_array($value)) $value = serialize($value);
+        if (is_array($value))
+            $value = serialize($value);
+        $save = $save && ($this->model->{$name} != $value);
+            
         $this->model->{$name}  = $value;
         if ($save)
         {

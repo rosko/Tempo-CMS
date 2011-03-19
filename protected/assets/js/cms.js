@@ -313,7 +313,7 @@ function pageunitAddForm(t)
 function pageunitEditForm(t)
 {
     var pageunit = $(t);
-    if (pageunit.hasClass('selected')) { return; }
+    if (pageunit.hasClass('selected')) {return;}
     fadeIn(pageunit, 'selected');
     pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
     unit_type = pageunit.attr('rel');
@@ -364,7 +364,11 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 
 function pageunitSetDialog(page_id, pageunit_id, unit_id)
 {
-    loadDialog('/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'));
+    loadDialog('/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'), {
+        onLoad: function() {
+            $.topbox.clear();
+        }
+    });
 }
 
 // =============================================================
@@ -374,7 +378,6 @@ function pageAddForm()
 {
     loadDialog('/?r=page/pageAdd&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
-        ajaxify: true,
         onOpen: function() {
             $('#Page_title').focus();
             $('#Page_parent_id').val($('body').attr('rel'));
@@ -389,32 +392,36 @@ function pageEditForm()
     var page_id = $('body').attr('rel');
     loadDialog('/?r=page/pageForm&id='+page_id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
-        ajaxify: true,
         onOpen: function(html) {
             $('#Page_title').focus();
             var form_id = $(html).find('form').attr('id');
-            $('input[name=deletepage]').unbind('click').click(function() {
-                pageDeleteDialog(null, function() {
-                    ajaxSave($('#'+form_id).attr('action'), $('#'+form_id).serialize()+'&delete=1', 'POST', function(html) {
-                        if (html.substring(0,2) == '{"') {
-                            var ret = jQuery.parseJSON(html);
-                            if (ret) {
-                              location.href = ret.url;
+            var v = $('#'+form_id).find('input[name=deletepage]').val();
+            $(html).find('button').each(function() {
+                if ($(this).text() == v) {
+                    $(this).unbind('click').bind('click', function() {
+                        pageDeleteDialog(null, function() {
+                            ajaxSave($('#'+form_id).attr('action'), $('#'+form_id).serialize()+'&delete=1', 'POST', function(html) {
+                                if (html.substring(0,2) == '{"') {
+                                    var ret = jQuery.parseJSON(html);
+                                    if (ret) {
+                                      location.href = ret.url;
+                                    }
+                                }
+                            });
+                        }, function(html) {
+                            if (html.substring(0,2) == '{"') {
+                                var ret = jQuery.parseJSON(html);
+                                if (ret) {
+                                  location.href = ret.url;
+                                }
+                            } else
+                            if ($(html).find('form').eq(0).find('.errorMessage').length == 0) {
+                                location.reload();
                             }
-                        }
+                        });
+                        return false;
                     });
-                }, function(html) {
-                    if (html.substring(0,2) == '{"') {
-                        var ret = jQuery.parseJSON(html);
-                        if (ret) {
-                          location.href = ret.url;
-                        }
-                    } else
-                    if ($(html).find('form').eq(0).find('.errorMessage').length == 0) {
-                        location.reload();
-                    }
-                });
-                return false;
+                }
             });
         }
     });

@@ -15,6 +15,8 @@ class SiteSettingsForm extends CFormModel
 			array('simpleMode, autoSave, showUnitAppearance, ajaxPager, ajaxPagerScroll', 'boolean'),
             array('theme', 'length', 'max'=>100),
             array('language', 'length', 'max'=>10),
+            array('defaultsShowEmail, defaultsSendMessage', 'length', 'max'=>32),
+            array('userExtraFields', 'safe'),
         );
         // Правила для проверки настроек для юнитов
         $unit_types = Unit::getTypes();
@@ -50,6 +52,9 @@ class SiteSettingsForm extends CFormModel
             'language' => Yii::t('cms', 'Main language'),
             'ajaxPager' => Yii::t('cms', 'Load pages in block without reloading whole web-page'),
             'ajaxPagerScroll' => Yii::t('cms', 'Scroll to block when navigate by pages'),
+            'defaultsShowEmail' => Yii::t('cms', 'Who can see email address in user profile, by default'),
+            'defaultsSendMessage' => Yii::t('cms', 'Who can send an email to user through the site, by default'),
+            'userExtraFields' => Yii::t('cms', 'Extra user profile fields'),
 		);
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
@@ -72,6 +77,8 @@ class SiteSettingsForm extends CFormModel
             'adminEmail'=>Yii::app()->params['admin']['email'],
             'defaultsPerPage'=>10,
             'language'=>Yii::app()->language,
+            'defaultsShowEmail'=>'registered',
+            'defaultsSendMessage'=>'registered',
         );
     }
 
@@ -113,12 +120,6 @@ class SiteSettingsForm extends CFormModel
                 'autoSave'=>array(
                     'type'=>'checkbox'
                 ),
-                'ajaxPager'=>array(
-                    'type'=>'checkbox'
-                ),
-                'ajaxPagerScroll'=>array(
-                    'type'=>'checkbox'
-                ),
                 Form::tab(Yii::t('cms', 'Appearance')),
                 'theme'=>array(
                     'type'=>'ThemeSelect',
@@ -133,6 +134,25 @@ class SiteSettingsForm extends CFormModel
                 ),
                 'showUnitAppearance'=>array(
                     'type'=>'checkbox'
+                ),
+                'ajaxPager'=>array(
+                    'type'=>'checkbox'
+                ),
+                'ajaxPagerScroll'=>array(
+                    'type'=>'checkbox'
+                ),
+                Form::tab(Yii::t('cms', 'Users')),
+                'defaultsShowEmail'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>User::userCategories(),
+                ),
+                'defaultsSendMessage'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>User::userCategories(),
+                ),
+                'userExtraFields'=>array(
+                    'type'=>'FieldSet',
+                    
                 ),
             ),
         );
@@ -248,5 +268,10 @@ class SiteSettingsForm extends CFormModel
         return $ret;
 		//return $this->_attributes;
 	}
+
+    public function  attributeNames()
+    {
+        return array_keys($this->_attributes);
+    }
 	
 }

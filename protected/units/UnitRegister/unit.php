@@ -82,7 +82,7 @@ class UnitRegister extends Content
 
     public static function defaultRegFields()
     {
-        return array('email', 'active', 'askfill');
+        return array('email', 'active', 'askfill', 'show_email', 'send_message');
     }
 
 	public static function form()
@@ -94,6 +94,10 @@ class UnitRegister extends Content
         foreach (array_keys($arr['elements']) as $k) {
             if (in_array($k, $default_fields)) continue;
             $fields_array[$k] = $labels[$k];
+        }
+        $extra_fields = User::getExtraFields('labels');
+        foreach ($extra_fields as $k => $v) {
+            $fields_array[$k] = '-'.$v;
         }
 		return array(
 			'elements'=>array(
@@ -141,6 +145,13 @@ class UnitRegister extends Content
         
     }
 
+    public function templateVars()
+    {
+        return array(
+            // TODO
+        );
+    }
+
     public function prepare($params)
     {
         $params = parent::prepare($params);
@@ -151,6 +162,10 @@ class UnitRegister extends Content
         foreach ($f['elements'] as $k => $v) {
             if (in_array($k, $fields))
                 $form_array['elements'][$k] = $v;
+        }
+        foreach ($form_array['elements']['extra_fields']['config'] as $k => $v) {
+            if (!in_array($v['name'], $fields))
+                unset($form_array['elements']['extra_fields']['config'][$k]);
         }
         $params['formElements'] = $form_array['elements'];
         $params['formRules'] = $this->makeValidationRules(new User);

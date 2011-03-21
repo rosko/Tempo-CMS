@@ -101,6 +101,7 @@ class UnitLogin extends Content
             $model=new LoginForm;
 			$model->attributes=$_POST['LoginForm'];
 			if($model->validate() && $model->login()) {
+                Yii::app()->controller->refresh();
                 return true;
 			}
 		}

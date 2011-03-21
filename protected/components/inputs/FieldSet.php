@@ -64,6 +64,14 @@ class FieldSet extends CInputWidget
                 ),
             ),
         ),
+        'textarea'=>array(
+            'rows'=>array(
+                'type'=>'Slider',
+            ),
+            'cols'=>array(
+                'type'=>'Slider',
+            ),
+        ),
     );
 
     // Обязательные правила для полей

@@ -35,25 +35,28 @@ class User extends CActiveRecord
             array('login, password, password_repeat', 'filter', 'filter'=>'strtolower'),
             array('login, password, password_repeat', 'filter', 'filter'=>'trim'),
             array('login, password', 'required', 'on'=>'add'),
-            array('login, password', 'required', 'on'=>'register'),
+//            array('login, password', 'required', 'on'=>'register'),
 			array('login, email, password', 'length', 'max'=>32, 'min'=>5, 'encoding'=>'UTF-8'),
             //array('login', 'match', 'not'=>true, 'pattern'=>'/^[0-9]*/u'),
             array('login, email', 'unique'),
-			array('email, name', 'required'),
+			array('email', 'required'),
+            array('name', 'required', 'on'=>'update'),
             array('login', 'match', 'pattern'=>'/^[a-z]+[a-z0-9-]*[a-z0-9]+$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers. And it can not start with a digit or sign')),
             array('password', 'match', 'pattern'=>'/^[[:graph:]]*$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers')),
             array('email', 'email'),
             array('password', 'compare', 'compareAttribute'=>'password_repeat'),
             array('password, password_repeat, authcode', 'safe'),
-            array('login', 'unsafe', 'on'=>'edit'),
+            array('login', 'unsafe', 'on'=>array('edit','update')),
 			array('name', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
-            array('active, askfill, show_email, send_message', 'unsafe', 'on'=>'register'),
-            array('active, askfill, agreed', 'unsafe', 'on'=>'update'),
+            array('active, askfill, show_email, send_message', 'unsafe', 'on'=>array('register', 'view')),
+            array('active, askfill, captcha, agreed', 'unsafe', 'on'=>array('update','view')),
             array('active, askfill, agreed', 'boolean'),
-            array('extra_fields', 'safe'),
+            array('show_email, send_message', 'safe'),
+            array('extra_fields', 'FieldsValidator', 'config'=>User::extraFields()),
             array('captcha', 'captcha', 'on'=>'register',
                 'allowEmpty'=>!CCaptcha::checkRequirements() || !Yii::app()->user->isGuest,
                 'captchaAction'=>'site/captcha'),
+            array('password, password_repeat, captcha', 'unsafe', 'on'=>'view'),
 		);
 	}
 
@@ -113,6 +116,16 @@ class User extends CActiveRecord
         );
     }
 
+    public function isUserInCategory($category)
+    {
+        $cond = array(
+            'all'=>true,
+            'registered'=>!Yii::app()->user->isGuest,
+            'none'=>false,
+        );
+        return $cond[$category];
+    }
+
     public function form()
     {
         return array(
@@ -129,6 +142,7 @@ class User extends CActiveRecord
                 'password'=>array(
                     'type'=>'password',
                     'value'=>'',
+                    'hint'=>!Yii::app()->user->isGuest ? Yii::t('cms', 'Enter your password only if you want to replace it') : '',
                 ),
                 'password_repeat'=>array(
                     'type'=>'password',
@@ -138,11 +152,12 @@ class User extends CActiveRecord
                 ),
                 'captcha'=>array(
                     'type'=>'text',
-                    'label'=>Yii::app()->controller->widget("CCaptcha", array(
+                    'label'=>Yii::t('cms', 'Verify code') . Yii::app()->controller->widget("CCaptcha", array(
                         'captchaAction'=>'site/captcha',
                         'clickableImage'=>true,
 
-                    ), true) . '<br />'. Yii::t('cms', 'Verify code'),
+                    ), true),
+                    'hint'=>Yii::t('cms', 'Enter the symbols from the image'),
                 ),
                 'agreed'=>array(
                     'type'=>'radio',
@@ -160,7 +175,7 @@ class User extends CActiveRecord
                 ),
                 'extra_fields'=>array(
                     'type'=>'Fields',
-                    'config'=>Yii::app()->settings->getValue('userExtraFields'),
+                    'config'=>User::extraFields(),
                 )
             ),
         );
@@ -235,18 +250,172 @@ class User extends CActiveRecord
         return self::$_admin;
     }
 
-    public function getExtraFields($what=null)
+    public function proposedFields($scenario='', $proposeRequired=false)
     {
-        $ef = Yii::app()->settings->getValue('userExtraFields');
-        $lang = Yii::app()->language;
-        if (!$what) {
-            $ret = $ef;
-        } elseif ($what == 'labels') {
-            $ret = array();
-            foreach ($ef as $k => $v) {
-                $ret[$v['name']] = $v['label'][$lang];
+        $specialFields = $this->specialFields($scenario);
+        $form = User::form();
+        $_fields = array_diff(array_keys($form['elements']), $specialFields['unsafe']);
+        if (!$proposeRequired) {
+            $_fields = array_diff($_fields, $specialFields['required']);
+        }
+        $labels = User::attributeLabels();
+
+        $fields = array();
+        foreach ($_fields as $field) {
+            $fields[$field] = $labels[$field];
+        }
+        foreach (User::extraLabels() as $field => $label) {
+            $fields[$field] = Yii::t('cms', 'Extra field').': '.$label;
+        }
+        return $fields;
+    }
+
+    public function makeForm($scenario='', $selectedFields=array(), $requiredFields=array())
+    {
+        $this->rules = null;
+        $specialFields = $this->specialFields($scenario);
+        $form = User::form();
+        
+        if (!is_array($selectedFields))
+            $selectedFields = array();        
+        if (!is_array($requiredFields))
+            $requiredFields = array();
+
+        $fields = array_unique(array_diff(array_merge(array_merge($specialFields['required'], $requiredFields), $selectedFields), $specialFields['unsafe']));
+        foreach ($fields as $name) {
+            if (isset($form['elements'][$name])) {
+                $formFields[$name] = $form['elements'][$name];
             }
         }
-        return $ret;
+        foreach ($formFields as $name => $field) {
+            if ($field['type']=='Fields') {
+                if (is_array($field['config'])) foreach ($field['config'] as $key => $extraField) {
+                    if (!in_array($extraField['name'], $fields)) {
+                        unset($formFields[$name]['config'][$key]);
+                    }
+                }
+            }
+        }
+        $oldRules = $this->rules();
+
+        $alreadyRequired = array();
+        $rules = array();
+        foreach ($oldRules as $rule) {
+            if ($scenario) {
+                $scenarios = isset($rule['on']) ? (is_array($rule['on']) ? $rule['on'] : explode(',',str_replace(' ','',$rule['on']))) : null;
+            }
+            if (!$scenario || !$scenarios || in_array($scenario,$scenarios)) {
+                if(isset($rule[0],$rule[1])) {
+                    if ($rule[1]=='captcha' && !in_array($rule[0],$selectedFields)) continue;
+                    if ($rule[1]=='required'/* || $rule[1]=='compare'*/)  {
+                        $validator = CValidator::createValidator($rule[1],$this,$rule[0],array_slice($rule,2));
+                        foreach ($validator->attributes as $attr) {
+                            if (!in_array($attr, $requiredFields) && !in_array($attr, $specialFields['required'])) {
+                                $validator->attributes = array_diff($validator->attributes, array($attr));
+                            } else {
+                                $alreadyRequired[] = $attr;
+                            }
+                        }
+                        $rule[0] = implode(', ', $validator->attributes);
+                    }
+                    if ($rule[1]=='FieldsValidator') {
+                        $alreadyRequired[] = $rule[0];
+                        if (is_array($rule['config'])) foreach ($rule['config'] as $key => $field) {
+                            if (!in_array($field['name'], $selectedFields)) {
+                                unset($rule['config'][$key]);
+                                continue;
+                            }
+
+                            $isRequired = in_array($field['name'], $requiredFields);
+
+                            if (!is_array($rule['config'][$key]['rules']))
+                                $rule['config'][$key]['rules'] = array();
+                            foreach ($rule['config'][$key]['rules'] as $i => $_rule) {
+                                if ($_rule[0]=='required') {
+                                    if (!in_array($field['name'], $requiredFields))
+                                        unset($rule['config'][$key]['rules'][$i]);
+                                    $isRequired = false;
+                                    $alreadyRequired[] = $field['name'];
+                                }
+                            }
+                            if ($isRequired) {
+                                $rule['config'][$key]['rules'][] = array('required');
+                                $alreadyRequired[] = $field['name'];
+                            }
+                        }
+                    }
+                    if ($rule[0])
+                        $rules[] = $rule;
+                }
+            }
+        }
+        $neededRequired = array_diff($requiredFields, $alreadyRequired);
+        if (!empty($neededRequired)) {
+            $rule = array(implode(', ',$neededRequired), 'required');
+            if ($scenario)
+                $rule['on'] = $scenario;
+            $rules[] = $rule;
+        }
+
+        if ($rules) foreach ($rules as $rule) {
+            if ($scenario) {
+                $scenarios = isset($rule['on']) ? (is_array($rule['on']) ? $rule['on'] : explode(',',str_replace(' ','',$rule['on']))) : null;
+            }
+            if (!$scenario || !$scenarios || in_array($scenario,$scenarios)) {
+                if ($rule[1]=='FieldsValidator') {
+                    $attributes = explode(',',str_replace(' ','',$rule[0]));
+                    foreach ($attributes as $attr) {
+                        if (isset($formFields[$attr]))
+                            $formFields[$attr]['config'] = $rule['config'];
+                    }
+                }
+            }
+        }
+
+        $this->rules = $rules;
+        return array(
+            'elements'=>$formFields,
+            'rules'=>$rules,
+        );
+        
+    }
+
+    public static function extraLabels()
+    {
+        $language = Yii::app()->language;
+        $labels = array();
+        foreach (User::extraFields() as $field) {
+            $labels[$field['name']] = $field['label'][$language];
+        }
+        return $labels;
+
+    }
+
+    public static function extraFields()
+    {
+        return Yii::app()->settings->getValue('userExtraFields');
+    }
+
+    public function specialFields($scenario='')
+    {
+        $requiredFields = array();
+        $unsafeFields = array();
+        foreach ($this->rules() as $rule) {
+            if ($scenario) {
+                $scenarios = isset($rule['on']) ? (is_array($rule['on']) ? $rule['on'] : explode(',',str_replace(' ','',$rule['on']))) : null;
+            }
+            if (!$scenario || !$scenarios || in_array($scenario,$scenarios)) {
+                if ($rule[1]=='unsafe') {
+                    $unsafeFields = array_merge($unsafeFields, explode(',',str_replace(' ','',$rule[0])));
+                }
+                if ($rule[1]=='required') {
+                    $requiredFields = array_merge($requiredFields, explode(',',str_replace(' ','',$rule[0])));
+                }
+            }
+        }
+        return array(
+            'required'=>$requiredFields,
+            'unsafe'=>$unsafeFields,
+        );
     }
 }

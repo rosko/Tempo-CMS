@@ -23,10 +23,14 @@ class Messenger extends CApplicationComponent
             $mailer->SetLanguage(Yii::app()->language);
             $mailer->Subject = mb_convert_encoding($subject, 'CP-1251', 'UTF-8');
             $mailer->MsgHTML(mb_convert_encoding($message, 'CP-1251', 'UTF-8'), Yii::getPathOfAlias('webroot'));
-            //try {
-                $mailer->Send();
-            //} catch (phpmailerException $e) {
-            //}
+            try {
+                return $mailer->Send();
+            } catch (phpmailerException $e) {
+              // TODO: Отправлять в специальную таблицу недоставленных сообщений.
+              // Чтобы можно было переотправить по крону или просмотреть на сайте
+              //echo $e->getMessage()."\n";
+              return false;
+            }
         }
     }
 }

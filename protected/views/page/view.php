@@ -42,6 +42,26 @@ EOD
 
 $js = '';
 $flashes = Yii::app()->user->getFlashes();
+
+if (Yii::app()->user->hasState('askfill'))  {
+
+    $registerUnit = UnitRegister::model()->find('unit_id > 0');
+    if ($registerUnit) {
+        $shortMessage = '<a href=\''.$registerUnit->getUnitUrl().'\'>'.Yii::t('cms', 'Please fill all required fields in your personal profile. And if necessary, change your password.').'</a>';
+        $message = '<h3>'.Yii::t('cms', 'Attention') .'</h3><p>'.$shortMessage.'</p>';
+        if (Yii::app()->user->getState('askfill') == 'first') {
+
+            $fancyPath = $am->publish(Yii::getPathOfAlias('application.vendors.fancybox'));
+            $cs->registerScriptFile($fancyPath.'/jquery.fancybox-1.3.1.pack.js');
+            $cs->registerCssFile($fancyPath.'/jquery.fancybox-1.3.1.css');
+            $js .= '$.fancybox("'.$message.'");';
+            Yii::app()->user->setState('askfill', 'second');
+        } else {
+            $flashes['askfill-permanent'] = $shortMessage;
+        }
+    }
+}
+
 foreach ($flashes as $k => $flash)
 {
     if (!is_string($flash)) continue;

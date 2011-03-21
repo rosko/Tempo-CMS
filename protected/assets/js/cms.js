@@ -72,6 +72,7 @@ function ajaxSaveProcess()
                         cms_current_command.success(ret);
                     }
                     ajaxSaveDone();
+                    cms_current_command = null;
                     if (cms_save_commands.length > 0) {
                         ajaxSaveProcess();
                     }
@@ -88,9 +89,10 @@ function ajaxSaveProcess()
 
 function ajaxSaveDone()
 {
-    if (!cms_current_command.silent)
+    if ((!cms_current_command) ||
+        (cms_current_command && !cms_current_command.silent) )
         showInfoPanel(i18n.cms.saved);
-    cms_current_command = null;
+    
 }
 
 function ajaxSaveRepeat(timeout)

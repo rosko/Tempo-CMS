@@ -169,13 +169,25 @@ class Unit extends I18nActiveRecord
 		return call_user_func(array($tmp_class, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
-    public function getUnitUrl()
+    public function getUnitPageArray()
     {
         $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
         $page = $command->queryRow();
-        return Yii::app()->controller->createUrl('page/view', array('id'=>$page['id'], 'alias'=>$page[Yii::app()->language.'_alias'], 'url'=>$page[Yii::app()->language.'_url']));
+        $page['alias'] = $page[Yii::app()->language.'_alias'];
+        $page['url'] = $page[Yii::app()->language.'_url'];
+        return $page;
+    }
+
+    public function getUnitUrl($absolute=false, $params=array())
+    {
+        $page = $this->getUnitPageArray();
+        $params = array_merge(array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
+        if ($absolute)
+            return Yii::app()->controller->createAbsoluteUrl('page/view', $params);
+        else
+            return Yii::app()->controller->createUrl('page/view', $params);
     }
 
     /**

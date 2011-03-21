@@ -287,5 +287,16 @@ return array(
     'Add item'=>'Добавить пункт',
     'Extra fields'=>'Дополнительные поля',
     'Input'=>'Ввод',
+    'Enter the symbols from the image'=>'Введите сиволы с картинки',
+    'Extra field'=>'Доп.поле',
+    'Enter your password only if you want to replace it'=>'Вводите пароль, только если вы хотите заменить его',
+    'Rows'=>'Строчки',
+    'Cols'=>'Столбики',
+    'Access denied'=>'Доступ запрещен',
+    'Try sign in'=>'Попробуйте войти',
+    'Please fill all required fields in your personal profile. And if necessary, change your password.'=>'Пожалуйста, заполните в Вашем личном профиле все необходимые поля. И при необходимости, смените пароль.',
+    'Hello'=>'Здравствуйте',
+    'Attention'=>'Внимание',
+    'Profile' => 'Профиль',
 );
 

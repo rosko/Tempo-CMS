@@ -7,7 +7,7 @@ class UnitRegister extends Content
 
     public function name($language=null)
     {
-        return Yii::t('UnitRegister.unit', 'Register Form', array(), null, $language);
+        return Yii::t('UnitRegister.unit', 'Registration and profile form', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -26,7 +26,7 @@ class UnitRegister extends Content
 			array('unit_id', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
             array('is_emailauth_req, is_invite_req, notify_admin, notify_user', 'boolean'),
-            array('fields, fields_req', 'type', 'type'=>'array'),
+            array('fields, fields_req, profile_fields, profile_fields_req', 'type', 'type'=>'array'),
             array('invites, agreement, text', 'safe'),
 		));
 	}
@@ -38,6 +38,8 @@ class UnitRegister extends Content
 //			'unit_id' => 'Unit',
             'fields' => Yii::t('UnitRegister.unit', 'Form fields'),
             'fields_req' => Yii::t('UnitRegister.unit', 'Required fields'),
+            'profile_fields' => Yii::t('UnitRegister.unit', 'Editable fields in user profile'),
+            'profile_fields_req' => Yii::t('UnitRegister.unit', 'Required editable fields in user profile'),
             'is_emailauth_req' => Yii::t('UnitRegister.unit', 'Is e-mail authorization needed?'),
             'is_invite_req' => Yii::t('UnitRegister.unit', 'Is invite required?'),
             'invites' => Yii::t('UnitRegister.unit', 'Invites'),
@@ -55,6 +57,8 @@ class UnitRegister extends Content
             'unit_id' => 'integer unsigned',
             'fields' => 'text',
             'fields_req' => 'text',
+            'profile_fields' => 'text', // поля, которые пользователь может заполнить в своем профиле
+            'profile_fields_req' => 'text', // поля, которые пользователь обязан заполнить в своем профиле
             'is_emailauth_req'=>'boolean',
             'notify_admin'=>'boolean',
             'notify_user'=>'boolean',
@@ -75,30 +79,32 @@ class UnitRegister extends Content
         return array(
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
-                'serialAttributes' => array('fields', 'fields_req'),
+                'serialAttributes' => array('fields', 'fields_req', 'profile_fields', 'profile_fields_req'),
             )
         );
     }
 
+    public function urlParam($method)
+    {
+        return 'profile_'.$method;
+    }
+
     public static function defaultRegFields()
     {
-        return array('email', 'active', 'askfill', 'show_email', 'send_message');
+        return array('email');
+    }
+
+    public static function restrictedRegFields()
+    {
+        return array('active', 'askfill', 'show_email', 'send_message');
     }
 
 	public static function form()
 	{
-        $arr = User::form();
-        $labels = User::attributeLabels();
-        $fields_array = array();
-        $default_fields = UnitRegister::defaultRegFields();
-        foreach (array_keys($arr['elements']) as $k) {
-            if (in_array($k, $default_fields)) continue;
-            $fields_array[$k] = $labels[$k];
-        }
-        $extra_fields = User::getExtraFields('labels');
-        foreach ($extra_fields as $k => $v) {
-            $fields_array[$k] = '-'.$v;
-        }
+        $model = new User;
+        $registerFields = $model->proposedFields('register', true);
+        $updateFields = $model->proposedFields('update', true);
+        
 		return array(
 			'elements'=>array(
                 Form::tab(Yii::t('UnitRegister.unit', 'Settings')),
@@ -106,13 +112,13 @@ class UnitRegister extends Content
                     'type'=>'listbox',
                     'multiple'=>true,
                     'size'=>7,
-                    'items'=>$fields_array,
+                    'items'=>$registerFields,
                 ),
                 'fields_req'=>array(
                     'type'=>'listbox',
                     'multiple'=>true,
                     'size'=>7,
-                    'items'=>$fields_array,
+                    'items'=>$registerFields,
                 ),
                 'is_emailauth_req'=>array(
                     'type'=>'checkbox',
@@ -130,6 +136,19 @@ class UnitRegister extends Content
                 Form::tab(Yii::t('UnitRegister.unit', 'User agreement')),
                 'agreement'=>array(
                     'type'=>'VisualTextAreaFCK'
+                ),
+                Form::tab(Yii::t('UnitRegister.unit', 'Editing profile')),
+                'profile_fields'=>array(
+                    'type'=>'listbox',
+                    'multiple'=>true,
+                    'size'=>7,
+                    'items'=>$updateFields,
+                ),
+                'profile_fields_req'=>array(
+                    'type'=>'listbox',
+                    'multiple'=>true,
+                    'size'=>7,
+                    'items'=>$updateFields,
                 ),
 // TODO: Поддержку инвайтов сделаем позже
 /*                'is_invite_req'=>array(
@@ -155,84 +174,102 @@ class UnitRegister extends Content
     public function prepare($params)
     {
         $params = parent::prepare($params);
-        $f = User::form();
-        $form_array = array();
-        $arr = is_array($this->fields) ? $this->fields : array();
-        $fields = array_merge(UnitRegister::defaultRegFields(), $arr);
-        foreach ($f['elements'] as $k => $v) {
-            if (in_array($k, $fields))
-                $form_array['elements'][$k] = $v;
+        if (isset($_GET[$this->urlParam('do')])) {
+            $params['doParam'] = $_GET[$this->urlParam('do')];
         }
-        foreach ($form_array['elements']['extra_fields']['config'] as $k => $v) {
-            if (!in_array($v['name'], $fields))
-                unset($form_array['elements']['extra_fields']['config'][$k]);
-        }
-        $params['formElements'] = $form_array['elements'];
-        $params['formRules'] = $this->makeValidationRules(new User);
-        if ($this->proccessRequest()) {
-            if ($this->is_emailauth_req) {
-                $params['waitingAuthCode'] = true;
-            } else {
-                $params['justRegistered'] = true;
+
+        if (($params['isGuest'] || $params['editMode']) && $params['doParam']!='edit') {
+
+            $model=new User('register');
+            $makeForm = $model->makeForm('register', $this->fields, $this->fields_req);
+            $params['formElements'] = $makeForm['elements'];
+            $params['formRules'] = $makeForm['rules'];
+            
+            if(isset($_REQUEST['ajax-validate']))
+            {
+                echo CActiveForm::validate($model);
+                Yii::app()->end();
             }
-        }
-        if ($_REQUEST['authcode']) {
-            $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
-            if ($user) {
-                $identity = new AuthCodeIdentity($_REQUEST['authcode']);
-                $identity->authenticate();
-                if($identity->errorCode===UserIdentity::ERROR_NONE) {
-                    Yii::app()->user->login($identity);
+
+            if ($this->proccessRequest()) {
+                if ($this->is_emailauth_req) {
+                    $params['waitingAuthCode'] = true;
+                } else {
+                    $params['justRegistered'] = true;
                 }
-                $user->saveAttributes(array(
-                    'active'=>true,
-                    'authcode'=>'',
-                ));
+            }
+            if ($_REQUEST['authcode']) {
+                $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
+                if ($user) {
+                    $identity = new AuthCodeIdentity($_REQUEST['authcode']);
+                    $identity->authenticate();
+                    if($identity->errorCode===UserIdentity::ERROR_NONE) {
+                        Yii::app()->user->login($identity);
+                    }
+                    $user->saveAttributes(array(
+                        'active'=>true,
+                        'authcode'=>'',
+                    ));
 
-                $cfg = Unit::loadConfig();
-                $viewFileDir = $cfg['UnitRegister'].'.UnitRegister.templates.mail.';
-                $tpldata = array(
-                    'model'=>$user,
-                    'settings' => Yii::app()->settings->model->getAttributes(),
-                    'page' => $this->getUnitPageArray(),
-                );
-                if ($this->notify_user) {
-                    // send 'to_user_notify' mail
-                    Yii::app()->messenger->send(
-                        'email',
-                        $user->email,
-                        Yii::t('UnitRegister.unit', 'Registration completed'),
-                        Yii::app()->controller->renderPartial(
-                            $viewFileDir.'to_user_notify',
-                            $tpldata,
-                            true
-                        )
+                    $cfg = Unit::loadConfig();
+                    $viewFileDir = $cfg['UnitRegister'].'.UnitRegister.templates.mail.';
+                    $tpldata = array(
+                        'model'=>$user,
+                        'settings' => Yii::app()->settings->model->getAttributes(),
+                        'page' => $this->getUnitPageArray(),
                     );
-                }                
-                $params['confirmedAuthCode'] = true;
-                unset($_REQUEST['authcode']);
-            } else {
-                $params['faultAuthCode'] = true;
+                    if ($this->notify_user) {
+                        // send 'to_user_notify' mail
+                        Yii::app()->messenger->send(
+                            'email',
+                            $user->email,
+                            Yii::t('UnitRegister.unit', 'Registration completed'),
+                            Yii::app()->controller->renderPartial(
+                                $viewFileDir.'to_user_notify',
+                                $tpldata,
+                                true
+                            )
+                        );
+                    }
+                    $params['confirmedAuthCode'] = true;
+                    unset($_REQUEST['authcode']);
+                } else {
+                    $params['faultAuthCode'] = true;
+                }
+
             }
 
+        } else {
+
+            if ($params['isGuest']) {
+                $params['accessDenied'] = true;
+            } else {
+                $makeForm = $params['user']->makeForm('update', $this->profile_fields, $this->profile_fields_req);
+                $params['formElements'] = $makeForm['elements'];
+                $params['formRules'] = $makeForm['rules'];
+
+                $profileUnit = UnitProfiles::model()->find('unit_id > 0');
+                if ($profileUnit)
+                    $params['profileUnitUrl'] = $profileUnit->getUnitUrl();
+                    $params['profileUnitUrlParams'] = $profileUnit->urlParam('view').'='.$params['user']->id;
+
+                if(isset($_REQUEST['ajax-validate']))
+                {
+                    echo CActiveForm::validate($params['user']);
+                    Yii::app()->end();
+                }
+                if(isset($_POST['User']))
+                {
+                    $params['user']->attributes=$_POST['User'];
+                    if ($params['user']->save()) {
+                        Yii::app()->user->setFlash('save-permanent', Yii::t('UnitRegister.unit','Profile edited successfully'));
+                        Yii::app()->controller->refresh();
+                    }
+                }
+            }
         }
 
         return $params;
-    }
-
-    public function ajax($vars)
-    {
-        $model=new User('register');
-        $model->rules = $this->makeValidationRules($model);
-		if(isset($_REQUEST['ajax-validate']))
-		{
-            echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-        if ($this->proccessRequest($model)) {
-            echo '1';
-        }
-        parent::ajax();
     }
 
     protected function proccessRequest($model=null)
@@ -241,7 +278,7 @@ class UnitRegister extends Content
 		{
             if (!$model) {
                 $model = new User('register');
-                $model->rules = $this->makeValidationRules($model);
+                $model->makeForm('register', $this->fields, $this->fields_req);
             }
             $tpldata = array();
 			$model->attributes=$_POST['User'];
@@ -317,35 +354,4 @@ class UnitRegister extends Content
         return false;
     }
 
-    protected function makeValidationRules($model)
-    {
-        if (!is_array($this->fields_req)) $this->fields_req = array();
-        if (!is_array($this->fields)) $this->fields = array();
-        $model->rules = null;
-        $oldrules = $model->rules();
-        $present = array();
-        $rules = array();
-        foreach ($oldrules as $rule) {
-			if(isset($rule[0],$rule[1])) {
-                if ($rule[1]=='captcha' && !in_array($rule[0],$this->fields)) continue;
-                if ($rule[1]=='required' || $rule[1]=='compare')  {
-                    $validator = CValidator::createValidator($rule[1],$this,$rule[0],array_slice($rule,2));
-                    foreach ($validator->attributes as $attr) {
-                        if (!in_array($attr, $this->fields_req)) {
-                            if (!in_array($attr, UnitRegister::defaultRegFields())) {
-                                $validator->attributes = array_diff($validator->attributes, array($attr));
-                            }
-                        } else {
-                            $present[] = $attr;
-                        }
-                    }
-                    $rule[0] = implode(', ', $validator->attributes);
-                }
-                if ($rule[0])
-                    $rules[] = $rule;
-            }
-        }
-        $rules[] = array(implode(', ',array_diff($this->fields_req, $present)), 'required', 'on'=>'register');
-        return $rules;
-    }
 }

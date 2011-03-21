@@ -35,6 +35,9 @@ function smarty_function_link($params, &$smarty){
     }     
     if (is_array($url))
         $url = Yii::app()->controller->createAbsoluteUrl($url[0],array_slice($url,1));
+    if (!empty($params['params'])) {
+        $url .= ((strpos($url,'?')===false) ? '?' : '&') . $params['params'];
+    }
     if (empty($params['text']))
         return $url;
     else

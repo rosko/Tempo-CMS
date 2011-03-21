@@ -10,8 +10,9 @@
             {if $faultAuthCode}
                 <h3 class="error">{t text='Your code is wrong. Try again, please.'}</h3>
             {else}
-                {if $isGuest || $editMode}
+                {if ($isGuest || $editMode) && $doParam != 'edit'}
 
+<h2>{t text='Registration'}</h2>
 {if $content.agreement}
     <div id="RegisterAgreement{$unit.id}">
         <h2>{t text="User agreement"}</h2>
@@ -21,13 +22,23 @@
     <div id="RegisterForm{$unit.id}" style="display: none;">
 {/if}
     {$content.text}
-    {form className="User" elements=$formElements enableAjax='validate' scenario="register" rules=$formRules}
+    {form className="User" elements=$formElements enableAjax='validate' scenario="register" rules=$formRules submitLabel={t text='Sign up'}}
 {if $content.agreement}
     </div>
 {/if}
 
                 {else}
-                    {redirect to="{link url='/'}"}
+
+                    {if $user && $formElements}
+                        {if $profileUnitUrl}
+                            <p>{link text={t text='View profile'} url=$profileUnitUrl params=$profileUnitUrlParams}</p>
+                        {/if}
+                        <h2>{t text="Editing profile"} {$user.login}</h2>
+                        {form className="User" id=$user.id elements=$formElements enableAjax=true scenario="update" rules=$formRules submitLabel={t text='Save'}}
+                    {else}
+                        {if $accessDenied}{accessdenied}{/if}
+                    {/if}
+
                 {/if}
             {/if}
         {/if}

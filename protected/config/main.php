@@ -87,6 +87,7 @@ return CMap::mergeArray(array(
         'urlManager'=>array(
             'rules'=>array(
                 'page/unitForm'=>'page/unitForm',
+                'page/unitView'=>'page/unitView',
                 'login'=>'site/login',
                 'site/captcha'=>'site/captcha',
                 "site/login"=>'site/login',

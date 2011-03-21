@@ -25,7 +25,8 @@ class UnitProfiles extends Content
 		return $this->localizedRules(array(
 			array('unit_id', 'required'),
 			array('unit_id, per_page', 'numerical', 'integerOnly'=>true),
-            array('table_fields, displayed_fields, profile_fields, profile_fields_req', 'type', 'type'=>'array'),
+            array('table_fields, displayed_fields', 'type', 'type'=>'array'),
+            array('feedback_form', 'safe'),
 		));
 	}
 
@@ -36,9 +37,8 @@ class UnitProfiles extends Content
 //			'unit_id' => 'Unit',
             'table_fields' => Yii::t('UnitProfiles.unit', 'Fields in users table'),
             'displayed_fields' => Yii::t('UnitProfiles.unit', 'Displayed fields in user profile'),
-            'profile_fields' => Yii::t('UnitProfiles.unit', 'Editable fields in user profile'),
-            'profile_fields_req' => Yii::t('UnitProfiles.unit', 'Required editable fields in user profile'),
             'per_page' => Yii::t('UnitProfiles.unit', 'Rows in table per page'),
+            'feedback_form' => Yii::t('UnitProfiles.unit', 'Feedback form'),
 		);
 	}
 
@@ -49,9 +49,8 @@ class UnitProfiles extends Content
             'unit_id' => 'integer unsigned',
             'table_fields' => 'text', // поля отображаемые в таблице пользователей
             'displayed_fields' => 'text', // поля отображаемые при просмотре профиля пользователя
-            'profile_fields' => 'text', // поля, которые пользователь может заполнить в своем профиле
-            'profile_fields_req' => 'text', // поля, которые пользователь обязан заполнить в своем профиле
             'per_page' => 'integer unsigned', // количество профилей в таблице на одну страницу
+            'feedback_form' => 'text',
         );
     }
 
@@ -60,28 +59,21 @@ class UnitProfiles extends Content
         return array(
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
-                'serialAttributes' => array('table_fields', 'displayed_fields', 'profile_fields', 'profile_fields_req'),
+                'serialAttributes' => array('table_fields', 'displayed_fields', 'feedback_form'),
             )
         );
     }
 
-    public static function restrictedProfileFields()
+    public function urlParam($method)
     {
-        return array('password', 'password_repeat', 'captcha', 'active', 'authcode', 'agreed', 'askfill', 'show_email', 'send_message');
+        return 'profile_'.$method;
     }
 
 	public static function form()
 	{
-        $arr = User::form();
-        $labels = User::attributeLabels();
-        $fields_array = array();
-        $all_fields_array = array();
-        $restricted_fields = UnitProfiles::restrictedProfileFields();
-        foreach (array_keys($arr['elements']) as $k) {
-            if (!in_array($k, $restricted_fields))
-                $fields_array[$k] = $labels[$k];
-            $all_fields_array[$k] = $labels[$k];
-        }
+        $model = new User;
+        $viewFields = $model->proposedFields('view', true);
+
 		return array(
 			'elements'=>array(
                 Form::tab(Yii::t('UnitProfiles.unit', 'Settings')),
@@ -89,35 +81,28 @@ class UnitProfiles extends Content
                     'type'=>'listbox',
                     'multiple'=>true,
                     'size'=>7,
-                    'items'=>$fields_array,
+                    'items'=>$viewFields,
                 ),
                 'displayed_fields'=>array(
                     'type'=>'listbox',
                     'multiple'=>true,
                     'size'=>7,
-                    'items'=>$fields_array,
+                    'items'=>$viewFields,
                 ),
-/*                'profile_fields'=>array(
-                    'type'=>'listbox',
-                    'multiple'=>true,
-                    'size'=>7,
-                    'items'=>$all_fields_array,
-                ),
-                'profile_fields_req'=>array(
-                    'type'=>'listbox',
-                    'multiple'=>true,
-                    'size'=>7,
-                    'items'=>$all_fields_array,
-                ),*/
 				'per_page'=>array(
 					'type'=>'Slider',
+                    'hint'=>Yii::t('UnitProfiles.unit', 'If zero choosed, accordingly site\'s general settings'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 50,
                         'step' => 5,
 					)
 				),
-                Yii::t('UnitProfiles.unit', 'If zero choosed, accordingly site\'s general settings'),
+                Form::tab(Yii::t('UnitProfiles.unit', 'Feedback form')),
+                'feedback_form'=>array(
+                    'type'=>'FieldSet',
+                ),
+                
             )
         );
 
@@ -125,9 +110,205 @@ class UnitProfiles extends Content
 
     public function prepare($params)
     {
-        $params = parent::prepare($params);
+        $params = parent::prepare($params);        
+        $id = __CLASS__.$this->id;
+        $params['profileVar'] = $this->urlParam('view');
+        $blank = true;
+
+        if (!empty($_REQUEST[$params['profileVar']])) {
+
+            $profile = User::model()->findByPk(intval($_REQUEST[$params['profileVar']]));
+            if ($profile) {
+
+                $params['details'] = Yii::app()->controller->widget('zii.widgets.CDetailView', array(
+                    'data'=>$profile,
+                    'attributes'=>$this->makeFields($this->displayed_fields, $profile),
+                ), true);
+                $params['profile'] = $profile->getAttributes();
+
+                if ($profile->id == $params['user']->id)
+                {
+                    $registerUnit = UnitRegister::model()->find('unit_id > 0');
+                    if ($registerUnit)
+                        $params['profileEditUrl'] = $registerUnit->getUnitUrl();
+                }
+
+                if (User::isUserInCategory($profile->send_message) && $profile->id != $params['user']->id && $profile->email) {
+
+                    $vm = new VirtualModel($this->feedback_form, 'FieldSet');                    
+                    $config = $vm->formMap;
+                    $config['id'] = sprintf('%x',crc32(serialize(array_keys($this->feedback_form))));
+                    $config['buttons'] = array(
+                        'send'=>array(
+                            'type'=>'submit',
+                            'label'=>Yii::t('UnitProfiles.unit', 'Send'),
+                        ),
+                    );
+                    $config['activeForm'] = Form::ajaxify($config['id']);
+                    $config['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitView&pageunit_id='.$params['pageunit']->id.'&'.$params['profileVar'].'='.$profile->id;
+                    $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
+                    $form = new Form($config, $vm);
+
+                    if(isset($_REQUEST['ajax-validate']))
+                    {
+                        echo CActiveForm::validate($vm);
+                        Yii::app()->end();
+                    }
+
+                    if ($form->submitted('send')) {
+                        $vm = $form->model;
+                        if ($form->validate()) {
+
+                            $cfg = Unit::loadConfig();
+                            $viewFileDir = $cfg['UnitProfiles'].'.UnitProfiles.templates.mail.';
+                            $labels = $vm->attributeLabels();
+                            foreach ($vm->getAttributes() as $attr => $value) {
+                                $tpldata['fields'][$labels[$attr]] = $value;
+                            }
+                            $tpldata['profile'] = $profile->getAttributes();
+                            $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
+                            $tpldata['page'] = $this->getUnitPageArray();
+                            $registerUnit = UnitRegister::model()->find('unit_id > 0');
+                            if ($registerUnit) {
+                                $tpldata['profileEditUrl'] = $registerUnit->getUnitUrl();
+                                $tpldata['profileEditUrlParams'] = $registerUnit->urlParam('do').'=edit';
+                            }
+
+                            Yii::app()->messenger->send(
+                                'email',
+                                $profile->email,
+                                '['.$_SERVER['HTTP_HOST'].'] '. Yii::t('UnitProfiles.unit', 'Feedback form'),
+                                Yii::app()->controller->renderPartial(
+                                    $viewFileDir.'feedback',
+                                    $tpldata,
+                                    true
+                                )
+                            );
+  
+                            Yii::app()->user->setFlash('save-permanent', Yii::t('UnitProfiles.unit','Your message was successfully sent'));
+                            Yii::app()->controller->refresh();
+                        }
+                    }
+
+                    $params['feedbackForm'] = $form->render();
+
+                }
+
+
+            } else {
+                $params['error'] = Yii::t('UnitProfiles.unit', 'Profile not found');
+            }
+            $blank = false;
+        }
+
+        if ($blank) {
+            $params = $this->prepareTable($params);
+
+        }
+        return $params;
+    }
+
+    protected function prepareTable($params)
+    {
+        $id = __CLASS__.$this->id;
+        $tableFields = $this->makeFields($this->table_fields);
+        $urlparams = (bool)Yii::app()->settings->getValue('ajaxPager') ? array(
+            'route'=>'page/unitView',
+            'params'=>array(
+                'pageunit_id'=>$params['pageunit']['id'],
+            ),
+        ) : array();
+
+        $dataProvider=new CActiveDataProvider('User', array(
+            'pagination'=>CMap::mergeArray(array(
+                'pageVar'=>$this->urlParam('page'),
+                'pageSize' => $this->per_page ? $this->per_page : Yii::app()->settings->getValue('defaultsPerPage'),
+            ), $urlparams),
+            'sort'=>CMap::mergeArray(array(
+                'sortVar'=>$this->urlParam('sort'),
+            ), $urlparams),
+        ));
+        $tableFields[] = array(
+            'class'=>'CButtonColumn',
+            'template'=>'{view}',
+            'buttons'=>array(
+                'view'=>array(
+                    'label'=>Yii::t('UnitProfiles.unit', 'View profile'),
+                    'url' => '"?'.$params['profileVar'].'={$data->id}"',
+                ),
+            ),
+        );
+
+        $params['table'] = Yii::app()->controller->widget('zii.widgets.grid.CGridView', array(
+            'id'=>$id,
+            'ajaxUpdate'=>(bool)Yii::app()->settings->getValue('ajaxPager') ? $id : false,
+            'ajaxVar'=>$id,
+            'dataProvider'=>$dataProvider,
+            'columns'=>$tableFields,
+            'selectableRows'=>0,
+        ), true);
 
         return $params;
+    }
+
+    protected function makeFields($fields, $user=null)
+    {
+        if (!is_array($fields)) $fields = array();
+        $u = new User;
+        $specialFields = $u->specialFields('view');
+
+        $fields = array_diff($fields, $specialFields['unsafe']);
+        $form = User::form();
+        foreach ($form['elements'] as $name => $field) {
+            if ($field['type']=='Fields') {
+                foreach ($field['config'] as $extraField) {
+                    if (in_array($extraField['name'], $fields)) {
+                        if ($user) {
+                            foreach ($fields as $i => $attr) {
+                                if ($attr == $extraField['name']) {
+                                    $fields[$i] = array(
+                                        'label'=>$extraField['label'][Yii::app()->language],
+                                        'value'=>$user->{$name}[$extraField['name']],
+                                        'name'=>$extraField['name'],
+                                    );
+                                }
+                            }
+                        } else {
+                            foreach ($fields as $i => $attr) {
+                                if ($attr == $extraField['name']) {
+                                    $fields[$i] = array(
+                                        'header'=>$extraField['label'][Yii::app()->language],
+                                        'value'=>'$data->'.$name.'['.$extraField['name'].']',
+                                        'name'=>$extraField['name'],
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                if (in_array($name, $fields))
+                    $fields = array_diff($fields, array($name));
+            }
+        }
+        foreach ($fields as $key => $field) {
+            if ($field=='email') {
+                if ($user) {
+                    $fields[$key] = array(
+                        'name'=>'email',
+                        'value'=>$user->email,
+                        'visible'=>User::isUserInCategory($user->show_email) || $user->id == Yii::app()->user->id,
+                    );
+                } else {
+                    $fields[$key] = array(
+                        'name'=>'email',
+                        'value'=>'User::isUserInCategory($data->show_email) ? $data->email : ""',
+                    );
+                }
+            }
+        }
+        return $fields;
+
+
     }
 
 }

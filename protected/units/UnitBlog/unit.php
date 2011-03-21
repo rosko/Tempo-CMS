@@ -63,12 +63,12 @@ class UnitBlog extends Content
                 Form::tab(Yii::t('UnitBlog.unit', 'Settings')),
 				'per_page'=>array(
 					'type'=>'Slider',
+                    'hint'=>Yii::t('UnitBlog.unit', 'If zero choosed, accordingly site\'s general settings'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 25,
 					)
-				),
-                Yii::t('UnitBlog.unit', 'If zero choosed, accordingly site\'s general settings'),
+				),                
 			),
 		);
 	}

@@ -139,13 +139,14 @@ class Content extends I18nActiveRecord
         return $page;
     }
 
-    public function getUnitUrl($absolute=false)
+    public function getUnitUrl($absolute=false, $params=array())
     {
         $page = $this->getUnitPageArray();
+        $params = array_merge(array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
         if ($absolute)
-            return Yii::app()->controller->createAbsoluteUrl('page/view', array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']));
+            return Yii::app()->controller->createAbsoluteUrl('page/view', $params);
         else
-            return Yii::app()->controller->createUrl('page/view', array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']));
+            return Yii::app()->controller->createUrl('page/view', $params);
     }
 
     public function prepare($params)

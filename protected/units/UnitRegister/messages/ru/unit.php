@@ -1,6 +1,9 @@
 <?php
 return array(
     'Register Form' => 'Форма регистрации',
+    'Registration and profile form' => 'Регистрация и редактирование профиля',
+
+    'Registration'=>'Регистрация',
 
     'Form fields' => 'Поля формы',
     'Required fields' => 'Обязательные для заполнения поля',
@@ -24,4 +27,14 @@ return array(
 
     'Settings' => 'Настройки',
     'I agree' => 'Я согласен',
+
+    'Editable fields in user profile' => 'Редактируемые поля в профиле',
+    'Required editable fields in user profile' => 'Обязательные редактируемые поля в профиле',
+    'Editing profile'=>'Редактирование профиля',
+    'Profile edited successfully'=>'Профиль успешно отредактирован',
+
+    'Sign up' => 'Зарегистрироваться',
+    'Save' => 'Сохранить',
+    'View profile'=>'Просмотреть профиль',
+
 );

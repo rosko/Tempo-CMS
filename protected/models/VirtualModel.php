@@ -20,9 +20,31 @@ class VirtualModel extends CModel
     private $_labels = array();
     private $_values = array();
 
-    public function __construct($config = null)
+    public function __construct($config = null, $format = 'native', $default=array())
     {
         if (!is_null($config)) {
+            if ($format == 'FieldSet') {
+                $inputConfig = $config;
+                $config = array();
+                foreach ($inputConfig as $key => $field) {
+
+                    $name = $field['name'];
+                    unset($field['name']);
+                    if (isset($default[$name]))
+                        $field['default'] = $default[$name];
+
+                    $field['label'] = $field['label'][Yii::app()->language];
+                    $field['hint'] = $field['hint'][Yii::app()->language];
+
+                    if (isset($field['rules'])) foreach ($field['rules'] as $i => $rule) {
+                        array_unshift($rule, $name);
+                        $field['rules'][$i] = $rule;
+                    }
+                    if (empty($field['rules'])) $field['rules'] = array(array($name, 'safe'));
+
+                    $config[$name] = $field;
+                }
+            }
             $this->configure($config);
         }
     }

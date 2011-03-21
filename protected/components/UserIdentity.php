@@ -23,6 +23,8 @@ class UserIdentity extends CUserIdentity
 		else if(User::hash($this->password)!==$user->password)
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else {
+            if ($user->askfill)
+                $this->setState('askfill', 'first');
             $this->_id = $user->id;
             $this->username = $user->login ? $user->login : $user->email;
 			$this->errorCode=self::ERROR_NONE;

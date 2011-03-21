@@ -59,20 +59,20 @@ class UnitSitemap extends Content
 				),
 				'recursive'=>array(
 					'type'=>'Slider',
+                    'hint'=>Yii::t('UnitSitemap.unit', 'If zero choosed, siblings pages will show'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 10,
 					)
-				),
-                Yii::t('UnitSitemap.unit', 'If zero choosed, siblings pages will show'),
+				),                
 				'per_page'=>array(
 					'type'=>'Slider',
+                    'hint'=>Yii::t('UnitSitemap.unit', 'If zero choosed, accordingly site\'s general settings'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 25,
 					)
 				),
-                Yii::t('UnitSitemap.unit', 'If zero choosed, accordingly site\'s general settings'),
 				'page'=>array(
 					'type'=>'PageSelect',
                     'excludeCurrent'=>false,

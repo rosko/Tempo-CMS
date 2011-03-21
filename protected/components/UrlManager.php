@@ -34,7 +34,8 @@ class UrlManager extends CUrlManager
         }
 
         if (!empty($params['url'])) {
-            $params['url'] = substr($params['url'],1);
+            if (substr($params['url'],0,1)=='/')
+                $params['url'] = substr($params['url'],1);
             $tmp = explode('/',$params['url']);
             if ($tmp[count($tmp)-1] == '') {
                 unset($params['url']);

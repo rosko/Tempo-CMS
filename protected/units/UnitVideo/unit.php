@@ -115,9 +115,9 @@ EOD;
 						'change' => $changeHeight
 					)
 				),
-                Form::tab(Yii::t('UnitVideo.unit', 'HTML')),
-                Yii::t('UnitVideo.unit', 'If the link to your video is not recognized, use the version with the html-code.'),
+                Form::tab(Yii::t('UnitVideo.unit', 'HTML')),                
                 'html'=>array(
+                    'hint'=>Yii::t('UnitVideo.unit', 'If the link to your video is not recognized, use the version with the html-code.'),
                     'type'=>'textarea',
                         'rows'=>6,
                         'cols'=>60

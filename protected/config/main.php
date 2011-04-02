@@ -13,6 +13,7 @@ return CMap::mergeArray(array(
 		'application.models.*',
 		'application.components.*',
 		'application.components.inputs.*',
+        'ext.yiidebugtb.*',
 	),
 
     'components'=>array(
@@ -28,7 +29,7 @@ return CMap::mergeArray(array(
         'authManager'=>array(
             'class'=>'AuthManager',
             'connectionID'=>'db',
-            'defaultRoles'=>array('guest','authenticated'),
+            'defaultRoles'=>array('anybody', 'guest', 'authenticated'),
             'itemTable'=>$config['components']['db']['tablePrefix'].'auth_item',
             'itemChildTable'=>$config['components']['db']['tablePrefix'].'auth_itemchild',
             'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
@@ -94,6 +95,7 @@ return CMap::mergeArray(array(
                 "site/logout"=>'site/logout',
                 'filesEditor/save'=>'filesEditor/save',
                 'users'=>'user/index',
+                'rights'=>'rights',
                 
 
             ),
@@ -101,6 +103,17 @@ return CMap::mergeArray(array(
 		'errorHandler'=>array(
             'errorAction'=>'site/error',
         ),
+		'log'=>array(
+			'class'=>'CLogRouter',
+            'routes'=>array(
+                array(
+                    'class'=>'XWebDebugRouter',
+                    'config'=>'alignLeft, opaque, runInDebug, yamlStyle',
+                    'levels'=>'error, warning, trace, profile, info',
+                    'allowedIPs'=>array('127.0.0.1'),
+                ),
+            ),
+		),
         
 	),
 

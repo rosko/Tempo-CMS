@@ -15,6 +15,8 @@ $hmargin = max(ceil($height/10), 7);
     <?php foreach ($config['buttons'] as $name => $button) { ?>
 
 <?php
+if ($button==null) continue;
+
 $i++;
 $url = Toolbar::getIconUrlByAlias($button['icon'], '', $config['iconSet'], $config['iconSize']);
 $hover = Toolbar::getIconUrlByAlias($button['icon'], 'hover', $config['iconSet'], $config['iconSize']);

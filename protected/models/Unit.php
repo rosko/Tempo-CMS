@@ -56,10 +56,13 @@ class Unit extends I18nActiveRecord
 		);
 	}
 
-    public function defaultAccess()
+    public function operations()
     {
         return array(
-            'manage'=>'superadmin',
+            'manageUnit'=>array(
+                'label'=>'Manage settings',
+                'defaultRoles'=>array('administrator'),
+            ),
         );
     }
 

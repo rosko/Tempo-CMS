@@ -25,9 +25,9 @@ class ClientScript extends CClientScript
                 $this->registerScriptFile($this->strtr($url));
             foreach ($this->neededCssFiles as $url)
                 $this->registerCssFile($this->strtr($url));
-            if (Yii::app()->user->checkAccess('createPage') || 
-                Yii::app()->user->checkAccess('updatePage') ||
-                Yii::app()->user->checkAccess('deletePage')) {
+            if (Yii::app()->controller->id == 'page' && (Yii::app()->user->checkAccess('createPage', array('page'=>Yii::app()->controller->loadModel())) ||
+                Yii::app()->user->checkAccess('updatePage', array('page'=>Yii::app()->controller->loadModel())) ||
+                Yii::app()->user->checkAccess('deletePage', array('page'=>Yii::app()->controller->loadModel())))) {
                 foreach ($this->neededAdminCoreScripts as $name)
                     $this->registerCoreScript($name);
                 foreach ($this->neededAdminScriptFiles as $url)

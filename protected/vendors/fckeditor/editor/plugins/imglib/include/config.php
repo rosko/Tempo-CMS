@@ -32,7 +32,7 @@ $CFG->debug = true;
 /*
  * Full path to a directory which holds the images.
  */
-$CFG->imgUploadDir = dirname(__FILE__) . '/../../../../../../files/';
+$CFG->imgUploadDir = $_SERVER['DOCUMENT_ROOT'] . '/files/';
 
 /*
  * An absolute or relative URL to the image folder WITHOUT end slash.

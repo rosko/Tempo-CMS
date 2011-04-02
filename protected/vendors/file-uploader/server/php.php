@@ -36,7 +36,7 @@ class UploadFileForm {
 }
 
 function handleUpload(){
-	$uploaddir = dirname(__FILE__) . '/../../../files/';
+	$uploaddir = $_SERVER['DOCUMENT_ROOT'] . '/files/';
 	$maxFileSize = 100 * 1024 * 1024;
 		
 	if (isset($_GET['qqfile'])){

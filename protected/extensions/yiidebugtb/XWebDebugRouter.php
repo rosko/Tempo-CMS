@@ -30,7 +30,8 @@
  * 		array(
  * 			'class'=>'XWebDebugRouter',
  * 			'config'=>'alignLeft, opaque, runInDebug, fixedPos, collapsed',
- * 			'levels'=>'error, warning, trace, profile, info'
+ * 			'levels'=>'error, warning, trace, profile, info',
+ *      'allowedIPs'=>array('127.0.0.1','192.168.1.54','192\.168\.1[0-5]\.[0-9]{3}'),
  * 		),
  * ),
  * [...]
@@ -41,9 +42,13 @@
  * 'runInDebug'	=> Show debug toolbar only if Yii application running in DEBUG MODE (see index.php for details)
  * 'fixedPos'	=> Makes debug toolbar sticky with browser window, not document!
  * 'collapsed'	=> Show debug toolbar minimized by default.
+ *
+ * Also there is an additional security feature you may need - 'allowedIPs' option. This option
+ * holds the array of IP addresses of all machines you need to use in development cycle. So if you
+ * forget to remove YII_DEBUG from bootstrap file for the production stage, your client don't see
+ * the toolbar anyway.
+ * AllowedIPs be defined as a preg regexps ie: '192\.168\.1[0-5]\.[0-9]{3}'
  */
-
- //TODO: Need more comments (rus: Нужно больше комментариев к коду)
 
 /**
  * Helper class for array dumping.
@@ -202,6 +207,8 @@ class yiiDebugClass
 		{
 			list($message, $level, $category, $timestamp) = $item;
 			$message = CHtml::encode($message);
+			// put each source file on its own line
+			$message = implode("<br/>", explode("\n", $message));
 			$time=yiiDebugTrace::timestampToTime($timestamp);
 			$odd = !$odd;
 
@@ -438,6 +445,7 @@ class yiiDebugConfig extends yiiDebugClass
 class XWebDebugRouter extends CLogRoute
 {
 	public $config = '';
+	public $allowedIPs = array('127.0.0.1');
 
 	public function collectLogs($logger, $processLogs = false)
 	{
@@ -450,6 +458,30 @@ class XWebDebugRouter extends CLogRoute
 	{
 		$app=Yii::app();
 		$config = array();
+
+		$ip = $app->request->getUserHostAddress();
+		$allowed = false;
+		foreach($this->allowedIPs as $pattern)
+		{
+			// if found any char other than [0-9] and dot, treat pattern as a regexp
+			if(preg_match('/[^0-9:\.]/', $pattern))
+			{
+				if(preg_match('/'.$pattern.'/', $ip))
+				{
+					$allowed = true;
+					break;
+				}
+
+			}
+			else if($pattern === $ip)
+			{
+				$allowed = true;
+				break;
+			}
+		}
+
+		if(!$allowed) return;
+
 		foreach (explode(',', $this->config) as $value)
 		{
 			$value = trim($value);

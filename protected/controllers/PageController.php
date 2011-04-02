@@ -27,12 +27,13 @@ class PageController extends Controller
 
 	public function accessRules()
 	{
+		if (!isset($_GET['id'])) $this->paramId();
 		$ret = array(
             array('allow',
                 'actions'=>array(
                     'pageAdd',
                 ),
-                'roles'=>array('createPage'),
+                'expression'=>'Yii::app()->user->checkAccess("createPage", array("page"=>Yii::app()->controller->loadModel()))',
             ),
 			array('allow',
 				'actions'=>array(
@@ -41,7 +42,7 @@ class PageController extends Controller
                     'pageTree',
                     'getUrl',
                 ),
-				'roles'=>array('readPage'),
+                'expression'=>'Yii::app()->user->checkAccess("readPage", array("page"=>Yii::app()->controller->loadModel()))',
 			),
 			array('allow',
 				'actions'=>array(
@@ -53,32 +54,34 @@ class PageController extends Controller
                     'pageForm',
                     'pageRename', 'pageFill', 'pagesSort',
                 ),
-				'roles'=>array('updatePage'),
+                'expression'=>'Yii::app()->user->checkAccess("updatePage", array("page"=>Yii::app()->controller->loadModel()))',
 			),
             array('allow',
                 'actions'=>array(
                     'siteMap',
                 ),
-                'roles'=>array('createPage', 'updatePage', 'deletePage'),
+                'expression'=>'Yii::app()->user->checkAccess("createPage", array("page"=>Yii::app()->controller->loadModel())) ||
+                              Yii::app()->user->checkAccess("updatePage", array("page"=>Yii::app()->controller->loadModel())) ||
+                              Yii::app()->user->checkAccess("deletePage", array("page"=>Yii::app()->controller->loadModel()))',
             ),
             array('allow',
                 'actions'=>array(
                     'hasChildren',
                     'pageDeleteDialog', 'pageDelete',
                 ),
-                'roles'=>array('deletePage'),
+                'expression'=>'Yii::app()->user->checkAccess("deletePage", array("page"=>Yii::app()->controller->loadModel()))',
             ),
 			array('allow',
 				'actions'=>array(
                     'siteSettings',
                 ),
-				'roles'=>array('updateSettings'),
+                'expression'=>'Yii::app()->user->checkAccess("updateSettings", array("page"=>Yii::app()->controller->loadModel()))',
 			),
 			array('allow',
 				'actions'=>array(
                     'unitsInstall',
                 ),
-				'roles'=>array('manageUnit'),
+                'expression'=>'Yii::app()->user->checkAccess("manageUnit", array("page"=>Yii::app()->controller->loadModel()))',
 			),
 			array('deny',
 				'users'=>array('*'),
@@ -97,6 +100,21 @@ class PageController extends Controller
         return $ret;
 	}
 
+    protected function paramId()
+    {
+        // Поиск страницы
+        $lang = Yii::app()->language;
+        if (!empty($_GET['alias'])){
+            $page = Page::model()->getAll("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
+            if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_alias']==$_GET['alias']))
+                $_GET['id'] = $page[0]['id'];
+        } elseif (!empty($_GET['url'])) {
+            $page = Page::model()->getAll("`{$lang}_url` = :url", array(':url'=> '/'.$_GET['url']));
+            if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_url']=='/'.$_GET['url']))
+                $_GET['id'] = $page[0]['id'];
+        } else $_GET['id'] = 1;
+    }
+
 	// Отображает страницу
 	public function actionView()
 	{
@@ -109,22 +127,13 @@ class PageController extends Controller
             echo '</pre>';
         }
  */
+        Yii::app()->installer->installAll(false);
 		if (!isset($_GET['id'])) {
-            // Поиск страницы
-            $lang = Yii::app()->language;
-            if (!empty($_GET['alias'])) {
-                $page = Page::model()->getAll("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
-                if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_alias']==$_GET['alias']))
-                    $_GET['id'] = $page[0]['id'];
-            } elseif (!empty($_GET['url'])) {
-                $page = Page::model()->getAll("`{$lang}_url` = :url", array(':url'=> '/'.$_GET['url']));
-                if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_url']=='/'.$_GET['url']))
-                    $_GET['id'] = $page[0]['id'];
-            } else $_GET['id'] = 1;
+            $this->paramId();
 		} else {
             // Сделать переадрессацию, если страница запрошена по id без указания адреса
             // и при этом режим редактирования отключен
-            if (!Yii::app()->user->checkAccess('updatePage') &&
+            if (!Yii::app()->user->checkAccess('updatePage', array('page'=>$this->loadModel())) &&
                 (Yii::app()->getUrlManager()->getUrlFormat()==UrlManager::PATH_FORMAT) &&
                 !$_GET['alias'] && !$_GET['url']) {
                 $page = Page::model()->findByPk(intval($_GET['id']));
@@ -140,12 +149,11 @@ class PageController extends Controller
                 }
             }
         }                
-        $this->loadModel();
-        if ($this->_model->redirect) {
-            if (!Yii::app()->user->checkAccess('updatePage'))
-                $this->redirect($this->_model->redirect);
+        if ($this->loadModel()->redirect) {
+            if (!Yii::app()->user->checkAccess('updatePage', array('page'=>$this->loadModel())))
+                $this->redirect($this->loadModel()->redirect);
             else
-                Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$this->_model->redirect . '">'.$this->_model->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
+                Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$this->loadModel()->redirect . '">'.$this->loadModel()->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
         }
 
         $unitContent = '';
@@ -157,7 +165,7 @@ class PageController extends Controller
         }
 
 		$this->render('view',array(
-			'model'=>$this->_model,
+			'model'=>$this->loadModel(),
             'unitContent' => $unitContent,
 		));
 	}

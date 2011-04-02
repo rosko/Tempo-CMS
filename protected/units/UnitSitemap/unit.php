@@ -97,7 +97,7 @@ class UnitSitemap extends Content
     public function cacheParams()
     {
         return array(
-            'page_id' => Yii::app()->controller->_model->id,
+            'page_id' => Yii::app()->controller->loadModel()->id,
         );
     }
 

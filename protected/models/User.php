@@ -181,13 +181,13 @@ class User extends CActiveRecord
         );
     }
 
-    public function defaultAccess()
+    public function operations()
     {
         return array(
-            'create'=>'superadmin',
-            'read'=>'authenticated',
-            'update'=>'superadmin',
-            'delete'=>'superadmin',
+            'updateUser'=>array(
+                'label'=>'Manage settings',
+                'defaultRoles'=>array('administrator'),
+            ),
         );
     }
 
@@ -226,6 +226,10 @@ class User extends CActiveRecord
         }
         if (!$this->send_message) {
             $this->send_message = Yii::app()->settings->getValue('defaultsSendMessage');
+        }
+        if ($this->scenario == 'update') {
+            $this->askfill = false;
+            Yii::app()->user->setState('askfill', null);
         }
         return parent::beforeSave();
     }
@@ -417,5 +421,10 @@ class User extends CActiveRecord
             'required'=>$requiredFields,
             'unsafe'=>$unsafeFields,
         );
+    }
+
+    public function getFullname()
+    {
+        return $this->login . ', ' . $this->email . ', ' . $this->name;
     }
 }

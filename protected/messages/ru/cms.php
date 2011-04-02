@@ -298,5 +298,8 @@ return array(
     'Hello'=>'Здравствуйте',
     'Attention'=>'Внимание',
     'Profile' => 'Профиль',
+
+    'Access rights' => 'Права доступа',
+    'Author' => 'Автор',
 );
 

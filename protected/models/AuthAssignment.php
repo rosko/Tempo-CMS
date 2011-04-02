@@ -29,30 +29,51 @@ class AuthAssignment extends CActiveRecord
         Yii::app()->db->createCommand($sql)->execute();
 
         $auth=Yii::app()->authManager;
+        $auth->createRole('anybody', 'Anybody');
+
         $bizRule='return Yii::app()->user->isGuest;';
-        $auth->createRole('guest', 'Guest', $bizRule);
+        $role = $auth->createRole('guest', 'Guest', $bizRule);
+        $role->addChild('anybody');
 
         $bizRule='return !Yii::app()->user->isGuest;';
         $role = $auth->createRole('authenticated', 'Authenticated user', $bizRule);
-        $role->addChild('guest');
+        $role->addChild('anybody');
 
-        $role = $auth->createRole('superadmin', 'Super administrator');
+        $role = $auth->createRole('author', 'Author');
         $role->addChild('authenticated');
 
-        $auth->assign('superadmin', User::getAdmin()->id);
+        $role = $auth->createRole('editor', 'Editor');
+        $role->addChild('authenticated');
 
-        $classes = array('Page', 'User', 'Settings', 'Unit');
+        $role = $auth->createRole('administrator', 'Administrator');
+        $role->addChild('authenticated');
+
+        $auth->assign('administrator', User::getAdmin()->id);
+
+        $classes = array('Page', 'Settings', 'Unit', 'User');
         foreach ($classes as $className) {
-            if (method_exists($className, 'defaultAccess')) {
-                $a = call_user_func(array($className, 'defaultAccess'));
-                foreach ($a as $operation => $role) {
-                    $auth->createOperation($operation.$className, $className.' '.$operation);
-                    if (is_array($role)) {
-                        foreach ($role as $r) {
-                            $auth->addItemChild($r, $operation.$className);
+            if (method_exists($className, 'operations')) {
+                $a = call_user_func(array($className, 'operations'));
+                foreach ($a as $operation => $params) {
+                    $auth->createOperation($operation, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
+                    if (is_array($params['defaultRoles']))
+                        foreach ($params['defaultRoles'] as $role) {
+                            $auth->addItemChild($role, $operation);
                         }
-                    } else
-                        $auth->addItemChild($role, $operation.$className);
+                }
+            }
+            if (method_exists($className, 'tasks')) {
+                $a = call_user_func(array($className, 'tasks'));
+                foreach ($a as $task => $params) {
+                    $auth->createTask($task, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
+                    if (is_array($params['children']))
+                        foreach ($params['children'] as $operation) {
+                            $auth->addItemChild($task, $operation);
+                        }
+                    if (is_array($params['defaultRoles']))
+                        foreach ($params['defaultRoles'] as $role) {
+                            $auth->addItemChild($role, $task);
+                        }
                 }
             }
         }

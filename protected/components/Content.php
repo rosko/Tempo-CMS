@@ -114,9 +114,9 @@ class Content extends I18nActiveRecord
                 unset($params['_']);
             }
             $pagination->params = array_merge($params, array(
-                'id' => Yii::app()->controller->_model->id,
-                'alias' => Yii::app()->controller->_model->alias,
-                'url' => Yii::app()->controller->_model->url,
+                'id' => Yii::app()->controller->loadModel()->id,
+                'alias' => Yii::app()->controller->loadModel()->alias,
+                'url' => Yii::app()->controller->loadModel()->url,
             ));
             $pagerCssClass .= Yii::app()->settings->getValue('ajaxPager') ? ' ajaxPager ' : '';
             return Yii::app()->controller->widget('CLinkPager', array(
@@ -160,7 +160,7 @@ class Content extends I18nActiveRecord
         }
         if(isset($_GET['id']))
             $params['page'] = Yii::app()->controller->loadModel();
-        $params['editMode'] = Yii::app()->user->checkAccess('updatePage');
+        $params['editMode'] = Yii::app()->user->checkAccess('updatePage', array('page'=>$params['page']));
         $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
         $len = strlen($params['className']);
         foreach ($params['settings']['global'] as $k => $v) {
@@ -314,7 +314,7 @@ class Content extends I18nActiveRecord
     {
         $unit = Unit::model()->findByPk($vars['unit_id']);
         $content = $unit->content;
-        if ($content && Yii::app()->user->checkAccess('updatePage')) {
+        if ($content && Yii::app()->user->checkAccess('updatePage', array('page'=>Yii::app()->controller->loadModel()))) {
             if (isset($vars['Content'])) {
                 $content->attributes=$vars['Content'];
             }

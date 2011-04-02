@@ -115,9 +115,9 @@ $('.ajaxPager a').live('click', function() {
 EOD;
 $cs->registerScript('ajaxPager', $js, CClientScript::POS_READY);
 
-if (Yii::app()->user->checkAccess('createPage') || 
-    Yii::app()->user->checkAccess('updatePage') ||
-    Yii::app()->user->checkAccess('deletePage')) {
+if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
+    Yii::app()->user->checkAccess('updatePage', array('page'=>$model)) ||
+    Yii::app()->user->checkAccess('deletePage', array('page'=>$model))) {
 
     if (!$model->active) {
         $this->pageTitle = '['.Yii::t('cms', 'Page unactive').'] ' . $this->pageTitle;
@@ -127,7 +127,7 @@ if (Yii::app()->user->checkAccess('createPage') ||
     $baseUrl = Yii::app()->getAssetManager()->publish($dir);
     $cs->registerScriptFile($baseUrl.'/jquery.jstree.js');
 
-    if (Yii::app()->user->checkAccess('updatePage')) {
+    if (Yii::app()->user->checkAccess('updatePage', array('page'=>$model))) {
         $cs->registerScript('cms-area', <<<EOD
 
             // Настройки и обработчики перещения юнитов на странице
@@ -258,7 +258,7 @@ EOD
         'vertical'=>true,
         'rows'=>2,
         'buttons'=>array(
-            'edit' => Yii::app()->user->checkAccess('updatePage') ? array(
+            'edit' => Yii::app()->user->checkAccess('updatePage', array('page'=>$model)) ? array(
                 'icon' => 'edit',
                 'title' => Yii::t('cms', 'Page properties'),
                 'click' => 'js:function(){ pageEditForm(); return false; }',
@@ -273,7 +273,7 @@ js:function(){
         }
 EOD
             ):null,
-            'pageadd' => Yii::app()->user->checkAccess('createPage')?array(
+            'pageadd' => Yii::app()->user->checkAccess('createPage', array('page'=>$model))?array(
                 'icon' => 'add',
                 'title' => Yii::t('cms', 'Create new page'),
                 'click' => 'js:function() { pageAddForm(); return false; }',
@@ -293,7 +293,7 @@ js:function() {
         }
 EOD
             ):null,
-            'sitemap' =>  Yii::app()->user->checkAccess('createPage')&&Yii::app()->user->checkAccess('updatePage')&&Yii::app()->user->checkAccess('deletePage')?array(
+            'sitemap' =>  Yii::app()->user->checkAccess('createPage', array('page'=>$model))&&Yii::app()->user->checkAccess('updatePage', array('page'=>$model))&&Yii::app()->user->checkAccess('deletePage', array('page'=>$model))?array(
                 'icon' => 'sitemap',
                 'title' => Yii::t('cms', 'Sitemap'),
                 'click' => <<<EOD
@@ -348,7 +348,7 @@ EOD
 /*
  * Панель инструментов для блоков
  */
-    if (Yii::app()->user->checkAccess('updatePage')) {
+    if (Yii::app()->user->checkAccess('updatePage', array('page'=>$model))) {
 
         $this->widget('Toolbar', array(
             'id' => 'pageunitpanel',

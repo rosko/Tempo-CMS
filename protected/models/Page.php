@@ -26,6 +26,8 @@ class Page extends I18nActiveRecord
             array('alias', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
             array('alias', 'match', 'pattern'=>'/^'.Yii::app()->params['aliasPattern'].'$/u'),
             array('url', 'PageUrlValidator'),
+            array('access', 'safe'),
+            array('author_id', 'safe'),
 		));
 	}
 
@@ -61,24 +63,90 @@ class Page extends I18nActiveRecord
 		);
 	}
 
-    public function defaultAccess()
+    // Чем меньше операций, тем лучше быстродействие
+    public function operations()
     {
         return array(
-            'create'=>'superadmin',
-            'read'=>array('guest','authenticated'),
-            'update'=>'superadmin',
-            'delete'=>'superadmin',
+            'createPage'=>array(
+                'label'=>'Add child page', // Право создавать дочернюю страницу в любом месте или только для этой страницы
+                'defaultRoles'=>array('administrator', 'editor', 'author'),
+            ),
+            'readPage'=>array(
+                'label'=>'View page', // Право просматривать все страницы или только эту
+                'defaultRoles'=>array('anybody'),
+            ),
+            'updatePage'=>array(
+                'label'=>'Edit page content', // Право редактировать свойства всех страниц или только этой
+                'defaultRoles'=>array('administrator', 'editor'),
+            ),
+            'editSettingsPage'=>array(
+                'label'=>'Edit page settings', // Право редактировать свойства всех страниц или только этой
+                'defaultRoles'=>array('administrator', 'editor'),
+            ),
+            'editAccessPage'=>array(
+                'label'=>'Edit page access', // Право редактировать свойства всех страниц или только этой
+                'defaultRoles'=>array('administrator'),
+            ),
+            'movePage'=>array(
+                'label'=>'Move pages', // Право перемещать все страницы
+                'defaultRoles'=>array('administrator', 'editor'),
+            ),
+            'deletePage'=>array(
+                'label'=>'Delete page', // Право удалять все страницы или только эту
+                'defaultRoles'=>array('administrator', 'editor'),
+            ),
         );
     }
+
+    public function tasks()
+    {
+        return array(
+            'createOnOwnPage'=>array(
+                'label'=>'Add child page for own page',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('createPage'),
+                'defaultRoles'=>array('author'),
+            ),
+            'readOwnPage'=>array(
+                'label'=>'View own page',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('readPage'),
+                'defaultRoles'=>array('author', 'authenticated'),
+            ),
+            'updateOwnPage'=>array(
+                'label'=>'Edit own page content',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('updatePage'),
+                'defaultRoles'=>array('author', 'authenticated'),
+            ),
+            'editSettingsOwnPage'=>array(
+                'label'=>'Edit own page settings',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('editSettingsPage'),
+                'defaultRoles'=>array('author'),
+            ),
+            'editAccessOwnPage'=>array(
+                'label'=>'Edit own page access',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('editAccessPage'),
+                'defaultRoles'=>array('author'),
+            ),
+            'deleteOwnPage'=>array(
+                'label'=>'Delete own page',
+                'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
+                'children'=>array('deletePage'),
+                'defaultRoles'=>array('author'),
+            ),
+        );
+    }
+
+// 'bizRule'=>'return !empty(array_intersect(Yii::app()->user->roles, $params["page"]->access["{operation}Roles"])) || in_array(Yii::app()->user->id, $params["page"]->access["{operation}Users"]);',
 
     public function cacheParams()
     {
         $cacheParams = array(
             'language'=>Yii::app()->language,
         );
-        foreach (Page::defaultAccess() as $o => $r) {
-            $cacheParams[$o.'Page'] = Yii::app()->user->checkAccess($o.'Page');
-        }
         return $cacheParams;
     }
 
@@ -280,6 +348,8 @@ class Page extends I18nActiveRecord
             'language' => Yii::t('cms', 'Page language'),
             'alias' => Yii::t('cms', 'Page alias'),
             'url' => Yii::t('cms', 'Page url'),
+            'access'=> Yii::t('cms', 'Access rights'),
+            'author_id'=>Yii::t('cms', 'Author'),
 		);
 	}
 
@@ -304,6 +374,7 @@ class Page extends I18nActiveRecord
             'editor_id'=>'integer unsigned',
             'create'=>'datetime',
             'modify'=>'datetime',
+            'access'=>'text',
         );
     }
 
@@ -374,6 +445,14 @@ class Page extends I18nActiveRecord
                 'language'=>array(
                     'type'=>'LanguageSelect'
                 ),
+                Form::tab(Yii::t('cms', 'Access rights')),
+                'author_id'=>array(
+                    'type'=>'ComboBox',
+                    'array'=>CHtml::listData(User::model()->findAll(), 'id', 'fullname'),
+                ),
+                'access'=>array(
+                    'type'=>'AccessRights',
+                ),
 			),
 			'buttons'=>array(
 				'save'=>array(
@@ -384,6 +463,16 @@ class Page extends I18nActiveRecord
 			)
 		);
 	}
+
+    public function behaviors()
+    {
+        return array(
+            'CSerializeBehavior' => array(
+                'class' => 'application.behaviors.CSerializeBehavior',
+                'serialAttributes' => array('access'),
+            )
+        );
+    }
 
     public function isSimilarTo($page, $areas=array(), $unit_id=0)
     {

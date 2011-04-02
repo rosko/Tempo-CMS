@@ -25,10 +25,13 @@ class Settings extends CApplicationComponent
         }
     }
     
-    public function defaultAccess()
+    public function operations()
     {
         return array(
-            'update'=>'superadmin',
+            'updateSettings'=>array(
+                'label'=>'Manage settings', 
+                'defaultRoles'=>array('administrator'),
+            ),
         );
     }
 

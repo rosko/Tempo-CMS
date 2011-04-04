@@ -32,7 +32,7 @@ class User extends CActiveRecord
         // register, update - действия пользователя
         if ($this->rules) return $this->rules;
 		return array(
-            array('login, password, password_repeat', 'filter', 'filter'=>'strtolower'),
+            array('login', 'filter', 'filter'=>'strtolower'),
             array('login, password, password_repeat', 'filter', 'filter'=>'trim'),
             array('login, password', 'required', 'on'=>'add'),
 //            array('login, password', 'required', 'on'=>'register'),
@@ -199,6 +199,8 @@ class User extends CActiveRecord
         $user->email = Yii::app()->params['admin']['email'];
         $user->password = self::hash(Yii::app()->params['admin']['password']);
         $user->active = true;
+        $user->show_email = 'registered';
+        $user->send_message = 'registered';
         $user->save(false);
     }
 

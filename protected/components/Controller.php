@@ -6,7 +6,7 @@ class Controller extends CController
     public function init()
     {
         if (!is_file(Yii::getPathOfAlias('config.general').'.php')) {
-            
+            // ToDo: Сделать вызов инсталлятора
             Yii::app()->end();
         }
 
@@ -87,6 +87,10 @@ class Controller extends CController
             else
                 echo $output;
         }
+    }
+
+    public function loadModel() {
+        return false;
     }
 
 }

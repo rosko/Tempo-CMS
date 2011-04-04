@@ -19,7 +19,7 @@ class RecordsController extends Controller
 
 
                 ),
-				'users'=>array('admin'),
+                'expression'=>'Yii::app()->user->checkAccess("updateUser")',
 			),
 			array('deny',
 				'users'=>array('*'),

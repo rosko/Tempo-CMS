@@ -43,7 +43,7 @@ EOD
 $js = '';
 $flashes = Yii::app()->user->getFlashes();
 
-if (Yii::app()->user->hasState('askfill'))  {
+if (Yii::app()->user->hasState('askfill') && class_exists('UnitRegister'))  {
 
     $registerUnit = UnitRegister::model()->find('unit_id > 0');
     if ($registerUnit) {

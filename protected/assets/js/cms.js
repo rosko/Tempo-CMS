@@ -482,7 +482,7 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
 function recordEditForm(id, class_name, unit_id, grid_id)
 {
     var dlg_id = 'recordEditForm'+class_name+'_'+id;
-    loadDialog('/?r=page/unitForm&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'), {
+    loadDialog('/?r=page/unitForm&class_name='+class_name+'&record_id='+id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         id: dlg_id,
         className: 'recordEditForm-'+class_name,

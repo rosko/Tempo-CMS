@@ -56,6 +56,12 @@ class PageController extends Controller
                 ),
                 'expression'=>'Yii::app()->user->checkAccess("updatePage", array("page"=>Yii::app()->controller->loadModel()))',
 			),
+			array('allow',
+				'actions'=>array(
+                    'unitAdd', 'unitForm',
+                ),
+                'expression'=>'Yii::app()->user->checkAccess("updateUser", array("page"=>Yii::app()->controller->loadModel()))',
+			),
             array('allow',
                 'actions'=>array(
                     'siteMap',
@@ -517,8 +523,8 @@ class PageController extends Controller
             $content->scenario = 'edit';
         } elseif ($_REQUEST['class_name']) {
             $unit_class = $_REQUEST['class_name'];
-            if ($_REQUEST['id']) {
-                $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
+            if ($_REQUEST['record_id']) {
+                $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['record_id']);
                 $content->scenario = 'edit';
             } elseif (method_exists($unit_class, 'defaultObject')) {
 				$content = call_user_func(array($nit_class, 'defaultObject'));

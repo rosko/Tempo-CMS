@@ -14,10 +14,7 @@
         <a href="#" onclick="$('#RememberForm{$unit.id}').slideUp();$('#LoginForm{$unit.id}').slideDown();return false;">{t text="Back to login form"}</a>
     </div>
 {else}
-    {if $user.askfill or !$user.login}
-        {* Попросить заполнить профиль *}
-    {/if}
-    <h3>{t text='Hello'}, {$user.name}!</h3>
+    {dynamic callback=array('UnitLogin', 'dynamicGreetings')}
     {form method='POST'}
         <input type="submit" name="logout" value="{t text='Logout'}" />
     </form>

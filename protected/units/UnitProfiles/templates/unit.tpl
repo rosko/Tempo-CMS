@@ -10,18 +10,9 @@
         <p>{link text={t text='Profiles list'} url="page/view?id={$page.id}&alias={$page.alias}&url={$page.url}"}</p>
         {if $details}
             <h2>{t text="User"} {$profile.login}</h2>
-            {if $user.id == $profile.id && $profileEditUrl}
-                <p>{link text={t text='Edit profile'} url=$profileEditUrl}</p>
-            {/if}
+            {dynamic callback=array('UnitProfiles', 'dynamicEditProfileLink') id=$profile.id}
             {$details}
-            {if $feedbackForm}
-                <h3>{t text="Feedback form"}</h3>
-                {if !$sent}
-                    <div class="form">{$feedbackForm}</div>
-                {else}
-                    {t text='Your message was successfully sent'}
-                {/if}
-            {/if}
+            {dynamic callback=array('UnitProfiles', 'dynamicFeedbackForm') id=$profile.id feedback_form=$content.feedback_form pageunit_id=$pageunit.id}
         {/if}
     {/if}
 {/if}

@@ -4,6 +4,7 @@ class UnitRegister extends Content
 {
 	const ICON = '/images/icons/fatcow/16x16/user.png';
     const HIDDEN = true;
+    const CACHE = false;
 
     public function name($language=null)
     {
@@ -55,6 +56,8 @@ class UnitRegister extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'fields' => 'text',
             'fields_req' => 'text',
             'profile_fields' => 'text', // поля, которые пользователь может заполнить в своем профиле
@@ -87,6 +90,18 @@ class UnitRegister extends Content
     public function urlParam($method)
     {
         return 'profile_'.$method;
+    }
+
+    public function urlParams()
+    {
+        $list = array(
+            'view', 'do'
+        );
+        $ret = array();
+        foreach ($list as $param) {
+            $ret[] = self::urlParam($param);
+        }
+        return $ret;
     }
 
     public static function defaultRegFields()

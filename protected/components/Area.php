@@ -9,5 +9,3 @@ class Area extends CWidget
         $this->render('area', array('name'=>$this->name));
     }
 }
-
-?>

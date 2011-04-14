@@ -131,6 +131,8 @@ EOD;
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'video' => 'string',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',

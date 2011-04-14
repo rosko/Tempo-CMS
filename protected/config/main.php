@@ -26,13 +26,18 @@ return CMap::mergeArray(array(
             'loginUrl'=>array('site/login'),
             'returnUrl'=>array('page/view'),
 		),
-        'authManager'=>array(
+/*        'authManager'=>array(
             'class'=>'AuthManager',
             'connectionID'=>'db',
             'defaultRoles'=>array('anybody', 'guest', 'authenticated'),
             'itemTable'=>$config['components']['db']['tablePrefix'].'auth_item',
             'itemChildTable'=>$config['components']['db']['tablePrefix'].'auth_itemchild',
             'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
+        ),*/
+        'authManager'=>array(
+            'class'=>'CPhpAuthManager',
+            'authFile'=>Yii::getPathOfAlias('local.runtime.auth').'.php',
+            'defaultRoles'=>array('anybody', 'guest', 'authenticated'),
         ),
         'request'=>array(
             'enableCookieValidation'=>true,
@@ -111,6 +116,9 @@ return CMap::mergeArray(array(
                     'config'=>'alignLeft, opaque, runInDebug, yamlStyle',
                     'levels'=>'error, warning, trace, profile, info',
                     'allowedIPs'=>array('127.0.0.1'),
+                    'restrictedUris'=>array(
+                        '/?r=page/jsI18N',
+                    ),
                 ),
             ),
 		),

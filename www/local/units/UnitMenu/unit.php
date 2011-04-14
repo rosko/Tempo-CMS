@@ -64,8 +64,19 @@ class UnitMenu extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'recursive' => 'integer unsigned',
             'items' => 'text',
+        );
+    }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT CONCAT(MAX(`modify`),MAX(`create`)) FROM `' . Page::tableName() . '`',
+            ),
         );
     }
 

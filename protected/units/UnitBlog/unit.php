@@ -78,6 +78,8 @@ class UnitBlog extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'per_page' => 'integer unsigned',
             'items' => 'integer unsigned',
         );
@@ -102,6 +104,18 @@ class UnitBlog extends Content
         return array(
             '{$items}' => Yii::t('UnitBlog.unit', 'Еntries'),
             '{$pager}' => Yii::t('UnitBlog.unit', 'Pager'),
+        );
+    }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT MAX(modify) FROM `' . UnitBlogentry::tableName() . '` WHERE blog_id = :id',
+                'params' => array(
+                    'id' => $this->id
+                ),
+            ),
         );
     }
 

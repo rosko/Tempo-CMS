@@ -10,7 +10,7 @@
  * @link http://www.yiiframework.com/
  * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: index.php 2800 2011-01-01 19:36:52Z qiang.xue $
+ * @version $Id: index.php 2986 2011-02-20 17:08:50Z alexander.makarow $
  * @package system
  * @since 1.0
  */
@@ -81,9 +81,9 @@ $requirements=array(
 	array(
 		t('yii','Memcache extension'),
 		false,
-		extension_loaded("memcache"),
+		extension_loaded("memcache") || extension_loaded("memcached"),
 		'<a href="http://www.yiiframework.com/doc/api/CMemCache">CMemCache</a>',
-		''),
+		extension_loaded("memcached") ? t('yii', 'To use memcached set <a href="http://www.yiiframework.com/doc/api/CMemCache#useMemcached-detail">CMemCache::useMemcached</a> to <code>true</code>.') : ''),
 	array(
 		t('yii','APC extension'),
 		false,

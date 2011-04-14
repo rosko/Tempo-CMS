@@ -137,6 +137,15 @@ function showInfoPanelTimer(timeout)
     }
 }
 
+function getRealBgColor(elem)
+{
+    if (elem.css('backgroundColor') != 'transparent') {
+        return elem.css('backgroundColor');
+    } else {
+        return getRealBgColor(elem.parent());
+    }
+}
+
 function fadeIn(selector, className)
 {
     $(selector).removeClass('hover').addClass(className);
@@ -150,7 +159,16 @@ function fadeOut(selector, className)
         color1 = $(this).css('backgroundColor');
         $(this).removeClass(className);
         color2 = $(this).css('backgroundColor');
-        $(this).css('backgroundColor', color1).animate({backgroundColor: color2}, 1000);
+        color3 = color2;
+        if (color2 == 'transparent') {
+            color3 = getRealBgColor($(this));
+        }
+        $(this).css('backgroundColor', color1).animate({backgroundColor: color3}, {
+            duration: 1000,
+            complete: function() {
+                $(this).css('backgroundColor', color2);
+            }
+        });
     });
 }
 
@@ -332,7 +350,7 @@ function pageunitEditForm(t)
 function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 {
     $.ajax({
-        url: '/?r=page/getPageunitsByUnit&unit_id='+unit_id+'&language='+$.data(document.body, 'language'),
+        url: '/?r=page/getPageunitsByUnit&page_id='+page_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'),
         pageunit_id: pageunit_id,
         unit_id: unit_id,
         page_id: page_id,
@@ -351,7 +369,7 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
             else {
                 if (confirm(i18n.cms.deleteUnitWarning))
                 {
-                    ajaxSave('/?r=page/unitDelete&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+                    ajaxSave('/?r=page/unitDelete&page_id='+page_id+'&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
                         $('#cms-pageunit-'+pageunit_id).remove();
                         CmsAreaEmptyCheck();
                     });

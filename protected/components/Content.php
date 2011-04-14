@@ -2,6 +2,7 @@
 class Content extends I18nActiveRecord
 {
     const EXCLUSIVE = false; // Разрешает создавать только один экземпляр юнита и только в одном месте
+    const CACHE = true;
 
 	public static function form()
 	{
@@ -22,13 +23,20 @@ class Content extends I18nActiveRecord
             if ($this->hasAttribute('date')) {
                 $this->date = new CDbExpression('NOW()');
             }
+            if ($this->hasAttribute('create')) {
+                $this->create = new CDbExpression('NOW()');
+            }
+        } else {
+            if ($this->hasAttribute('modify')) {
+                $this->modify = new CDbExpression('NOW()');
+            }
         }
         return parent::beforeSave();
     }
 
-    public function dependencies()
+    public function cacheRequestTypes()
     {
-        return array();
+        return array('GET', 'POST');
     }
 
     // Настройки всего типа юнитов
@@ -49,7 +57,7 @@ class Content extends I18nActiveRecord
         );
     }
 
-    public function cacheParams()
+    public function cacheVaryBy()
     {
         return array();
     }
@@ -335,7 +343,8 @@ class Content extends I18nActiveRecord
                 }
                 $content->{$vars['attribute']} = substr($html, 0, $t[1]) . str_replace($source, $repl, substr($html, $t[1], strlen($repl))) . substr($html, $t[1]+strlen($repl));
             }
-            echo $content->save();
+            echo $unit->save() && $content->save();
         }
     }
+    
 }

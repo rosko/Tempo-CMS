@@ -446,6 +446,7 @@ class XWebDebugRouter extends CLogRoute
 {
 	public $config = '';
 	public $allowedIPs = array('127.0.0.1');
+    public $restrictedUris = array();
 
 	public function collectLogs($logger, $processLogs = false)
 	{
@@ -490,6 +491,10 @@ class XWebDebugRouter extends CLogRoute
 
 		//Checking for an AJAX Requests
 		if(!($app instanceof CWebApplication) || $app->getRequest()->getIsAjaxRequest()) return;
+
+        foreach ($this->restrictedUris as $rU) {
+            if (strpos($app->getRequest()->getRequestUri(), $rU) !== false) return;
+        }
 
 		//Checking for an DEBUG mode of running app
 		if (isset($config['runInDebug']) && (!DEFINED('YII_DEBUG') || YII_DEBUG == false)) return;

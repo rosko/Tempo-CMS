@@ -1,5 +1,5 @@
 <?php
-class I18nActiveRecord extends CActiveRecord
+class I18nActiveRecord extends ActiveRecord
 {
     public function i18n()
     {

@@ -56,6 +56,8 @@ class UnitHtml extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'html' => 'text',
         );
     }

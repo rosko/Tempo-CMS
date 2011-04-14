@@ -48,7 +48,7 @@ Yii::import('CHtml',true);
  * {@link CApplication::getErrorHandler()}.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CErrorHandler.php 2885 2011-01-17 13:15:21Z qiang.xue $
+ * @version $Id: CErrorHandler.php 3008 2011-02-26 19:54:10Z alexander.makarow $
  * @package system.base
  * @since 1.0
  */
@@ -390,6 +390,9 @@ class CErrorHandler extends CApplicationComponent
 				$args[$key] = 'null';
 			else if(is_resource($value))
 				$args[$key] = 'resource';
+
+			if(is_string($key))
+				$args[$key] = '"'.$key.'" => '.$args[$key];
 		}
 		$out = implode(", ", $args);
 

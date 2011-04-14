@@ -42,6 +42,8 @@ class UnitLogin extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
         );
     }
 
@@ -50,6 +52,33 @@ class UnitLogin extends Content
         return array(
             '{$formButtons}' => Yii::t('UnitLogin.unit', 'LoginForm buttons'),
         );
+    }
+
+    public function dynamicGreetings()
+    {
+        if (Yii::app()->user->id)
+            $user = User::model()->findByPk(Yii::app()->user->id);
+        if ($user) {
+            return '<h3>' . Yii::t('UnitLogin.unit', 'Hello') . ', ' . $user->name . '!</h3>';
+        }
+        return '';
+    }
+
+    public function cacheVaryBy()
+    {
+        return array(
+            'isGuest'=>Yii::app()->user->isGuest,
+        );
+    }
+
+    public function cacheRequestTypes()
+    {
+        return array('GET');
+    }
+
+    public function urlParams()
+    {
+        return array('authcode');
     }
 
     public function prepare($params)
@@ -67,7 +96,7 @@ class UnitLogin extends Content
         if ($this->proccessRequest()) {
             if($params['doRemember']) {
                 $params['doneRemember'] = true;
-                
+
             } else
                 Yii::app()->controller->refresh();
         }
@@ -134,7 +163,7 @@ class UnitLogin extends Content
                     );
                     return true;
                 }
-            }            
+            }
         }
         return false;
 

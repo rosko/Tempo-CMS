@@ -40,9 +40,11 @@ class UnitLangswitcher extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
         );
     }
-    public function cacheParams()
+    public function cacheVaryBy()
     {
         return array(
             'page_id' => Yii::app()->controller->loadModel()->id,

@@ -9,10 +9,10 @@ class PageController extends Controller
 	{
 		return array(
 			'accessControl',
-            array(
+/*            array(
                 'COutputCache + view',
                 'duration'=>3600,
-                'id'=>serialize(Page::cacheParams()),
+                'id'=>serialize(Page::cacheVaryBy()),
                 'varyByParam'=>array('id','language','alias','url'),
                 'dependency'=>array(
                     'class'=> 'CChainedCacheDependency',
@@ -21,13 +21,13 @@ class PageController extends Controller
                         new CDbCacheDependency('SELECT CONCAT(MAX(`create`),MAX(`modify`)) FROM `'.Unit::tableName().'`'),
                     )
                 ),
-            ),
+            ),*/
 		);
 	}
 
 	public function accessRules()
 	{
-		if (!isset($_GET['id'])) $this->paramId();
+        if (!isset($_GET['id']) && !isset($_GET['page_id'])) $this->paramId();
 		$ret = array(
             array('allow',
                 'actions'=>array(
@@ -133,7 +133,6 @@ class PageController extends Controller
             echo '</pre>';
         }
  */
-        Yii::app()->installer->installAll(false);
 		if (!isset($_GET['id'])) {
             $this->paramId();
 		} else {
@@ -174,6 +173,7 @@ class PageController extends Controller
 			'model'=>$this->loadModel(),
             'unitContent' => $unitContent,
 		));
+        Yii::app()->user->getFlashes(true);
 	}
 
 	// Создает новую страницу
@@ -308,7 +308,7 @@ class PageController extends Controller
 		if ($form->submitted('save')||$form->submitted('refresh')) {
 			$page = $form->model;
 			if ($form->validate()) {
-				$page->path = '';
+				//$page->path = '';
 				if ($page->save(false))
                     Yii::app()->user->setFlash('save', Yii::t('cms', 'Properties has been saved successfully'));
                 else
@@ -419,8 +419,6 @@ class PageController extends Controller
         {
             $unit = Unit::model()->findByPk(PageUnit::getUnitIdById($_REQUEST['pageunit_id']));
             echo $unit->move($_REQUEST['area'], $_REQUEST['cms-pageunit'], $_REQUEST['pageunit_id']);
-            // TODO: Улучшить этот момент, чтобы не очищался весь кеш
-            Yii::app()->cache->flush();
         }
 	}
 	
@@ -462,7 +460,6 @@ class PageController extends Controller
             foreach ($langs as $lang) {
                 $unit->{$lang.'_title'} = call_user_func(array($className, 'name'), $lang);
             }
-			$unit->create = new CDbExpression('NOW()');
 			$unit->save();
 
 			// Размещаем его на только текущей странице
@@ -498,6 +495,7 @@ class PageController extends Controller
                 $content->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['section_id']);
             }
 			$content->save(false);
+			$unit->save();
 			
             echo CJavaScript::jsonEncode(array('pageunit_id'=>$pageunit->id,'unit_id'=>$unit->id,'content_id'=>$content->id));
 		}
@@ -533,7 +531,7 @@ class PageController extends Controller
                 $content->scenario = 'add';
 			}
 
-            if (isset($content->unit_id)) {
+            if (!empty($content->unit_id)) {
                 $unit = $content->unit;
             }
             
@@ -628,7 +626,6 @@ class PageController extends Controller
 			if ($form->validate()) {
                 if (isset($unit)) {
     				$content->unit_id = $unit->id;
-        			$unit->modify = new CDbExpression('NOW()');
             		if ($unit->save(false)) {
                 		$content->save(false);
                         if ($content->hasAttribute('page_id')) {
@@ -929,6 +926,8 @@ class PageController extends Controller
 		{
 			if(isset($_GET['id']))
 				$this->_model=Page::model()->findbyPk($_GET['id']);
+			elseif(isset($_GET['page_id']))
+				$this->_model=Page::model()->findbyPk($_GET['page_id']);
 			if($this->_model===null)
 				throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
             else {

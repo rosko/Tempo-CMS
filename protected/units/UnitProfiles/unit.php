@@ -47,6 +47,8 @@ class UnitProfiles extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'table_fields' => 'text', // поля отображаемые в таблице пользователей
             'displayed_fields' => 'text', // поля отображаемые при просмотре профиля пользователя
             'per_page' => 'integer unsigned', // количество профилей в таблице на одну страницу
@@ -67,6 +69,80 @@ class UnitProfiles extends Content
     public function urlParam($method)
     {
         return 'profile_'.$method;
+    }
+
+    public function urlParams()
+    {
+        $list = array(
+            'view', 'do', 'page', 'sort'
+        );
+        $ret = array();
+        foreach ($list as $param) {
+            $ret[] = self::urlParam($param);
+        }
+        return $ret;
+    }
+
+    public function cacheVaryBy()
+    {
+        return array(
+            'isGuest'=>Yii::app()->user->isGuest,
+        );
+    }
+
+    public function cacheRequestTypes()
+    {
+        return array('GET');
+    }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT CONCAT(MAX(`create`),MAX(`modify`)) FROM `' . User::tableName() . '`',
+            ),
+        );
+    }
+
+    public static function dynamicEditProfileLink($param)
+    {
+        if (Yii::app()->user->id == $param['id']) {
+            $registerUnit = UnitRegister::model()->find('unit_id > 0');
+            if ($registerUnit) {
+                return '<p>' . CHtml::link(Yii::t('UnitProfiles.unit', 'Edit profile'), $registerUnit->getUnitUrl()) . '</p>';
+            }
+        }
+        return '';
+    }
+
+    public static function dynamicFeedbackForm($params)
+    {
+        $user = User::model()->findByPk($params['id']);
+        if ($user && User::isUserInCategory($user->send_message) && $user->id != Yii::app()->user->id && $user->email) {
+
+            $vm = new VirtualModel($params['feedback_form'], 'FieldSet');
+            $config = $vm->formMap;
+            $config['id'] = sprintf('%x',crc32(serialize(array_keys($params['feedback_form']))));
+            $config['buttons'] = array(
+                'send'=>array(
+                    'type'=>'submit',
+                    'label'=>Yii::t('UnitProfiles.unit', 'Send'),
+                ),
+            );
+            $profileVar = self::urlParam('view');
+            $config['activeForm'] = Form::ajaxify($config['id']);
+            $config['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitView&pageunit_id='.$params['pageunit_id'].'&'.$profileVar.'='.$user->id;
+            $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
+            $form = new Form($config, $vm);
+
+            $ret = '<h3>' . Yii::t('UnitProfiles.unit', 'Feedback form') . '</h3>' ;
+            if (Yii::app()->user->hasFlash('UnitProfilesSend-permanent'))
+                $ret .= Yii::t('UnitProfiles.unit' , 'Your message was successfully sent');
+            else
+                $ret .= '<div class="form">' . $form->render() . '</div>';
+            return $ret;
+        }
+        return '';
     }
 
 	public static function form()
@@ -126,13 +202,6 @@ class UnitProfiles extends Content
                 ), true);
                 $params['profile'] = $profile->getAttributes();
 
-                if ($profile->id == $params['user']->id)
-                {
-                    $registerUnit = UnitRegister::model()->find('unit_id > 0');
-                    if ($registerUnit)
-                        $params['profileEditUrl'] = $registerUnit->getUnitUrl();
-                }
-
                 if (User::isUserInCategory($profile->send_message) && $profile->id != $params['user']->id && $profile->email) {
 
                     $vm = new VirtualModel($this->feedback_form, 'FieldSet');                    
@@ -185,7 +254,7 @@ class UnitProfiles extends Content
                                 )
                             );
   
-                            Yii::app()->user->setFlash('save-permanent', Yii::t('UnitProfiles.unit','Your message was successfully sent'));
+                            Yii::app()->user->setFlash('UnitProfilesSend-permanent', Yii::t('UnitProfiles.unit','Your message was successfully sent'));
                             Yii::app()->controller->refresh();
                         }
                     }

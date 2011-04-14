@@ -86,6 +86,8 @@ class UnitSitemap extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'length' => 'integer unsigned',
             'recursive' => 'integer unsigned',
             'page' => 'integer unsigned',
@@ -94,10 +96,19 @@ class UnitSitemap extends Content
         );
     }
 
-    public function cacheParams()
+    public function cacheVaryBy()
     {
         return array(
             'page_id' => Yii::app()->controller->loadModel()->id,
+        );
+    }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT CONCAT(MAX(`modify`),MAX(`create`)) FROM `' . Page::tableName() . '`',
+            ),
         );
     }
 

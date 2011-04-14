@@ -138,6 +138,8 @@ EOD;
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'image' => 'string',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',

@@ -46,6 +46,16 @@ class Unit extends I18nActiveRecord
 		);
 	}
 
+    public function  behaviors() {
+        return array(
+            'CTimestampBehavior' => array(
+                'class' => 'zii.behaviors.CTimestampBehavior',
+                'createAttribute' => 'create',
+                'updateAttribute' => 'modify',
+            ),
+        );
+    }
+
 	public function attributeLabels()
 	{
 		return array(
@@ -221,10 +231,11 @@ class Unit extends I18nActiveRecord
             Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
         }
     }
-	
+
 	public function beforeDelete()
 	{
-		return $this->content->delete();
+		$this->content->delete();
+        return parent::beforeDelete();
 	}
 
     /**

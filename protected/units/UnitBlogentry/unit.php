@@ -50,7 +50,7 @@ class UnitBlogentry extends Content
         ));
     }
 
-	public static function form()
+    public static function form()
 	{
         $sectionsArray = UnitBlog::getSectionsArray();
 
@@ -87,6 +87,8 @@ class UnitBlogentry extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'text' => 'text',
             'date' => 'datetime',
             'source' => 'string',
@@ -141,7 +143,7 @@ class UnitBlogentry extends Content
 						'max' => 20,
 					)
 				)
-			),
+            ),
 			'section'=>array(
 				'blog_id'=>array(
 					'type'=>'ComboBox',
@@ -154,7 +156,8 @@ class UnitBlogentry extends Content
 	public function recently($limit=5)
 	{
 		$this->getDbCriteria()->mergeWith(array(
-			'limit'=>$limit
+			'limit'=>$limit,
+            'order'=>'date DESC',
 		));
 		return $this;
 	}

@@ -1,3 +1,9 @@
+<Limit PUT DELETE>
+order deny,allow
+deny from all
+</Limit>
+
+
 Options +FollowSymLinks
 IndexIgnore */*
 RewriteEngine on

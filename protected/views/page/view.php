@@ -17,6 +17,8 @@ $cs->registerScript('all', <<<EOD
         $.data(document.body, 'csrfTokenName', '{$csrfTokenName}');
         $.data(document.body, 'csrfToken', '{$csrfToken}');
 
+//        $('input[name={$csrfTokenName}]').val('{$csrfToken}');
+
         window.setInterval(function() { processLocationHash(); }, 100);
 
         $('<div id="cms-statusbar"></div>').prependTo('body');
@@ -41,7 +43,7 @@ EOD
 , CClientScript::POS_READY);
 
 $js = '';
-$flashes = Yii::app()->user->getFlashes();
+$flashes = Yii::app()->user->getFlashes(false);
 
 $unitConfig = Unit::loadConfig();
 if (Yii::app()->user->hasState('askfill') && isset($unitConfig['UnitRegister']))  {

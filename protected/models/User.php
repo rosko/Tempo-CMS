@@ -1,6 +1,6 @@
 <?php
 
-class User extends CActiveRecord
+class User extends ActiveRecord
 {
 	const ICON = '/images/icons/fatcow/16x16/user.png';
 
@@ -63,6 +63,11 @@ class User extends CActiveRecord
     public function behaviors()
     {
         return array(
+            'CTimestampBehavior' => array(
+                'class' => 'zii.behaviors.CTimestampBehavior',
+                'createAttribute' => 'create',
+                'updateAttribute' => 'modify',
+            ),
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
                 'serialAttributes' => array('extra_fields'),
@@ -93,6 +98,8 @@ class User extends CActiveRecord
     {
         return array(
             'id' => 'pk',
+            'create'=>'datetime',
+            'modify'=>'datetime',
             'login' => 'char(32)',
             'password' => 'char(64)',
             'email' => 'char(64)',

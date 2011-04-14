@@ -60,6 +60,8 @@ class UnitList extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'class_name' => 'char(64)',
             'rule' => 'string',
         );
@@ -71,17 +73,44 @@ class UnitList extends Content
         );
     }
 
+    public function cacheDependencies() {
+        $sql = '';
+        $ret = array();
+        if (Yii::$classMap[$this->class_name]) {
+            $rule = $this->makeRule();
+            eval("\$sql = {$this->class_name}::model()->{$rule}getSql('MAX(modify)');");
+        }
+        if ($sql) {
+            $ret = array(
+                array(
+                    'class'=>'system.caching.dependencies.CDbCacheDependency',
+                    'sql'=>$sql,
+                ),
+            );
+        }
+        return $ret;
+    }
+
+    public function makeRule()
+    {
+        $rule = $this->rule;
+        if ($rule)
+            $rule .= '->';
+        if (method_exists($this->class_name, 'scopes')) {
+            $scopes = call_user_func(array($this->class_name, 'scopes'));
+            if (isset($scopes['public']))
+                $rule = 'public()->'.$rule;
+        }
+        return $rule;
+    }
+
     public function prepare($params)
     {
         $params = parent::prepare($params);
         $params['items'] = array();
-        if (Yii::$classMap[$params['content']->class_name]) {
-            if ($params['content']->rule)
-                $params['content']->rule .= '->';
-            if (method_exists($params['content']->class_name, 'public')) {
-                $params['content']->rule = 'public()->'.$params['content']->rule;
-            }
-            eval("\$items = {$params['content']->class_name}::model()->{$params['content']->rule}findAll();");
+        if (Yii::$classMap[$this->class_name]) {
+            $rule = $this->makeRule();
+            eval("\$items = {$this->class_name}::model()->{$rule}findAll();");
             foreach ($items as $item)
             {
                 $params['items'][] = $item->run(array(), true);

@@ -16,8 +16,6 @@ class RecordsController extends Controller
 		return array(
 			array('allow',
 				'actions'=>array('create', 'view', 'delete', 'getUrl'
-
-
                 ),
                 'expression'=>'Yii::app()->user->checkAccess("updateUser")',
 			),

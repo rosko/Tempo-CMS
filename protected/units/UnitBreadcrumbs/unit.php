@@ -57,14 +57,25 @@ class UnitBreadcrumbs extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'separator' => 'char(32)',
         );
     }
 
-    public function cacheParams()
+    public function cacheVaryBy()
     {
         return array(
             'page_id' => Yii::app()->controller->loadModel()->id,
+        );
+    }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT MAX(modify) FROM `' . Page::tableName() . '` WHERE id in ('.Yii::app()->controller->loadModel()->path.') OR id = ' . Yii::app()->controller->loadModel()->id,
+            ),
         );
     }
 

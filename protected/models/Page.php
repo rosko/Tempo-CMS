@@ -4,6 +4,7 @@ class Page extends I18nActiveRecord
 {
 	protected $_path;
     protected $_url = array();
+    protected $_units = null;
 	
 	public static function model($className=__CLASS__)
 	{
@@ -142,12 +143,11 @@ class Page extends I18nActiveRecord
 
 // 'bizRule'=>'return !empty(array_intersect(Yii::app()->user->roles, $params["page"]->access["{operation}Roles"])) || in_array(Yii::app()->user->id, $params["page"]->access["{operation}Users"]);',
 
-    public function cacheParams()
+    public function cacheVaryBy()
     {
-        $cacheParams = array(
+        return array(
             'language'=>Yii::app()->language,
         );
-        return $cacheParams;
     }
 
     public function childrenPages($id=0)
@@ -163,7 +163,7 @@ class Page extends I18nActiveRecord
         return $this;
     }
 
-	public function getUnits($area='', $exclude=false)
+	public function _getUnits($area='', $exclude=false)
 	{
 		$condition = '`t`.`page_id` = :id';
 		$params = array(':id'=>$this->id);
@@ -185,6 +185,35 @@ class Page extends I18nActiveRecord
 			'params' => $params
 		));
 	}
+
+	public function getUnits($area='', $exclude=false)
+	{
+        if ($this->_units == null) {
+            $this->_units = PageUnit::model()->findAll(array(
+                'condition' => 'page_id = :id',
+                'params' => array(
+                    'id' => $this->id,
+                ),
+                'with' => array('unit'),
+                'order' => '`area`, `order`'
+            ));
+        }
+        $units = array();
+		if (!is_array($area)) {
+			$area = array($area);
+		}
+        foreach ($this->_units as $unit) {
+            if ($area) {
+                if (!$exclude) {
+                    if (in_array($unit->area, $area)) $units[] = $unit;
+                } else {
+                    if (!in_array($unit->area, $area)) $units[] = $unit;
+                }
+            } else $units[] = $unit;
+        }
+        return $units;
+	}
+
 
 	public static function getTree($exclude=array(),$exclude_children=true,$exclude_virtual=false)
 	{
@@ -227,6 +256,25 @@ class Page extends I18nActiveRecord
         return $this;
     }
 
+    public function beforeValidate()
+    {
+        if ($this->id) {
+            $oldThis = Page::model()->findByPk($this->id);
+        } else {
+            $oldThis = new Page();
+        }
+        $langs = array_keys(self::getLangs());
+        foreach ($langs as $lang) {
+            $param = $lang.'_url';
+            $this->_url[$lang] = $oldThis->$param;
+            $newurl = $this->generateUrl(true, $lang.'_alias');
+            if ($this->_url[$lang] != $newurl) {
+                $this->$param = $newurl;
+            }
+        }
+        return parent::beforeValidate();
+    }
+
     public function beforeSave()
 	{
 		$this->_path = $this->path;
@@ -234,16 +282,7 @@ class Page extends I18nActiveRecord
 		if ($this->_path != $newpath) {
 			$this->path = $newpath;
 		}
-        $langs = array_keys(self::getLangs());
-        foreach ($langs as $lang) {
-            $param = $lang.'_url';
-            $this->_url[$lang] = $this->$param;
-            $newurl = $this->generateUrl(true, $lang.'_alias');
-            if ($this->_url[$lang] != $newurl) {
-                $this->$param = $newurl;
-            }
-        }
-		return true;
+		return parent::beforeSave();
 	}
 	
 	public function afterSave()
@@ -268,7 +307,7 @@ class Page extends I18nActiveRecord
         		}
             }
         }
-		return true;
+		return parent::afterSave();
 	}
 	
 	public function afterDelete()
@@ -292,6 +331,7 @@ class Page extends I18nActiveRecord
 			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
 			Yii::app()->db->createCommand($sql)->execute();
 		}
+        return parent::afterDelete();
 	}
 	
 	public function deleteWithChildren()
@@ -467,10 +507,15 @@ class Page extends I18nActiveRecord
     public function behaviors()
     {
         return array(
+            'CTimestampBehavior' => array(
+                'class' => 'zii.behaviors.CTimestampBehavior',
+                'createAttribute' => 'create',
+                'updateAttribute' => 'modify',
+            ),
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
                 'serialAttributes' => array('access'),
-            )
+            ),
         );
     }
 
@@ -517,12 +562,12 @@ class Page extends I18nActiveRecord
 		$obj = new self;
         $d = date("Y-m-d H:i:s");
 		$obj->title = Yii::t('cms', 'New page createad at {time}', array('{time}' => $d));
-        $obj->alias = self::sanitizeAlias(date("Ymd Hi"));
+        $obj->alias = self::sanitizeAlias(date("Ymd His"));
         $obj->url = '/'.$obj->alias;
         $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
         foreach ($langs as $lang) {
             $obj->{$lang.'_title'} = Yii::t('cms', 'New page createad at {time}', array('{time}' => $d), null, $lang);
-            $obj->{$lang.'_alias'} = self::sanitizeAlias(date("Ymd Hi"));
+            $obj->{$lang.'_alias'} = self::sanitizeAlias(date("Ymd His"));
             $obj->{$lang.'_url'} = '/'.$obj->{$lang.'_alias'};
         }
 		$obj->active = true;
@@ -544,14 +589,6 @@ class Page extends I18nActiveRecord
 		else
 			$str=substr($str,0,64);
         return $str;
-    }
-
-    public function getAll($condition = '', $params = array())
-    {
-        $criteria=$this->getCommandBuilder()->createCriteria($condition,$params);
-        $this->beforeFind($criteria);
-		$this->applyScopes($criteria);
-        return $this->getCommandBuilder()->createFindCommand($this->getTableSchema(), $criteria)->queryAll();
     }
 
 }

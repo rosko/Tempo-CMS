@@ -65,6 +65,8 @@ class UnitText extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'text' => 'text',
             'author' => 'string',
         );

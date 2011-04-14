@@ -82,6 +82,8 @@ class Controller extends CController
 
             $output=$this->processOutput($output);
 
+            $output = preg_replace("/(\<input[^>]*value=[\'\"]?)([^\"\']*)([\'\"]?[^>]*name=[\'\"]?".Yii::app()->getRequest()->csrfTokenName."[\'\"]?[^>]*\>)/msi", "\${1}".Yii::app()->getRequest()->getCsrfToken()."\${3}", $output);
+
             if($return)
                 return $output;
             else

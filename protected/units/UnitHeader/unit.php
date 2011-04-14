@@ -59,7 +59,18 @@ class UnitHeader extends Content
         return array(
             'id' => 'pk',
             'unit_id' => 'integer unsigned',
+            'create' => 'datetime',
+            'modify' => 'datetime',
             'header' => 'char(32)',
         );
+    }
+
+    public function prepare($params)
+    {
+        $params = parent::prepare($params);
+        if ($params['unit']->title == '') {
+            $params['unit']->title = '&nbsp;';
+        }
+        return $params;
     }
 }

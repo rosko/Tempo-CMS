@@ -78,7 +78,7 @@ class UnitList extends Content
         $ret = array();
         if (Yii::$classMap[$this->class_name]) {
             $rule = $this->makeRule();
-            eval("\$sql = {$this->class_name}::model()->{$rule}getSql('MAX(modify)');");
+            eval("\$sql = {$this->class_name}::model()->{$rule}getSql('MAX(`modify`)');");
         }
         if ($sql) {
             $ret = array(

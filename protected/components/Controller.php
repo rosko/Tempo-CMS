@@ -95,4 +95,28 @@ class Controller extends CController
         return false;
     }
 
+	public function putDynamic($callback)
+	{
+		$params=func_get_args();
+		array_shift($params);
+        echo '<!-- dynamic '.base64_encode(serialize(array($callback,$params))).' -->';
+	}
+
+    public function processOutput($output)
+    {
+        return $this->processDynamic(parent::processOutput($output));
+    }
+
+    public function processDynamic($output)
+    {
+        $output=preg_replace_callback("/<!--\sdynamic\s([^\s]*)\s-->/m", array($this,'replaceDynamic'), $output);
+        return $output;
+    }
+
+    protected function replaceDynamic($matches)
+    {
+        list($callback,$params)=unserialize(base64_decode($matches[1], true));
+        return call_user_func_array($callback, $params);
+    }
+
 }

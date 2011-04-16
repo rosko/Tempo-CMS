@@ -37,9 +37,16 @@ class Settings extends CApplicationComponent
 
     public function loadAll()
     {
-        $sql = 'SELECT * FROM `' . $this->tableName . '`';
-        $command = Yii::app()->db->createCommand($sql);
-        $tmp = $command->queryAll();
+        $tmp = null;
+        if (Yii::app()->cache) {
+            $tmp = Yii::app()->cache->get('Settings');
+        }
+        if (!$tmp) {
+            $sql = 'SELECT * FROM `' . $this->tableName . '`';
+            $command = Yii::app()->db->createCommand($sql);
+            $tmp = $command->queryAll();
+            Yii::app()->cache->set('Settings', $tmp);
+        }
         foreach ($tmp as $s)
         {
             $s['name'] = $this->getI18nFieldName($s['name']);
@@ -65,7 +72,8 @@ class Settings extends CApplicationComponent
         {
             $name = $this->getI18nFieldName($name);
             $this->setValue($name, $value);
-        }        
+        }
+        Yii::app()->cache->set('Settings', null);
     }
 
     public function getValue($name)

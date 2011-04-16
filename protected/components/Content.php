@@ -251,7 +251,7 @@ class Content extends I18nActiveRecord
         if (trim($output) == '' && $params['editMode'])  {
             $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($className, 'name'))));
         }
-
+        
         if ($return)
             return $output . $output2;
         else

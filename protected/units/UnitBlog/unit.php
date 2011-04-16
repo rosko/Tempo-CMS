@@ -111,7 +111,7 @@ class UnitBlog extends Content
         return array(
             array(
                 'class'=>'system.caching.dependencies.CDbCacheDependency',
-                'sql'=>'SELECT MAX(modify) FROM `' . UnitBlogentry::tableName() . '` WHERE blog_id = :id',
+                'sql'=>'SELECT MAX(`modify`) FROM `' . UnitBlogentry::tableName() . '` WHERE blog_id = :id',
                 'params' => array(
                     'id' => $this->id
                 ),

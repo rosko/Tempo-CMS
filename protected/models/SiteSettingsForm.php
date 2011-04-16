@@ -12,11 +12,13 @@ class SiteSettingsForm extends CFormModel
             array('sitename', 'length', 'max'=>100),
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
+            array('cacheTime', 'numerical', 'min'=>0, 'integerOnly'=>true),
 			array('simpleMode, autoSave, showUnitAppearance, ajaxPager, ajaxPagerScroll', 'boolean'),
             array('theme', 'length', 'max'=>100),
             array('language', 'length', 'max'=>10),
             array('defaultsShowEmail, defaultsSendMessage', 'length', 'max'=>32),
             array('userExtraFields', 'safe'),
+
         );
         // Правила для проверки настроек для юнитов
         $unit_types = Unit::getTypes();
@@ -55,6 +57,7 @@ class SiteSettingsForm extends CFormModel
             'defaultsShowEmail' => Yii::t('cms', 'Who can see email address in user profile, by default'),
             'defaultsSendMessage' => Yii::t('cms', 'Who can send an email to user through the site, by default'),
             'userExtraFields' => Yii::t('cms', 'Extra user profile fields'),
+            'cacheTime' => Yii::t('cms', 'Cache time'),
 		);
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
@@ -79,6 +82,7 @@ class SiteSettingsForm extends CFormModel
             'language'=>Yii::app()->language,
             'defaultsShowEmail'=>'registered',
             'defaultsSendMessage'=>'registered',
+            'cacheTime'=>3600,
         );
     }
 
@@ -153,6 +157,16 @@ class SiteSettingsForm extends CFormModel
                 'userExtraFields'=>array(
                     'type'=>'FieldSet',
                     
+                ),
+                Form::tab(Yii::t('cms', 'Performance')),
+                'cacheTime'=>array(
+                    'type'=>'Slider',
+					'options'=>array(
+						'min'=>0,
+						'max'=>3600,
+                        'step'=>60,
+					),
+                    'hint'=>Yii::t('cms', 'in seconds, 0 = off, 3600 - one hour'),
                 ),
             ),
         );

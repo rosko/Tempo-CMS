@@ -71,10 +71,11 @@ class UnitBreadcrumbs extends Content
     }
 
     public function  cacheDependencies() {
+        $ids = str_replace('0,','',Yii::app()->controller->loadModel()->path) . ',' . Yii::app()->controller->loadModel()->id;
         return array(
             array(
                 'class'=>'system.caching.dependencies.CDbCacheDependency',
-                'sql'=>'SELECT MAX(modify) FROM `' . Page::tableName() . '` WHERE id in ('.Yii::app()->controller->loadModel()->path.') OR id = ' . Yii::app()->controller->loadModel()->id,
+                'sql'=>'SELECT MAX(`modify`) FROM `' . Page::tableName() . '` WHERE id in ('.$ids.')',
             ),
         );
     }

@@ -298,7 +298,7 @@ class UnitRegister extends Content
             $tpldata = array();
 			$model->attributes=$_POST['User'];
             if ($model->password == '') {
-                $model->password = $tpldata['generatedPassword'] = User::generatePassword();
+                $model->password = $model->password_repeat = $tpldata['generatedPassword'] = User::generatePassword();
                 $model->askfill = true;
             }
 			if($model->validate()) {

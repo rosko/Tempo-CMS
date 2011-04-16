@@ -294,7 +294,15 @@ class User extends ActiveRecord
         if (!is_array($requiredFields))
             $requiredFields = array();
 
+        if ($scenario == 'update' && !$this->login) {
+            array_unshift($selectedFields, 'login');
+            array_unshift($requiredFields, 'login');
+        }
+
         $fields = array_unique(array_diff(array_merge(array_merge($specialFields['required'], $requiredFields), $selectedFields), $specialFields['unsafe']));
+        if ($scenario == 'update' && !$this->login) {
+            array_unshift($fields, 'login');
+        }
         foreach ($fields as $name) {
             if (isset($form['elements'][$name])) {
                 $formFields[$name] = $form['elements'][$name];
@@ -385,6 +393,11 @@ class User extends ActiveRecord
             }
         }
 
+        if ($scenario == 'update' && !$this->login) {
+            foreach ($rules as $index => $rule) {
+                if ($rule[0]=='login' && $rule[1]=='unsafe') unset($rules[$index]);
+            }
+        }
         $this->rules = $rules;
         return array(
             'elements'=>$formFields,

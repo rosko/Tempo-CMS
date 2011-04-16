@@ -11,7 +11,7 @@ class PageController extends Controller
 			'accessControl',
 /*            array(
                 'COutputCache + view',
-                'duration'=>3600,
+                'duration'=>Yii::app()->settings->getValue('cacheTime'),
                 'id'=>serialize(Page::cacheVaryBy()),
                 'varyByParam'=>array('id','language','alias','url'),
                 'dependency'=>array(
@@ -111,13 +111,17 @@ class PageController extends Controller
         // Поиск страницы
         $lang = Yii::app()->language;
         if (!empty($_GET['alias'])){
-            $page = Page::model()->getAll("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
-            if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_alias']==$_GET['alias']))
-                $_GET['id'] = $page[0]['id'];
+            $page = Page::model()->find("`{$lang}_alias` = :alias", array(':alias'=> $_GET['alias']));
+            if ($page && (!Yii::app()->params['strictFind'] || $page[$lang.'_alias']==$_GET['alias'])) {
+                $_GET['id'] = $page->id;
+                $this->_model = $page;
+            }
         } elseif (!empty($_GET['url'])) {
-            $page = Page::model()->getAll("`{$lang}_url` = :url", array(':url'=> '/'.$_GET['url']));
-            if (isset($page[0]['id']) && (!Yii::app()->params['strictFind'] || $page[0][$lang.'_url']=='/'.$_GET['url']))
-                $_GET['id'] = $page[0]['id'];
+            $page = Page::model()->find("`{$lang}_url` = :url", array(':url'=> '/'.$_GET['url']));
+            if ($page && (!Yii::app()->params['strictFind'] || $page[$lang.'_url']=='/'.$_GET['url'])) {
+                $_GET['id'] = $page->id;
+                $this->_model = $page;
+            }
         } else $_GET['id'] = 1;
     }
 
@@ -137,8 +141,7 @@ class PageController extends Controller
             $this->paramId();
 		} else {
             // Сделать переадрессацию, если страница запрошена по id без указания адреса
-            // и при этом режим редактирования отключен
-            if (!Yii::app()->user->checkAccess('updatePage', array('page'=>$this->loadModel())) &&
+            if (!Yii::app()->user->checkAccess('guest') &&
                 (Yii::app()->getUrlManager()->getUrlFormat()==UrlManager::PATH_FORMAT) &&
                 !$_GET['alias'] && !$_GET['url']) {
                 $page = Page::model()->findByPk(intval($_GET['id']));

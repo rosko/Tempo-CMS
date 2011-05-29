@@ -33,6 +33,7 @@ return CMap::mergeArray(array(
             'itemTable'=>$config['components']['db']['tablePrefix'].'auth_item',
             'itemChildTable'=>$config['components']['db']['tablePrefix'].'auth_itemchild',
             'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
+            'rightsTable'=>$config['components']['db']['tablePrefix'].'rights',
         ),*/
         'authManager'=>array(
             'class'=>'CPhpAuthManager',
@@ -100,9 +101,6 @@ return CMap::mergeArray(array(
                 "site/logout"=>'site/logout',
                 'filesEditor/save'=>'filesEditor/save',
                 'users'=>'user/index',
-                'rights'=>'rights',
-                
-
             ),
         ),
 		'errorHandler'=>array(

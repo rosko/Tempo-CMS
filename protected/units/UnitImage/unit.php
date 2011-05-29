@@ -5,7 +5,7 @@ class UnitImage extends Content
 	const ICON = '/images/icons/fatcow/16x16/image.png';
     const HIDDEN = false;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitImage.unit', 'Image', array(), null, $language);
     }

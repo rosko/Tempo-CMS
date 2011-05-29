@@ -52,7 +52,7 @@ class Installer extends CApplicationComponent
 
     public function installAll($withUnits=true)
     {
-        // , 'AuthItem', 'AuthItemChild', 'AuthAssignment'
+        // 'ARRights', 'AuthItem', 'AuthItemChild', 'AuthAssignment'
         $classNames = array('User', 'Page', 'PageUnit', 'Unit');
         foreach ($classNames as $className)
             $this->installTable($className);

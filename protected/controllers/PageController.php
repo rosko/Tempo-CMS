@@ -141,7 +141,7 @@ class PageController extends Controller
             $this->paramId();
 		} else {
             // Сделать переадрессацию, если страница запрошена по id без указания адреса
-            if (!Yii::app()->user->checkAccess('guest') &&
+            if (Yii::app()->user->checkAccess('guest') &&
                 (Yii::app()->getUrlManager()->getUrlFormat()==UrlManager::PATH_FORMAT) &&
                 !$_GET['alias'] && !$_GET['url']) {
                 $page = Page::model()->findByPk(intval($_GET['id']));
@@ -459,9 +459,9 @@ class PageController extends Controller
 			$unit = new Unit;
 			$unit->type = $_REQUEST['type'];
             $className = Unit::getClassNameByUnitType($_REQUEST['type']);
-			$unit->title = call_user_func(array($className, 'name'));
+			$unit->title = call_user_func(array($className, 'unitName'));
             foreach ($langs as $lang) {
-                $unit->{$lang.'_title'} = call_user_func(array($className, 'name'), $lang);
+                $unit->{$lang.'_title'} = call_user_func(array($className, 'unitName'), $lang);
             }
 			$unit->save();
 
@@ -575,16 +575,16 @@ class PageController extends Controller
         {
             $form_array['title']='';
         }
-        if (method_exists($unit_class, 'name')) {
+        if (method_exists($unit_class, 'unitName')) {
             if (is_subclass_of($unit_class, 'Content')) {
                 $caption = array(
                     'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
-                    'label' => call_user_func(array($unit_class, 'name')),
+                    'label' => call_user_func(array($unit_class, 'unitName')),
                 );
             } else {
                 $caption = array(
                     'icon' => str_replace('16x16', '32x32', constant($unit_class.'::ICON')),
-                    'label' => $content->name(),
+                    'label' => $content->unitName(),
                 );
             }
         } else {
@@ -631,18 +631,6 @@ class PageController extends Controller
     				$content->unit_id = $unit->id;
             		if ($unit->save(false)) {
                 		$content->save(false);
-                        if ($content->hasAttribute('page_id')) {
-                            $p = Page::model()->findByPk($content->page_id);
-                            if ($p) {
-                                $p->title = $unit->title;
-                                $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
-                                foreach ($langs as $lang) {
-                                    $param = $lang.'_title';
-                                    $p->$param = $unit->$param;
-                                }
-                                $p->save(false);
-                            }
-                        }
                     }
                 } else $content->save(false);
 			}

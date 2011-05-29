@@ -113,7 +113,7 @@ class Unit extends I18nActiveRecord
                     if (is_dir($dir)) {
                         $className = basename($dir);
                         Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
-                        $u[$className] = call_user_func(array($className, 'name'));
+                        $u[$className] = call_user_func(array($className, 'unitName'));
                         $_units[$className] = array(
                             'name' => $u[$className],
                             'dir_alias' => $alias,
@@ -218,7 +218,7 @@ class Unit extends I18nActiveRecord
         $classNames = array_keys(self::loadConfig());
 		foreach ($classNames as $className) {
             if (!Yii::app()->settings->getValue('simpleMode') || !constant($className.'::HIDDEN'))
-                $ret[$className] = call_user_func(array($className, 'name'));
+                $ret[$className] = call_user_func(array($className, 'unitName'));
 
 		}
         asort($ret);

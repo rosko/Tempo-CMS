@@ -6,7 +6,7 @@ class UnitRegister extends Content
     const HIDDEN = true;
     const CACHE = false;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitRegister.unit', 'Registration and profile form', array(), null, $language);
     }
@@ -146,11 +146,13 @@ class UnitRegister extends Content
                 ),
                 Form::tab(Yii::t('UnitRegister.unit', 'Text')),
                 'text'=>array(
-                    'type'=>'VisualTextAreaFCK'
+					'type'=>'TextEditor',
+                    'kind'=>'fck',
                 ),
                 Form::tab(Yii::t('UnitRegister.unit', 'User agreement')),
                 'agreement'=>array(
-                    'type'=>'VisualTextAreaFCK'
+					'type'=>'TextEditor',
+                    'kind'=>'fck',
                 ),
                 Form::tab(Yii::t('UnitRegister.unit', 'Editing profile')),
                 'profile_fields'=>array(

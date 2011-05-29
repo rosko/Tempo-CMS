@@ -7,7 +7,7 @@ class UnitBreadcrumbs extends Content
 
     const DEFAULT_SEPARATOR = ' &raquo; ';
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitBreadcrumbs.unit', 'Breadcrumbs', array(), null, $language);
     }

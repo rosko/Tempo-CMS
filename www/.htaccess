@@ -3,8 +3,9 @@ order deny,allow
 deny from all
 </Limit>
 
-
+DirectoryIndex index.php
 Options +FollowSymLinks
+
 IndexIgnore */*
 RewriteEngine on
 

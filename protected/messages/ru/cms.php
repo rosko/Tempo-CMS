@@ -304,5 +304,7 @@ return array(
     'Cache time' => 'Время кэширования',
     'in seconds, 0 = off, 3600 - one hour' => 'в секундах, 0 = выключено, 3600 = один час',
     'Performance' => 'Производительность',
+    'Transliterate page slug' => 'Транслитерация адреса страницы',
+    'Lowercase page slug' => 'Адрес страницы в нижнем регистре',
 );
 

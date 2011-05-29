@@ -5,7 +5,7 @@ class UnitSearch extends Content
 	const ICON = '/images/icons/fatcow/16x16/find.png';
     const HIDDEN = true;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitSearch.unit', 'Search', array(), null, $language);
     }

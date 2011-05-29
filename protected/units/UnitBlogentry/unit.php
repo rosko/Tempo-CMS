@@ -5,7 +5,7 @@ class UnitBlogentry extends Content
 	const ICON = '/images/icons/fatcow/16x16/newspaper_add.png';
     const HIDDEN = true;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitBlogentry.unit', 'Blog/news entry', array(), null, $language);
     }
@@ -58,7 +58,8 @@ class UnitBlogentry extends Content
 			'elements'=>array(
                 Form::tab('Новость'),
 				'text'=>array(
-					'type'=>'VisualTextAreaFCK',
+					'type'=>'TextEditor',
+                    'kind'=>'fck',
 				),
                 'blog_id'=> !empty($sectionsArray) ? array(
                     'type'=>'ComboBox',

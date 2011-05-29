@@ -5,7 +5,7 @@ class UnitLogin extends Content
 	const ICON = '/images/icons/fatcow/16x16/user.png';
     const HIDDEN = true;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitLogin.unit', 'Login Form', array(), null, $language);
     }
@@ -59,7 +59,7 @@ class UnitLogin extends Content
         if (Yii::app()->user->id)
             $user = User::model()->findByPk(Yii::app()->user->id);
         if ($user) {
-            return '<h3>' . Yii::t('UnitLogin.unit', 'Hello') . ', ' . $user->name . '!</h3>';
+            return '<h3>' . Yii::t('UnitLogin.unit', 'Hello') . ', ' . $user->displayname . '!</h3>';
         }
         return '';
     }

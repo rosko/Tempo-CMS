@@ -10,7 +10,7 @@ $this->widget('RecordsGrid', array(
         'id',
         'login',
         'email',
-        'name',
+        'displayname',
     ),
     
 ));

@@ -5,7 +5,7 @@ class UnitMenu extends Content
 	const ICON = '/images/icons/fatcow/16x16/breeze.png';
     const HIDDEN = true;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitMenu.unit', 'Menu', array(), null, $language);
     }

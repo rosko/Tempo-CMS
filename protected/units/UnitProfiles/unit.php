@@ -5,7 +5,7 @@ class UnitProfiles extends Content
 	const ICON = '/images/icons/fatcow/16x16/user.png';
     const HIDDEN = true;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitProfiles.unit', 'User profiles', array(), null, $language);
     }

@@ -18,7 +18,7 @@ class Page extends I18nActiveRecord
 
 	public function rules()
 	{
-		return $this->localizedRules(array(
+        $rules = array(
 			array('parent_id, title', 'required'),
 			array('parent_id, order, active', 'numerical', 'integerOnly'=>true),
 			array('path, title, keywords, description, redirect, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
@@ -29,7 +29,14 @@ class Page extends I18nActiveRecord
             array('url', 'PageUrlValidator'),
             array('access', 'safe'),
             array('author_id', 'safe'),
-		));
+		);
+        if ($this->virtual) {
+            $rules[] = array('parent_id', 'unsafe');
+        }
+        if ($this->id) {
+            $rules[] = array('alias, url', 'unsafe');
+        }
+		return $this->localizedRules($rules);
 	}
 
     public function i18n()
@@ -589,6 +596,30 @@ class Page extends I18nActiveRecord
 		else
 			$str=substr($str,0,64);
         return $str;
+    }
+
+    public static function transliterate($str)
+    {
+        $ret = $str;
+        $transliteration = Page::transliteration();
+        if (is_array($transliteration) && !empty($transliteration)) {
+            $ret = str_replace($transliteration[0], $transliteration[1], $str);
+        }
+        return $ret;
+
+    }
+
+    public static function transliteration()
+    {
+        $files = array(
+            Yii::getPathOfAlias('config.transliteration').'.php',
+            Yii::getPathOfAlias('application.config.transliteration').'.php',
+        );
+        foreach ($files as $file) {
+            if (is_file($file))
+                return include($file);
+        }
+        return false;
     }
 
 }

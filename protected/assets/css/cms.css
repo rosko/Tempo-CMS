@@ -209,3 +209,7 @@ input.w200 {
     font-size:1em !important;
 }
 
+
+.cke_dialog_background_cover {
+    display:none;
+}

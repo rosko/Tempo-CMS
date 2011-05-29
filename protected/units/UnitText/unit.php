@@ -5,7 +5,7 @@ class UnitText extends Content
 	const ICON = '/images/icons/fatcow/16x16/text_dropcaps.png';
     const HIDDEN = false;
 	
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitText.unit', 'Text', array(), null, $language);
     }
@@ -49,7 +49,8 @@ class UnitText extends Content
 		return array(
 			'elements'=>array(
 				'text'=>array(
-					'type'=>'VisualTextAreaFCK',
+					'type'=>'TextEditor',
+                    'kind'=>'fck',
 				),
 				'author'=>array(
 					'type'=>'ComboBox',

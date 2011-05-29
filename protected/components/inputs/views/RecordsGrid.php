@@ -1,5 +1,5 @@
 <?php
-    $title = (property_exists($class_name, 'name') ? call_user_func(array($class_name, 'name')) . ' ' : '') . date('Y-m-d H:i');
+    $title = (property_exists($class_name, 'unitName') ? call_user_func(array($class_name, 'unitName')) . ' ' : '') . date('Y-m-d H:i');
     $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
 ?>
 <div id="<?=$id?>_header">

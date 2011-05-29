@@ -229,7 +229,7 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
         'valid_children'=>array('mainpage'),
         'types'=>array(
             'default'=>array(
-                'valid_children'=>array('default'),
+                'valid_children'=>array('default', 'virtual'),
                 //"select_node"=> 'js:function() {alert("select");return true;} ',
                 'hover_node'=>false,
 //                "open_node"=>false,
@@ -245,8 +245,14 @@ EOD
 ,*/
 //                "delete_node"=>
             ),
+            'virtual'=>array(
+                "valid_children"=>array('default', 'virtual'),
+				"start_drag" => false,
+				"move_node" => false,
+                'hover_node'=>false,
+            ),
             'mainpage'=>array(
-                "valid_children"=>array('default'),
+                "valid_children"=>array('default', 'virtual'),
 				"start_drag" => false,
 				"move_node" => false,
 				"delete_node" => false,
@@ -346,6 +352,7 @@ function showBranch($tree, $path) {
     if ($tree)
 	foreach ($tree[$path] as $page) {
 		$data = ($page['id'] == 1) ?  ' rel="mainpage"' : '';
+        $data = $page['virtual'] ? ' rel="virtual"' : '';
 		echo '<li id="page-' . $page['id']. '" ' . $data . ' ><a rev="page" rel="'.$page['id'].'" href="#'.$page['id'].'"><ins>&nbsp;</ins>' . $page['title'] . "</a>\n";
 		if ($tree[$path.','.$page['id']]) {
 			echo "<ul>\n";

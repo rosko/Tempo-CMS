@@ -73,7 +73,7 @@ class UrlManager extends CUrlManager
                 unset($_GET['language']);
                 unset($_REQUEST['language']);
             }
-        }        
+        }
     }
 }
 

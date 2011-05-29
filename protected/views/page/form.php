@@ -11,17 +11,24 @@ if ($show_title === false) {
 
 if (get_class($form->model)=='Page') {
     $js = '';
-    if ($form->model->id == 1) {
-        $js .= <<<EOD
-            $('#{$form->uniqueId} .field_alias').hide();
-            $('#{$form->uniqueId} .field_url').hide();
-EOD;
-    } else {
+    if ($form->model->id != 1) {
         if ($form->model->isNewRecord) {
+
+            $jsA = '';
+            $jsB = '';
+            if (Yii::app()->settings->getValue('slugTransliterate')) {
+                $jsA .= 'transliterate(';
+                $jsB .= ')';
+            }
+            if (Yii::app()->settings->getValue('slugLowercase')) {
+                $jsA .= 'strtolower(';
+                $jsB .= ')';
+            }
+
             $js .= <<<EOD
             $('#{$form->uniqueId} .field_url').hide();
             $('#{$form->uniqueId} #Page_title').bind('keyup change',function() {
-                $('#{$form->uniqueId} #Page_alias').val(sanitizeAlias($(this).val()));
+                $('#{$form->uniqueId} #Page_alias').val({$jsA}sanitizeAlias($(this).val(){$jsB}));
                 $('#{$form->uniqueId} #Page_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
             });
 EOD;
@@ -29,7 +36,7 @@ EOD;
             foreach ($langs as $lang) {
                 $js .= <<<EOD
                 $('#{$form->uniqueId} #Page_{$lang}_title').bind('keyup change',function() {
-                    $('#{$form->uniqueId} #Page_{$lang}_alias').val(sanitizeAlias($(this).val()));
+                    $('#{$form->uniqueId} #Page_{$lang}_alias').val({$jsA}sanitizeAlias($(this).val(){$jsB}));
                     $('#{$form->uniqueId} #Page_{$lang}_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_{$lang}_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
                 });
 EOD;
@@ -71,26 +78,6 @@ if (Yii::app()->settings->getValue('showUnitAppearance') && $form['unit']->model
 EOD;
 
 }
-
-/*
-Меняет внешний вид кнопок согласно jqueryUI
-
-$js .= <<<EOD
-
-    var ics = {
-        go: 'ui-icon-arrowfresh-1-s',
-        refresh: 'ui-icon-refresh',
-        deletepage: 'ui-icon-closethick',
-        save: 'ui-icon-check',
-        apply: 'ui-icon-bullet'
-    };
-    $('input[type=submit]').each(function() {
-        $(this).button({icons: {primary: ics[$(this).attr('name')]} });
-    });
-
-
-EOD;
-*/
 
 $js .= <<<EOD
     if (!$('#{$form->uniqueId} .ui-tabs-panel').length) {

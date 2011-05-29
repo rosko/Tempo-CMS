@@ -4,7 +4,7 @@
         if ($content) { ?>
 
 <div
-    <?php if ($editArea) { ?>title="<?php echo call_user_func(array($className, 'name')); ?>"<?php } ?>
+    <?php if ($editArea) { ?>title="<?php echo call_user_func(array($className, 'unitName')); ?>"<?php } ?>
     id="cms-pageunit-<?=$pageunit->id?>"
     class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$pageunit->unit->type?>"
     rel="<?=$pageunit->unit->type?>"

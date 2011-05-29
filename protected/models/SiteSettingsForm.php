@@ -18,6 +18,7 @@ class SiteSettingsForm extends CFormModel
             array('language', 'length', 'max'=>10),
             array('defaultsShowEmail, defaultsSendMessage', 'length', 'max'=>32),
             array('userExtraFields', 'safe'),
+            array('slugTransliterate, slugLowercase', 'boolean'),
 
         );
         // Правила для проверки настроек для юнитов
@@ -58,6 +59,8 @@ class SiteSettingsForm extends CFormModel
             'defaultsSendMessage' => Yii::t('cms', 'Who can send an email to user through the site, by default'),
             'userExtraFields' => Yii::t('cms', 'Extra user profile fields'),
             'cacheTime' => Yii::t('cms', 'Cache time'),
+            'slugTransliterate' => Yii::t('cms', 'Transliterate page slug'),
+            'slugLowercase' => Yii::t('cms', 'Lowercase page slug'),
 		);
         $unit_types = Unit::getTypes();
         foreach ($unit_types as $unit_class) {
@@ -124,6 +127,12 @@ class SiteSettingsForm extends CFormModel
                 'autoSave'=>array(
                     'type'=>'checkbox'
                 ),
+                'slugTransliterate'=>array(
+                    'type'=>'checkbox'
+                ),
+                'slugLowercase'=>array(
+                    'type'=>'checkbox'
+                ),
                 Form::tab(Yii::t('cms', 'Appearance')),
                 'theme'=>array(
                     'type'=>'ThemeSelect',
@@ -177,7 +186,7 @@ class SiteSettingsForm extends CFormModel
             if (method_exists($unit_class, 'settings')) {
                 $elems = call_user_func(array($unit_class, 'settings'), $unit_class);
                 if (is_array($elems) && !empty($elems)) {
-                    $ret['elements'][] = Form::section(call_user_func(array($unit_class, 'name')));
+                    $ret['elements'][] = Form::section(call_user_func(array($unit_class, 'unitName')));
                     foreach ($elems as $k => $elem)
                     {
                         $ret['elements'][$unit_class.'.'.$k] = $elem;

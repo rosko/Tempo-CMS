@@ -5,7 +5,7 @@ class UnitLangswitcher extends Content
 	const ICON = '/images/icons/fatcow/16x16/style_go.png';
     const HIDDEN = false;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitLangswitcher.unit', 'Language switcher', array(), null, $language);
     }

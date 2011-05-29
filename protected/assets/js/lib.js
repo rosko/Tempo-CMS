@@ -282,3 +282,44 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
 
 // =============================================================
 
+
+function str_replace ( search, replace, subject ) {
+
+    // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+    // +   improved by: Gabriel Paderni
+    if(!(replace instanceof Array)){
+		replace=new Array(replace);
+		if(search instanceof Array){
+			while(search.length>replace.length){
+				replace[replace.length]=replace[0];
+			}
+		}
+	}
+
+	if(!(search instanceof Array))search=new Array(search);
+	while(search.length>replace.length){
+		replace[replace.length]='';
+	}
+
+	if(subject instanceof Array){
+		for(k in subject){
+			subject[k]=str_replace(search,replace,subject[k]);
+		}
+		return subject;
+	}
+
+	for(var k=0; k<search.length; k++){
+		var i = subject.indexOf(search[k]);
+		while(i>-1){
+			subject = subject.replace(search[k], replace[k]);
+			i = subject.indexOf(search[k],i);
+		}
+	}
+
+	return subject;
+
+}
+
+function strtolower(str) {
+    return str.toLowerCase();
+}

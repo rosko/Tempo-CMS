@@ -16,7 +16,7 @@ class User extends ActiveRecord
 		return parent::model($className);
 	}
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
     }
@@ -40,14 +40,14 @@ class User extends ActiveRecord
             //array('login', 'match', 'not'=>true, 'pattern'=>'/^[0-9]*/u'),
             array('login, email', 'unique'),
 			array('email', 'required'),
-            array('name', 'required', 'on'=>'update'),
+            array('displayname', 'required', 'on'=>'update'),
             array('login', 'match', 'pattern'=>'/^[a-z]+[a-z0-9-]*[a-z0-9]+$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers. And it can not start with a digit or sign')),
             array('password', 'match', 'pattern'=>'/^[[:graph:]]*$/', 'message'=>Yii::t('cms', '{attribute} can only contain letters and numbers')),
             array('email', 'email'),
             array('password', 'compare', 'compareAttribute'=>'password_repeat'),
             array('password, password_repeat, authcode', 'safe'),
             array('login', 'unsafe', 'on'=>array('edit','update')),
-			array('name', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
+			array('displayname', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
             array('active, askfill, show_email, send_message', 'unsafe', 'on'=>array('register', 'view')),
             array('active, askfill, captcha, agreed', 'unsafe', 'on'=>array('update','view')),
             array('active, askfill, agreed', 'boolean'),
@@ -83,7 +83,7 @@ class User extends ActiveRecord
 			'password' => Yii::t('cms', 'Password'),
             'password_repeat' => Yii::t('cms', 'Repeat password'),
 			'email' => Yii::t('cms', 'E-mail'),
-			'name' => Yii::t('cms', 'Name'),
+			'displayname' => Yii::t('cms', 'Name'),
             'active' => Yii::t('cms', 'Active'),
             'captcha'=> Yii::t('cms', 'Verify code'),
             'agreed'=> Yii::t('cms', 'I agree with the agreement'),
@@ -103,7 +103,7 @@ class User extends ActiveRecord
             'login' => 'char(32)',
             'password' => 'char(64)',
             'email' => 'char(64)',
-            'name' => 'char(64)',
+            'displayname' => 'char(64)',
             'active'=>'boolean',
             'authcode' => 'char(64)',
             'agreed'=>'boolean',
@@ -140,7 +140,7 @@ class User extends ActiveRecord
                 'login'=>array(
                     'type'=>'text',
                 ),
-                'name'=>array(
+                'displayname'=>array(
                     'type'=>'text',
                 ),
                 'email'=>array(
@@ -202,7 +202,7 @@ class User extends ActiveRecord
     {
         $user = new self;
         $user->login = self::ADMIN_LOGIN;
-        $user->name = Yii::app()->params['admin']['name'];
+        $user->displayname  = Yii::app()->params['admin']['displayname'];
         $user->email = Yii::app()->params['admin']['email'];
         $user->password = self::hash(Yii::app()->params['admin']['password']);
         $user->active = true;
@@ -447,6 +447,6 @@ class User extends ActiveRecord
 
     public function getFullname()
     {
-        return $this->login . ', ' . $this->email . ', ' . $this->name;
+        return $this->login . ', ' . $this->email . ', ' . $this->displayname;
     }
 }

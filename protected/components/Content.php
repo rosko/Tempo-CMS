@@ -34,6 +34,23 @@ class Content extends I18nActiveRecord
         return parent::beforeSave();
     }
 
+    public function afterSave()
+    {
+        if ($this->hasAttribute('page_id')) {
+            $page = Page::model()->findByPk($this->page_id);
+            if ($page) {
+                $page->title = $this->unit->title;
+                $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+                foreach ($langs as $lang) {
+                    $param = $lang.'_title';
+                    $page->$param = $this->unit->$param;
+                }
+                $page->save(false);
+            }
+        }
+        return parent::afterSave();
+    }
+
     public function cacheRequestTypes()
     {
         return array('GET', 'POST');
@@ -249,7 +266,7 @@ class Content extends I18nActiveRecord
         $output .= Yii::app()->controller->renderPartial($alias,
                            $params, true);
         if (trim($output) == '' && $params['editMode'])  {
-            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($className, 'name'))));
+            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($className, 'unitName'))));
         }
         
         if ($return)

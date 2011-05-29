@@ -5,7 +5,7 @@ class UnitBlog extends Content
 	const ICON = '/images/icons/fatcow/16x16/newspaper.png';
     const HIDDEN = false;
 
-    public function name($language=null)
+    public function unitName($language=null)
     {
         return Yii::t('UnitBlog.unit', 'Blog/news section', array(), null, $language);
     }

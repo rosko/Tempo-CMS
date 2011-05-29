@@ -467,7 +467,7 @@ EOD
             foreach ($unit_types as $unit_class) {
                 $i++;
                 $unit_type = Unit::getUnitTypeByClassName($unit_class);
-                ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=call_user_func(array($unit_class, 'name'))?>" href="#" ><img src="<?=constant($unit_class.'::ICON')?>" alt="<?=call_user_func(array($unit_class, 'name'))?>" /> <?=call_user_func(array($unit_class, 'name'))?></a></li><?php
+                ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=call_user_func(array($unit_class, 'unitName'))?>" href="#" ><img src="<?=constant($unit_class.'::ICON')?>" alt="<?=call_user_func(array($unit_class, 'unitName'))?>" /> <?=call_user_func(array($unit_class, 'unitName'))?></a></li><?php
                 if ($i == ceil($unit_types_count/2)) {
                     ?></ul><ul><?php
                 }

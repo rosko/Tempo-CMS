@@ -68,7 +68,7 @@ class FilesEditorController extends Controller
                     }
                 }
 
-                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'name'))));
+                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'unitName'))));
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
@@ -111,7 +111,7 @@ class FilesEditorController extends Controller
                 $setts = call_user_func(array($name, 'settings'), $name);
                 foreach ($setts as $k => $v) {
                     $var = '{$settings.local.'.$k.'}';
-                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>call_user_func(array($name, 'name')))) . self::SUGGESTIONS_SEPARATOR . $v['label'];
+                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>call_user_func(array($name, 'unitName')))) . self::SUGGESTIONS_SEPARATOR . $v['label'];
                 }
             }
         } else {

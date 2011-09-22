@@ -22,9 +22,9 @@ function smarty_function_form($params, &$smarty)
 
             $form_array['activeForm'] = Form::ajaxify($id);
             $unit = $smarty->getTemplateVars('unit');
-            $pageunit = $smarty->getTemplateVars('pageunit');
+            $pageUnit = $smarty->getTemplateVars('pageUnit');
             unset($form_array['activeForm']['focus']);
-            $form_array['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitView&pageunit_id='.$pageunit['id'].$params['ajaxUrlParams'];
+            $form_array['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$pageUnit['id'].$params['ajaxUrlParams'];
             if ($params['enableAjax'] === 'validate') {
                 $form_array['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
             } else {
@@ -32,8 +32,8 @@ function smarty_function_form($params, &$smarty)
 js:function(f,d,h){
     if (!h) {
         var params = f.serialize();
-        ajaxSave('/?r=page/unitView&pageunit_id={$pageunit['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
-        //    updatePageunit({$pageunit['id']}, '.pageunit[rev={$unit['id']}]');
+        ajaxSave('/?r=view/unit&pageUnitId={$pageUnit['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
+        //    cmsReloadPageUnit({$pageUnit['id']}, '.pageunit[rev={$unit['id']}]');
         });
     }
 }
@@ -61,7 +61,8 @@ EOD
             $form->model = call_user_func(array($params['className'],'model'))->findByPk(intval($params['id']));
         else
             $form->model = new $params['className'];
-        $form->model->scenario = $params['scenario'];
+        if (!empty($params['scenario']))
+            $form->model->scenario = $params['scenario'];
         if (!empty($params['rules']))
             $form->model->rules = $params['rules'];
 

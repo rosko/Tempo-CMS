@@ -23,7 +23,7 @@ class UnitBlog extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id, per_page, items', 'numerical', 'integerOnly'=>true),
 		);
 	}
@@ -52,8 +52,9 @@ class UnitBlog extends Content
                 Form::tab(Yii::t('UnitBlog.unit', 'Blog/news section')),
                 'items' => array(
                     'type'=>'RecordsGrid',
-                    'class_name' => 'UnitBlogentry',
-                    'foreign_attribute' => 'blog_id',
+                    'makePage'=>true,
+                    'className' => 'UnitBlogentry',
+                    'foreignAttribute' => 'blog_id',
                     'addButtonTitle'=>Yii::t('UnitBlog.unit', 'Create entry'),
                     'columns' => array(
                         'date',
@@ -72,6 +73,21 @@ class UnitBlog extends Content
 			),
 		);
 	}
+
+    public function feed()
+    {
+        return array(
+            'title'=>null, // тогда используется unit->title
+            'description'=>null, // тогда используется unit->title
+            'author'=>null, // тогда не используется, а можно указать имя поля с id автора (User)
+            'items'=>array(
+                'UnitBlogentry',
+                'condition'=>'`blog_id` = :id AND `date` <= NOW()',
+                'order'=>'`date` DESC',
+                'params'=>array('id'),
+            ),
+        );
+    }
 
     public function scheme()
     {
@@ -107,6 +123,13 @@ class UnitBlog extends Content
         );
     }
 
+    public function cacheVaryBy()
+    {
+        return array(
+            '_GET' => $_GET,
+        );
+    }
+
     public function  cacheDependencies() {
         return array(
             array(
@@ -124,6 +147,7 @@ class UnitBlog extends Content
         $params = parent::prepare($params);
         $items = UnitBlogentry::model()
                     ->public()
+                    ->with('unit')
                     ->selectPage($params['content']->pageNumber, $params['content']->per_page)
                     ->findAll('blog_id = :id', array(':id'=>$params['content']->id));
         

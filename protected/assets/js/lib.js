@@ -1,42 +1,56 @@
+// Сколько секунд отображается всплывающая инфо-панель
+var cmsInfoPanelTimeout = 3;
+var cmsInfoPanelTimer = null;
+
+// =============================================================
+// Перевод строки
+//
+// @param string message переводимая строка
+// @param array params параметры
+// @return string переведенная строка
+
 function t(message, params)
 {
-    for (x in params)
-    {
+    for (x in params) {
         message = message.replace(x, params[x]);
     }
     return message;
 }
 
 // =============================================================
-// Функции для отображение разных уведомление и диалоговых окон
+// Функции для отображение разных уведомлений и диалоговых окон
 
 // Уведомляющая надпись
+//
+// @param string html html-код надписи
+// @param int timeout время отображения надписи
+// @param boolean error является ли эта надпись сообщением об ошибке
 
-function showInfoPanel(html, timeout, error)
+function cmsShowInfoPanel(html, timeout, error)
 {
-    clearTimeout(cms_infopanel_timer);
+    clearTimeout(cmsInfoPanelTimer);
     var t = 'message';
     if (error) {
         t = 'error';
     }
     if (timeout == null) {
-        timeout = cms_infopanel_timeout;
+        timeout = cmsInfoPanelTimeout;
     }
-    notify(html, {
+    cmsNotify(html, {
         type: t,
         disappearTime: timeout
     });
     if (timeout > 0) {
-        cms_infopanel_timer = setTimeout('hideInfoPanel()', timeout*1000);
+        cmsInfoPanelTimer = setTimeout('cmsHideInfoPanel()', timeout*1000);
     }
 }
 
-function hideInfoPanel()
+function cmsHideInfoPanel()
 {
-    removeLastNotification();
+    cmsRemoveLastNotification();
 }
 
-function notify(message, opts)
+function cmsNotify(message, opts)
 {
     if (opts == null) {
         opts = {};
@@ -53,45 +67,44 @@ function notify(message, opts)
     });
 }
 
-function removeLastNotification()
+function cmsRemoveLastNotification()
 {
     var obj = $('#cms-notification .jnotify-item:last');
     obj.animate({ opacity: '0' }, 600, function() {
         obj.parent().animate({ height: '0px' }, 300,
               function() {
                   obj.parent().remove();
-                  // IEsucks
                   if (navigator.userAgent.match(/MSIE (\d+\.\d+);/)) {
-                      //http://groups.google.com/group/jquery-dev/browse_thread/thread/ba38e6474e3e9a41
                       obj.parent().parent().removeClass('IEsucks');
                   }
-                  // -------
         });
     });
 }
 
-function getLastNotification()
+function cmsGetLastNotification()
 {
     return $('#cms-notification .jnotify-item:last').text();
 }
 
-function updatePageunit(pageunit_id, selector, onSuccess, data)
+function cmsReloadPageUnit(pageUnitId, selector, onSuccess, data)
 {
-    var page_id = $('body').attr('rel');
+    var pageId = $('body').attr('rel');
     var language = $('body').data('language');
-    var ls = getLocationSearch();
+    var locationString = cmsGetLocationSearch();
     if (data == undefined) { data = ''} else {
-        if (ls)
+        if (locationString)
             data = '&'+data;
     }
     $.ajax({
-        url: '/?r=page/unitView&pageunit_id='+pageunit_id+'&id='+page_id+'&language='+language,
-        data: ls+data,
+        url: '/?r=view/unit&pageUnitId='+pageUnitId+'&pageId='+pageId+'&language='+language,
+        data: locationString+data,
         async: false,
         cache: false,
         success: function(html) {
             $(selector).html(html);
-            CmsAreaEmptyCheck();
+            if ($.isFunction(cmsAreaEmptyCheck)) {
+                cmsAreaEmptyCheck();
+            }
             if ($.isFunction(onSuccess)) {
                 onSuccess(html);
             }
@@ -99,10 +112,9 @@ function updatePageunit(pageunit_id, selector, onSuccess, data)
     });
 }
 
-function getLocationSearch()
+function cmsGetLocationSearch()
 {
-    var ret = window.location.search.substring(1);
-    var arr = ret.split('&');
+    var arr = window.location.search.substring(1).split('&');
     var params = new Array();
     for (i in arr) {
         var pos = arr[i].indexOf('=');
@@ -117,7 +129,7 @@ function getLocationSearch()
     return params.join('&');
 }
 
-function addToLocationHash(str, process, delvar)
+function cmsAddToLocationHash(str, process, delvar)
 {
     if (location.hash == '' || location.hash == '#' || location.hash == '#.') {
         setLocationHash(str);
@@ -211,13 +223,13 @@ function processLocationHash()
                     var ppos = key.indexOf('_');
                     if (ppos > 0) {
                         unit = key.substr(0,ppos);
-                        content_id = unit.match(/[0-9]*/gi).join('');
-                        rel = unit.substr(0, unit.indexOf(content_id));
-                        pageunit = $('.pageunit[rel="'+rel+'"][content_id='+content_id+']');
-                        if (pageunit.length) {
+                        contentId = unit.match(/[0-9]*/gi).join('');
+                        rel = unit.substr(0, unit.indexOf(contentId));
+                        pageUnit = $('.pageunit[rel="'+rel+'"][content_id='+contentId+']');
+                        if (pageUnit.length) {
                             $('#pageunitpanel').appendTo('body');
-                            pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-                            updatePageunit(pageunit_id, '.pageunit[rev='+pageunit.attr('rev')+']', null, arr.join('&'));
+                            pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
+                            cmsReloadPageUnit(pageUnitId, '.pageunit[rev='+pageUnit.attr('rev')+']', null, arr.join('&'));
                         }
                     }
                 }
@@ -249,7 +261,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
                     if ($.isFunction(onClose)) {
                         onClose(html);
                     } else
-                        closeDialog();
+                        cmsCloseDialog();
                 } else {
                     if (!validate) {
                         $(container).html(html);
@@ -281,7 +293,6 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
 }
 
 // =============================================================
-
 
 function str_replace ( search, replace, subject ) {
 

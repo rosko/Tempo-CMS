@@ -23,7 +23,7 @@ class UnitVideo extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
 			array('video', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('html', 'length', 'max'=>3000, 'encoding'=>'UTF-8'),

@@ -51,8 +51,8 @@ class PageUnit extends CActiveRecord
 	}
 	
 	/**
-     * Возвращает идентификатор блока которому принадлежит pageunit
-     * @param integer идентификатор pageunit`а
+     * Возвращает идентификатор блока которому принадлежит pageUnit
+     * @param integer идентификатор pageUnit`а
      * @return integer  идентификатор блока (Unit)
      */
     public static function getUnitIdById($id)
@@ -75,9 +75,9 @@ class PageUnit extends CActiveRecord
                 ORDER BY `page_id`, `area`
                 ';
 		$result = Yii::app()->db->createCommand($sql)->queryAll();
-        $prev_page_id = -1;
-        $prev_area = '';
-        $prev_order = -1;
+        $prevPageId = -1;
+        $prevArea = '';
+        $prevOrder = -1;
         $ret = array();
         foreach ($result as $row) {
             if (($row['min'] > 0) || ($row['max'] != $row['count']-1)) $ret[] = $row['page_id'] . '=' . $row['area'];

@@ -157,11 +157,11 @@ class SiteSettingsForm extends CFormModel
                 Form::tab(Yii::t('cms', 'Users')),
                 'defaultsShowEmail'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::userCategories(),
+                    'items'=>User::roles(),
                 ),
                 'defaultsSendMessage'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::userCategories(),
+                    'items'=>User::roles(),
                 ),
                 'userExtraFields'=>array(
                     'type'=>'FieldSet',

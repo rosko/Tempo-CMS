@@ -23,7 +23,7 @@ class UnitHeader extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('header', 'length', 'max'=>20),
 		);

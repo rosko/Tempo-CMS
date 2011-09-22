@@ -5,7 +5,7 @@
 
     {foreach $items as $item}
     {if !$item.virtual}
-    <li>{link text=$item.title url="page/view?id={$item.id}&alias={$item.alias}&url={$item.url}"}
+    <li>{link text=$item.title url="view/index?pageId={$item.id}&alias={$item.alias}&url={$item.url}"}
 
         {if $item.description && $content.length}
         <p>{$item.description|strip_tags|truncate:{$content.length}|nl2br}</p>

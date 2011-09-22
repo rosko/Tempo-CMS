@@ -8,6 +8,7 @@ return array(
     'Blog/news section' => 'Раздел блога/новостей',
     'Section' => 'Раздел',
     'Source' => 'Источник',
+    'Entry' => 'Запись',
 
     'Published only' => 'Только опубликованные',
     'With source' => 'С указанием источника',

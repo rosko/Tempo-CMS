@@ -10,7 +10,7 @@
  * @link http://www.yiiframework.com/
  * @copyright Copyright &copy; 2008-2011 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- * @version $Id: index.php 2986 2011-02-20 17:08:50Z alexander.makarow $
+ * @version $Id: index.php 3243 2011-05-28 22:32:30Z alexander.makarow $
  * @package system
  * @since 1.0
  */
@@ -109,6 +109,13 @@ $requirements=array(
 		//extension_loaded('gd'),
 		'<a href="http://www.yiiframework.com/doc/api/CCaptchaAction">CCaptchaAction</a>',
 		$message),
+	array(
+		t('yii','Ctype extension'),
+		false,
+		extension_loaded("ctype"),
+		'<a href="http://www.yiiframework.com/doc/api/CDateFormatter">CDateFormatter</a>, <a href="http://www.yiiframework.com/doc/api/CDateFormatter">CDateTimeParser</a>, <a href="http://www.yiiframework.com/doc/api/CTextHighlighter">CTextHighlighter</a>, <a href="http://www.yiiframework.com/doc/api/CHtmlPurifier">CHtmlPurifier</a>',
+		''
+	)
 );
 
 function checkServerVar()

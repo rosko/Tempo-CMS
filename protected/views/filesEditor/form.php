@@ -1,5 +1,5 @@
 <?php $js = '';
-$codemirrorPath=Yii::app()->params['_path']['codemirror'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.codemirror'));
+$codemirrorPath=Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.codemirror'));
 ?>
 <form id="<?=$id?>" method="POST" action="<?=$this->createAbsoluteUrl('filesEditor/save', array(
     'type' => $type,
@@ -229,10 +229,10 @@ function loadFile(file, writable, button)
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                showInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cms_html_loading_image, 0);
             },
             success: function(html) {
-                hideInfoPanel();
+                cmsHideInfoPanel();
                 $('#<?=$id?> input[name=file]:hidden').val(file);
                 $('#<?=$id?>_textarea').val(html);
                 $('#<?=$id?>_textarea').data('initvalue',  $('#<?=$id?>_textarea').val());
@@ -321,10 +321,10 @@ $('#<?=$id?>_createfile').click(function() {
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                showInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cms_html_loading_image, 0);
             },
             success: function(html) {
-                hideInfoPanel();
+                cmsHideInfoPanel();
                 if (html) {
                     $('#<?=$id?> ul.files').append('<li><a href="#" class="fileitem" rev="'+filename+'" rel="1">'+filename+'</a></li>');
                     $('#<?=$id?> ul.files a[rev='+filename+']').bind('click', function() {
@@ -347,10 +347,10 @@ $('#<?=$id?>_delete').click(function() {
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                showInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cms_html_loading_image, 0);
             },
             success: function(html) {
-                hideInfoPanel();
+                cmsHideInfoPanel();
                 $('#<?=$id?>_delete').appendTo('#<?=$id?>').hide();
                 $('#<?=$id?> ul.files li a.hover').parents('li:eq(0)').remove();
                 $('#<?=$id?> ul.files a[rev=]').click();

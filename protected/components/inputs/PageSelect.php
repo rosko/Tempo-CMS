@@ -50,7 +50,7 @@ class PageSelect extends CInputWidget
             } else
                 echo CHtml::textField('',$title,$options);
         }
-        //echo $this->render('application.views.page.pagetree', array('tree' => Page::model()->getTree($this->model->id)), true);
+        //echo $this->render('application.views.page.tree', array('tree' => Page::model()->getTree($this->model->id)), true);
         echo "</div><div style='border:1px solid gray;background:white;width:{$this->width}px;height:{$this->height}px;overflow:scroll;" . (!$this->multiple ? "position:absolute;display:none;" : "") . "' id='" . $this->htmlOptions['id'] . "_dialog'></div>";
 
     }    
@@ -65,20 +65,20 @@ class PageSelect extends CInputWidget
         {
             $textLinkJs = <<<EOD
 $.ajax({
-    url: '/?r=page/getUrl&id='+id+'&language='+$.data(document.body, 'language'),
+    url: '/?r=page/getUrl&pageId='+id+'&language='+$.data(document.body, 'language'),
     cache: false,
     beforeSend: function() {
-        showInfoPanel(cms_html_loading_image, 0);
+        cmsShowInfoPanel(cms_html_loading_image, 0);
     },
     success: function(html) {
-        hideInfoPanel();
+        cmsHideInfoPanel();
         $('#{$this->textLinkId}').val(html);
     }
 });
 EOD;
         }
 
-        $model_id = $this->hasModel()&&$this->excludeCurrent ? $this->model->id : 0;
+        $modelId = $this->hasModel()&&$this->excludeCurrent ? $this->model->id : 0;
         $ajax_data = "'";
         if ($this->enabledOnly != null)
         {
@@ -136,7 +136,7 @@ $('#{$id}_title').click(function() {
     if ($('#{$id}_dialog').html() == '') {
         $('#{$id}_dialog').html('{$txtLoading}...');
         $.ajax({
-            url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=0&language='+$.data(document.body, 'language'),
+            url: '/?r=page/tree&pageId={$modelId}&treeId=pagetree_{$id}&multiple=0&language='+$.data(document.body, 'language'),
             data: {$ajax_data},
             method: 'POST',
             cache: false,
@@ -196,7 +196,7 @@ EOD;
 
 $(function() {
     $.ajax({
-        url: '/?r=page/pageTree&id={$model_id}&tree_id=pagetree_{$id}&multiple=1&language='+$.data(document.body, 'language'),
+        url: '/?r=page/tree&pageId={$modelId}&treeId=pagetree_{$id}&multiple=1&language='+$.data(document.body, 'language'),
         cache: false,
         data: {$ajax_data},
         method: 'POST',
@@ -233,6 +233,7 @@ EOD;
 
         $cs=Yii::app()->getClientScript();
         $cs->registerScript('Yii.PageSelect#'.$id,$js);
+        $cs->registerPackage('jstree');
 
     }
 }

@@ -25,7 +25,7 @@ class UnitBreadcrumbs extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('separator', 'length', 'max'=>16, 'encoding'=>'UTF-8'),
 		);
@@ -66,12 +66,12 @@ class UnitBreadcrumbs extends Content
     public function cacheVaryBy()
     {
         return array(
-            'page_id' => Yii::app()->controller->loadModel()->id,
+            'pageId' => Yii::app()->page->model->id,
         );
     }
 
     public function  cacheDependencies() {
-        $ids = str_replace('0,','',Yii::app()->controller->loadModel()->path) . ',' . Yii::app()->controller->loadModel()->id;
+        $ids = str_replace('0,','',Yii::app()->page->model->path) . ',' . Yii::app()->page->model->id;
         return array(
             array(
                 'class'=>'system.caching.dependencies.CDbCacheDependency',
@@ -108,7 +108,7 @@ class UnitBreadcrumbs extends Content
         $links = array();
         foreach ($ids as $id) {
             if ($id == 0 || $id == 1) continue;
-            $links[$parents[$id]->title] = array('page/view', 'id'=>$parents[$id]->id, 'alias'=>$parents[$id]->alias, 'url'=>$parents[$id]->url);
+            $links[$parents[$id]->title] = array('view/index', 'pageId'=>$parents[$id]->id, 'alias'=>$parents[$id]->alias, 'url'=>$parents[$id]->url);
         }
         if ($params['page']->id != 1)
             $links[] = $params['page']->title;
@@ -118,7 +118,7 @@ class UnitBreadcrumbs extends Content
 
         $params['separator'] = $params['content']->separator ? $params['content']->separator : self::DEFAULT_SEPARATOR;
 
-        $params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('page/view', 'id'=>$parents[1]->id, 'alias'=>$parents[1]->alias, 'url'=>$parents[1]->url)) : $params['page']->title);
+        $params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('view/index', 'pageId'=>$parents[1]->id, 'alias'=>$parents[1]->alias, 'url'=>$parents[1]->url)) : $params['page']->title);
 
         return $params;
     }

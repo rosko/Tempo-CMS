@@ -1,7 +1,7 @@
 <h3>Dear {$model.name}</h3>
 
 <p>You or someone else just registered on the web-site
-{link url="page/view" text=$settings.sitename}.</p>
+{link url="view/index" text=$settings.sitename}.</p>
 
 {if $model.login}
 <p>Your username: {$model.login}

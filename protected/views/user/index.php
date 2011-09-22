@@ -5,7 +5,7 @@
 <?php
 
 $this->widget('RecordsGrid', array(
-    'class_name' => 'User',
+    'className' => 'User',
     'columns' => array(
         'id',
         'login',

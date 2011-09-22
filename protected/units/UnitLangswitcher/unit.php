@@ -23,7 +23,7 @@ class UnitLangswitcher extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 		);
 	}
@@ -47,7 +47,21 @@ class UnitLangswitcher extends Content
     public function cacheVaryBy()
     {
         return array(
-            'page_id' => Yii::app()->controller->loadModel()->id,
+            'pageId' => Yii::app()->page->model->id,
+            '_GET' => $_GET,
         );
     }
+
+    public function  cacheDependencies() {
+        return array(
+            array(
+                'class'=>'system.caching.dependencies.CDbCacheDependency',
+                'sql'=>'SELECT MAX(`modify`) FROM `' . Page::tableName() . '` WHERE id = :id',
+                'params'=>array(
+                    'id'=>Yii::app()->page->model->id,
+                ),
+            ),
+        );
+    }
+
 }

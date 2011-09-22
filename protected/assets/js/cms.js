@@ -2,9 +2,6 @@
 
 // Картинка изображающая процесс загрузки
 var cms_html_loading_image = '<img src="/images/ajax-loader.gif" />';
-// Сколько секунд отображается всплывающая инфо-панель
-var cms_infopanel_timeout = 3;
-var cms_infopanel_timer = null;
 var cms_infopanel_time_timer = false;
 var cms_save_timer = false;
 var cms_saveprocess_timer = null;
@@ -26,15 +23,13 @@ function CmsCommand(url, data, method, success, silent)
     this.silent = silent;
 }
 
-function ajaxSaveArea(area, name, page_id, add_params)
+function ajaxSaveArea(area, name, pageId, add_params)
 {
-    var url = '/?r=page/unitMove&page_id='+page_id;
-    var params = $(area).sortable('serialize');
-    var data = 'area='+name+'&'+params
-    if (add_params) {
-        data = add_params+'&'+data;
-    }
-    ajaxSave(url, data);
+    var url = '/?r=unit/move&pageId='+pageId+'&area='+name+'&'+add_params;
+    var params = $(area).sortable('serialize', {
+        'key':'pageUnits[]'
+    });
+    ajaxSave(url, params);
 }
 
 function ajaxSave(url, data, method, success, silent)
@@ -62,11 +57,11 @@ function ajaxSaveProcess()
             type: cms_current_command.method,
             beforeSend: function() {
                 if (!cms_current_command.silent)
-                    showInfoPanel(cms_html_loading_image, 0);
+                    cmsShowInfoPanel(cms_html_loading_image, 0);
             },
             success: function(ret) {
                 if (!cms_current_command.silent)
-                    hideInfoPanel();
+                    cmsHideInfoPanel();
                 if (ret != 0) {
                     if ($.isFunction(cms_current_command.success)) {
                         cms_current_command.success(ret);
@@ -91,8 +86,8 @@ function ajaxSaveDone()
 {
     if ((!cms_current_command) ||
         (cms_current_command && !cms_current_command.silent) )
-        showInfoPanel(i18n.cms.saved);
-    
+        cmsShowInfoPanel(i18n.cms.saved);
+
 }
 
 function ajaxSaveRepeat(timeout)
@@ -105,22 +100,22 @@ function ajaxSaveRepeat(timeout)
     }
     cms_save_commands.unshift(cms_current_command);
     cms_current_command = null;
-    
-    hideInfoPanel();
-    showInfoPanel(i18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+i18n.cms.retryNow+'</a>', timeout-1, true);
+
+    cmsHideInfoPanel();
+    cmsShowInfoPanel(i18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+i18n.cms.retryNow+'</a>', timeout-1, true);
     $('#cms-info-button-repeat').unbind('click').bind('click',function() {
-        hideInfoPanel();
+        cmsHideInfoPanel();
         cms_save_timer = false;
         clearTimeout(cms_saveprocess_timer);
         ajaxSaveProcess();
     });
     clearTimeout(cms_infopanel_time_timer);
-    showInfoPanelTimer(timeout);
+    cmsShowInfoPanelTimer(timeout);
     cms_save_timer = true;
     cms_saveprocess_timer = setTimeout("cms_save_timer=false;ajaxSaveProcess()", timeout*1000);
 }
 
-function showInfoPanelTimer(timeout)
+function cmsShowInfoPanelTimer(timeout)
 {
     var t = new Date(timeout*1000);
     var minutes = t.getMinutes().toString();
@@ -133,7 +128,7 @@ function showInfoPanelTimer(timeout)
     }
     $('#cms-info-timer').html(minutes+':'+seconds);
     if (timeout > 1) {
-        cms_infopanel_time_timer = setTimeout("showInfoPanelTimer("+(timeout-1)+")", 1000);
+        cms_infopanel_time_timer = setTimeout("cmsShowInfoPanelTimer("+(timeout-1)+")", 1000);
     }
 }
 
@@ -179,7 +174,7 @@ function fadeOut(selector, className)
 function clearSelection()
 {
     if (window.getSelection) {        // Firefox, Opera, Safari
-        var selection = window.getSelection ();                                        
+        var selection = window.getSelection ();
         selection.removeAllRanges ();
     }
     else {
@@ -195,14 +190,14 @@ function trim(string)
     return string.replace(/(^\s+)|(\s+$)/g, "");
 }
 
-function getAreaNameByPageunit(pageunit)
+function getAreaNameByPageUnit(pageUnit)
 {
-    return $(pageunit).parents('.cms-area').eq(0).attr('id').replace('cms-area-', '');
+    return $(pageUnit).parents('.cms-area').eq(0).attr('id').replace('cms-area-', '');
 }
 
-function getAreaByPageunit(pageunit)
+function getAreaByPageUnit(pageUnit)
 {
-    return $(pageunit).parents('.cms-area').eq(0);
+    return $(pageUnit).parents('.cms-area').eq(0);
 }
 
 function getAreaName(area)
@@ -240,12 +235,12 @@ function ajaxSubmitForm(form, data, hasError, events)
                 events.onSuccess(html);
             }
 
-            var pageunit_id = form.attr('rel');
-            if (pageunit_id != undefined) {
-                var pageunit = $('#cms-pageunit-'+pageunit_id);
-                var unit_id = pageunit.attr('rev');
+            var pageUnitId = form.attr('rel');
+            if (pageUnitId != undefined) {
+                var pageUnit = $('#cms-pageunit-'+pageUnitId);
+                var unitId = pageUnit.attr('rev');
                 //alert(pageunit.attr('rev'));
-                updatePageunit(pageunit_id, '.cms-pageunit[rev='+unit_id+']');
+                cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+unitId+']');
             }
             // Или обновить таблицу записей
             if (form.data('grid_id') !== undefined) {
@@ -256,16 +251,18 @@ function ajaxSubmitForm(form, data, hasError, events)
                 if (ret) {
                     location.href = ret.url;
                 }
+            } else {
+                $(form).attr('action', $(html).find('form').attr('action'));
             }
             if (btn_name == 'refresh') {
-                location.href = '/?r=page/view&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language');
+                location.href = '/?r=view/index&pageId='+$('body').attr('rel')+'&language='+$.data(document.body, 'language');
             } else if (btn_name != 'apply') {
                 if ($(form).parents('.cms-dialog').length) {
                     var dlg = $(form).parents('.cms-dialog');
                     $(dlg).dialog('close');
                 }
                 $(form).remove();
-                closeDialog();
+                cmsCloseDialog();
             }
 
         });
@@ -295,7 +292,7 @@ function ajaxSubmitForm(form, data, hasError, events)
 // =============================================================
 
 
-function CmsAreaEmptyCheck()
+function cmsAreaEmptyCheck()
 {
     $('.cms-area').each(function() {
         if ($(this).find('.cms-pageunit').length > 0) {
@@ -303,75 +300,75 @@ function CmsAreaEmptyCheck()
         } else {
             var btn = $('<a class="cms-button w100p" title="'+i18n.cms.addAnotherUnit+'" href="#">'+i18n.cms.addUnit+'</a>')
                 .click(function() {
-                    pageunitAddForm(this);
+                    pageUnitAddForm(this);
                     return false;
                 });
             $(this).html('').append($('<div class="cms-empty-area-buttons"></div>').append(btn));
         }
-    });    
+    });
 }
 
-function pageunitAddForm(t)
+function pageUnitAddForm(t)
 {
-    var pageunit = $(t).parents('.cms-pageunit');
-    if (pageunit.length) {
-        pageunit  = pageunit.eq(0);
-        var pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
+    var pageUnit = $(t).parents('.cms-pageunit');
+    if (pageUnit.length) {
+        pageUnit  = pageUnit.eq(0);
+        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
     } else {
-        var pageunit_id = '0';
+        var pageUnitId = '0';
     }
     var area_name = $(t).parents('.cms-area').eq(0).attr('id').replace('cms-area-','');
-    pageunitadd = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
-    pageunitadd.find('.cms-btn-pageunit-create').attr('rel', area_name);
-    pageunitadd.find('.cms-btn-pageunit-create').attr('rev', pageunit_id);
-    openDialog(pageunitadd);
+    pageUnitAdd = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
+    pageUnitAdd.find('.cms-btn-pageunit-create').attr('rel', area_name);
+    pageUnitAdd.find('.cms-btn-pageunit-create').attr('rev', pageUnitId);
+    cmsOpenDialog(pageUnitAdd);
 }
 
 // =============================================================
 
 
-function pageunitEditForm(t)
+function pageUnitEditForm(t)
 {
-    var pageunit = $(t);
-    if (pageunit.hasClass('selected')) {return;}
-    fadeIn(pageunit, 'selected');
-    pageunit_id = pageunit.attr('id').replace('cms-pageunit-','');
-    unit_type = pageunit.attr('rel');
-    loadDialog('/?r=page/unitForm&unit_type='+unit_type+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'), {
-        pageunit: pageunit,
-        pageunit_id: pageunit_id,
+    var pageUnit = $(t);
+    if (pageUnit.hasClass('selected')) {return;}
+    fadeIn(pageUnit, 'selected');
+    pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
+    unitType = pageUnit.attr('rel');
+    cmsLoadDialog('/?r=unit/edit&type='+unitType+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
+        pageUnit: pageUnit,
+        pageUnitId: pageUnitId,
         simpleClose: false,
         onClose: function() {
-            updatePageunit(pageunit_id, '.cms-pageunit[rev='+pageunit.attr('rev')+']');
+            cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+pageUnit.attr('rev')+']');
         }
     });
 }
 
-function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
+function pageUnitDeleteDialog(unitId, pageUnitId, pageId)
 {
     $.ajax({
-        url: '/?r=page/getPageunitsByUnit&page_id='+page_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'),
-        pageunit_id: pageunit_id,
-        unit_id: unit_id,
-        page_id: page_id,
+        url: '/?r=unit/getPageUnitsByUnitId&pageId='+pageId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'),
+        pageUnitId: pageUnitId,
+        unitId: unitId,
+        pageId: pageId,
         type: 'GET',
         cache: false,
         beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cms_html_loading_image, 0);
         },
         success: function(html) {
-            hideInfoPanel();
+            cmsHideInfoPanel();
             var ids = jQuery.parseJSON(html);
             if (ids.length > 1)
             {
-                loadDialog('/?r=page/unitDeleteDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'));
+                cmsLoadDialog('/?r=unit/deleteDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'));
             }
             else {
                 if (confirm(i18n.cms.deleteUnitWarning))
                 {
-                    ajaxSave('/?r=page/unitDelete&page_id='+page_id+'&pageunit_id[]='+pageunit_id+'&unit_id='+unit_id+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
-                        $('#cms-pageunit-'+pageunit_id).remove();
-                        CmsAreaEmptyCheck();
+                    ajaxSave('/?r=unit/delete&pageId='+pageId+'&pageUnitId[]='+pageUnitId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+                        $('#cms-pageunit-'+pageUnitId).remove();
+                        cmsAreaEmptyCheck();
                     });
                 } else {
                     fadeOut('.selected', 'selected');
@@ -382,9 +379,9 @@ function pageunitDeleteDialog(unit_id, pageunit_id, page_id)
 
 }
 
-function pageunitSetDialog(page_id, pageunit_id, unit_id)
+function pageUnitSetDialog(pageId, pageUnitId, unitId)
 {
-    loadDialog('/?r=page/unitSetDialog&id='+page_id+'&unit_id='+unit_id+'&pageunit_id='+pageunit_id+'&language='+$.data(document.body, 'language'), {
+    cmsLoadDialog('/?r=unit/setDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
         onLoad: function() {
             $.topbox.clear();
         }
@@ -396,7 +393,7 @@ function pageunitSetDialog(page_id, pageunit_id, unit_id)
 
 function pageAddForm()
 {
-    loadDialog('/?r=page/pageAdd&id='+$('body').attr('rel')+'&language='+$.data(document.body, 'language'), {
+    cmsLoadDialog('/?r=page/add&pageId='+$('body').attr('rel')+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         onOpen: function() {
             $('#Page_title').focus();
@@ -409,18 +406,18 @@ function pageAddForm()
 
 function pageEditForm()
 {
-    var page_id = $('body').attr('rel');
-    loadDialog('/?r=page/pageForm&id='+page_id+'&language='+$.data(document.body, 'language'), {
+    var pageId = $('body').attr('rel');
+    cmsLoadDialog('/?r=page/edit&pageId='+pageId+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         onOpen: function(html) {
             $('#Page_title').focus();
-            var form_id = $(html).find('form').attr('id');
-            var v = $('#'+form_id).find('input[name=deletepage]').val();
+            var formId = $(html).find('form').attr('id');
+            var v = $('#'+formId).find('input[name=deletepage]').val();
             $(html).find('button').each(function() {
                 if ($(this).text() == v) {
                     $(this).unbind('click').bind('click', function() {
                         pageDeleteDialog(null, function() {
-                            ajaxSave($('#'+form_id).attr('action'), $('#'+form_id).serialize()+'&delete=1', 'POST', function(html) {
+                            ajaxSave($('#'+formId).attr('action'), $('#'+formId).serialize()+'&delete=1', 'POST', function(html) {
                                 if (html.substring(0,2) == '{"') {
                                     var ret = jQuery.parseJSON(html);
                                     if (ret) {
@@ -447,36 +444,36 @@ function pageEditForm()
     });
 }
 
-function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
+function pageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
 {
-    if (!page_id) {
-        page_id = $('body').attr('rel');
+    if (!pageId) {
+        pageId = $('body').attr('rel');
     }
     $.ajax({
-        url:'/?r=page/hasChildren&id='+page_id+'&language='+$.data(document.body, 'language'),
+        url:'/?r=page/hasChildren&pageId='+pageId+'&language='+$.data(document.body, 'language'),
         cache: false,
-        page_id: page_id,
+        pageId: pageId,
         onChildrenDelete: onChildrenDelete,
         onCancel: onCancel,
         beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);                    
+            cmsShowInfoPanel(cms_html_loading_image, 0);
         },
         success: function(html) {
-            hideInfoPanel();
+            cmsHideInfoPanel();
             if (html == '0') {
                 if (confirm(i18n.cms.deletePageWarning))
                 {
                     // В функции должно быть ручное удаление страницы
                     if ($.isFunction(onOneDelete)) {
                         onOneDelete(this);
-                    }                    
+                    }
                 } else {
                     if ($.isFunction(onCancel)) {
                         onCancel(this);
-                    }                                        
+                    }
                 }
             } else {
-                loadDialog('/?r=page/pageDeleteDialog&id='+page_id+'&language='+$.data(document.body, 'language'), {
+                cmsLoadDialog('/?r=page/deleteDialog&pageId='+pageId+'&language='+$.data(document.body, 'language'), {
                     ajaxify: true,
                     onClose: function() {
                         if ($.isFunction(onCancel)) {
@@ -491,59 +488,59 @@ function pageDeleteDialog(page_id, onOneDelete, onChildrenDelete, onCancel)
                 });
             }
         }
-    });    
+    });
 }
 
 // =============================================================
 
 
-function recordEditForm(id, class_name, unit_id, grid_id)
+function recordEditForm(id, className, unitId, gridId)
 {
-    var dlg_id = 'recordEditForm'+class_name+'_'+id;
-    loadDialog('/?r=page/unitForm&class_name='+class_name+'&record_id='+id+'&language='+$.data(document.body, 'language'), {
+    var dlgId = 'recordEditForm'+className+'_'+id;
+    cmsLoadDialog('/?r=unit/edit&className='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
-        id: dlg_id,
-        className: 'recordEditForm-'+class_name,
+        id: dlgId,
+        className: 'recordEditForm-'+className,
         title: i18n.cms.editing,
         onOpen: function() {
-            $('#'+dlg_id).find('form').data('grid_id', grid_id);
-            $('#'+dlg_id).find('label[for="Unit_title"]:eq(0)').next().focus();
+            $('#'+dlgId).find('form').data('grid_id', gridId);
+            $('#'+dlgId).find('label[for="Unit_title"]:eq(0)').next().focus();
         }
     });
 }
 
-function recordDelete(id, class_name, unit_id, grid_id)
+function recordDelete(id, className, unitId, gridId)
 {
-    if (unit_id > 0) {
+    if (unitId > 0) {
         // Удаляем юнит
         $.ajax({
-            url:'/?r=page/unitCheck&unit_id='+unit_id+'&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
+            url:'/?r=unit/check&unitId='+unitId+'&className='+className+'&pageId='+id+'&language='+$.data(document.body, 'language'),
             cache: false,
             id: id,
-            class_name: class_name,
-            unit_id: unit_id,
+            className: className,
+            unitId: unitId,
             beforeSend: function() {
-                showInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cms_html_loading_image, 0);
             },
             success: function(html) {
-                hideInfoPanel();
+                cmsHideInfoPanel();
                 if (html.substring(0,2) == '{"') {
                     var ret = jQuery.parseJSON(html);
                     if (ret.page) {
                         if (ret.page.similarToParent) {
-                            recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
+                            recordDeleteConfirm(unitId, gridId, '&withPage=1');
                         } else {
                             var buttons = {};
                             buttons[i18n.cms.deleteUnitOnly] = function() {
-                                recordDeleteConfirm(unit_id, grid_id);
+                                recordDeleteConfirm(unitId, gridId);
                                 $(this).dialog('close');
                             };
                             buttons[i18n.cms.deleteUnitAndPage] = function() {
-                                recordDeleteConfirm(unit_id, grid_id, '&with_page=1');
+                                recordDeleteConfirm(unitId, gridId, '&withPage=1');
                                 $(this).dialog('close');
                             };
-                            var dlg_id = 'UnitDeleteConform_'+unit_id;
-                            var dlg = $('#cms-dialog').clone().attr('id', dlg_id).addClass('cms-dialog').appendTo('body');
+                            var dlgId = 'UnitDeleteConform_'+unitId;
+                            var dlg = $('#cms-dialog').clone().attr('id', dlgId).addClass('cms-dialog').appendTo('body');
                             dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(i18n.cms.deleteUnitRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
                             dlg.dialog({
                                 title: i18n.cms.deletingUnit,
@@ -551,15 +548,15 @@ function recordDelete(id, class_name, unit_id, grid_id)
                                 zIndex: 10000,
                                 buttons: buttons,
                                 close: function() {
-                                    $('#'+dlg_id).remove();
+                                    $('#'+dlgId).remove();
                                 }
                             });
                         }
                     } else {
-                        recordDeleteConfirm(unit_id, grid_id);
+                        recordDeleteConfirm(unitId, gridId);
                     }
                 } else {
-                    recordDeleteConfirm(unit_id, grid_id);
+                    recordDeleteConfirm(unitId, gridId);
                 }
             }
         });
@@ -567,14 +564,14 @@ function recordDelete(id, class_name, unit_id, grid_id)
         // Удаляем просто запись
         if (confirm(i18n.cms.deleteRecordWarning))
         {
-            ajaxSave('/?r=records/delete&id='+id+'&class_name='+class_name+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
-                $.fn.yiiGridView.update(grid_id);
+            ajaxSave('/?r=records/delete&id='+id+'&className='+className+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+                $.fn.yiiGridView.update(gridId);
             });
         }
     }
 }
 
-function recordDeleteConfirm(unit_id, grid_id, data, str)
+function recordDeleteConfirm(unitId, gridId, data, str)
 {
     if (str == undefined) {
         var str = i18n.cms.deleteRecordWarning;
@@ -584,26 +581,26 @@ function recordDeleteConfirm(unit_id, grid_id, data, str)
     }
     if (confirm(str))
     {
-        ajaxSave('/?r=page/unitDelete&unit_id='+unit_id+'&pageunit_id=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
-            if (grid_id !== undefined) {
-                $.fn.yiiGridView.update(grid_id);
+        ajaxSave('/?r=unit/delete&unitId='+unitId+'&pageUnitId=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+            if (gridId !== undefined) {
+                $.fn.yiiGridView.update(gridId);
             }
         });
     }
 }
 
-function gotoRecordPage(id, class_name)
+function gotoRecordPage(id, className)
 {
     $.ajax({
-        url:'/?r=records/getUrl&class_name='+class_name+'&id='+id+'&language='+$.data(document.body, 'language'),
+        url:'/?r=records/getUrl&className='+className+'&id='+id+'&language='+$.data(document.body, 'language'),
         cache: false,
         id: id,
-        class_name: class_name,
+        className: className,
         beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cms_html_loading_image, 0);
         },
         success: function(ret) {
-            hideInfoPanel();
+            cmsHideInfoPanel();
             if (ret) {
                 location.href = ret;
             }

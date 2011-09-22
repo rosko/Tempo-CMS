@@ -1,7 +1,7 @@
 <?php
     $id = str_replace(array('?', '=', '&'),
                       array('%3F', '%3D', '%26'), $id);
-    $jwplayerPath=Yii::app()->params['_path']['jwplayer'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.jwplayer'));
+    $jwplayerPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.jwplayer'));
 ?>
 <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="<?=$width?>" height="<?=$height?>">
     <param name="movie" value="<?=$jwplayerPath?>/player.swf" />

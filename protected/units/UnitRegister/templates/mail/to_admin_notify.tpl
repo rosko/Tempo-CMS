@@ -1,6 +1,6 @@
 <h3>Hello, mr. administrator</h3>
 
-<p>Just joined your site {link url="page/view" text=$settings.sitename} the new user. Here are his data:</p>
+<p>Just joined your site {link url="view/index" text=$settings.sitename} the new user. Here are his data:</p>
 
 <table>
     <tr>
@@ -27,4 +27,4 @@
 site robot.</p>
 
 <p><small>P.S. Such notification can be disabled in options block "Registration Form"on page
-{assign var="link" value={link url="page/view?id={$page.id}&alias={$page.alias}&url={$page.url}"}}{link url=$link text=$link}</small></p>
+{assign var="link" value={link url="view/index?pageId={$page.id}&alias={$page.alias}&url={$page.url}"}}{link url=$link text=$link}</small></p>

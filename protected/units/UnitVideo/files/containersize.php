@@ -31,13 +31,13 @@ $('#<?=$className;?>_setsize').keydown(function () {
 function <?=$className;?>_makesize(value, is_height, uihandle)
 {
 	$('#<?=$className;?>_<?=$attribute?>').change();
-	var pageunit_id = $(uihandle).parents('form').eq(0).attr('rel');
+	var pageUnitId = $(uihandle).parents('form').eq(0).attr('rel');
 	if (is_height) {
-		$('#cms-pageunit-'+pageunit_id).find('<?=$selector?>').height(value);
+		$('#cms-pageunit-'+pageUnitId).find('<?=$selector?>').height(value);
 		var w = $('#<?=$className;?>_<?=$width?>').val();
 		var h = value;
 	} else {
-		$('#cms-pageunit-'+pageunit_id).find('<?=$selector?>').width(value);
+		$('#cms-pageunit-'+pageUnitId).find('<?=$selector?>').width(value);
 		var w = value
 		var h = $('#<?=$className;?>_<?=$height?>').val();
 	}

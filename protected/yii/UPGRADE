@@ -1,5 +1,5 @@
 
-         Upgrading Instructions for Yii Framework v1.1.7
+         Upgrading Instructions for Yii Framework v1.1.8
          ===============================================
 
 !!!IMPORTANT!!!
@@ -17,6 +17,17 @@ General upgrade intructions
   release and update.
 - Check if everything is OK, if not — revert from backup and post
   issues to Yii issue tracker.
+
+
+Upgrading from v1.1.7
+---------------------
+- CDbAuthManager will now quote columns and tables referenced in its SQL code.
+If your auth tables were created in a case-insensitive fashion (e.g. on PostgreSQL)
+while your DBMS is case-sensitive, this change may cause DB query errors.
+To fix this issue, you will have to rename the table names and columns, or re-create
+the auth tables by following the SQL code given in framework/web/auth/*.sql.
+- jQuery was upgraded to 1.6.1. Check your client side code and if you have issues consider
+downgrading to 1.5.1 or 1.4.4.
 
 
 Upgrading from v1.1.6

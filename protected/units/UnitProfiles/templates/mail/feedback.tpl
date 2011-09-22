@@ -1,7 +1,7 @@
 <h3>Dear {$profile.name}</h3>
 
 <p>Someone filled out your feedback form on the site.
-{link url="page/view" text=$settings.sitename}.</p>
+{link url="view/index" text=$settings.sitename}.</p>
 
 <p>Here is the information:</p>
 <table>

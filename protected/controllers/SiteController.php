@@ -26,7 +26,7 @@ class SiteController extends Controller
 
 	public function actionLogin()
 	{
-		if (Yii::app()->user->checkAccess('updatePage')) {
+		if (Yii::app()->user->checkAccess('updateContentPage')) {
 			if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],'/site/login')===false &&
                  strpos($_SERVER['HTTP_REFERER'],'://'.$_SERVER['HTTP_HOST'])===false)
 				$this->redirect($_SERVER['HTTP_REFERER']);
@@ -68,5 +68,37 @@ class SiteController extends Controller
 		else
 			$this->redirect(Yii::app()->homeUrl);
 	}
+
+    public function actionFeed($type='rss')
+    {
+        header('Content-Type: application/rss+xml');
+        if (isset($_GET['unittype'])) {
+            $className = Unit::getClassNameByUnitType($_GET['unittype']);
+            Unit::loadTypes();
+            if (!FeedHelper::isFeedPresent($className, !isset($_GET['pageId'])))
+                throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
+
+            // Фид определенного раздела
+            if (isset($_GET['pageId']) && ($content = call_user_func(array($className, 'model'))->findByPk(intval($_GET['pageId']))))
+            {
+                FeedHelper::renderFeed($type, $content);
+            // Фид всех записей этого типа
+            } 
+            else
+            {
+                FeedHelper::renderFeed($type, $className);
+            }
+        // Общий фид
+        } else {
+            FeedHelper::renderFeed($type);
+        }
+    }
 	
+    public function actionJsI18N($language)
+    {
+        header('Content-type: text/javascript');
+        Yii::app()->language = $language;
+        $this->renderPartial('/jsI18N');
+    }
+
 }

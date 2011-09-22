@@ -1,6 +1,18 @@
-// Диалоговое окно
+// =============================================================
+// Открытие диаологового окна
+// =============================================================
+//
+// @param string content содержимое диалогового окна
+// @param object options дополнительные настройки
+// boolean simpleClose позволять закрывать кнопкой Escape
+// array buttons список кнопок, index - название кнопки, value - фукнция выполняемая при нажатии
+// string title заголовок диалогового окна
+// int width ширина
+// int height высота
+// function onOpen функция выполняемая при открытии диалога (первым параметром в функцию передается объект topbox)
+// function onClose функция выполняемая при закрытии диалога (первым параметром в функцию передается объект topbox)
 
-function openDialog(content, options) {
+function cmsOpenDialog(content, options) {
     if (options == null) {
         options = {};
     }
@@ -14,7 +26,8 @@ function openDialog(content, options) {
             options.buttons[b.val()] = function() {
                 form = $(this).parents('.topbox-window:eq(0)').find('form');
                 button = form.find('input[value="'+$(this).html()+'"]');
-                form.attr('rev', button.attr('name')).submit();
+                form.attr('rev', button.attr('name'));
+                form.submit();
             }
             b.hide();
         });
@@ -53,12 +66,31 @@ function openDialog(content, options) {
     });
 }
 
-function closeDialog()
+// =============================================================
+// Закрытие диалогового окна
+// =============================================================
+
+function cmsCloseDialog()
 {
     $.topbox.close();
 }
 
-function loadDialog(url, opts)
+// =============================================================
+// Загрузка диалогового окна с помощью ajax-запроса
+// =============================================================
+//
+// @param string url адрес запроса
+// @param object opts дополнительные параметры
+// function onLoad функция выполняемая при загрузке контента через ajax (первым параметром передается полученный из запроса html-код)
+// string className имя css-класса для диалога
+// string id id диалога
+// string pageUnitId id страничного блока к которому относится этот диалог
+// function onSubmit функция выполняемая при отправке формы через диалог (первым параметром передается объект формы)
+// boolean ajaxify осуществлять ли отправку формы диалога через ajax
+// function onSave функция выполняемая при успешной отправке формы диалога (первым параметром передается html-код ответа)
+// а также все, что относятся к параметру options в функции cmsOpenDialog
+
+function cmsLoadDialog(url, opts)
 {
     if (opts == null) {
         opts = {};
@@ -68,10 +100,10 @@ function loadDialog(url, opts)
         cache: false,
         opts: opts,
         beforeSend: function() {
-            showInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cms_html_loading_image, 0);
         },
         success: function(html) {
-            hideInfoPanel();
+            cmsHideInfoPanel();
             if ($.isFunction(opts.onLoad)) {
                 opts.onLoad(html);
             }
@@ -85,8 +117,8 @@ function loadDialog(url, opts)
                 opts.id = '#cms-dialog-'+dlg.find('form').attr('id');
             }
             dlg.attr('id', opts.id)
-            if (opts.pageunit_id != undefined)
-                dlg.find('form').attr('rel', pageunit_id);
+            if (opts.pageUnitId != undefined)
+                dlg.find('form').attr('rel', opts.pageUnitId);
             dlg.find('form').find('input[type="submit"]').click(function() {
                 $(this).parents('form').attr('rev', $(this).attr('name'));
             });
@@ -105,8 +137,7 @@ function loadDialog(url, opts)
                 }
                 return false;
             });
-
-            openDialog(dlg, opts);
+            cmsOpenDialog(dlg, opts);
         }
     });
 

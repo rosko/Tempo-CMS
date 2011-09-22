@@ -2,7 +2,7 @@
 
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
-
+error_reporting(E_ALL ^ E_NOTICE);
 $config = is_file($GLOBALS['local_config']) ? require($GLOBALS['local_config']) : array();
 
 return CMap::mergeArray(array(
@@ -16,6 +16,11 @@ return CMap::mergeArray(array(
         'ext.yiidebugtb.*',
 	),
 
+    'modules'=>array(
+        'install'=>array(
+        ),
+    ),
+
     'components'=>array(
         'assetManager'=>array(
             'linkAssets'=>true,
@@ -24,7 +29,7 @@ return CMap::mergeArray(array(
 			'allowAutoLogin'=>true,
             'autoRenewCookie'=>true,
             'loginUrl'=>array('site/login'),
-            'returnUrl'=>array('page/view'),
+            'returnUrl'=>array('view/index'),
 		),
 /*        'authManager'=>array(
             'class'=>'AuthManager',
@@ -35,6 +40,10 @@ return CMap::mergeArray(array(
             'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
             'rightsTable'=>$config['components']['db']['tablePrefix'].'rights',
         ),*/
+        'page'=>array(
+            'class'=>'PageComponent',
+           
+        ),
         'authManager'=>array(
             'class'=>'CPhpAuthManager',
             'authFile'=>Yii::getPathOfAlias('local.runtime.auth').'.php',
@@ -59,46 +68,40 @@ return CMap::mergeArray(array(
             'notLoadCoreScriptsOnAjax' => array(
                 'jquery',
                 'jquery.ui',
-                'yiiactiveform',
-            ),
-            'neededCoreScripts' => array(
-                'jquery',
-                'jquery.ui',
-            ),
-            'neededCssFiles' => array(
-                '{juiThemeUrl}/{juiTheme}/jquery-ui.css',
-                '{jnotify}/jquery.jnotify.css',
-            ),
-            'neededScriptFiles' => array(
-                '{jnotify}/jquery.jnotify.js',
-                '{js}/jquery.scrollTo.js',
-                '{js}/lib.js',
-                '{jsI18N}',
-            ),
-            'neededAdminCoreScripts' => array(
-                'yiiactiveform',
-            ),
-            'neededAdminCssFiles' => array(
-                '{topbox}/css/topbox.css',
-                '{css}/cms.css',
-            ),
-            'neededAdminScriptFiles' => array(
-                '{core}/jui/js/jquery-ui-i18n.min.js',
-                '{js}/jquery.cookie.js',
-                '{js}/jquery.hotkeys.js',
-                '{topbox}/js/topbox.js',
-                '{js}/dialogs.js',
-                '{js}/cms.js',
             ),
         ),
         'urlManager'=>array(
             'rules'=>array(
-                'page/unitForm'=>'page/unitForm',
-                'page/unitView'=>'page/unitView',
+                'feed.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
+                '<language:[A-Za-z-]+>/feed.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
+                'feed/<unittype:\w+>.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
+                '<language:[A-Za-z-]+>/feed/<unittype:\w+>.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
+                'feed/<unittype:\w+>/<id:\d+>.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
+                '<language:[A-Za-z-]+>/feed/<unittype:\w+>/<id:\d+>.<type:\w+>'=>array(
+                    'site/feed',
+                    'urlSuffix'=>'.xml',
+                ),
                 'login'=>'site/login',
                 'site/captcha'=>'site/captcha',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
+                'unit/edit'=>'unit/edit',
+                'view/unit'=>'view/unit',
                 'filesEditor/save'=>'filesEditor/save',
                 'users'=>'user/index',
             ),
@@ -115,7 +118,7 @@ return CMap::mergeArray(array(
                     'levels'=>'error, warning, trace, profile, info',
                     'allowedIPs'=>array('127.0.0.1'),
                     'restrictedUris'=>array(
-                        '/?r=page/jsI18N',
+                        '/?r=site/jsI18N',
                     ),
                 ),
             ),

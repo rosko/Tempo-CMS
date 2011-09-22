@@ -1,12 +1,8 @@
-<?php
-    $title = (property_exists($class_name, 'unitName') ? call_user_func(array($class_name, 'unitName')) . ' ' : '') . date('Y-m-d H:i');
-    $dataAdd = CJavaScript::quote('Page[title]=' . $title . '&Page[parent_id]=' . $page_id . '&Page[keywords]=&Page[description]=&go=1');
-?>
 <div id="<?=$id?>_header">
     <input type="button" class="<?=$id?>_add" value="<?=$addButtonTitle ? $addButtonTitle : Yii::t('cms', 'Add')?>" />
 </div>
 
-<?=$records_grid?>
+<?=$recordsGrid?>
 
 <div id="<?=$id?>_footer">
     
@@ -25,65 +21,30 @@ $('#<?=$id?>_check input').live('click', function() {
     });
 });
 $('.<?=$id?>_add').click(function() {
-    var new_page_id = 0;
-    if (<?=$page_id?> > 0) {
-        $.ajax({
-            url:'/?r=page/pageAdd&json=1',
-            cache: false,
-            success: function(html) {
-                if (html.substring(0,2) == '{"') {
-                    var ret = jQuery.parseJSON(html);
-                    if (ret) {
-                        ajaxSave('/?r=page/pageAdd&id=<?=$page_id?>&_='+ret.underscore, '<?=$dataAdd?>&'+ret.unique_id+'=1', 'POST', function(html){
-                            if (html.substring(0,2) == '{"') {
-                                var ret = jQuery.parseJSON(html);
-                                if (ret) {
-                                    new_page_id = ret.id;
-                                    ajaxSave('/?r=page/unitAdd', 'pageunit_id=0&area=<?=$area?>&page_id='+new_page_id+'&type=<?=$type?>&section_id=<?=$section_id?>&foreign_attribute=<?=$foreign_attribute?>&content_page_id='+new_page_id, 'GET', function(html) {
-                                        if ($.fn.yiiGridView)
-                                            $.fn.yiiGridView.update('<?=$id?>');
-                                        if (html.substring(0,2) == '{"') {
-                                            var ret = jQuery.parseJSON(html);
-                                            if (ret) {
-                                                if ($.fn.yiiGridView) {
-                                                    recordEditForm(ret.content_id, '<?=$class_name?>', ret.unit_id, '<?=$id?>');
-                                                } else {
-                                                    recordEditForm(ret.content_id, '<?=$class_name?>', ret.unit_id);
-                                                    $('#recordEditForm<?=$class_name?>_'+ret.content_id).live('dialogbeforeclose', function() {
-                                                        updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        }, true);
-                    }
-                }
+    var newPageId = 0;
+    
+    if (<?=$pageId?> > 0) {
+
+        var url = '/?r=unit/edit&area=<?=$area?>&makePage=<?=(int)$this->makePage?>&pageId=<?=$pageId?>&type=<?=$type?>&sectionId=<?=$sectionId?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
+        cmsLoadDialog(url, {
+            simpleClose: false,
+            onClose: function() {
+                $.fn.yiiGridView.update('<?=$id?>');
+                cmsReloadPageUnit(<?=$pageUnitId?>, '.cms-pageunit[rev=<?=$unitId?>]');
             }
         });
-    } else {
+
+    } else { 
         // Иначе просто создаем запись
         if ($.fn.yiiGridView) {
-            recordEditForm(0, '<?=$class_name?>', '', '<?=$id?>');
+            recordEditForm(0, '<?=$className?>', 0, '<?=$id?>');
         } else {
-            recordEditForm(0, '<?=$class_name?>', '');
-            $('#recordEditForm<?=$class_name?>_0').live('dialogbeforeclose', function() {
-                updatePageunit(<?=$pageunit_id?>, '.cms-pageunit[rev=<?=$unit_id?>]');
+            recordEditForm(0, '<?=$className?>', 0);
+            $('#recordEditForm<?=$className?>_0').live('dialogbeforeclose', function() {
+                cmsReloadPageUnit(<?=$pageUnitId?>, '.cms-pageunit[rev=<?=$unitId?>]');
             });
         }
 
-/*
-        ajaxSave('/?r=records/create&class_name=<?=$class_name?>&section_id=<?=$section_id?>&foreign_attribute=<?=$foreign_attribute?>', '', 'GET', function(html){
-            $.fn.yiiGridView.update('<?=$id?>');
-            if (html.substring(0,2) == '{"') {
-                var ret = jQuery.parseJSON(html);
-                if (ret) {
-                }
-            }
-        });
-*/
     }
 
 

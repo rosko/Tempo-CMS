@@ -1,88 +1,14 @@
 <?php
-$css = ''; $js = '';
-$vmargin = max(ceil($width/10), 7);
-$hmargin = max(ceil($height/10), 7);
-
+$js = '';
 ?>
 
-<div class="cms-panel" id="<?=$id?>"><div style="padding:<?=$hmargin?>px <?=$vmargin?>px;">
-    <ul>
-<?php if (is_array($config['buttons'])) {
-    $nl = $config['vertical'] ? $config['rows'] : ceil(count($config['buttons']) / $config['rows']);
-    $i=0;
-?>
-
-    <?php foreach ($config['buttons'] as $name => $button) { ?>
-
-<?php
-if ($button==null) continue;
-
-$i++;
-$url = Toolbar::getIconUrlByAlias($button['icon'], '', $config['iconSet'], $config['iconSize']);
-$hover = Toolbar::getIconUrlByAlias($button['icon'], 'hover', $config['iconSet'], $config['iconSize']);
-if (!$hover) { $hover = $url; }
-
-$bgcolor = ($hover == $url) ? 'background-color: '. $config['buttonBorderColor'] . ';' : '';
-$css .= <<<EOD
-
-    #{$id}_{$name} {
-        background:url('{$url}') {$config['buttonBackgroundColor']} no-repeat center;
-        width:{$width}px;
-        height:{$height}px;
-        display:block;
-        cursor:pointer;
-        padding:{$hmargin}px;
-        border:1px solid transparent;
-    }
-    #{$id}_{$name}:hover {
-        background-image:url('{$hover}');
-        {$bgcolor}
-        border:1px solid {$config['buttonBorderColor']};
-    }
-
-EOD;
-
-if ($button['click'])
-    $js .= "$('#{$id}_{$name}').click(".CJavaScript::encode($button['click']).");\n";
-?>
-
-        <li style="margin:<?=$hmargin?>px <?=$wmargin?>px;float:left;"><a id="<?=$id?>_<?=$name?>" title="<?=$button['title']?>" href="#"></a></li>
-
-<?php if ($nl == $i) { ?>
-    </ul><ul>
-<?php $i=0; }?>
-
-
-    <?php } ?>
-<?php } ?>
-
-    </ul>
-</div></div>
+<div class="<?=$config['cssClass']?>" id="<?=$id?>">
+<?php echo $this->renderButtons($config['buttons'], $config['vertical'], $config['rows'], $config, $id, $js); ?>
+</div>
 
 
 <?php
-// CSS
-
-$css .= <<<EOD
-
-#{$id} {
-    display:none;
-    background-color:{$config['panelBackgroundColor']};
-    border:1px solid {$config['panelBorderColor']};
-    opacity:{$config['opacity']};
-    position:absolute;
-    border-radius:{$config['borderRadius']}px;
-    cursor:move;
-    overflow:hidden;
-}
-#{$id} ul {
-    margin:0px;padding:0px;clear:both;list-style-type:none;
-}
-
-EOD;
-
 // JavaScript
-
 if ($config['click'])
     $js .= "$('#{$id}').click(".CJavaScript::encode($config['click']).");\n";
 if ($config['dblclick'])
@@ -94,7 +20,7 @@ if (is_numeric($p2) && is_numeric($p3)) {
     $l = $p2;$t = $p3;
 } else {
     $w = ($p1 == 'absolute') ? 'bw' : 'w';
-    $h = ($p1 == 'absolute') ? 'hw' : 'h';
+    $h = ($p1 == 'absolute') ? 'bh' : 'h';
 
     $l = ($p2 == 'right' || $p3 == 'right') ? $w.'-_w' : 0;
     $t = ($p2 == 'bottom' || $p3 == 'bottom') ? $t = $h.'-_h' : 0;
@@ -110,6 +36,14 @@ if (is_numeric($p2) && is_numeric($p3)) {
         }
 }
 
+if (($p2 == 'wide' && ($p3 == 'top' || $p3 == 'bottom')) ||
+    ($p3 == 'wide' && ($p2 == 'top' || $p2 == 'bottom')) ){
+    $js .= "$('#{$id}').css('width', '100%');";
+}
+if (($p2 == 'wide' && ($p3 == 'left' || $p3 == 'right')) ||
+    ($p3 == 'wide' && ($p2 == 'left' || $p2 == 'right')) ){
+    $js .= "$('#{$id}').css('height', '100%');";
+}
 
 $b = $config['location']['show'] == 'always' ? 'window' : "'body'";
 $js .= <<<EOD
@@ -120,7 +54,7 @@ $js .= <<<EOD
         var bh = $({$b}).height();
         var w = $(hoster).width();
         var h = $(hoster).height();
-        var p = $(hoster).offset();
+        var p = $(hoster).position();
         var l = p.left;
         var t = p.top;
         var _w = $('#{$id}').width();
@@ -145,6 +79,7 @@ EOD;
 }
 
 $p = $config['location']['show'] == 'always' ? 'fixed' : 'absolute';
+$cursor = $config['location']['draggable'] ? 'move': 'auto';
 
 $js .= <<<EOD
             if (_t > bh-_h) { _t = bh - _h; }
@@ -158,9 +93,8 @@ $js .= <<<EOD
                 top:_t+'px',
                 width:_w+'px',
                 height:_h+'px',
-                'z-index': {$config['zIndex']}
+                cursor:'{$cursor}'
             });
-            
         }
 
         location{$id}('{$config['location']['selector']}');
@@ -229,6 +163,7 @@ EOD;
                 } else {
                     obj.appendTo('body').{$config['functionHide']};
                 }
+                return false;
             });
 EOD;
 }
@@ -237,7 +172,5 @@ EOD;
 $cs = Yii::app()->getClientScript();
 $cs->registerCoreScript('jquery');
 $cs->registerCoreScript('jquery.ui');
-$cs->registerCss('Toolbar'.$id, $css);
+$cs->registerCssFile($config['cssFile']);
 $cs->registerScript('Toolbar'.$id, $js, CClientScript::POS_READY);
-
-?>

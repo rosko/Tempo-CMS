@@ -33,19 +33,19 @@ class TemplateSelect extends CInputWidget
         }
         if ($this->hasModel() && (get_class($this->model) == 'Unit'))
         {
-            $unit_id = $this->model->id;
+            $unitId = $this->model->id;
             $injs = <<<EOD
-   updatePageunit($('.cms-pageunit[rev={$unit_id}]').attr('id').replace('cms-pageunit-',''), '.cms-pageunit[rev={$unit_id}]');
+   cmsReloadPageUnit($('.cms-pageunit[rev={$unitId}]').attr('id').replace('cms-pageunit-',''), '.cms-pageunit[rev={$unitId}]');
 EOD;
         } else {
             $injs = '';
         }
 
-        $escaped_id = str_replace('.', '\\\\.', $id);
+        $escapedId = str_replace('.', '\\\\.', $id);
         $txtTemplateEditor = Yii::t('cms', 'Template editor');
 
         $js = <<<EOD
-js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escaped_id}').val(), {
+js:cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escapedId}').val(), {
         title: '{$txtTemplateEditor}',
         id: 'filesEditor',
         className: 'filesEditor',
@@ -55,7 +55,7 @@ js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
             {$injs}
             if ($('#filesEditor ul.files a.fileitem').length) {
                 var html = '';
-                var val = $('#{$escaped_id}').val();
+                var val = $('#{$escapedId}').val();
                 $('#filesEditor ul.files a.fileitem').each(function() {
                     html += '<option value="'+$(this).attr('rev')+'">'+$(this).text()+'</option>';
                 });
@@ -63,10 +63,10 @@ js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
                 if (selected.length) {
                    val = selected.attr('rev');
                 }
-                if ($('#{$escaped_id}').length) {
-                    $('#{$escaped_id}').html(html).val(val);
+                if ($('#{$escapedId}').length) {
+                    $('#{$escapedId}').html(html).val(val);
                 } else {
-                    $('<select id="{$id}" name="{$name}"></select>').insertAfter('label[for={$escaped_id}]').html(html).val(val);
+                    $('<select id="{$id}" name="{$name}"></select>').insertAfter('label[for={$escapedId}]').html(html).val(val);
                 }
             }
         },
@@ -74,7 +74,7 @@ js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
             {$injs}
             if ($('#filesEditor ul.files a.fileitem').length) {
                 var html = '';
-                var val = $('#{$escaped_id}').val();
+                var val = $('#{$escapedId}').val();
                 $('#filesEditor ul.files a.fileitem').each(function() {
                     html += '<option value="'+$(this).attr('rev')+'">'+$(this).text()+'</option>';
                 });
@@ -82,10 +82,10 @@ js:loadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
                 if (selected.length) {
                    val = selected.attr('rev');
                 }
-                if ($('#{$escaped_id}').length) {
-                    $('#{$escaped_id}').html(html).val(val);
+                if ($('#{$escapedId}').length) {
+                    $('#{$escapedId}').html(html).val(val);
                 } else {
-                    $('<select id="{$id}" name="{$name}"></select>').insertAfter('label[for={$escaped_id}]').html(html).val(val);
+                    $('<select id="{$id}" name="{$name}"></select>').insertAfter('label[for={$escapedId}]').html(html).val(val);
                 }
             }
         }

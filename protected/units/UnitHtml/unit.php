@@ -22,11 +22,18 @@ class UnitHtml extends Content
 
 	public function rules()
 	{
-		return array(
-			array('unit_id, html', 'required'),
+		return $this->localizedRules(array(
+            array('unit_id', 'required', 'on'=>'edit'),
+			array('html', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
-		);
+		));
 	}
+
+    public function i18n()
+    {
+        return array('html');
+    }
+
 
 	public function attributeLabels()
 	{

@@ -1,5 +1,5 @@
 {if $unit.title}
-    {if $pageunit.page_id != $page.id}
+    {if $pageUnit.page_id != $page.id}
         <h2><a href="{$unitUrl}">{$unit.title}</a></h2>
     {else}
     <h2>{$unit.title}</h2>

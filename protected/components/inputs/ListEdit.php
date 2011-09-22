@@ -20,7 +20,7 @@ class ListEdit extends CInputWidget
 
         $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
         if (!is_array($value)) {
-            $unser = unserialize($value);
+            $unser = @unserialize($value);
             $value =  $unser===FALSE ? $value : $unser;
         }
 

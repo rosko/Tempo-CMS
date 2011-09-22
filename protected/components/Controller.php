@@ -26,7 +26,12 @@ class Controller extends CController
         }
         Yii::app()->language = $language;
 
+        if (!Yii::app()->request->isAjaxRequest)
+            Yii::app()->getClientScript()->registerCssFile(Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css')).'/icons/'.Yii::app()->params['icons'].'.css');
+
         Unit::loadTypes();
+
+        Yii::app()->getClientScript()->packages = require(Yii::getPathOfAlias('application.config').'/packages.php');
     }
 
     public function setTheme()
@@ -35,10 +40,10 @@ class Controller extends CController
         if (Yii::app()->settings->getValue('theme')
             && in_array(Yii::app()->settings->getValue('theme'), Yii::app()->themeManager->themeNames))
             $theme = Yii::app()->settings->getValue('theme');
-        if (isset($this->_model)) {
-            if ($this->_model->theme
-                && in_array($this->_model->theme, Yii::app()->themeManager->themeNames))
-                $theme = $this->_model->theme;
+        if (Yii::app()->page->model) {
+            if (Yii::app()->page->model->theme
+                && in_array(Yii::app()->page->model->theme, Yii::app()->themeManager->themeNames))
+                $theme = Yii::app()->page->model->theme;
         }
         Yii::app()->theme = $theme;
     }
@@ -52,10 +57,10 @@ class Controller extends CController
         $vars['title'] = $this->pageTitle;
     	$vars['sitename'] = Yii::app()->settings->getValue('sitename');
 
-        if (isset($this->_model)) {
-            $vars['title'] = $this->_model->title;
-            $vars['keywords'] = $this->_model->keywords;
-            $vars['description'] = $this->_model->description;
+        if (Yii::app()->page->model) {
+            $vars['title'] = Yii::app()->page->model->title;
+            $vars['keywords'] = Yii::app()->page->model->keywords;
+            $vars['description'] = Yii::app()->page->model->description;
         }
 
         if ($vars['sitename']) {
@@ -64,9 +69,8 @@ class Controller extends CController
         $vars['themeBaseUrl'] = Yii::app()->theme->getBaseUrl();
         $vars['cssUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css'));
         $vars['jsUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
-        if (isset(Yii::app()->controller->_model))
-            $vars['page'] = Yii::app()->controller->loadModel();
-        $vars['editMode'] = Yii::app()->user->checkAccess('updatePage', array('page'=>$vars['page']));
+        $vars['page'] = Yii::app()->page->model;
+        $vars['editMode'] = Yii::app()->user->checkAccess('updateContentPage', array('page'=>$vars['page']));
         $vars['settings']['global'] = Yii::app()->settings->model->getAttributes();
 
 
@@ -89,10 +93,6 @@ class Controller extends CController
             else
                 echo $output;
         }
-    }
-
-    public function loadModel() {
-        return false;
     }
 
 	public function putDynamic($callback)
@@ -118,5 +118,21 @@ class Controller extends CController
         list($callback,$params)=unserialize(base64_decode($matches[1], true));
         return call_user_func_array($callback, $params);
     }
+
+	/**
+     * Исполняет проверку формы
+     *
+     * @param CActiveRecord $model
+     * @param array $attributes
+     * @param boolean $loadInput
+     */
+    protected function performAjaxValidation($model, $attributes=null, $loadInput=true)
+	{
+		if(isset($_REQUEST['ajax-validate']))
+		{
+            echo CActiveForm::validate($model, $attributes, $loadInput);
+			Yii::app()->end();
+		}
+	}
 
 }

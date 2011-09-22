@@ -1,0 +1,210 @@
+.cms-icon-small-empty {
+    background-image:none;
+    width:0px;
+    height:0px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-add {
+    background-image:url('/images/icons/fatcow/16x16/page_add.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-delete {
+    background-image:url('/images/icons/fatcow/16x16/cross.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-page {
+    background-image:url('/images/icons/fatcow/16x16/page.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-data {
+    background-image:url('/images/icons/fatcow/16x16/curriculum_vitae.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-up {
+    background-image:url('/images/icons/fatcow/16x16/arrow_up.png');    
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-down {
+    background-image:url('/images/icons/fatcow/16x16/arrow_down.png');    
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-move {
+    background-image:url('/images/icons/fatcow/16x16/application_cascade.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-edit {
+    background-image:url('/images/icons/fatcow/16x16/page_edit.png');    
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-settings {
+    background-image:url('/images/icons/fatcow/16x16/cog.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-sitemap {
+    background-image:url('/images/icons/fatcow/16x16/sitemap.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-files {
+    background-image:url('/images/icons/fatcow/16x16/folder.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-exit {
+    background-image:url('/images/icons/fatcow/16x16/door.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-units {
+    background-image:url('/images/icons/fatcow/16x16/large_tiles.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-user {
+    background-image:url('/images/icons/fatcow/16x16/user.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-bookmark {
+    background-image:url('/images/icons/fatcow/16x16/bookmark.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+.cms-icon-small-system {
+    background-image:url('/images/icons/fatcow/16x16/system_monitor.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
+
+
+
+
+
+.cms-icon-big-empty {
+    background-image:none;
+    width:0px;
+    height:0px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-add {
+    background-image:url('/images/icons/fatcow/32x32/page_add.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-delete {
+    background-image:url('/images/icons/fatcow/32x32/cross.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-page {
+    background-image:url('/images/icons/fatcow/32x32/page.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-data {
+    background-image:url('/images/icons/fatcow/32x32/curriculum_vitae.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+
+.cms-icon-big-up {
+    background-image:url('/images/icons/fatcow/32x32/arrow_up.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-down {
+    background-image:url('/images/icons/fatcow/32x32/arrow_down.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-move {
+    background-image:url('/images/icons/fatcow/32x32/application_cascade.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-edit {
+    background-image:url('/images/icons/fatcow/32x32/page_edit.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-settings {
+    background-image:url('/images/icons/fatcow/32x32/cog.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-sitemap {
+    background-image:url('/images/icons/fatcow/32x32/sitemap.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-files {
+    background-image:url('/images/icons/fatcow/32x32/folder.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-exit {
+    background-image:url('/images/icons/fatcow/32x32/door.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-units {
+    background-image:url('/images/icons/fatcow/32x32/large_tiles.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-user {
+    background-image:url('/images/icons/fatcow/32x32/user.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-bookmark {
+    background-image:url('/images/icons/fatcow/32x32/bookmark.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-system {
+    background-image:url('/images/icons/fatcow/32x32/system_monitor.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}

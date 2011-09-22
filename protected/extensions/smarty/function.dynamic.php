@@ -7,7 +7,7 @@ function smarty_function_dynamic($params, &$smarty){
     $callback = $params['callback'];
     unset($params['callback']);
     $route = Yii::app()->getController()->getId() . '/' . Yii::app()->getController()->getAction()->getId();
-    if ($route == 'page/view') {
+    if ($route == 'view/index') {
         Yii::app()->controller->putDynamic($callback,$params);
     } else {
         echo call_user_func_array($callback, $params);

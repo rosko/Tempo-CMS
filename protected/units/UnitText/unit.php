@@ -23,7 +23,8 @@ class UnitText extends Content
 	public function rules()
 	{
 		return $this->localizedRules(array(
-			array('unit_id, text', 'required'),
+			array('text', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('author', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
 		));

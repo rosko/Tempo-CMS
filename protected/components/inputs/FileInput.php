@@ -58,7 +58,7 @@ class FileInput extends CInputWidget
         if ($this->showFileManagerButton)
         {
             $am=Yii::app()->getAssetManager();
-            $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
+            $fckeditorPath= $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
             $js .= <<<EOD
 
 $('#{$id}_button').click(function() {
@@ -73,7 +73,7 @@ EOD;
 
         if ($this->showUploadButton)
         {
-            $fileuploaderPath=Yii::app()->params['_path']['file-uploader'] = $am->publish(Yii::getPathOfAlias('application.vendors.file-uploader'));
+            $fileuploaderPath=$am->publish(Yii::getPathOfAlias('application.vendors.file-uploader'));
             $cs->registerCssFile($fileuploaderPath.'/client/fileuploader.css');
             $cs->registerScriptFile($fileuploaderPath.'/client/jquery.fileuploader.js');
             $txtDragHere = Yii::t('cms', 'Drag here');
@@ -127,7 +127,7 @@ var uploader = new qq.FileUploader({
         emptyError: "{$txtEmptyError}"
     },
     showMessage: function(message) {
-        showInfoPanel(message, 10);
+        cmsShowInfoPanel(message, 10);
     }
 });    
 EOD;

@@ -23,7 +23,8 @@ class UnitList extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id, class_name', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
+			array('class_name', 'required'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 			array('rule', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
 		);
@@ -84,7 +85,8 @@ class UnitList extends Content
             $ret = array(
                 array(
                     'class'=>'system.caching.dependencies.CDbCacheDependency',
-                    'sql'=>$sql,
+                    'sql'=>$sql['sql'],
+                    'params'=>$sql['params'],
                 ),
             );
         }

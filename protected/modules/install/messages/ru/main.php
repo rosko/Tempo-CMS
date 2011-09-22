@@ -1,0 +1,20 @@
+<?php
+return array(
+    'Next' => 'Далее',
+    'Previous' => 'Назад',
+    'Database settings' => 'Настройка базы данных',
+    'Hostname' => 'Адрес',
+    'Port'=>'Порт',
+    'Basename'=>'Имя базы',
+    'Prefix'=>'Префикс для таблиц',
+    'Username'=>'Имя пользователя',
+    'Password'=>'Пароль',
+    'repeat'=>'еще раз',
+    'Administrator settings'=>'Настройка администратора',
+    'Admin login'=>'Логин администратора',
+    'Admin e-mail'=>'Электронная почта',
+    'Admin password'=>'Пароль',
+    'Step {step}/{steps}' => 'Шаг {step} из {steps}',
+    'Create database'=>'Создать базу данных',
+    'Refresh'=>'Обновить',
+);

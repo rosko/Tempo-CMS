@@ -5,11 +5,11 @@ function smarty_function_accessdenied($params, &$smarty){
     echo '<p>'.Yii::t('cms','Access denied').'</p>';
     $unitLogin = UnitLogin::model()->find();
     if ($unitLogin && $unitLogin->unit_id) {
-        $pageunit = PageUnit::model()->find('unit_id = :unit_id', array(
+        $pageUnit = PageUnit::model()->find('unit_id = :unit_id', array(
             'unit_id'=>$unitLogin->unit_id,
         ));
         $unitLogin->run(array(
-            'pageunit'=>$pageunit
+            'pageUnit'=>$pageUnit
         ));
     }
 

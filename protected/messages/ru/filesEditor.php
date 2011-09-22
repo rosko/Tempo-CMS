@@ -38,4 +38,5 @@ return array(
     'Is user is a guest mode flag' => 'Признак, что посетитель не является зарегистрированным пользователем',
 
     'User IP address' => 'IP-адрес посетителя',
+    'Language' => 'Язык',
 );

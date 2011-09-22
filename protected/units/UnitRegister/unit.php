@@ -24,7 +24,7 @@ class UnitRegister extends Content
 	public function rules()
 	{
 		return $this->localizedRules(array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
             array('is_emailauth_req, is_invite_req, notify_admin, notify_user', 'boolean'),
             array('fields, fields_req, profile_fields, profile_fields_req', 'type', 'type'=>'array'),

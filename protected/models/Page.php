@@ -33,7 +33,7 @@ class Page extends I18nActiveRecord
         if ($this->virtual) {
             $rules[] = array('parent_id', 'unsafe');
         }
-        if ($this->id) {
+        if ($this->id==1) {
             $rules[] = array('alias, url', 'unsafe');
         }
 		return $this->localizedRules($rules);
@@ -75,31 +75,31 @@ class Page extends I18nActiveRecord
     public function operations()
     {
         return array(
-            'createPage'=>array(
+            'create'=>array(
                 'label'=>'Add child page', // Право создавать дочернюю страницу в любом месте или только для этой страницы
                 'defaultRoles'=>array('administrator', 'editor', 'author'),
             ),
-            'readPage'=>array(
+            'read'=>array(
                 'label'=>'View page', // Право просматривать все страницы или только эту
                 'defaultRoles'=>array('anybody'),
             ),
-            'updatePage'=>array(
-                'label'=>'Edit page content', // Право редактировать свойства всех страниц или только этой
+            'updateContent'=>array(
+                'label'=>'Edit page content', // Право редактировать контент всех страниц или только этой
                 'defaultRoles'=>array('administrator', 'editor'),
             ),
-            'editSettingsPage'=>array(
+            'updateSettings'=>array(
                 'label'=>'Edit page settings', // Право редактировать свойства всех страниц или только этой
                 'defaultRoles'=>array('administrator', 'editor'),
             ),
-            'editAccessPage'=>array(
-                'label'=>'Edit page access', // Право редактировать свойства всех страниц или только этой
+            'updateAccess'=>array(
+                'label'=>'Edit page access', // Право редактировать права доступа всех страниц или только этой
                 'defaultRoles'=>array('administrator'),
             ),
-            'movePage'=>array(
-                'label'=>'Move pages', // Право перемещать все страницы
+            'move'=>array(
+                'label'=>'Move page', // Право перемещать все страницы
                 'defaultRoles'=>array('administrator', 'editor'),
             ),
-            'deletePage'=>array(
+            'delete'=>array(
                 'label'=>'Delete page', // Право удалять все страницы или только эту
                 'defaultRoles'=>array('administrator', 'editor'),
             ),
@@ -109,37 +109,37 @@ class Page extends I18nActiveRecord
     public function tasks()
     {
         return array(
-            'createOnOwnPage'=>array(
+            'createOnOwn'=>array(
                 'label'=>'Add child page for own page',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
                 'children'=>array('createPage'),
                 'defaultRoles'=>array('author'),
             ),
-            'readOwnPage'=>array(
+            'readOwn'=>array(
                 'label'=>'View own page',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
                 'children'=>array('readPage'),
                 'defaultRoles'=>array('author', 'authenticated'),
             ),
-            'updateOwnPage'=>array(
+            'updateContentOwn'=>array(
                 'label'=>'Edit own page content',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
-                'children'=>array('updatePage'),
+                'children'=>array('updateContentPage'),
                 'defaultRoles'=>array('author', 'authenticated'),
             ),
-            'editSettingsOwnPage'=>array(
+            'updateSettingsOwn'=>array(
                 'label'=>'Edit own page settings',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
-                'children'=>array('editSettingsPage'),
+                'children'=>array('updateSettingsPage'),
                 'defaultRoles'=>array('author'),
             ),
-            'editAccessOwnPage'=>array(
+            'updateAccessOwn'=>array(
                 'label'=>'Edit own page access',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
-                'children'=>array('editAccessPage'),
+                'children'=>array('updateAccessPage'),
                 'defaultRoles'=>array('author'),
             ),
-            'deleteOwnPage'=>array(
+            'deleteOwn'=>array(
                 'label'=>'Delete own page',
                 'bizRule'=>'return Yii::app()->user->id==$params["page"]->author_id;',
                 'children'=>array('deletePage'),
@@ -263,7 +263,7 @@ class Page extends I18nActiveRecord
         return $this;
     }
 
-    public function beforeValidate()
+    public function save($runValidation = true, $attributes = null)
     {
         if ($this->id) {
             $oldThis = Page::model()->findByPk($this->id);
@@ -279,7 +279,7 @@ class Page extends I18nActiveRecord
                 $this->$param = $newurl;
             }
         }
-        return parent::beforeValidate();
+        return parent::save($runValidation, $attributes);
     }
 
     public function beforeSave()
@@ -526,13 +526,13 @@ class Page extends I18nActiveRecord
         );
     }
 
-    public function isSimilarTo($page, $areas=array(), $unit_id=0)
+    public function isSimilarTo($page, $areas=array(), $unitId=0)
     {
         $id = is_object($page) ? $page->id : $page;
         $sql = 'SELECT `unit_id` FROM `' . PageUnit::tableName() . '`
                 WHERE `page_id` = :id
                       AND `area` ' . (!empty($areas) ? (is_array($areas) ? 'IN ('.implode(',',$areas).')' : ' = `area`') : 'NOT LIKE "main%"').'
-                      '.($unit_id ? ' AND `unit_id` != '.intval($unit_id) : '');
+                      '.($unitId ? ' AND `unit_id` != '.intval($unitId) : '');
         $command = Yii::app()->db->createCommand($sql);
         $command->bindParam(':id', $this->id, PDO::PARAM_INT);
         $arr = $command->queryColumn();

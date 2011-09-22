@@ -3,24 +3,25 @@
 class RecordsGrid extends CInputWidget
 {
     public $addButtonTitle;
-    public $class_name;
-    public $foreign_attribute;
-    public $section_type='';
-    public $section_id=0;
+    public $className;
+    public $makePage = false;
+    public $foreignAttribute;
+    public $sectionType='';
+    public $sectionId=0;
     public $columns=array();
     public $order;
 
     public function run()
     {
-        if($this->hasModel()===false && $this->section_type)  {
-            $this->model = call_user_func(array($this->section_type, 'model'))->findByPk($this->section_id);
+        if($this->hasModel()===false && $this->sectionType)  {
+            $this->model = call_user_func(array($this->sectionType, 'model'))->findByPk($this->sectionId);
         }
 
         if ($this->model instanceof Content) {
 
-            $dataProvider=new CActiveDataProvider($this->class_name, array(
+            $dataProvider=new CActiveDataProvider($this->className, array(
                 'criteria'=> array(
-                    'condition'=> $this->foreign_attribute . ' = :id',
+                    'condition'=> $this->foreignAttribute . ' = :id',
                     'with' => 'unit',
                     'params'=>array(
                         ':id' => $this->model->id
@@ -44,7 +45,7 @@ class RecordsGrid extends CInputWidget
 
         } else {
             
-            $dataProvider=new CActiveDataProvider($this->class_name, array(
+            $dataProvider=new CActiveDataProvider($this->className, array(
                 'sort' => array(
                     'defaultOrder' => $this->order,
                 ),
@@ -58,13 +59,13 @@ class RecordsGrid extends CInputWidget
         if ($this->model) {
             $id = __CLASS__.'_'.get_class($this->model).'_'.$this->model->id;
         } else {
-            $id = __CLASS__.$this->class_name;
+            $id = __CLASS__.$this->className;
         }
 
         $this->registerClientScript();
 
 
-        $records_grid = $this->widget('zii.widgets.grid.CGridView', array(
+        $recordsGrid = $this->widget('zii.widgets.grid.CGridView', array(
             'id'=>$id,
             'dataProvider'=>$dataProvider,
             'ajaxUpdate'=> $id,
@@ -122,35 +123,35 @@ EOD
             )
         ), true);
 
-        $page_id = 0;
+        $pageId = 0;
         $area = '';
         $type = '';
-        $pageunit_id = 0;
-        $unit_id = 0;
+        $pageUnitId = 0;
+        $unitId = 0;
         if ($this->model->unit_id) {
-            $pageunit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
-            if ($pageunit) {
-                $pageunit_id = $pageunit->id;
-                $unit_id = $this->model->unit_id;
-                $page_id = $pageunit->page_id;
-                $area = $pageunit->area;
-                $type = Unit::getUnitTypeByClassName($this->class_name);
+            $pageUnit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
+            if ($pageUnit) {
+                $pageUnitId = $pageUnit->id;
+                $unitId = $this->model->unit_id;
+                $pageId = $pageUnit->page_id;
+                $area = $pageUnit->area;
+                $type = Unit::getUnitTypeByClassName($this->className);
             }
         }
 
         $this->render('RecordsGrid', array(
             'id' => $id,
-            'foreign_attribute' => $this->foreign_attribute,
+            'foreignAttribute' => $this->foreignAttribute,
             'addButtonTitle' => $this->addButtonTitle,
-            'page_id' => $page_id,
+            'pageId' => $pageId,
             'area' => $area,
             'type' => $type,
-            'class_name' => $this->class_name,
-            'records_grid' => $records_grid,
-            'section_id' => $this->model->id,
-            'section_type' => get_class($this->model),
-            'pageunit_id' => $pageunit_id,
-            'unit_id' => $unit_id,
+            'className' => $this->className,
+            'recordsGrid' => $recordsGrid,
+            'sectionId' => $this->model->id,
+            'sectionType' => get_class($this->model),
+            'pageUnitId' => $pageUnitId,
+            'unitId' => $unitId,
         ));
 
     }
@@ -158,7 +159,7 @@ EOD
     public function registerClientScript()
     {
         $cs=Yii::app()->getClientScript();
-        $cs->registerScriptFile('/js/jquery.ba-bbq.js');
+        //$cs->registerScriptFile('/js/jquery.ba-bbq.js');
 
     }
 }

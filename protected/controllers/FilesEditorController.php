@@ -9,7 +9,7 @@ class FilesEditorController extends Controller
 	public function filters()
 	{
 		return array(
-			'accessControl', // perform access control for CRUD operations
+//			'accessControl', // perform access control for CRUD operations
 		);
 	}
 
@@ -35,7 +35,7 @@ class FilesEditorController extends Controller
         $suggestions = array(
             ''=>'',
             '{dateformat pattern="d MMMM yyyy" time=$content.date}'=> Yii::t('filesEditor', 'Function to show time'),
-            '{link text="'.Yii::t('cms', 'Link').'" url="page/view?id=1"}' => Yii::t('filesEditor', 'Function to show link, i.e. to page with ID=1'),
+            '{link text="'.Yii::t('cms', 'Link').'" url="view/index?pageId=1"}' => Yii::t('filesEditor', 'Function to show link, i.e. to page with ID=1'),
         );
         if ($type == 'templates') {
             if (class_exists($name)) {
@@ -72,6 +72,7 @@ class FilesEditorController extends Controller
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
+                $suggestions['{$language}'] = Yii::t('filesEditor', 'Language');
                 $suggestions['{$isGuest}'] = Yii::t('filesEditor', 'Is user is a guest mode flag');
                 if (method_exists($name, 'templateVars'))
                 {
@@ -84,7 +85,7 @@ class FilesEditorController extends Controller
                 $objs = array(
                     'content'=>$name,
                     'unit'=>'Unit',
-                    'pageunit'=>'PageUnit',
+                    'pageUnit'=>'PageUnit',
                     'page'=>'Page',
                     'user'=>'User',
                 );
@@ -92,7 +93,7 @@ class FilesEditorController extends Controller
                     'unit'=>Yii::t('filesEditor', 'Unit'),
                     'content'=>Yii::t('filesEditor', 'Unit'),
                     'page'=>Yii::t('filesEditor', 'Showing page'),
-                    'pageunit'=>Yii::t('filesEditor', 'Unit location'),
+                    'pageUnit'=>Yii::t('filesEditor', 'Unit location'),
                     'user'=>Yii::t('filesEditor', 'User'),
                 );
                 foreach ($objs as $param => $obj) {
@@ -127,7 +128,7 @@ class FilesEditorController extends Controller
         $suggestions['{$MEMORY}'] = Yii::t('filesEditor', 'Used memory (megabytes)');
         if (!empty($files)) {
             $id = 'FilesEditor_'.sprintf('%x',crc32(serialize($files).$type.$name));
-            $this->render('form', array(
+            $this->render('/form', array(
                 'id' => $id,
                 'files' => $files,
                 'type' => $type,

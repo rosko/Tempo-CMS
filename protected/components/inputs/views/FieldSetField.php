@@ -6,9 +6,9 @@
             <legend>
                 <strong><?php $l = $FS->typesLabels(); echo $l[$field['type']];?></strong><br />
                 <input type="text" name="<?=$name?>[<?=$k?>][label][<?=Yii::app()->language?>]" value="<?=$field['label'][Yii::app()->language]?>" />
-                <img style="vertical-align:middle;margin-left:15px;" src="<?=Toolbar::getIconUrlByAlias('settings', '', 'fatcow', '16x16')?>" />
+                <span class="cms-icon-inline cms-icon-small-settings"></span>
                 <a href="#" class="FieldSet_field_toggleoptions"><?=Yii::t('cms', 'Show options')?></a>
-                <img style="vertical-align:middle;margin-left:15px;" src="<?=Toolbar::getIconUrlByAlias('delete', '', 'fatcow', '16x16')?>" />
+                <span class="cms-icon-inline cms-icon-small-delete"></span>
                 <a href="#" class="FieldSet_field_delete"><?=Yii::t('cms', 'Delete this field')?></a>
             </legend>
             <div class="hidden FieldSet_field_options">

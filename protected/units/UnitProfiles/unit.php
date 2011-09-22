@@ -23,7 +23,7 @@ class UnitProfiles extends Content
 	public function rules()
 	{
 		return $this->localizedRules(array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id, per_page', 'numerical', 'integerOnly'=>true),
             array('table_fields, displayed_fields', 'type', 'type'=>'array'),
             array('feedback_form', 'safe'),
@@ -118,7 +118,7 @@ class UnitProfiles extends Content
     public static function dynamicFeedbackForm($params)
     {
         $user = User::model()->findByPk($params['id']);
-        if ($user && User::isUserInCategory($user->send_message) && $user->id != Yii::app()->user->id && $user->email) {
+        if ($user && Yii::app()->user->checkAccess($user->send_message) && $user->id != Yii::app()->user->id && $user->email) {
 
             $vm = new VirtualModel($params['feedback_form'], 'FieldSet');
             $config = $vm->formMap;
@@ -131,7 +131,7 @@ class UnitProfiles extends Content
             );
             $profileVar = self::urlParam('view');
             $config['activeForm'] = Form::ajaxify($config['id']);
-            $config['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitView&pageunit_id='.$params['pageunit_id'].'&'.$profileVar.'='.$user->id;
+            $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$params['pageUnitId'].'&'.$profileVar.'='.$user->id;
             $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
             $form = new Form($config, $vm);
 
@@ -202,7 +202,7 @@ class UnitProfiles extends Content
                 ), true);
                 $params['profile'] = $profile->getAttributes();
 
-                if (User::isUserInCategory($profile->send_message) && $profile->id != $params['user']->id && $profile->email) {
+                if (Yii::app()->user->checkAccess($profile->send_message) && $profile->id != $params['user']->id && $profile->email) {
 
                     $vm = new VirtualModel($this->feedback_form, 'FieldSet');                    
                     $config = $vm->formMap;
@@ -214,7 +214,7 @@ class UnitProfiles extends Content
                         ),
                     );
                     $config['activeForm'] = Form::ajaxify($config['id']);
-                    $config['activeForm']['clientOptions']['validationUrl'] = '/?r=page/unitView&pageunit_id='.$params['pageunit']->id.'&'.$params['profileVar'].'='.$profile->id;
+                    $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$params['pageUnit']->id.'&'.$params['profileVar'].'='.$profile->id;
                     $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
                     $form = new Form($config, $vm);
 
@@ -282,9 +282,9 @@ class UnitProfiles extends Content
         $id = __CLASS__.$this->id;
         $tableFields = $this->makeFields($this->table_fields);
         $urlparams = (bool)Yii::app()->settings->getValue('ajaxPager') ? array(
-            'route'=>'page/unitView',
+            'route'=>'view/unit',
             'params'=>array(
-                'pageunit_id'=>$params['pageunit']['id'],
+                'pageUnitId'=>$params['pageUnit']['id'],
             ),
         ) : array();
 
@@ -365,12 +365,12 @@ class UnitProfiles extends Content
                     $fields[$key] = array(
                         'name'=>'email',
                         'value'=>$user->email,
-                        'visible'=>User::isUserInCategory($user->show_email) || $user->id == Yii::app()->user->id,
+                        'visible'=>Yii::app()->user->checkAccess($user->show_email) || $user->id == Yii::app()->user->id,
                     );
                 } else {
                     $fields[$key] = array(
                         'name'=>'email',
-                        'value'=>'User::isUserInCategory($data->show_email) ? $data->email : ""',
+                        'value'=>'Yii::app()->user->checkAccess($data->show_email) ? $data->email : ""',
                     );
                 }
             }

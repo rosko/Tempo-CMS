@@ -23,7 +23,8 @@ class UnitBlogentry extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id, text, date', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
+			array('text, date', 'required'),
 			array('unit_id, page_id, blog_id', 'numerical', 'integerOnly'=>true),
 			array('source', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
 			array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
@@ -56,7 +57,7 @@ class UnitBlogentry extends Content
 
 		return array(
 			'elements'=>array(
-                Form::tab('Новость'),
+                Form::tab(Yii::t('UnitBlogentry.unit', 'Entry')),
 				'text'=>array(
 					'type'=>'TextEditor',
                     'kind'=>'fck',
@@ -170,6 +171,15 @@ class UnitBlogentry extends Content
             'params' => array(':id' => $id),
 		));
 		return $this;
+    }
+
+    public function feedItem()
+    {
+        return array(
+            'title'=>null, // тогда используется unit->title,
+            'description'=>'text',
+            'updated'=>'date',
+        );
     }
 
     public function templateVars()

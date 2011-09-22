@@ -19,7 +19,7 @@ ul.dropdown li {
 {if $tree[$path]}
     {foreach $tree[$path] as $item}
     {if !$item.virtual}
-    <li>{link text=$item.title url="page/view?id={$item.id}&alias={$item.alias}&url={$item.url}"}
+    <li>{link text=$item.title url="view/index?pageId={$item.id}&alias={$item.alias}&url={$item.url}"}
 
         {$p = "{$path},{$item.id}"}
 

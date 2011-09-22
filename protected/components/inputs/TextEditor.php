@@ -37,7 +37,7 @@ class TextEditor extends CInputWidget
         $cs=Yii::app()->getClientScript();
 
         $am=Yii::app()->getAssetManager();
-        $fckeditorPath=Yii::app()->params['_path']['fckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
+        $fckeditorPath = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
         $jsUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         $themeBaseUrl = Yii::app()->theme->baseUrl;
 
@@ -129,7 +129,7 @@ EOD;
         $cs=Yii::app()->getClientScript();
 
         $am=Yii::app()->getAssetManager();
-        $CkeditorPath=Yii::app()->params['_path']['ckeditor'] = $am->publish(Yii::getPathOfAlias('application.vendors.ckeditor'));
+        $CkeditorPath = $am->publish(Yii::getPathOfAlias('application.vendors.ckeditor'));
         $baseUrl = Yii::app()->baseUrl;
         $jsUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         $themeBaseUrl = Yii::app()->theme->baseUrl;
@@ -156,7 +156,7 @@ EOD;
             'disableNativeSpellChecker'=>false,
             'fillEmptyBlocks'=>true,
             'removeFormatTags'=>'code,del,dfn,div,font,ins,kbd,q,samp,span,tt,var,dl,dt,dd,form,input,button,textarea,label',
-            'removeDialogTabs'=>'flash:advanced;image:advanced;link:advanced;link:target;image:Link',
+            'removeDialogTabs'=>'flash:advanced;image:advanced;link:advanced;image:Link',
             'format_tags'=>'p;h1;h2;h3;h4;h5;h6',
             'forceEnterMode'=>true,
             'forceSimpleAmpersand'=>true,

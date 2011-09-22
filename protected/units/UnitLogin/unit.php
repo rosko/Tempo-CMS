@@ -23,7 +23,7 @@ class UnitLogin extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 		);
 	}
@@ -100,7 +100,7 @@ class UnitLogin extends Content
             } else
                 Yii::app()->controller->refresh();
         }
-        if ($_REQUEST['authcode']) {
+        if (!empty($_REQUEST['authcode'])) {
             $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
             if ($user) {
                 $identity = new AuthCodeIdentity($_REQUEST['authcode']);

@@ -1,0 +1,149 @@
+.aristo-menu {
+    position:absolute;
+    display:none;
+    z-index: 900;
+    border: 1px solid #acacac;
+    border-top-color: #bdbdbd;
+    border-bottom-color: #949494;
+}
+.aristo-menu div {
+    font-family:  Helvetica,Arial,sans-serif !important;
+    background: #ddd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#c4c4c4));
+    background: -moz-linear-gradient(top, #ededed, #c4c4c4);
+    border-radius: .214em;
+    -webkit-border-radius: .214em;
+    -moz-border-radius: .214em;
+}
+.aristo-menu ul{
+    margin:0px;
+    padding:0px;
+    clear:both;
+    list-style-type:none;
+}
+.aristo-menu ul li {
+    float:left;
+}
+.aristo-menu ul li.right {
+    float:right;
+}
+.aristo-menu ul li a {
+    display:block;
+    cursor:pointer;
+    text-decoration: none;
+    font-weight: bold;
+    color: #4f4f4f;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.698);
+    padding:3px 10px 3px 3px;
+    border:1px solid transparent;
+
+}
+.aristo-menu ul li a:hover {
+    background: #ddd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#bbe1f7), to(#80adc7));
+    background: -moz-linear-gradient(top, #bbe1f7, #80adc7);
+    border-top: 1px solid #567c91;
+    border-left: 1px solid #88aec4;
+    border-right: 1px solid #88aec4;
+    border-bottom: 1px solid #88aec4;
+    border-color: #6e94a9;
+    background: -webkit-gradient(linear, left top, left bottom, from(#81afc8), to(#b7def4));
+    background: -moz-linear-gradient(top, #81afc8, #b7def4);
+    color:#313131;
+    text-decoration: none;
+}
+.aristo-menu ul li a span {
+    float:left;
+    margin:1px 3px 1px 0px;
+}
+
+.aristo-menu ul li input {
+    padding:0px;
+    margin:0px 5px 0px 0px;
+    vertical-align:baseline;
+    float:left;
+}
+.aristo-menu ul li label {
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+
+/*
+.aristo-menu span.right
+{
+    float:right;
+    display:block;
+    line-height: 28px;
+    background: #ddd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#bbe1f7), to(#80adc7));
+    background: -moz-linear-gradient(top, #bbe1f7, #80adc7);
+    border-top: 1px solid #567c91;
+    border-bottom: 1px solid #88aec4;
+    border-color: #6e94a9;
+    margin-top: -1px;
+}*/
+/*
+.aristo-menu li ul, .aristo-menu li.right ul{
+    display:none;
+    height:auto;
+    padding:0px;
+    margin-top:6px;
+    margin-left: -13px;
+    position:absolute;
+    border: 1px solid #acacac;
+    border-top: 0px;
+    border-bottom-color: #949494;
+    -moz-border-radius: 0 0 0.214em 0.214em;
+    width:205px;
+    z-index:9999;
+    box-shadow: 0 0 7px #53a6d5, inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.aristo-menu li.right ul{
+right: 0;
+}
+
+.aristo-menu li ul li{
+    float: left;
+    padding: 5px 0;
+}
+.aristo-menu li:hover ul{
+    display:block;
+}
+.aristo-menu li li {
+    display:block;
+    margin:0px;
+    padding:0px;
+    width:205px;
+}
+.aristo-menu li:hover li a{
+    background:none;
+}
+.aristo-menu li ul a{
+    padding:0 6px;
+    margin: 0 .5em;
+    display:block;
+    font-style:normal;
+    text-align:left;
+}
+.aristo-menu li ul a:hover, .aristo-menu li ul li:hover a{
+    color:#313131;
+    text-decoration:none;
+}
+.aristo-menu p {
+    clear:left;
+}
+.aristo-menu span {
+    display:block;
+    float:right;
+    line-height: 35px;
+    padding: 0 25px;
+}
+.aristo-menu span a {
+    font-weight: normal;
+    text-align: center;
+    text-decoration: none;
+    color: #000000;
+}
+
+*/

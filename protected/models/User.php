@@ -114,25 +114,6 @@ class User extends ActiveRecord
         );
     }
 
-    public function userCategories()
-    {
-        return array(
-            'all'=>Yii::t('cms', 'All visitors'),
-            'registered'=>Yii::t('cms', 'Registered users'),
-            'none'=>Yii::t('cms', 'Nobody'),
-        );
-    }
-
-    public function isUserInCategory($category)
-    {
-        $cond = array(
-            'all'=>true,
-            'registered'=>!Yii::app()->user->isGuest,
-            'none'=>false,
-        );
-        return $cond[$category];
-    }
-
     public function form()
     {
         return array(
@@ -174,11 +155,11 @@ class User extends ActiveRecord
                 ),
                 'show_email'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::userCategories(),
+                    'items'=>User::roles(),
                 ),
                 'send_message'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::userCategories(),
+                    'items'=>User::roles(),
                 ),
                 'extra_fields'=>array(
                     'type'=>'Fields',
@@ -188,12 +169,62 @@ class User extends ActiveRecord
         );
     }
 
+    public function roles()
+    {
+        $roles = Yii::app()->getAuthManager()->getRoles();
+        $ret = array(''=>Yii::t('cms', 'Nobody'));
+        foreach ($roles as $role) {
+            $ret[$role->name] = Yii::t('cms', $role->description);
+        }
+        return $ret;
+    }
+
     public function operations()
     {
         return array(
-            'updateUser'=>array(
-                'label'=>'Manage settings',
+            'create'=>array(
+                'label'=>'Add user', // Право создавать пользователей
+                'defaultRoles'=>array('administrator', 'guest'),
+            ),
+            'read'=>array(
+                'label'=>'View user', // Право просматривать данные пользователей
+                'defaultRoles'=>array('authenticated'),
+            ),
+            'update'=>array( // Право редактировать пользователей
+                'label'=>'Update user',
                 'defaultRoles'=>array('administrator'),
+            ),
+            'updateAccess'=>array( // Право редактировать права доступа пользователей
+                'label'=>'Update user access',
+                'defaultRoles'=>array('administrator'),
+            ),
+            'delete'=>array( // Право удалять пользователей
+                'label'=>'Delete user',
+                'defaultRoles'=>array('administrator'),
+            ),
+        );
+    }
+
+    public function tasks()
+    {
+        return array(
+            'readOwn'=>array(
+                'label'=>'View own user',
+                'bizRule'=>'return Yii::app()->user->id==$params["user"]->id;',
+                'children'=>array('readUser'),
+                'defaultRoles'=>array('authenticated'),
+            ),
+            'updateOwn'=>array(
+                'label'=>'Edit own user',
+                'bizRule'=>'return Yii::app()->user->id==$params["user"]->id;',
+                'children'=>array('updateUser'),
+                'defaultRoles'=>array('authenticated'),
+            ),
+            'deleteOwn'=>array(
+                'label'=>'Delete own user',
+                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->id;',
+                'children'=>array('deleteUser'),
+                'defaultRoles'=>array('authenticated'),
             ),
         );
     }

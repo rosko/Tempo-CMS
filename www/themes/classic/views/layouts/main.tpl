@@ -28,7 +28,7 @@
 <div class="container" id="page">
 
 	<div id="header">
-		<div id="logo">{link text=$sitename url="page/view"}</div>
+		<div id="logo">{link text=$sitename url="/view/index"}</div>
 	</div><!-- header -->
 
 	<div id="mainmenu">

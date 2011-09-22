@@ -23,7 +23,8 @@ class UnitImage extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id, image, width, height', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
+			array('image, width, height', 'required'),
 			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
 			array('image, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8')
@@ -91,7 +92,7 @@ EOD;
 					'size'=>40,
 					'showPageSelectButton'=>false,
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-					'onChange'=> "js:$('#cms-pageunit-'+pageunit_id).find('img').attr('src', $(this).val());"
+					'onChange'=> "js:$('#cms-pageunit-'+pageUnitId).find('img').attr('src', $(this).val());"
 				),
                 self::renderFile($className, 'files.imagesize'),
 				'width'=>array(

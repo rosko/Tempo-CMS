@@ -11,6 +11,9 @@ class Installer extends CApplicationComponent
 
         if (!$tableName && method_exists($className, 'tableName'))
             $tableName = call_user_func(array($className, 'tableName'));
+
+        Yii::app()->getCache()->delete('yii:dbschema'.Yii::app()->getDb()->connectionString.':'.Yii::app()->getDb()->username.':'.$tableName);
+
         if (method_exists($className, 'scheme') && $tableName) {
             $scheme = call_user_func(array($className, 'scheme'));
             if (method_exists($className, 'i18n')) {
@@ -40,6 +43,16 @@ class Installer extends CApplicationComponent
                         Yii::app()->db->createCommand()->alterColumn($tableName, $k, $v);
                     } else {
                         Yii::app()->db->createCommand()->addColumn($tableName, $k, $v);
+                        if (isset($langs) && is_array($langs)) {
+                            $underscorePos = strpos($k, '_');
+                            if ($underscorePos !== false) {
+                                $prefix = substr($k,0,$underscorePos);
+                                $base = substr($k, $underscorePos+1);
+                                if (isset($simpleScheme[$base]) && in_array($prefix, $langs)) {
+                                    Yii::app()->getDb()->createCommand('update `'.$tableName.'` set `'.$k.'` = `'.$base.'`')->execute();
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -137,24 +150,24 @@ class Installer extends CApplicationComponent
             if (method_exists($className, 'operations')) {
                 $a = call_user_func(array($className, 'operations'));
                 foreach ($a as $operation => $params) {
-                    $auth->createOperation($operation, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
+                    $auth->createOperation($operation.$className, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
                     if (is_array($params['defaultRoles']))
                         foreach ($params['defaultRoles'] as $role) {
-                            $auth->addItemChild($role, $operation);
+                            $auth->addItemChild($role, $operation.$className);
                         }
                 }
             }
             if (method_exists($className, 'tasks')) {
                 $a = call_user_func(array($className, 'tasks'));
                 foreach ($a as $task => $params) {
-                    $auth->createTask($task, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
+                    $auth->createTask($task.$className, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
                     if (is_array($params['children']))
                         foreach ($params['children'] as $operation) {
-                            $auth->addItemChild($task, $operation);
+                            $auth->addItemChild($task.$className, $operation);
                         }
                     if (is_array($params['defaultRoles']))
                         foreach ($params['defaultRoles'] as $role) {
-                            $auth->addItemChild($role, $task);
+                            $auth->addItemChild($role, $task.$className);
                         }
                 }
             }

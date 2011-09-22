@@ -1,0 +1,38 @@
+.cms-menu {
+    position:absolute;
+    z-index: 900;
+    display:none;
+}
+.cms-menu div {
+    padding:7px;
+    background-color:white;
+    border:1px solid lightblue;
+    opacity:0.95;
+    border-radius:7px;
+}
+.cms-menu ul {
+    margin:0px;
+    padding:0px;
+    clear:both;
+    list-style-type:none;
+}
+.cms-menu ul li {
+    float:left;
+}
+.cms-menu ul li a {
+    background-color:white;
+    background-repeat:no-repeat;
+    display:block;
+    cursor:pointer;
+    padding:7px;
+    text-decoration: none;
+    border:1px solid transparent;
+}
+.cms-menu ul li a:hover {
+    background-color:lightblue;
+    border:1px solid lightblue;
+}
+.cms-menu ul li a span {
+    float:left;
+    margin:1px;
+}

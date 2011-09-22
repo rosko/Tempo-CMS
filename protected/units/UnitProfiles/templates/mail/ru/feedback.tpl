@@ -1,7 +1,7 @@
 <h3>Здравствуйте, {$profile.name}</h3>
 
 <p>Только что кто-то заполнил Вашу форму обратной связи на сайте
-{link url="page/view" text=$settings.sitename}.</p>
+{link url="view/index" text=$settings.sitename}.</p>
 
 <p>Вот информация:</p>
 <table>

@@ -115,10 +115,10 @@ class Content extends I18nActiveRecord
 
     public function getPageNumber()
     {
-        return intval($_GET[$this->getPageVar()]);
+        return intval(@$_GET[$this->getPageVar()]);
     }
 
-    public function renderPager($showedCount, $itemCount, $currentPage, $pageSize=0, $page_id=0, $pagerCssClass='')
+    public function renderPager($showedCount, $itemCount, $currentPage, $pageSize=0, $pageId=0, $pagerCssClass='')
     {
         if ($showedCount < $itemCount) {
             foreach ($_GET as $k => $v) {
@@ -132,16 +132,16 @@ class Content extends I18nActiveRecord
             $pagination->pageVar = $this->getPageVar();
             $pagination->pageSize = $pageSize;
             $pagination->currentPage = $currentPage-1;
-            $pagination->route = 'page/view';
+            $pagination->route = 'view/index';
             $params = $_GET;
-            if (Yii::app()->controller->action->id == 'unitView') {
-                unset($params['pageunit_id']);
+            if (Yii::app()->controller->id == 'view' && Yii::app()->controller->action->id == 'unit') {
+                unset($params['pageUnitId']);
                 unset($params['_']);
             }
             $pagination->params = array_merge($params, array(
-                'id' => Yii::app()->controller->loadModel()->id,
-                'alias' => Yii::app()->controller->loadModel()->alias,
-                'url' => Yii::app()->controller->loadModel()->url,
+                'pageId' => Yii::app()->page->model->id,
+                'alias' => Yii::app()->page->model->alias,
+                'url' => Yii::app()->page->model->url,
             ));
             $pagerCssClass .= Yii::app()->settings->getValue('ajaxPager') ? ' ajaxPager ' : '';
             return Yii::app()->controller->widget('CLinkPager', array(
@@ -167,11 +167,11 @@ class Content extends I18nActiveRecord
     public function getUnitUrl($absolute=false, $params=array())
     {
         $page = $this->getUnitPageArray();
-        $params = array_merge(array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
+        $params = array_merge(array('pageId'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
         if ($absolute)
-            return Yii::app()->controller->createAbsoluteUrl('page/view', $params);
+            return Yii::app()->controller->createAbsoluteUrl('view/index', $params);
         else
-            return Yii::app()->controller->createUrl('page/view', $params);
+            return Yii::app()->controller->createUrl('view/index', $params);
     }
 
     public function prepare($params)
@@ -180,12 +180,15 @@ class Content extends I18nActiveRecord
         $params['unit'] = $this->unit;
         $params['content'] = $this;
         $params['isGuest'] = Yii::app()->user->isGuest;
+        $params['language'] = Yii::app()->language;
+        $get = $_GET;
+        unset($get['alias'],$get['pageId'],$get['url'],$get['language']);
+        $params['getParams'] = http_build_query($get);
         if (!$params['isGuest']) {
             $params['user'] = User::model()->findByPk(Yii::app()->user->id);
         }
-        if(isset($_GET['id']))
-            $params['page'] = Yii::app()->controller->loadModel();
-        $params['editMode'] = Yii::app()->user->checkAccess('updatePage', array('page'=>$params['page']));
+        $params['page'] = Yii::app()->page->model;
+        $params['editMode'] = Yii::app()->user->checkAccess('updateContentPage', array('page'=>$params['page']));
         $params['settings']['global'] = Yii::app()->settings->model->getAttributes();
         $len = strlen($params['className']);
         foreach ($params['settings']['global'] as $k => $v) {
@@ -202,29 +205,29 @@ class Content extends I18nActiveRecord
         $params = $this->prepare($params);
 
         $output = '';
-        if ($params['editMode'] && method_exists($this, 'form') && $arr = $this->form()) {
+/*        if ($params['editMode'] && method_exists($this, 'form') && $arr = $this->form()) {
             if (is_array($arr))
             foreach ($arr['elements'] as $i => $elem) {
                 if (is_array($elem) && $elem['type']=='RecordsGrid') {
                     $output .= Yii::app()->controller->renderPartial('application.components.inputs.views.RecordsGrid', array(
                         'id' => __CLASS__.'_'.get_class($this).'_'.$this->id,
-                        'foreign_attribute' => $elem['foreign_attribute'],
+                        'foreignAttribute' => $elem['foreign_attribute'],
                         'addButtonTitle' => $elem['addButtonTitle'],
-                        'page_id' => $params['page']->id,
-                        'area' => $params['pageunit']->area,
+                        'pageId' => $params['page']->id,
+                        'area' => $params['pageUnit']->area,
                         'type' => Unit::getUnitTypeByClassName($elem['class_name']),
-                        'class_name' => $elem['class_name'],
-                        'section_id' => $this->id,
-                        'section_type' => get_class($this),
-                        'pageunit_id' => $params['pageunit']->id,
-                        'unit_id' => $params['unit']->id,
+                        'className' => $elem['class_name'],
+                        'sectionId' => $this->id,
+                        'sectionType' => get_class($this),
+                        'pageUnitId' => $params['pageUnit']->id,
+                        'unitId' => $params['unit']->id,
                     ), true);
                 }
             }
             if ($output) {
                 $output .= '<hr />';
             }
-        }
+        }*/
 
         $output2 = '';
         if ($params['editMode'])
@@ -337,9 +340,9 @@ class Content extends I18nActiveRecord
     // Обработка ajax-запроса
     public function ajax($vars)
     {
-        $unit = Unit::model()->findByPk($vars['unit_id']);
+        $unit = Unit::model()->findByPk($vars['unitId']);
         $content = $unit->content;
-        if ($content && Yii::app()->user->checkAccess('updatePage', array('page'=>Yii::app()->controller->loadModel()))) {
+        if ($content && Yii::app()->user->checkAccess('updateContentPage', array('page'=>Yii::app()->page->model))) {
             if (isset($vars['Content'])) {
                 $content->attributes=$vars['Content'];
             }

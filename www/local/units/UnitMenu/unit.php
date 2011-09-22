@@ -23,7 +23,7 @@ class UnitMenu extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id, recursive', 'numerical', 'integerOnly'=>true),
 		);
 	}
@@ -68,6 +68,13 @@ class UnitMenu extends Content
             'modify' => 'datetime',
             'recursive' => 'integer unsigned',
             'items' => 'text',
+        );
+    }
+
+    public function cacheVaryBy()
+    {
+        return array(
+            'pageId' => Yii::app()->page->model->id,
         );
     }
 

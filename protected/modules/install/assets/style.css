@@ -1,0 +1,10 @@
+.commands dt {
+    border-top:2px solid lightgray;
+    padding-top:0.5em;
+}
+.commands dd {
+    margin-bottom:1em;
+}
+.commands dd img {
+    vertical-align: middle;
+}

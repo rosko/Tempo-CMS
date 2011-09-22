@@ -28,7 +28,7 @@ class Settings extends CApplicationComponent
     public function operations()
     {
         return array(
-            'updateSettings'=>array(
+            'update'=>array(
                 'label'=>'Manage settings', 
                 'defaultRoles'=>array('administrator'),
             ),
@@ -80,7 +80,7 @@ class Settings extends CApplicationComponent
     {
         $name = $this->getI18nFieldName($name);
         $value = $this->model->{$name};
-            $unser = unserialize($value);
+        $unser = @unserialize($value);
         return $unser===FALSE ? $value : $unser;
         }
     

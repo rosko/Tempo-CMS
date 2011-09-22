@@ -1,6 +1,6 @@
 <h3>Здравствуйте, господин главный администратор</h3>
 
-<p>Только что на вашем сайте {link url="page/view" text=$settings.sitename} зарегистрировался 
+<p>Только что на вашем сайте {link url="view/index" text=$settings.sitename} зарегистрировался
 новый пользователь. Вот его данные:</p>
 
 <table>
@@ -28,4 +28,4 @@
 робот сайта.</p>
 
 <p><small>P.S. Подобные уведомления можно отключить в настройках блока "Форма регистрации" на странице
-{assign var="link" value={link url="page/view?id={$page.id}&alias={$page.alias}&url={$page.url}"}}{link url=$link text=$link}</small></p>
+{assign var="link" value={link url="view/index?pageId={$page.id}&alias={$page.alias}&url={$page.url}"}}{link url=$link text=$link}</small></p>

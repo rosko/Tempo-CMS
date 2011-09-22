@@ -23,7 +23,7 @@ class UnitSitemap extends Content
 	public function rules()
 	{
 		return array(
-			array('unit_id', 'required'),
+            array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id, length, recursive, page, per_page', 'numerical', 'integerOnly'=>true),
             array('show_title', 'boolean'),
 		);
@@ -99,7 +99,7 @@ class UnitSitemap extends Content
     public function cacheVaryBy()
     {
         return array(
-            'page_id' => Yii::app()->controller->loadModel()->id,
+            'pageId' => Yii::app()->page->model->id,
         );
     }
 

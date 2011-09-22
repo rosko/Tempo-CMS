@@ -342,14 +342,14 @@ EOD
 ,
         'move_node.jstree' => <<<EOD
 js:function(e, data) {
-    var id = $(data.rslt.o).children('a:eq(0)').attr('rel');
-    var parent_id = $(data.rslt.o).parents('li:eq(0)').children('a:eq(0)').attr('rel');
+    var pageId = $(data.rslt.o).children('a:eq(0)').attr('rel');
+    var parentId = $(data.rslt.o).parents('li:eq(0)').children('a:eq(0)').attr('rel');
     var siblings = [];
     $(data.rslt.o).parent().children().each(function () {
         siblings.push($(this).children('a:eq(0)').attr('rel'));
     });
-//    var url = '/?r=page/pagesSort&id='+id+'&language='+$.data(document.body, 'language');
-//    var params = 'parent_id='+parent_id+'&'+decodeURIComponent($.param({'order': siblings}));
+//    var url = '/?r=page/sort&pageId='+pageId+'&language='+$.data(document.body, 'language');
+//    var params = 'parentId='+parentId+'&'+decodeURIComponent($.param({'order': siblings}));
 //    ajaxSave(url, params, 'POST');
 }
 EOD

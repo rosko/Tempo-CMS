@@ -6,30 +6,32 @@ class Area extends CWidget
     
     public function run()
     {
-        $editArea = Yii::app()->user->checkAccess('updatePage', array('page'=>$this->controller->loadModel())) && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
-        if (get_class($this->controller) == 'PageController' && $this->controller->loadModel()) {
-            $pageunits = $this->controller->loadModel()->getUnits($this->name);
-        } else $pageunits = array();
+        $page = Yii::app()->page->model;
+        $editArea = Yii::app()->user->checkAccess('updateContentPage', array('page'=>$page)) && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
+        if ($page) {
+            $pageUnits = $page->getUnits($this->name);
+        } else $pageUnits = array();
 
         $output = '';
 
-        foreach ($pageunits as $i => $pageunit) {
+        foreach ($pageUnits as $i => $pageUnit) {
 
-            $className = Unit::getClassNameByUnitType($pageunit->unit->type);
+            $className = Unit::getClassNameByUnitType($pageUnit->unit->type);
 
             $cacheVaryBy = array(
                 'className'=>'Unit',
-                'id'=>$pageunit->unit->id,
+                'pageUnitId'=>$pageUnit->id,
+                'id'=>$pageUnit->unit->id,
                 'language'=>Yii::app()->language,
                 'editMode'=>$editArea,
-                'modify'=>$pageunit->unit->modify,
+                'modify'=>$pageUnit->unit->modify,
             );
             $properties = array(
                 'duration' => Yii::app()->settings->getValue('cacheTime'),
             );
             if (constant($className.'::CACHE')) {
                 if (method_exists($className, 'cacheDependencies')) {
-                    $content = $pageunit->unit->content;
+                    $content = $pageUnit->unit->content;
                     $tmp = $content->cacheDependencies();
                     if (!empty($tmp) && is_array($tmp)) {
                         if (count($tmp)==1) {
@@ -64,8 +66,8 @@ class Area extends CWidget
                 }
             }
 
-            $output .= $this->render('pageunit', array(
-                'pageunit'=>$pageunit,
+            $output .= $this->render('pageUnit', array(
+                'pageUnit'=>$pageUnit,
                 'className'=>$className,
                 'editArea'=>$editArea,
                 'cacheVaryBy'=>$cacheVaryBy,

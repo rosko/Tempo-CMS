@@ -7,7 +7,7 @@ class RecordsController extends Controller
 	public function filters()
 	{
 		return array(
-			'accessControl', // perform access control for CRUD operations
+//			'accessControl', // perform access control for CRUD operations
 		);
 	}
 
@@ -17,7 +17,7 @@ class RecordsController extends Controller
 			array('allow',
 				'actions'=>array('create', 'view', 'delete', 'getUrl'
                 ),
-                'expression'=>'Yii::app()->user->checkAccess("updateUser")',
+				'users'=>array('*'),
 			),
 			array('deny',
 				'users'=>array('*'),
@@ -41,9 +41,9 @@ class RecordsController extends Controller
 			} else {
 				$model = new $className;
 			}
-            if ($_REQUEST['foreign_attribute'] && $_REQUEST['section_id'] && $model->hasAttribute($_REQUEST['foreign_attribute']))
+            if ($_REQUEST['foreign_attribute'] && $_REQUEST['sectionId'] && $model->hasAttribute($_REQUEST['foreign_attribute']))
             {
-                $model->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['section_id']);
+                $model->{$_REQUEST['foreign_attribute']} = intval($_REQUEST['sectionId']);
             }
             $model->save(false);
             echo CJavaScript::jsonEncode(array(
@@ -70,8 +70,8 @@ class RecordsController extends Controller
 
     public function actionGetUrl()
     {
-        if ($_REQUEST['id'] && $_REQUEST['class_name']) {
-            $unit_class = $_REQUEST['class_name'];
+        if ($_REQUEST['id'] && $_REQUEST['className']) {
+            $unit_class = $_REQUEST['className'];
             $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
             if ($content->unit_id) {
                 $unit = $content->unit;

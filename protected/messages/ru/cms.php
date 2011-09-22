@@ -48,8 +48,8 @@ return array(
     'Tab loading error' => 'Ошибка при загрузке закладки.',
     'This page has redirection to' => 'На странице настроена переадресация на',
     'Page properties' => 'Свойства страницы',
-    'Save & Go' => 'Сохранить и перейти',
-    'Save & Go to the new page' => 'Сохранить и перейти к созданной странице',
+    'Save and Go' => 'Сохранить и перейти',
+    'Save and Go to the new page' => 'Сохранить и перейти к созданной странице',
     'Page has been created successfully' => 'Страница успешно создана',
     'Save' => 'Сохранить',
     'Save and reload the page' => 'Сохранить и обновить страницу',
@@ -215,6 +215,7 @@ return array(
     'Show options' =>'Показать опции',
     'Hide options' =>'Скрыть опции',
     'Delete this field' => 'Удалить это поле',
+    'Delete this item' => 'Удалить этот пункт',
     'Hint'=>'Подсказка',
     'Add field'=>'Добавить поле',
 
@@ -306,5 +307,16 @@ return array(
     'Performance' => 'Производительность',
     'Transliterate page slug' => 'Транслитерация адреса страницы',
     'Lowercase page slug' => 'Адрес страницы в нижнем регистре',
+    'Pages' => 'Страницы',
+    'Information'=>'Информация',
+    'Bookmarks'=>'Закладки',
+    'System'=>'Система',
+    'Edit mode' => 'Режим редактирования',
+
+    'Anybody'=>'Кто-либо',
+    'Authenticated user'=>'Зарегистрированный пользователь',
+    'Administrator'=>'Администратор',
+    'Editor'=>'Редактор',
+    'Guest'=>'Гость (незарегистрированный пользователь)',
 );
 

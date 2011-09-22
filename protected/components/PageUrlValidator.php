@@ -7,11 +7,12 @@ class PageUrlValidator extends CUniqueValidator
     public function restrictedUrls()
     {
         return array(
-            '/page/unitView',
-            '/page/unitForm',
             '/site/captcha',
             '/site/login',
             '/site/logout',
+            '/unit/edit',
+            '/view/unit',
+            '/view/page',
             '/login',
             '/users',
         );

@@ -19,8 +19,11 @@ class Unit extends I18nActiveRecord
             'type' => 'char(64)',
             'title' => 'string',
             'template' => 'char(32)',
-            'create' => 'datetime',
-            'modify' => 'datetime',
+            'author_id'=>'integer unsigned',
+            'editor_id'=>'integer unsigned',
+            'create'=>'datetime',
+            'modify'=>'datetime',
+            'access'=>'text',
         );
     }
 
@@ -69,9 +72,63 @@ class Unit extends I18nActiveRecord
     public function operations()
     {
         return array(
-            'manageUnit'=>array(
-                'label'=>'Manage settings',
+            'create'=>array(
+                'label'=>'Create unit', // Право создавать блоки
+                'defaultRoles'=>array('author', 'editor', 'administrator'),
+            ),
+            'read'=>array(
+                'label'=>'View unit', // Право просматривать блоки
+                'defaultRoles'=>array('anybody'),
+            ),
+            'update'=>array(
+                'label'=>'Update unit', // Право редактировать блоки
+                'defaultRoles'=>array('editor' , 'administrator'),
+            ),
+            'updateAccess'=>array(
+                'label'=>'Update unit access', // Право редактировать права доступа к блокам
                 'defaultRoles'=>array('administrator'),
+            ),
+            'move'=>array(
+                'label'=>'Move unit', // Право перемещать блоки
+                'defaultRoles'=>array('administrator', 'editor'),
+            ),
+            'delete'=>array(
+                'label'=>'Delete unit', // Право удалять блоки
+                'defaultRoles'=>array('editor', 'administrator'),
+            ),
+            'manage'=>array(
+                'label'=>'Move unit', // Право инсталлировать/деинсталлировать юниты
+                'defaultRoles'=>array('administrator'),
+            ),
+        );
+    }
+
+    public function tasks()
+    {
+        return array(
+            'readOwn'=>array(
+                'label'=>'View own unit',
+                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
+                'children'=>array('readUnit'),
+                'defaultRoles'=>array('author', 'authenticated'),
+            ),
+            'updateOwn'=>array(
+                'label'=>'Edit own unit',
+                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
+                'children'=>array('updateUnit'),
+                'defaultRoles'=>array('author', 'authenticated'),
+            ),
+            'updateAccessOwn'=>array(
+                'label'=>'Edit own unit access',
+                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
+                'children'=>array('updateAccessUnit'),
+                'defaultRoles'=>array('author'),
+            ),
+            'deleteOwn'=>array(
+                'label'=>'Delete own unit',
+                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
+                'children'=>array('deleteUnit'),
+                'defaultRoles'=>array('author'),
             ),
         );
     }
@@ -178,8 +235,8 @@ class Unit extends I18nActiveRecord
      */
     public function getContent()
 	{
-        $tmp_class = Unit::getClassNameByUnitType($this->type);
-		return call_user_func(array($tmp_class, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
+        $tmpClass = Unit::getClassNameByUnitType($this->type);
+		return call_user_func(array($tmpClass, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
     public function getUnitPageArray()
@@ -196,11 +253,11 @@ class Unit extends I18nActiveRecord
     public function getUnitUrl($absolute=false, $params=array())
     {
         $page = $this->getUnitPageArray();
-        $params = array_merge(array('id'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
+        $params = array_merge(array('pageId'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
         if ($absolute)
-            return Yii::app()->controller->createAbsoluteUrl('page/view', $params);
+            return Yii::app()->controller->createAbsoluteUrl('view/index', $params);
         else
-            return Yii::app()->controller->createUrl('page/view', $params);
+            return Yii::app()->controller->createUrl('view/index', $params);
     }
 
     /**
@@ -241,87 +298,88 @@ class Unit extends I18nActiveRecord
     /**
      * Устанавливает юнит на конкретной странице в определенном месте
      * 
-     * @param integer id страницы
+     * @param integer pageId id страницы
      * @param string название области блоков
      * @param integer номер по порядку размещения блоков
      * @return PageUnit
      */
-    public function setOnPage($page_id, $area, $order)
+    public function setOnPage($pageId, $area, $order)
     {
+        $pageId = (int)$pageId;
         // Раздвигаем последующие юниты
         $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
         $command = Yii::app()->db->createCommand($sql);
-        $command->bindValue(':page_id', intval($page_id), PDO::PARAM_INT);
+        $command->bindValue(':page_id', $pageId, PDO::PARAM_INT);
         $command->bindValue(':area', $area, PDO::PARAM_STR);
         $command->bindValue(':order', $order, PDO::PARAM_INT);
         $command->execute();
 
         // Устанавливаем юнит
-        $pageunit = new PageUnit;
-        $pageunit->page_id = intval($page_id);
-        $pageunit->unit_id = $this->id;
-        $pageunit->order = $order+1;
-        $pageunit->area = $area;
-        $pageunit->save();
+        $pageUnit = new PageUnit;
+        $pageUnit->page_id = $pageId;
+        $pageUnit->unit_id = $this->id;
+        $pageUnit->order = $order+1;
+        $pageUnit->area = $area;
+        $pageUnit->save();
 
-        return $pageunit;
+        return $pageUnit;
     }
 
     /**
      * Устанавливает юнит только на конкретных страницах
      * @param array id страниц, где должен быть размещен юнит
-     * @param integer id pageunit'а, на основе которого делается размещение на других страницах
+     * @param integer id pageUnit'а, на основе которого делается размещение на других страницах
      * @return boolean true в случае удачной операции, false - в обратном случае
      */
-    public function setOnPagesOnly($page_ids, $pageunit_id)
+    public function setOnPagesOnly($pageIds, $pageUnitId)
     {
         $transaction=Yii::app()->db->beginTransaction();
 		try
 		{
-            $pageunit = PageUnit::model()->findByPk($pageunit_id);
-            if ($pageunit) {
-                if (empty($page_ids)) {
-                    $page_ids = array($pageunit->page_id);
+            $pageUnit = PageUnit::model()->findByPk($pageUnitId);
+            if ($pageUnit) {
+                if (empty($pageIds)) {
+                    $pageIds = array($pageUnit->page_id);
                 }
 
                 $sql = 'SELECT `page_id` FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id';
                 $command = Yii::app()->db->createCommand($sql);
                 $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-                $cur_page_ids = $command->queryColumn();
+                $curPageIds = $command->queryColumn();
 
-                // Удаляем лишние pageunit`ы
-                $del_page_ids = array_diff($cur_page_ids, $page_ids);
-                if (!empty($del_page_ids)) {
-                    $sql = 'DELETE FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id AND `page_id` IN (' . implode(', ',$del_page_ids) . ')';
+                // Удаляем лишние pageUnit`ы
+                $delPageIds = array_diff($curPageIds, $pageIds);
+                if (!empty($delPageIds)) {
+                    $sql = 'DELETE FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id AND `page_id` IN (' . implode(', ',$delPageIds) . ')';
                     $command = Yii::app()->db->createCommand($sql);
                     $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
                     $command->execute();
 
-                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $del_page_ids).') AND `area` = :area AND `order` > :order';
+                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $delPageIds).') AND `area` = :area AND `order` > :order';
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
-                    $command->bindValue(':order', $pageunit->order, PDO::PARAM_INT);
+                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
+                    $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
                     $command->execute();
                 }
 
-                // Добавляем необходимые pageunit`ы
-                $add_page_ids = array_diff($page_ids, $cur_page_ids);
-                if (!empty($add_page_ids)) {
-                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $add_page_ids).') AND `area` = :area AND `order` >= :order';
+                // Добавляем необходимые pageUnit`ы
+                $addPageIds = array_diff($pageIds, $curPageIds);
+                if (!empty($addPageIds)) {
+                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $addPageIds).') AND `area` = :area AND `order` >= :order';
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
-                    $command->bindValue(':order', $pageunit->order, PDO::PARAM_INT);
+                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
+                    $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
                     $command->execute();
 
                     $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
-                    $sql_arr = array();
-                    foreach ($add_page_ids as $id)
+                    $sqlArr = array();
+                    foreach ($addPageIds as $id)
                     {
-                        $sql_arr[] = '('.intval($id).', '.intval($this->id).', '.intval($pageunit->order).', :area)';
+                        $sqlArr[] = '('.intval($id).', '.intval($this->id).', '.intval($pageUnit->order).', :area)';
                     }
-                    $sql .= implode(',', $sql_arr);
+                    $sql .= implode(',', $sqlArr);
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
+                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
                     $command->execute();
                 }
             }
@@ -341,16 +399,16 @@ class Unit extends I18nActiveRecord
      * @param boolean если true - разместить вверху, иначе - внизу области
      * @param string название области блоков
      */
-    protected function setOnPagesTopOrBottom($page_ids, $on_top, $area)
+    protected function setOnPagesTopOrBottom($pageIds, $onTop, $area)
     {
-        if (!empty($page_ids) && is_array($page_ids)) {
+        if (!empty($pageIds) && is_array($pageIds)) {
             // Если разместить блок вверху
-            if ($on_top) {
+            if ($onTop) {
                 // Оставить блок вверху, а то, что нужно подвинуть вниз
                 $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
                         INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE
-                                        `page_id` IN ('.implode(', ', $page_ids) .')
+                                        `page_id` IN ('.implode(', ', $pageIds) .')
                                         AND `area` = :area
                                         AND `order` = 0
                                         AND `unit_id` != :unit_id
@@ -370,7 +428,7 @@ class Unit extends I18nActiveRecord
                 $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
                         INNER JOIN (SELECT MAX(`order`) as `m`, `page_id` FROM `' . PageUnit::tableName() . '`
                                     WHERE
-                                        `page_id` IN ('.implode(', ', $page_ids) .')
+                                        `page_id` IN ('.implode(', ', $pageIds) .')
                                     AND `area` = :area
                                     AND `unit_id` != :unit_id
                                     GROUP BY `page_id` ) as pu2
@@ -389,17 +447,17 @@ class Unit extends I18nActiveRecord
     /**
      * Обрабатывает перемещение блока
      * @param string название области 
-     * @param array массив идентификаторов pageunit'ов размещенных на странице, где делается перемещение
-     * @param integer идентификатор перемещаемого pageunit'а
+     * @param array массив идентификаторов pageUnit'ов размещенных на странице, где делается перемещение
+     * @param integer идентификатор перемещаемого pageUnit'а
      * @return boolean true в случае удачной операции, false - в обратном случае
      */
-    public function move($area, $pageunit_ids, $pageunit_id)
+    public function move($area, $pageUnitIds, $pageUnitId)
     {
         $transaction=Yii::app()->db->beginTransaction();
 		try
 		{
-            $pageunit = PageUnit::model()->findByPk($pageunit_id);
-            $is_new_area = $pageunit->area != $area;
+            $pageUnit = PageUnit::model()->findByPk($pageUnitId);
+            $isNewArea = $pageUnit->area != $area;
 
             // Переносим блок в нужное место и сбрасываем сортировку
             $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area, `order` = 0
@@ -420,43 +478,43 @@ class Unit extends I18nActiveRecord
                         AND pu.`order` > :order';
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-            $command->bindValue(':area', $pageunit->area, PDO::PARAM_STR);
-            $command->bindValue(':order', $pageunit->order, PDO::PARAM_INT);
+            $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
+            $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
             $command->execute();
 
             // Выделяем списки блоков, которые идут перед и после перемещаемого блока
-            $pageunit_order = -1;
-            foreach ($pageunit_ids as $i=>$id) {
-                $pageunit_ids[$i] = intval($id);
-                if ($pageunit_id == $id) { $pageunit_order = $i; }
+            $pageUnitOrder = -1;
+            foreach ($pageUnitIds as $i=>$id) {
+                $pageUnitIds[$i] = intval($id);
+                if ($pageUnitId == $id) { $pageUnitOrder = $i; }
             }
-            $ids = array_flip($pageunit_ids);
+            $ids = array_flip($pageUnitIds);
             $sql = 'SELECT `unit_id`, `id` FROM `' . PageUnit::tableName() . '`
-                    WHERE `id` IN (' . implode(', ', $pageunit_ids) . ')';
+                    WHERE `id` IN (' . implode(', ', $pageUnitIds) . ')';
             $result = Yii::app()->db->createCommand($sql)->queryAll();
-            $unit_ids = array();
+            $unitIds = array();
             foreach ($result as $row) {
-                $unit_ids[intval($ids[$row['id']])] = $row['unit_id'];
+                $unitIds[intval($ids[$row['id']])] = $row['unit_id'];
             }
-            ksort($unit_ids);
+            ksort($unitIds);
 
-            $pre_ids = array();
-            $post_ids = array();
-            foreach ($unit_ids as $i=>$id) {
-                if ($i < $pageunit_order) {
-                    $pre_ids[] = $id;
-                } elseif ($i > $pageunit_order) {
-                    $post_ids[] = $id;
+            $preIds = array();
+            $postIds = array();
+            foreach ($unitIds as $i=>$id) {
+                if ($i < $pageUnitOrder) {
+                    $preIds[] = $id;
+                } elseif ($i > $pageUnitOrder) {
+                    $postIds[] = $id;
                 }
             }
-            $pre_ids = array_reverse($pre_ids);
-            $co = max(count($pre_ids), count($post_ids));
+            $preIds = array_reverse($preIds);
+            $co = max(count($preIds), count($postIds));
             $_ids = array();
             for ($i = 0; $i < $co; $i++)
             {
-                $_ids[] = array('id' => isset($pre_ids[$i]) ? $pre_ids[$i] : 0,
+                $_ids[] = array('id' => isset($preIds[$i]) ? $preIds[$i] : 0,
                                 'pre' => true);
-                $_ids[] = array('id' => isset($post_ids[$i]) ? $post_ids[$i] : 0,
+                $_ids[] = array('id' => isset($postIds[$i]) ? $postIds[$i] : 0,
                                 'pre' => false);
             }
 
@@ -473,20 +531,20 @@ class Unit extends I18nActiveRecord
             $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
             $result = $command->queryAll();
             $pages = array();
-            $pageunits = array();
+            $pageUnits = array();
             foreach ($result as $row) {
                 $pages[$row['page_id']][] = $row['unit_id'];
-                $pageunits[$row['unit_id']][] = $row['id'];
+                $pageUnits[$row['unit_id']][] = $row['id'];
                 $units[$row['unit_id']][] = $row['page_id'];
             }
 
             // Отделяем страницы, где размещение пройдет просто, а где надо подумать
-            $simple_pages = $pages;
-            foreach ($simple_pages as $id=>$page) {
-                if (count(array_intersect($page, $unit_ids))==0) {
+            $simplePages = $pages;
+            foreach ($simplePages as $id=>$page) {
+                if (count(array_intersect($page, $unitIds))==0) {
                     unset($pages[$id]);
                 } else {
-                    unset($simple_pages[$id]);
+                    unset($simplePages[$id]);
                 }
             }
 
@@ -494,9 +552,9 @@ class Unit extends I18nActiveRecord
             // дополнительно обрабатывать нету нужды.
 
             // Обработка страниц, у которых нету тех блоков, которые есть на текущей
-            if (!empty($simple_pages) && is_array($simple_pages)) {
-                $on_top = count($pre_ids) < count($post_ids);
-                $this->setOnPagesTopOrBottom(array_keys($simple_pages), $on_top, $area);
+            if (!empty($simplePages) && is_array($simplePages)) {
+                $onTop = count($preIds) < count($postIds);
+                $this->setOnPagesTopOrBottom(array_keys($simplePages), $onTop, $area);
             }
 
             // Обработка страниц, которые кроме своих блоков имеют также те блоки, которые
@@ -504,15 +562,15 @@ class Unit extends I18nActiveRecord
             if (!empty($pages) && is_array($pages)) {
                 // Обходим массив с идентификаторами юнитов, которые размещены
                 // вокруг перемещаемого блока
-                $page_ids = array_keys($pages);
+                $pageIds = array_keys($pages);
                 foreach ($_ids as $k=>$r) {
                     $id = $r['id'];
-                    if (empty($page_ids)) {
+                    if (empty($pageIds)) {
                         break;
                     }
 
                     if (isset($units[$id]) && !empty($units[$id]) && is_array($units[$id])) {
-                        $units[$id] = array_intersect($page_ids, $units[$id]);
+                        $units[$id] = array_intersect($pageIds, $units[$id]);
                     }
 
                     // Если юнит размещен на какой-то странице
@@ -553,10 +611,10 @@ class Unit extends I18nActiveRecord
                         $command->execute();
 
                         // Из массива страниц убираем уже обработанные
-                        $page_ids = array_diff($page_ids, $units[$id]);
+                        $pageIds = array_diff($pageIds, $units[$id]);
                     } elseif (($id == 0)&&($k < 2)) {
-                        $this->setOnPagesTopOrBottom($page_ids, $r['pre'], $area);
-                        $page_ids = array();
+                        $this->setOnPagesTopOrBottom($pageIds, $r['pre'], $area);
+                        $pageIds = array();
                     }
                 }
             }

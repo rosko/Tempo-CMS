@@ -213,3 +213,11 @@ input.w200 {
 .cke_dialog_background_cover {
     display:none;
 }
+
+.cms-icon {
+    display:block;
+    float:left;
+}
+.cms-icon-inline {
+    display:inline-block;
+}

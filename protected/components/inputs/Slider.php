@@ -50,14 +50,14 @@ class Slider extends CJuiSliderInput
 
         $js = "jQuery('#{$id}_slider').slider($options);\n";
         
-        $js .= <<<EOD
+        $js .= <<<JS
         
 jQuery('#{$idHidden}').keyup(function () {
     $('#{$id}_slider').slider('option', 'value', $(this).val());
     $('#{$id}_slider').trigger('change');
 });
         
-EOD;
+JS;
         $cs = Yii::app()->getClientScript();
         $cs->registerScript(__CLASS__.'#'.$id, $js);        
     }

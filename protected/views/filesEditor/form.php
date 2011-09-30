@@ -229,7 +229,7 @@ function loadFile(file, writable, button)
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                cmsShowInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
             success: function(html) {
                 cmsHideInfoPanel();
@@ -321,7 +321,7 @@ $('#<?=$id?>_createfile').click(function() {
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                cmsShowInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
             success: function(html) {
                 cmsHideInfoPanel();
@@ -347,7 +347,7 @@ $('#<?=$id?>_delete').click(function() {
             cache: false,
             dataType: 'text',
             beforeSend: function() {
-                cmsShowInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
             success: function(html) {
                 cmsHideInfoPanel();

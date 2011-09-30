@@ -22,17 +22,17 @@ class Form extends CForm
 	{
         $this->title = null;
         $className = get_class($this->getModel(false));
-        $js = <<<EOD
+        $js = <<<HTML
    <script type="text/javascript">
         $(function() {
-EOD;
+HTML;
         if (is_subclass_of($className, 'I18nActiveRecord')) {
             $langs = array_keys(call_user_func(array($className, 'getLangs'), Yii::app()->language));
             if (!empty($langs)) {
                 foreach ($this->_config['elements'] as $k => $v) {
                     if (in_array($k, call_user_func(array($className, 'i18n'))) && is_array($v)) {
                         $txtButton = Yii::t('languages', 'Translations');
-                        $js .= <<<EOD
+                        $js .= <<<JS
     //$('<br />').appendTo('#{$this->uniqueId} .field_{$k}');
     button = $('<span></span>').button({
         text: false,
@@ -49,7 +49,7 @@ EOD;
         $('#{$this->uniqueId}_field_{$k}').slideToggle();
     });
     
-EOD;
+JS;
                         foreach ($langs as $lang) {
                             $this->getElements()->add($lang.'_'.$k, $v);
                             $js .= "$('#{$this->uniqueId} .field_{$lang}_{$k}').appendTo(fieldset);\n";
@@ -58,20 +58,20 @@ EOD;
                 }
             }
         }
-        $js .= <<<EOD
+        $js .= <<<HTML
         });
    </script>
-EOD;
+HTML;
         return parent::render() . $js;
     }
 
     public function renderElements()
     {
         $output='';
-        $js = <<<EOD
+        $js = <<<HTML
     <script type="text/javascript">
 	$(function() {
-EOD;
+HTML;
         $preoutput = '<ul>';
         $t_counter = 0;
         $s_counter = 0;
@@ -122,12 +122,12 @@ EOD;
                         $output .= '</div>';
                     } else {
                         $output .= '<div id="cms-form-'.$this->uniqueId.'-sections-'.$t_counter.'">';
-                        $js .= <<<EOD
+                        $js .= <<<JS
    $('#cms-form-{$this->uniqueId}-sections-{$t_counter}').accordion({
        autoHeight:false,
        collapsible:true
    });
-EOD;
+JS;
                     }
                     $output .= '<h3><a href="#">'.$title.'</a></h3><div>';
                     $s_counter++;
@@ -143,7 +143,7 @@ EOD;
             $preoutput .= '</ul>';
             $output = substr($output,6) . '</div>';
             $txtLoadError = Yii::t('cms', 'Tab loading error');
-            $js .= <<<EOD
+            $js .= <<<JS
 		$("#cms-form-tabs-{$this->uniqueId}").tabs({
 			ajaxOptions: {
 				error: function( xhr, status, index, anchor ) {
@@ -156,16 +156,18 @@ EOD;
                 }
             }
         });
+JS;
+            $js .= <<<DATA
    	});
     </script>
-EOD;
+DATA;
             return '<div id="cms-form-tabs-'.$this->uniqueId.'">' . $preoutput . $output . '</div>' . $js;
         } elseif ($s_counter >0) {
             $output .= '</div>';
-            $js .= <<<EOD
+            $js .= <<<DATA
    	});
     </script>
-EOD;
+DATA;
             return $output . $js;
 
         } else {
@@ -200,7 +202,7 @@ EOD;
                 'validateOnSubmit'=>true,
                 'validateOnChange'=>true,
                 'validateOnType'=>false,
-                'afterValidate'=> 'js:function(f,d,h){ajaxSubmitForm(f,d,h);}'
+                'afterValidate'=> 'js:function(f,d,h){cmsAjaxSubmitForm(f,d,h);}'
             ),
         );
     }

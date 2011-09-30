@@ -111,7 +111,7 @@ class InstallController extends Controller
                     'validateOnSubmit'=>true,
                     'validateOnChange'=>true,
                     'validateOnType'=>false,
-//                    'afterValidate'=> 'js:function(f,d,h){ajaxSubmitForm(f,d,h);}'
+//                    'afterValidate'=> 'js:function(f,d,h){cmsAjaxSubmitForm(f,d,h);}'
                 ),                
             );
             $form = new CForm($form_array, $model);

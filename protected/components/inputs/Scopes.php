@@ -111,7 +111,7 @@ class Scopes extends CInputWidget
             $fields = array_keys($scope);
             $js .= "scopes['{$k}'] = {" . implode(":true, ",$fields) . ":true};\n";
         }
-        $js .= <<<EOD
+        $js .= <<<JS
 
 function generateChain()
 {
@@ -141,8 +141,7 @@ function generateChain()
 $('.{$id}-scope, .{$id}_fieldset input').bind('click focusin focusout keydown change', function() {
     $('#{$id}').val(generateChain());
 });
-EOD
-;
+JS;
 
         $cs=Yii::app()->getClientScript();
         $cs->registerScript('Yii.Inputs.Scopes#'.$id,$js, CClientScript::POS_READY);

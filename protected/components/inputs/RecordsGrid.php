@@ -71,8 +71,8 @@ class RecordsGrid extends CInputWidget
             'ajaxUpdate'=> $id,
             'ajaxVar' =>$id,
             'selectableRows' => 2,
-            'selectionChanged' => <<<EOD
-js:function(id) {
+            'selectionChanged' => 'js:function(id)'.<<<JS
+ {
     var settings = $.fn.yiiGridView.settings[id];
     $('#'+id+' .'+settings.tableClass+' > tbody > tr').each(function(i){
             $(this).find('input[type=checkbox]:eq(0)').attr('checked', $(this).hasClass('selected'));
@@ -81,7 +81,7 @@ js:function(id) {
     //alert(sel);
     return true;
 }
-EOD
+JS
 ,
             'columns'=> array_merge(
                 array(
@@ -95,7 +95,7 @@ EOD
                         'name'=>'title',
                         'type'=>'raw',
                         'header'=>Yii::t('cms', 'Title'),
-                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
+                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".$ddata->unit->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
                     ),
                 ) : array(),
                 $this->columns,
@@ -106,16 +106,16 @@ EOD
                         'buttons'=>array(
                             'view'=>array(
                                 'label'=>Yii::t('cms', 'Go to page'),
-                                'url' => '"javascript:gotoRecordPage({$data->id}, \'".get_class($data)."\')"',
+                                'url' => '"javascript:cmsGotoRecordPage({$data->id}, \'".get_class($data)."\')"',
                                 'visible' => 'isset($data->unit)',
                             ),
                             'update'=>array(
-                                'url' => '"javascript:recordEditForm({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\');"',
+                                'url' => '"javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\');"',
                             ),
                             'del'=>array(
                                 'label'=>Yii::t('cms', 'Delete'),
                                 'imageUrl'=>'/images/delete.png',
-                                'url'=>'"javascript:recordDelete({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\')"',
+                                'url'=>'"javascript:cmsRecordDelete({$data->id}, \'".get_class($data)."\', \'".(isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\')"',
                             ),
                         ),
                     ),

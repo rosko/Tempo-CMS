@@ -269,29 +269,29 @@ $this->widget('ext.jsTree.CjsTree', array(
         ),
     ),
     'events'=>array(
-        'dblclick.jstree'=> <<<EOD
-js:function(e) {
+        'dblclick.jstree'=> 'js:function(e)'.<<<JS
+ {
     $('#{$id}_filetree').jstree('toggle_node', e.target);
     e.stopImmediatePropagation();
     return false;
 }
-EOD
+JS
 ,
-        'select_node.jstree' => <<<EOD
-js:function(e) {
+        'select_node.jstree' => 'js:function(e)'.<<<JS
+ {
     var select = $('#{$id}_filetree').jstree('get_selected');
     if (select.length == 1) {
         select_{$id} = select;
     }
 }
-EOD
+JS
 ,
-        'create_node.jstree' => <<<EOD
-js:function(e, data) {
+        'create_node.jstree' => 'js:function(e, data)'.<<<JS
+ {
     var path = $('#{$id}_filetree').jstree('get_path', data.rslt.obj);
     var url = '/?r=fileManager/create&volume={$volume}&path='+pathToString(path)+'&type='+data.rslt.obj.attr('rel');
     var params = '';
-    ajaxSave(url, params, 'GET', function(html) {
+    cmsAjaxSave(url, params, 'GET', function(html) {
         if (html.toString() != '0') {
             $('#{$id}_filetree').jstree('set_text', data.rslt.obj, html);
             $(data.rslt.obj).attr('rev', html);
@@ -300,17 +300,17 @@ js:function(e, data) {
         }
     });
 }
-EOD
+JS
 ,
-        'delete_node.jstree' => <<<EOD
-js:function(e, data) {
+        'delete_node.jstree' => 'js:function(e, data)'.<<<JS
+ {
     if (confirm("{$strDoYouReally}")) {
         var path = $('#{$id}_filetree').jstree('get_path', data.rslt.parent);
         if (!path) { path = new Array(); }
         path.push($('#{$id}_filetree').jstree('get_text', data.rslt.obj));
         var url = '/?r=fileManager/delete&volume={$volume}&path='+pathToString(path);
         var params = '';
-        ajaxSave(url, params, 'GET', function(html) {
+        cmsAjaxSave(url, params, 'GET', function(html) {
             if (html.toString() == 'error') {
                 $.jstree.rollback(data.rlbk);
             }
@@ -319,10 +319,10 @@ js:function(e, data) {
         $.jstree.rollback(data.rlbk);
     }
 }
-EOD
+JS
 ,
-        'rename_node.jstree' => <<<EOD
-js:function(e, data) {
+        'rename_node.jstree' => 'js:function(e, data)'.<<<JS
+ {
 
         var path = $('#{$id}_filetree').jstree('get_path', data.rslt.obj.parent());
         var newname = $('#{$id}_filetree').jstree('get_text', data.rslt.obj);
@@ -331,17 +331,17 @@ js:function(e, data) {
         path.push(oldname);
         var url = '/?r=fileManager/rename&volume={$volume}&path='+pathToString(path)+'&newName='+newname;
         var params = '';
-        ajaxSave(url, params, 'GET', function(html) {
+        cmsAjaxSave(url, params, 'GET', function(html) {
             if (html.toString() != '0') {
                 $('#{$id}_filetree').jstree('set_text', data.rslt.obj, html);
                 $(data.rslt.obj).attr('rev', html);
             }
         });
 }
-EOD
+JS
 ,
-        'move_node.jstree' => <<<EOD
-js:function(e, data) {
+        'move_node.jstree' => 'js:function(e, data)'.<<<JS
+ {
     var pageId = $(data.rslt.o).children('a:eq(0)').attr('rel');
     var parentId = $(data.rslt.o).parents('li:eq(0)').children('a:eq(0)').attr('rel');
     var siblings = [];
@@ -350,9 +350,9 @@ js:function(e, data) {
     });
 //    var url = '/?r=page/sort&pageId='+pageId+'&language='+$.data(document.body, 'language');
 //    var params = 'parentId='+parentId+'&'+decodeURIComponent($.param({'order': siblings}));
-//    ajaxSave(url, params, 'POST');
+//    cmsAjaxSave(url, params, 'POST');
 }
-EOD
+JS
 ,
     ),
 ));

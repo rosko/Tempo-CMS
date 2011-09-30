@@ -59,7 +59,7 @@ class FileInput extends CInputWidget
         {
             $am=Yii::app()->getAssetManager();
             $fckeditorPath= $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
-            $js .= <<<EOD
+            $js .= <<<JS
 
 $('#{$id}_button').click(function() {
 	var url = '{$fckeditorPath}/editor/plugins/imglib/index.html#returnto={$id}';
@@ -68,7 +68,7 @@ $('#{$id}_button').click(function() {
 $('#{$id}').dblclick(function() {
     $('#{$id}_button').click();
 });
-EOD;
+JS;
         }
 
         if ($this->showUploadButton)
@@ -82,7 +82,7 @@ EOD;
             $txtTypeError = Yii::t('cms', '{file} has wrong type. Allowed only next types: {extensions}.');
             $txtSizeError = Yii::t('cms', '{file} too big, maximum allowed size is {sizeLimit}.');
             $txtEmptyError = Yii::t('cms' , '{file} is empty, please, choose files again except {file}.');
-            $js .= <<<EOD
+            $js .= <<<JS
 var uploader = new qq.FileUploader({
     element: document.getElementById('{$id}_file'),
     action: '{$fileuploaderPath}/server/php.php',
@@ -130,7 +130,7 @@ var uploader = new qq.FileUploader({
         cmsShowInfoPanel(message, 10);
     }
 });    
-EOD;
+JS;
             
         }
 
@@ -138,7 +138,7 @@ EOD;
             if (substr($this->onChange,0,3) == 'js:') {
                 $this->onChange = substr($this->onChange,3);
             }
-            $js .= <<<EOD
+            $js .= <<<JS
 $('#{$id}').change(function() {
     {$this->onChange}
 });
@@ -151,7 +151,7 @@ $('#{$id}').mousemove(function() {
 $('#{$id}').focusout(function() {
     {$this->onChange}
 });
-EOD;
+JS;
         }
 
         $cs->registerScript('Yii.FileInput#'.$id,$js);

@@ -28,17 +28,16 @@ function smarty_function_form($params, &$smarty)
             if ($params['enableAjax'] === 'validate') {
                 $form_array['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
             } else {
-                $form_array['activeForm']['clientOptions']['afterValidate'] = <<<EOD
-js:function(f,d,h){
+                $form_array['activeForm']['clientOptions']['afterValidate'] = 'js:function(f,d,h)'.<<<JS
+{
     if (!h) {
         var params = f.serialize();
-        ajaxSave('/?r=view/unit&pageUnitId={$pageUnit['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
+        cmsAjaxSave('/?r=view/unit&pageUnitId={$pageUnit['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
         //    cmsReloadPageUnit({$pageUnit['id']}, '.pageunit[rev={$unit['id']}]');
         });
     }
 }
-EOD
-;
+JS;
             }
         }
 

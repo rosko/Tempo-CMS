@@ -595,6 +595,15 @@ class Page extends I18nActiveRecord
 			$str=mb_substr($str,0,64,'UTF-8');
 		else
 			$str=substr($str,0,64);
+        if (Yii::app()->settings->getValue('slugTransliterate')) {
+            $str = self::transliterate($str);
+        }
+        if (Yii::app()->settings->getValue('slugLowercase')) {
+            if(function_exists('mb_strtolower'))
+                $str=mb_strtolower($str,'UTF-8');
+            else
+                $str=strtolower($str);
+        }
         return $str;
     }
 

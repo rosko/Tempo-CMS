@@ -17,45 +17,45 @@ if (get_class($form->model)=='Page') {
             $jsA = '';
             $jsB = '';
             if (Yii::app()->settings->getValue('slugTransliterate')) {
-                $jsA .= 'transliterate(';
+                $jsA .= 'cmsTransliterate(';
                 $jsB .= ')';
             }
             if (Yii::app()->settings->getValue('slugLowercase')) {
-                $jsA .= 'strtolower(';
+                $jsA .= 'cmsStrToLower(';
                 $jsB .= ')';
             }
 
-            $js .= <<<EOD
+            $js .= <<<JS
             $('#{$form->uniqueId} .field_url').hide();
             $('#{$form->uniqueId} #Page_title').bind('keyup change',function() {
-                $('#{$form->uniqueId} #Page_alias').val({$jsA}sanitizeAlias($(this).val(){$jsB}));
-                $('#{$form->uniqueId} #Page_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
+                $('#{$form->uniqueId} #Page_alias').val({$jsA}cmsSanitizeAlias($(this).val(){$jsB}));
+                $('#{$form->uniqueId} #Page_url').val(cmsMakeUrl(cmsSanitizeAlias($('#{$form->uniqueId} #Page_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
             });
-EOD;
+JS;
             $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
             foreach ($langs as $lang) {
-                $js .= <<<EOD
+                $js .= <<<JS
                 $('#{$form->uniqueId} #Page_{$lang}_title').bind('keyup change',function() {
-                    $('#{$form->uniqueId} #Page_{$lang}_alias').val({$jsA}sanitizeAlias($(this).val(){$jsB}));
-                    $('#{$form->uniqueId} #Page_{$lang}_url').val(makeUrl(sanitizeAlias($('#{$form->uniqueId} #Page_{$lang}_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
+                    $('#{$form->uniqueId} #Page_{$lang}_alias').val({$jsA}cmsSanitizeAlias($(this).val(){$jsB}));
+                    $('#{$form->uniqueId} #Page_{$lang}_url').val(cmsMakeUrl(cmsSanitizeAlias($('#{$form->uniqueId} #Page_{$lang}_alias').val()), $('#{$form->uniqueId} #Page_url').val()));
                 });
-EOD;
+JS;
             }
         }
-        $js .= <<<EOD
+        $js .= <<<JS
         $('#{$form->uniqueId} #Page_alias').bind('keyup change',function() {
-            $(this).val(sanitizeAlias($(this).val()));
-            $('#{$form->uniqueId} #Page_url').val(makeUrl(sanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_url').val()));
+            $(this).val(cmsSanitizeAlias($(this).val()));
+            $('#{$form->uniqueId} #Page_url').val(cmsMakeUrl(cmsSanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_url').val()));
         });
-EOD;
+JS;
         $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
         foreach ($langs as $lang) {
-            $js .= <<<EOD
+            $js .= <<<JS
             $('#{$form->uniqueId} #Page_{$lang}_alias').bind('keyup change',function() {
-                $(this).val(sanitizeAlias($(this).val()));
-                $('#{$form->uniqueId} #Page_{$lang}_url').val(makeUrl(sanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_{$lang}_url').val()));
+                $(this).val(cmsSanitizeAlias($(this).val()));
+                $('#{$form->uniqueId} #Page_{$lang}_url').val(cmsMakeUrl(cmsSanitizeAlias($(this).val()), $('#{$form->uniqueId} #Page_{$lang}_url').val()));
             });
-EOD;
+JS;
         }
     }
     $cs->registerScript('page_js', $js, CClientScript::POS_READY);
@@ -65,7 +65,7 @@ $js = '';
 
 if (Yii::app()->settings->getValue('showUnitAppearance') && $form['unit']->model) {
     $txtAppearance = Yii::t('cms', 'Appearance');
-    $js .= <<<EOD
+    $js .= <<<JS
 
     if ($('#{$form->uniqueId} .field_template').length) {
         $('#{$form->uniqueId} ul.ui-tabs-nav a').each(function() {
@@ -75,18 +75,18 @@ if (Yii::app()->settings->getValue('showUnitAppearance') && $form['unit']->model
         });
     }
 
-EOD;
+JS;
 
 }
 
-$js .= <<<EOD
+$js .= <<<JS
     if (!$('#{$form->uniqueId} .ui-tabs-panel').length) {
         if ($('#{$form->uniqueId}').height() > $(window).height()*0.65) {
             $('#{$form->uniqueId}').height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
         }
     }
 
-EOD;
+JS;
 
 if ($js)
     $cs->registerScript('form', $js, CClientScript::POS_READY);

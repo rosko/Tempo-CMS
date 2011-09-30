@@ -75,11 +75,11 @@ class SiteController extends Controller
         if (isset($_GET['unittype'])) {
             $className = Unit::getClassNameByUnitType($_GET['unittype']);
             Unit::loadTypes();
-            if (!FeedHelper::isFeedPresent($className, !isset($_GET['pageId'])))
+            if (!FeedHelper::isFeedPresent($className, !isset($_GET['id'])))
                 throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
 
             // Фид определенного раздела
-            if (isset($_GET['pageId']) && ($content = call_user_func(array($className, 'model'))->findByPk(intval($_GET['pageId']))))
+            if (isset($_GET['id']) && ($content = call_user_func(array($className, 'model'))->findByPk(intval($_GET['id']))))
             {
                 FeedHelper::renderFeed($type, $content);
             // Фид всех записей этого типа

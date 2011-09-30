@@ -1,18 +1,16 @@
 // =============================================================
 
 // Картинка изображающая процесс загрузки
-var cms_html_loading_image = '<img src="/images/ajax-loader.gif" />';
-var cms_infopanel_time_timer = false;
-var cms_save_timer = false;
-var cms_saveprocess_timer = null;
-// Лимит количества попыток сохранения
-    var cms_save_tries_limit = 10;
+var cmsHtmlLoadingImage = '<img src="/images/ajax-loader.gif" />';
+var cmsInfoPanelTimeTimer = false;
+var cmsSaveTimer = false;
+var cmsSaveProcessTimer = null;
 // Минимальный интервал между повторными попытками сохранения
-var cms_save_repeattime = 5;
-var cms_save_max_repeattime = 1800;
-var cms_current_command = null;
+var cmsSaveRepeatTime = 5;
+var cmsSaveMaxRepeatTime = 1800;
+var cmsCurrentCommand = null;
 
-var cms_save_commands = new Array();
+var cmsSaveCommands = new Array();
 
 function CmsCommand(url, data, method, success, silent)
 {
@@ -23,96 +21,96 @@ function CmsCommand(url, data, method, success, silent)
     this.silent = silent;
 }
 
-function ajaxSaveArea(area, name, pageId, add_params)
+function cmsAjaxSaveArea(area, name, pageId, add_params)
 {
     var url = '/?r=unit/move&pageId='+pageId+'&area='+name+'&'+add_params;
     var params = $(area).sortable('serialize', {
         'key':'pageUnits[]'
     });
-    ajaxSave(url, params);
+    cmsAjaxSave(url, params);
 }
 
-function ajaxSave(url, data, method, success, silent)
+function cmsAjaxSave(url, data, method, success, silent)
 {
-    cms_save_commands.push(new CmsCommand(url, data, method, success, silent));
-    ajaxSaveProcess();
+    cmsSaveCommands.push(new CmsCommand(url, data, method, success, silent));
+    cmsAjaxSaveProcess();
 }
 
-function ajaxSaveProcess()
+function cmsAjaxSaveProcess()
 {
-    if (!cms_current_command && !cms_save_timer) {
-        cms_current_command = cms_save_commands.shift();
-        if (!cms_current_command.tries) cms_current_command.tries = 0;
-        cms_current_command.tries++;
-        if (!cms_current_command.method) {
-            cms_current_command.method = 'POST';
+    if (!cmsCurrentCommand && !cmsSaveTimer) {
+        cmsCurrentCommand = cmsSaveCommands.shift();
+        if (!cmsCurrentCommand.tries) cmsCurrentCommand.tries = 0;
+        cmsCurrentCommand.tries++;
+        if (!cmsCurrentCommand.method) {
+            cmsCurrentCommand.method = 'POST';
         }
-        if (cms_current_command.method.toUpperCase()== 'POST') {
-            cms_current_command.data += '&'+$.data(document.body, 'csrfTokenName')+'='+$.data(document.body, 'csrfToken');
+        if (cmsCurrentCommand.method.toUpperCase()== 'POST') {
+            cmsCurrentCommand.data += '&'+$.data(document.body, 'csrfTokenName')+'='+$.data(document.body, 'csrfToken');
         }
         $.ajax({
-            url: cms_current_command.url,
-            data: cms_current_command.data,
+            url: cmsCurrentCommand.url,
+            data: cmsCurrentCommand.data,
             cache: false,
-            type: cms_current_command.method,
+            type: cmsCurrentCommand.method,
             beforeSend: function() {
-                if (!cms_current_command.silent)
-                    cmsShowInfoPanel(cms_html_loading_image, 0);
+                if (!cmsCurrentCommand.silent)
+                    cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
             success: function(ret) {
-                if (!cms_current_command.silent)
+                if (!cmsCurrentCommand.silent)
                     cmsHideInfoPanel();
                 if (ret != 0) {
-                    if ($.isFunction(cms_current_command.success)) {
-                        cms_current_command.success(ret);
+                    if ($.isFunction(cmsCurrentCommand.success)) {
+                        cmsCurrentCommand.success(ret);
                     }
-                    ajaxSaveDone();
-                    cms_current_command = null;
-                    if (cms_save_commands.length > 0) {
-                        ajaxSaveProcess();
+                    cmsAjaxSaveDone();
+                    cmsCurrentCommand = null;
+                    if (cmsSaveCommands.length > 0) {
+                        cmsAjaxSaveProcess();
                     }
                 } else {
-                    ajaxSaveRepeat(cms_current_command.tries*cms_save_repeattime);
+                    cmsAjaxSaveRepeat(cmsCurrentCommand.tries*cmsSaveRepeatTime);
                 }
             },
             error: function() {
-                ajaxSaveRepeat(cms_current_command.tries*cms_save_repeattime);
+                cmsAjaxSaveRepeat(cmsCurrentCommand.tries*cmsSaveRepeatTime);
             }
         });
     }
 }
 
-function ajaxSaveDone()
+function cmsAjaxSaveDone()
 {
-    if ((!cms_current_command) ||
-        (cms_current_command && !cms_current_command.silent) )
-        cmsShowInfoPanel(i18n.cms.saved);
+    if ((!cmsCurrentCommand) ||
+        (cmsCurrentCommand && !cmsCurrentCommand.silent) )
+        cmsShowInfoPanel(cmsI18n.cms.saved);
 
 }
 
-function ajaxSaveRepeat(timeout)
+function cmsAjaxSaveRepeat(timeout)
 {
     if (timeout == null) {
-        timeout = cms_save_repeattime;
+        timeout = cmsSaveRepeatTime;
     }
-    if (timeout > cms_save_max_repeattime) {
-        timeout = cms_save_max_repeattime;
+    if (timeout > cmsSaveMaxRepeatTime) {
+        timeout = cmsSaveMaxRepeatTime;
     }
-    cms_save_commands.unshift(cms_current_command);
-    cms_current_command = null;
+    cmsSaveCommands.unshift(cmsCurrentCommand);
+    cmsCurrentCommand = null;
 
     cmsHideInfoPanel();
-    cmsShowInfoPanel(i18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+i18n.cms.retryNow+'</a>', timeout-1, true);
+    cmsShowInfoPanel(cmsI18n.cms.savingError + ' <span id="cms-info-timer"></span>. <a href="#" id="cms-info-button-repeat">'+cmsI18n.cms.retryNow+'</a>', timeout-1, true);
     $('#cms-info-button-repeat').unbind('click').bind('click',function() {
         cmsHideInfoPanel();
-        cms_save_timer = false;
-        clearTimeout(cms_saveprocess_timer);
-        ajaxSaveProcess();
+        cmsSaveTimer = false;
+        clearTimeout(cmsSaveProcessTimer);
+        cmsAjaxSaveProcess();
     });
-    clearTimeout(cms_infopanel_time_timer);
+    clearTimeout(cmsInfoPanelTimeTimer);
     cmsShowInfoPanelTimer(timeout);
-    cms_save_timer = true;
-    cms_saveprocess_timer = setTimeout("cms_save_timer=false;ajaxSaveProcess()", timeout*1000);
+    cmsSaveTimer = true;
+    cmsSaveProcessTimer = setTimeout("cmsSaveTimer=false;cmsAjaxSaveProcess()", timeout*1000);
 }
 
 function cmsShowInfoPanelTimer(timeout)
@@ -128,25 +126,25 @@ function cmsShowInfoPanelTimer(timeout)
     }
     $('#cms-info-timer').html(minutes+':'+seconds);
     if (timeout > 1) {
-        cms_infopanel_time_timer = setTimeout("cmsShowInfoPanelTimer("+(timeout-1)+")", 1000);
+        cmsInfoPanelTimeTimer = setTimeout("cmsShowInfoPanelTimer("+(timeout-1)+")", 1000);
     }
 }
 
-function getRealBgColor(elem)
+function cmsGetRealBgColor(elem)
 {
     if (elem.css('backgroundColor') != 'transparent') {
         return elem.css('backgroundColor');
     } else {
-        return getRealBgColor(elem.parent());
+        return cmsGetRealBgColor(elem.parent());
     }
 }
 
-function fadeIn(selector, className)
+function cmsFadeIn(selector, className)
 {
     $(selector).removeClass('hover').addClass(className);
 }
 
-function fadeOut(selector, className)
+function cmsFadeOut(selector, className)
 {
     var elems = $(selector);
     elems.removeClass('hover');
@@ -156,7 +154,7 @@ function fadeOut(selector, className)
         color2 = $(this).css('backgroundColor');
         color3 = color2;
         if (color2 == 'transparent') {
-            color3 = getRealBgColor($(this));
+            color3 = cmsGetRealBgColor($(this));
         }
         $(this).css('backgroundColor', color1).animate({backgroundColor: color3}, {
             duration: 1000,
@@ -171,7 +169,7 @@ function fadeOut(selector, className)
 
 // Вспомогательные мелкие функции
 
-function clearSelection()
+function cmsClearSelection()
 {
     if (window.getSelection) {        // Firefox, Opera, Safari
         var selection = window.getSelection ();
@@ -185,27 +183,27 @@ function clearSelection()
     }
 }
 
-function trim(string)
+function cmsTrim(string)
 {
     return string.replace(/(^\s+)|(\s+$)/g, "");
 }
 
-function getAreaNameByPageUnit(pageUnit)
+function cmsGetAreaNameByPageUnit(pageUnit)
 {
     return $(pageUnit).parents('.cms-area').eq(0).attr('id').replace('cms-area-', '');
 }
 
-function getAreaByPageUnit(pageUnit)
+function cmsGetAreaByPageUnit(pageUnit)
 {
     return $(pageUnit).parents('.cms-area').eq(0);
 }
 
-function getAreaName(area)
+function cmsGetAreaName(area)
 {
     return $(area).attr('id').replace('cms-area-', '');
 }
 
-function sanitizeAlias(str)
+function cmsSanitizeAlias(str)
 {
     str = str.replace(/[\s\:\.]/gi, '-')
     while (str.indexOf('--')>-1) {
@@ -214,7 +212,7 @@ function sanitizeAlias(str)
     return str.replace(/[^0-9A-Za-zА-Яа-я-]*/gi, '');
 }
 
-function makeUrl(alias, oldurl)
+function cmsMakeUrl(alias, oldurl)
 {
     var p = oldurl.split('/');
     p[p.length-1] = alias;
@@ -222,14 +220,14 @@ function makeUrl(alias, oldurl)
 }
 
 
-function ajaxSubmitForm(form, data, hasError, events)
+function cmsAjaxSubmitForm(form, data, hasError, events)
 {
     var btn_name = form.attr('rev');
     if (!hasError) {
         // Сохранить юнит
         if (!btn_name) { btn_name = 'save'; }
         var params = form.serialize() + '&' + btn_name +'=1';
-        ajaxSave(form.attr('action'), params, form.attr('method'), function(html) {
+        cmsAjaxSave(form.attr('action'), params, form.attr('method'), function(html) {
             // Обновить на странице
             if (events != undefined && $.isFunction(events.onSuccess)) {
                 events.onSuccess(html);
@@ -298,9 +296,9 @@ function cmsAreaEmptyCheck()
         if ($(this).find('.cms-pageunit').length > 0) {
             $(this).find('.cms-empty-area-buttons').remove();
         } else {
-            var btn = $('<a class="cms-button w100p" title="'+i18n.cms.addAnotherUnit+'" href="#">'+i18n.cms.addUnit+'</a>')
+            var btn = $('<a class="cms-button w100p" title="'+cmsI18n.cms.addAnotherUnit+'" href="#">'+cmsI18n.cms.addUnit+'</a>')
                 .click(function() {
-                    pageUnitAddForm(this);
+                    cmsPageUnitAddForm(this);
                     return false;
                 });
             $(this).html('').append($('<div class="cms-empty-area-buttons"></div>').append(btn));
@@ -308,7 +306,7 @@ function cmsAreaEmptyCheck()
     });
 }
 
-function pageUnitAddForm(t)
+function cmsPageUnitAddForm(t)
 {
     var pageUnit = $(t).parents('.cms-pageunit');
     if (pageUnit.length) {
@@ -327,11 +325,11 @@ function pageUnitAddForm(t)
 // =============================================================
 
 
-function pageUnitEditForm(t)
+function cmsPageUnitEditForm(t)
 {
     var pageUnit = $(t);
     if (pageUnit.hasClass('selected')) {return;}
-    fadeIn(pageUnit, 'selected');
+    cmsFadeIn(pageUnit, 'selected');
     pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
     unitType = pageUnit.attr('rel');
     cmsLoadDialog('/?r=unit/edit&type='+unitType+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
@@ -344,7 +342,7 @@ function pageUnitEditForm(t)
     });
 }
 
-function pageUnitDeleteDialog(unitId, pageUnitId, pageId)
+function cmsPageUnitDeleteDialog(unitId, pageUnitId, pageId)
 {
     $.ajax({
         url: '/?r=unit/getPageUnitsByUnitId&pageId='+pageId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'),
@@ -354,7 +352,7 @@ function pageUnitDeleteDialog(unitId, pageUnitId, pageId)
         type: 'GET',
         cache: false,
         beforeSend: function() {
-            cmsShowInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
         },
         success: function(html) {
             cmsHideInfoPanel();
@@ -364,14 +362,14 @@ function pageUnitDeleteDialog(unitId, pageUnitId, pageId)
                 cmsLoadDialog('/?r=unit/deleteDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'));
             }
             else {
-                if (confirm(i18n.cms.deleteUnitWarning))
+                if (confirm(cmsI18n.cms.deleteUnitWarning))
                 {
-                    ajaxSave('/?r=unit/delete&pageId='+pageId+'&pageUnitId[]='+pageUnitId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+                    cmsAjaxSave('/?r=unit/delete&pageId='+pageId+'&pageUnitId[]='+pageUnitId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
                         $('#cms-pageunit-'+pageUnitId).remove();
                         cmsAreaEmptyCheck();
                     });
                 } else {
-                    fadeOut('.selected', 'selected');
+                    cmsFadeOut('.selected', 'selected');
                 }
             }
         }
@@ -379,7 +377,7 @@ function pageUnitDeleteDialog(unitId, pageUnitId, pageId)
 
 }
 
-function pageUnitSetDialog(pageId, pageUnitId, unitId)
+function cmsPageUnitSetDialog(pageId, pageUnitId, unitId)
 {
     cmsLoadDialog('/?r=unit/setDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
         onLoad: function() {
@@ -391,7 +389,7 @@ function pageUnitSetDialog(pageId, pageUnitId, unitId)
 // =============================================================
 
 
-function pageAddForm()
+function cmsPageAddForm()
 {
     cmsLoadDialog('/?r=page/add&pageId='+$('body').attr('rel')+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
@@ -404,7 +402,7 @@ function pageAddForm()
 }
 
 
-function pageEditForm()
+function cmsPageEditForm()
 {
     var pageId = $('body').attr('rel');
     cmsLoadDialog('/?r=page/edit&pageId='+pageId+'&language='+$.data(document.body, 'language'), {
@@ -416,8 +414,8 @@ function pageEditForm()
             $(html).find('button').each(function() {
                 if ($(this).text() == v) {
                     $(this).unbind('click').bind('click', function() {
-                        pageDeleteDialog(null, function() {
-                            ajaxSave($('#'+formId).attr('action'), $('#'+formId).serialize()+'&delete=1', 'POST', function(html) {
+                        cmsPageDeleteDialog(null, function() {
+                            cmsAjaxSave($('#'+formId).attr('action'), $('#'+formId).serialize()+'&delete=1', 'POST', function(html) {
                                 if (html.substring(0,2) == '{"') {
                                     var ret = jQuery.parseJSON(html);
                                     if (ret) {
@@ -444,7 +442,7 @@ function pageEditForm()
     });
 }
 
-function pageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
+function cmsPageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
 {
     if (!pageId) {
         pageId = $('body').attr('rel');
@@ -456,12 +454,12 @@ function pageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
         onChildrenDelete: onChildrenDelete,
         onCancel: onCancel,
         beforeSend: function() {
-            cmsShowInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
         },
         success: function(html) {
             cmsHideInfoPanel();
             if (html == '0') {
-                if (confirm(i18n.cms.deletePageWarning))
+                if (confirm(cmsI18n.cms.deletePageWarning))
                 {
                     // В функции должно быть ручное удаление страницы
                     if ($.isFunction(onOneDelete)) {
@@ -494,14 +492,14 @@ function pageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
 // =============================================================
 
 
-function recordEditForm(id, className, unitId, gridId)
+function cmsRecordEditForm(id, className, unitId, gridId)
 {
-    var dlgId = 'recordEditForm'+className+'_'+id;
+    var dlgId = 'cmsRecordEditForm'+className+'_'+id;
     cmsLoadDialog('/?r=unit/edit&className='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         id: dlgId,
-        className: 'recordEditForm-'+className,
-        title: i18n.cms.editing,
+        className: 'cmsRecordEditForm-'+className,
+        title: cmsI18n.cms.editing,
         onOpen: function() {
             $('#'+dlgId).find('form').data('grid_id', gridId);
             $('#'+dlgId).find('label[for="Unit_title"]:eq(0)').next().focus();
@@ -509,7 +507,7 @@ function recordEditForm(id, className, unitId, gridId)
     });
 }
 
-function recordDelete(id, className, unitId, gridId)
+function cmsRecordDelete(id, className, unitId, gridId)
 {
     if (unitId > 0) {
         // Удаляем юнит
@@ -520,7 +518,7 @@ function recordDelete(id, className, unitId, gridId)
             className: className,
             unitId: unitId,
             beforeSend: function() {
-                cmsShowInfoPanel(cms_html_loading_image, 0);
+                cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
             success: function(html) {
                 cmsHideInfoPanel();
@@ -528,22 +526,22 @@ function recordDelete(id, className, unitId, gridId)
                     var ret = jQuery.parseJSON(html);
                     if (ret.page) {
                         if (ret.page.similarToParent) {
-                            recordDeleteConfirm(unitId, gridId, '&withPage=1');
+                            cmsRecordDeleteConfirm(unitId, gridId, '&withPage=1');
                         } else {
                             var buttons = {};
-                            buttons[i18n.cms.deleteUnitOnly] = function() {
-                                recordDeleteConfirm(unitId, gridId);
+                            buttons[cmsI18n.cms.deleteUnitOnly] = function() {
+                                cmsRecordDeleteConfirm(unitId, gridId);
                                 $(this).dialog('close');
                             };
-                            buttons[i18n.cms.deleteUnitAndPage] = function() {
-                                recordDeleteConfirm(unitId, gridId, '&withPage=1');
+                            buttons[cmsI18n.cms.deleteUnitAndPage] = function() {
+                                cmsRecordDeleteConfirm(unitId, gridId, '&withPage=1');
                                 $(this).dialog('close');
                             };
                             var dlgId = 'UnitDeleteConform_'+unitId;
                             var dlg = $('#cms-dialog').clone().attr('id', dlgId).addClass('cms-dialog').appendTo('body');
-                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(i18n.cms.deleteUnitRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
+                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(cmsI18n.cms.deleteUnitRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
                             dlg.dialog({
-                                title: i18n.cms.deletingUnit,
+                                title: cmsI18n.cms.deletingUnit,
                                 modal: true,
                                 zIndex: 10000,
                                 buttons: buttons,
@@ -553,35 +551,35 @@ function recordDelete(id, className, unitId, gridId)
                             });
                         }
                     } else {
-                        recordDeleteConfirm(unitId, gridId);
+                        cmsRecordDeleteConfirm(unitId, gridId);
                     }
                 } else {
-                    recordDeleteConfirm(unitId, gridId);
+                    cmsRecordDeleteConfirm(unitId, gridId);
                 }
             }
         });
     } else {
         // Удаляем просто запись
-        if (confirm(i18n.cms.deleteRecordWarning))
+        if (confirm(cmsI18n.cms.deleteRecordWarning))
         {
-            ajaxSave('/?r=records/delete&id='+id+'&className='+className+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+            cmsAjaxSave('/?r=records/delete&id='+id+'&className='+className+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
                 $.fn.yiiGridView.update(gridId);
             });
         }
     }
 }
 
-function recordDeleteConfirm(unitId, gridId, data, str)
+function cmsRecordDeleteConfirm(unitId, gridId, data, str)
 {
     if (str == undefined) {
-        var str = i18n.cms.deleteRecordWarning;
+        var str = cmsI18n.cms.deleteRecordWarning;
     }
     if (data == undefined) {
         var data = '';
     }
     if (confirm(str))
     {
-        ajaxSave('/?r=unit/delete&unitId='+unitId+'&pageUnitId=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+        cmsAjaxSave('/?r=unit/delete&unitId='+unitId+'&pageUnitId=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
             if (gridId !== undefined) {
                 $.fn.yiiGridView.update(gridId);
             }
@@ -589,7 +587,7 @@ function recordDeleteConfirm(unitId, gridId, data, str)
     }
 }
 
-function gotoRecordPage(id, className)
+function cmsGotoRecordPage(id, className)
 {
     $.ajax({
         url:'/?r=records/getUrl&className='+className+'&id='+id+'&language='+$.data(document.body, 'language'),
@@ -597,7 +595,7 @@ function gotoRecordPage(id, className)
         id: id,
         className: className,
         beforeSend: function() {
-            cmsShowInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
         },
         success: function(ret) {
             cmsHideInfoPanel();

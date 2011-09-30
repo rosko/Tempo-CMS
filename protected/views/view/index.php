@@ -11,7 +11,7 @@ $csrfToken = Yii::app()->getRequest()->getCsrfToken();
 
 $title = str_replace("'", "\\'", $model->title);
 
-$cs->registerScript('all', <<<EOD
+$cs->registerScript('all', <<<JS
 
         $('body').attr('rel', {$model->id});
         $.data(document.body, 'title', '{$title}');
@@ -21,7 +21,7 @@ $cs->registerScript('all', <<<EOD
 
 //        $('input[name={$csrfTokenName}]').val('{$csrfToken}');
 
-        window.setInterval(function() { processLocationHash(); }, 100);
+        window.setInterval(function() { cmsProcessLocationHash(); }, 100);
 
         $('<div id="cms-statusbar"></div>').prependTo('body');
         $('<div id="cms-notification"></div>').prependTo('body');
@@ -41,7 +41,7 @@ $cs->registerScript('all', <<<EOD
                 });
 
 
-EOD
+JS
 , CClientScript::POS_READY);
 
 $js = '';
@@ -99,7 +99,7 @@ if (Yii::app()->settings->getValue('ajaxPagerScroll')) {
     $addjs = '';
 }
 
-$js = <<<EOD
+$js = <<<JS
 $('.ajaxPager a').live('click', function() {
     var pageUnit = $(this).parents('.pageunit').eq(0);
     if (pageUnit.length) {
@@ -117,7 +117,7 @@ $('.ajaxPager a').live('click', function() {
     }
     return false;
 });
-EOD;
+JS;
 $cs->registerScript('ajaxPager', $js, CClientScript::POS_READY);
 
 if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
@@ -132,7 +132,7 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
     }
 
     if (Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model))) {
-        $cs->registerScript('cms-area', <<<EOD
+        $cs->registerScript('cms-area', <<<JS
 
             // Настройки и обработчики перещения юнитов на странице
             $('.cms-area').sortable({
@@ -144,15 +144,15 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
                 cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
                 update:function(event, ui) {
                     var pageUnitId = $(ui.item).attr('id').replace('cms-pageunit-','');
-                    var areaName = getAreaNameByPageUnit(ui.item);
+                    var areaName = cmsGetAreaNameByPageUnit(ui.item);
                     if (ui.sender) {
                         // Запрос на обновление предыдущей области + перемещенному элементу указывается новое значение в area
     //                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
-    //                    ajaxSaveArea($(ui.sender), areaName, {$model->id}, 'pageUnitId='+pageUnitId+'&old_area='+old_area);
+    //                    cmsAjaxSaveArea($(ui.sender), areaName, {$model->id}, 'pageUnitId='+pageUnitId+'&old_area='+old_area);
 
                     } else {
                         // Запрос на обновление текущей области
-                        ajaxSaveArea(getAreaByPageUnit(ui.item), areaName, {$model->id}, 'pageUnitId='+pageUnitId);
+                        cmsAjaxSaveArea(cmsGetAreaByPageUnit(ui.item), areaName, {$model->id}, 'pageUnitId='+pageUnitId);
                     }
                 },
                 start:function(event, ui) {
@@ -180,8 +180,8 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
             });
 
             $('.cms-pageunit').live('dblclick', function() {
-                clearSelection();
-                pageUnitEditForm(this);
+                cmsClearSelection();
+                cmsPageUnitEditForm(this);
                 return false;
             })
 
@@ -207,19 +207,19 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
                 });
             }
 
-EOD
+JS
     , CClientScript::POS_READY);
 
 
         if (Yii::app()->settings->getValue('autoSave')) {
 
-            $cs->registerScript('autoSave', <<<EOD
+            $cs->registerScript('autoSave', <<<JS
                 setInterval(function() {
                     $('form input[name=apply]:submit').each(function() {
                         $(this).parents('form').attr('rev', 'apply').trigger('submit');
                     });
                 }, 30000);
-EOD
+JS
             , CClientScript::POS_READY);
 
         }

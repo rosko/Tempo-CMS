@@ -1,3 +1,4 @@
+
 // =============================================================
 // Открытие диаологового окна
 // =============================================================
@@ -57,7 +58,7 @@ function cmsOpenDialog(content, options) {
             }
         },
         onClose: function() {
-            fadeOut('.selected', 'selected');
+            cmsFadeOut('.selected', 'selected');
             $(content).html('');
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);
@@ -100,7 +101,7 @@ function cmsLoadDialog(url, opts)
         cache: false,
         opts: opts,
         beforeSend: function() {
-            cmsShowInfoPanel(cms_html_loading_image, 0);
+            cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
         },
         success: function(html) {
             cmsHideInfoPanel();
@@ -127,7 +128,7 @@ function cmsLoadDialog(url, opts)
                     opts.onSubmit(this);
                 }
                 if (opts.ajaxify) {
-                    ajaxSubmitForm($(this), null, null, {
+                    cmsAjaxSubmitForm($(this), null, null, {
                         onSuccess: function(html) {
                             if ($.isFunction(opts.onSave)) {
                                 opts.onSave(html);

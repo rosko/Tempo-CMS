@@ -8,7 +8,7 @@
 <?php
 
     $cs=Yii::app()->getClientScript();
-    $cs->registerScript('pagemap', <<<EOD
+    $cs->registerScript('pagemap', <<<JS
 $(function() {
     $('.cms-btn-pagemap-openall').click(function() {
         $('#pagemap').jstree('open_all');
@@ -19,7 +19,7 @@ $(function() {
         return false;
     });
 });
-EOD
+JS
 );
 
 
@@ -233,15 +233,15 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
                 //"select_node"=> 'js:function() {alert("select");return true;} ',
                 'hover_node'=>false,
 //                "open_node"=>false,
-/*                "create_node"=> <<<EOD
-js:function(e, data) {
+/*                "create_node"=> 'js:function(e, data) '.<<<JS
+{
     var obj = this.data.ui.hovered ||this.data.ui.last_selected;
     var pageId = $(obj).attr('id');
     //alert(pageId);
     return true;
 }
 
-EOD
+JS
 ,*/
 //                "delete_node"=>
             ),
@@ -264,8 +264,8 @@ EOD
         )
     ),
     'events'=>array(
-        'dblclick.jstree'=> <<<EOD
-js:function(e) {
+        'dblclick.jstree'=> 'js:function(e) '.<<<JS
+{
     var pageId = $(e.target).attr('rel');
     if (pageId) {
         var title = $(e.target).text();
@@ -274,10 +274,10 @@ js:function(e) {
     e.stopImmediatePropagation();
     return false;
 }
-EOD
+JS
 ,
-        'move_node.jstree' => <<<EOD
-js:function(e, data) {
+        'move_node.jstree' => 'js:function(e, data) '.<<<JS
+{
     var pageId = $(data.rslt.o).children('a:eq(0)').attr('rel');
     var parentId = $(data.rslt.o).parents('li:eq(0)').children('a:eq(0)').attr('rel');
     var siblings = [];
@@ -286,12 +286,12 @@ js:function(e, data) {
     });
     var url = '/?r=page/sort&pageId='+pageId+'&language='+$.data(document.body, 'language');
     var params = 'parentId='+parentId+'&'+decodeURIComponent($.param({'order': siblings}));
-    ajaxSave(url, params, 'POST');
+    cmsAjaxSave(url, params, 'POST');
 }
-EOD
+JS
 ,
-        'rename_node.jstree' => <<<EOD
-js:function(e, data) {
+        'rename_node.jstree' => 'js:function(e, data) '.<<<JS
+{
     var pageId = $(data.rslt.obj).children('a:eq(0)').attr('rel');
     var parentId = $(data.rslt.obj).parents('li:eq(0)').children('a:eq(0)').attr('rel');
     var siblings = [];
@@ -303,8 +303,8 @@ js:function(e, data) {
     var title = $(data.rslt.obj).children('a:eq(0)').text();
     if (pageId == undefined) pageId = 0;
     var url = '/?r=page/rename&pageId='+pageId+'&language='+$.data(document.body, 'language');
-    var params = 'parentId='+parentId+'&title='+trim(title)+'&'+decodeURIComponent($.param({'order': siblings}));
-    ajaxSave(url, params, 'POST', function(html) {
+    var params = 'parentId='+parentId+'&title='+cmsTrim(title)+'&'+decodeURIComponent($.param({'order': siblings}));
+    cmsAjaxSave(url, params, 'POST', function(html) {
         if (html != 0 && !pageId) {
             // Установить новому элементу указания на id страницы
             $(data.rslt.obj).attr('id', 'page-'+html);
@@ -315,27 +315,27 @@ js:function(e, data) {
         }
     });
 }
-EOD
+JS
 ,
-        'create_node.jstree' => <<<EOD
-js:function(e, data) {
+        'create_node.jstree' => 'js:function(e, data) '.<<<JS
+{
     var pageId = $(data.rslt.o).children('a:eq(0)').attr('rel');
     var title = $(e.target).text();
 //    alert(title);
 }
-EOD
+JS
 ,
-        'delete_node.jstree' => <<<EOD
-js:function(e, data) {
+        'delete_node.jstree' => 'js:function(e, data) '.<<<JS
+{
 //    if (data.func == 'delete_node')
 //    {
 //        if(data.args[0]) {
 //            var pageId = $(data.args[0]).children('a:eq(0)').attr('rel');
             var pageId = $(data.rslt.obj).children('a:eq(0)').attr('rel');
-            pageDeleteDialog(pageId, function() {
+            cmsPageDeleteDialog(pageId, function() {
                 var url = '/?r=page/delete&pageId='+pageId+'&language='+$.data(document.body, 'language');
                 var params = 'deletechildren=1';
-                ajaxSave(url, params, 'GET');
+                cmsAjaxSave(url, params, 'GET');
             }, function(html) {
                 cmsCloseDialog();
                 {$jsChildrenDelete}
@@ -346,7 +346,7 @@ js:function(e, data) {
 //        return false;
 //    }
 }
-EOD
+JS
 ,
     ),
     ));

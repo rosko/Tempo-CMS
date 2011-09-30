@@ -59,7 +59,7 @@ class ComboBox extends CJuiInputWidget
             $aaa = 'this.value';
             $aab = ' || matcher.test(this.value)';
         }
-        $js = <<<EOD
+        $js = <<<JS
 
 	(function( $ ) {
 		$.widget( "ui.combobox", {
@@ -118,25 +118,25 @@ class ComboBox extends CJuiInputWidget
 						}
 					})
 					.addClass( "ui-widget ui-widget-content ui-corner-left" );
-EOD;
+JS;
 
         if ($this->canEdit) {
                 
-            $js .= <<<EOD
+            $js .= <<<JS
                 input.parents('form:eq(0)').submit(function() {
                     $('#{$id}')
                         .append('<option value="'+input.val()+'">'+input.val()+'</option>')
                         .val(input.val());
                     return true;
                 });
-EOD;
+JS;
         }
 
         $aaa = '"<a>" + item.label + "</a>"';
         if ($this->showValues) {
             $aaa = '"<a><strong>" + item.label + "</strong><br>" + item.value +  "</a>"';
         }
-        $js .= <<<EOD
+        $js .= <<<JS
                 input.data( "autocomplete" )._renderItem = function( ul, item ) {
 					return $( "<li></li>" )
 						.data( "item.autocomplete", item )
@@ -168,10 +168,12 @@ EOD;
 						input.focus();
                         return false;
 					});
+JS;
+        $js .= <<<DATA
 			}
 		});
 	})( jQuery );
-EOD;
+DATA;
 
 		$js .= "$('#{$id}').combobox();";
         if ($this->hasModel()) {

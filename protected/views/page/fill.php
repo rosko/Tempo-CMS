@@ -1,9 +1,9 @@
 <?php
 $cs = Yii::app()->getClientScript();
-$cs->registerScript('pagefill', <<<EOD
+$cs->registerScript('pagefill', <<<JS
     $(function() {
     });
-EOD
+JS
 );
 ?>
 

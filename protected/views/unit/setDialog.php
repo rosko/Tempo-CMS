@@ -3,7 +3,7 @@
 
     $cs=Yii::app()->getClientScript();
     $cs->registerPackage('jstree');
-    $cs->registerScript('unitSetDialog', <<<EOD
+    $cs->registerScript('unitSetDialog', <<<JS
 
 $(function() {
     $('.cms-btn-pagemap-select').click(function() {
@@ -72,7 +72,7 @@ $(function() {
         }
         var url = '/?r=unit/set&unitId={$unitId}&pageUnitId={$pageUnitId}';
         var data = decodeURIComponent($.param({'pageIds': ids}));
-        ajaxSave(url, data, 'POST');
+        cmsAjaxSave(url, data, 'POST');
         if (cur_page) {
             $('#cms-pageunit-{$pageUnitId}').remove();
         }
@@ -84,7 +84,7 @@ $(function() {
 
 });
 
-EOD
+JS
 );
 
 ?>

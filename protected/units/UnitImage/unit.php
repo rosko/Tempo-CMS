@@ -61,28 +61,28 @@ class UnitImage extends Content
 	public static function form()
 	{
 		$className = __CLASS__;
-		$slideWidth = <<<EOD
-js:function(event,ui) {
+		$slideWidth = 'js:function(event,ui)'.<<<JS
+ {
 	$('#{$className}_width').val(ui.value);
 	{$className}_makesize(ui.value, false, ui.handle);
 }
-EOD;
-		$changeWidth = <<<EOD
-js:function(event,ui) {
+JS;
+		$changeWidth = 'js:function(event,ui)'.<<<JS
+ {
 	{$className}_makesize(ui.value, false, ui.handle);
 }
-EOD;
-		$slideHeight = <<<EOD
-js:function(event,ui) {
+JS;
+		$slideHeight = 'js:function(event,ui)'.<<<JS
+ {
 	$('#{$className}_height').val(ui.value);
 	{$className}_makesize(ui.value, true, ui.handle);
 }
-EOD;
-		$changeHeight = <<<EOD
-js:function(event,ui) {
+JS;
+		$changeHeight = 'js:function(event,ui)'.<<<JS
+ {
 	{$className}_makesize(ui.value, true, ui.handle);
 }
-EOD;
+JS;
 		
 		return array(
 			'elements'=>array(

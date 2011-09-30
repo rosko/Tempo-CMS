@@ -23,7 +23,7 @@ $('#<?=$id?>_check input').live('click', function() {
 $('.<?=$id?>_add').click(function() {
     var newPageId = 0;
     
-    if (<?=$pageId?> > 0) {
+    if (<?=$pageId?>) {
 
         var url = '/?r=unit/edit&area=<?=$area?>&makePage=<?=(int)$this->makePage?>&pageId=<?=$pageId?>&type=<?=$type?>&sectionId=<?=$sectionId?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
         cmsLoadDialog(url, {
@@ -37,10 +37,10 @@ $('.<?=$id?>_add').click(function() {
     } else { 
         // Иначе просто создаем запись
         if ($.fn.yiiGridView) {
-            recordEditForm(0, '<?=$className?>', 0, '<?=$id?>');
+            cmsRecordEditForm(0, '<?=$className?>', 0, '<?=$id?>');
         } else {
-            recordEditForm(0, '<?=$className?>', 0);
-            $('#recordEditForm<?=$className?>_0').live('dialogbeforeclose', function() {
+            cmsRecordEditForm(0, '<?=$className?>', 0);
+            $('#cmsRecordEditForm<?=$className?>_0').live('dialogbeforeclose', function() {
                 cmsReloadPageUnit(<?=$pageUnitId?>, '.cms-pageunit[rev=<?=$unitId?>]');
             });
         }

@@ -1,5 +1,6 @@
 <script type="text/javascript">
 <?php foreach ($content->resizableObjects() as $selector => $o) { ?>
+    if ($('#cms-pageunit-<?=$pageUnit->id?>').find('<?=$selector?>').length) {
     $('#cms-pageunit-<?=$pageUnit->id?>').find('<?=$selector?>').each(function(){
         if ($(this).width() == 0)
             $(this).width(10);
@@ -58,7 +59,7 @@
                 'top': '',
                 'left': ''
             });
-            ajaxSave('/?r=unit/ajax&unitId=<?=$unit->id?>', data, 'POST');
+            cmsAjaxSave('/?r=unit/ajax&unitId=<?=$unit->id?>', data, 'POST');
         }
     }).parent('.ui-wrapper').css({
         'position': 'relative',
@@ -72,5 +73,6 @@
         if ($(this).attr('align'))
             $(this).parent('.ui-wrapper').css('float', $(this).attr('align'));
     });
+    }
 <?php } ?>
 </script>

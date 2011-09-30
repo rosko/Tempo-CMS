@@ -55,7 +55,7 @@ class CJsTree extends CWidget
         $options=$this->getClientOptions();
         $options=$options===array()?'{}' : CJavaScript::encode($options);
 		$events = $this->getClientEvents();
-        $cs->registerScript('Yii.CJsTree#'.$id, <<<EOD
+        $cs->registerScript('Yii.CJsTree#'.$id, <<<JS
 jQuery(function () { 
     jQuery("#{$id}").jstree({$options}){$events};
     jQuery.jstree._fn.check_node_all = function(obj) {
@@ -77,7 +77,7 @@ jQuery(function () {
         if(rc) { coll.children(":checkbox").removeAttr("checked"); }
     }
 });
-EOD
+JS
 );
         if($this->cssFile !== null && $this->cssFile !== false)
             $cs->registerCssFile($this->cssFile);

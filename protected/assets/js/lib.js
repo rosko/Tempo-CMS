@@ -3,21 +3,6 @@ var cmsInfoPanelTimeout = 3;
 var cmsInfoPanelTimer = null;
 
 // =============================================================
-// Перевод строки
-//
-// @param string message переводимая строка
-// @param array params параметры
-// @return string переведенная строка
-
-function t(message, params)
-{
-    for (x in params) {
-        message = message.replace(x, params[x]);
-    }
-    return message;
-}
-
-// =============================================================
 // Функции для отображение разных уведомлений и диалоговых окон
 
 // Уведомляющая надпись
@@ -132,7 +117,7 @@ function cmsGetLocationSearch()
 function cmsAddToLocationHash(str, process, delvar)
 {
     if (location.hash == '' || location.hash == '#' || location.hash == '#.') {
-        setLocationHash(str);
+        cmsSetLocationHash(str);
     } else {
         if (location.hash.indexOf(str)==-1 && !delvar) { return true; }
 
@@ -167,12 +152,12 @@ function cmsAddToLocationHash(str, process, delvar)
 
         //location.hash += '&' + str;
         if (process || process==undefined) {
-            processLocationHash();
+            cmsProcessLocationHash();
         }
     }    
 }
 
-function delFromLocationHash(variable)
+function cmsDelFromLocationHash(variable)
 {
     var params = new Array();
     var arr = location.hash.substr(1).split('&');
@@ -189,7 +174,7 @@ function delFromLocationHash(variable)
     location.hash = params.join('&');
 }
 
-function setLocationHash(str, process)
+function cmsSetLocationHash(str, process)
 {
     if (str != '') {
         location.hash = str;
@@ -197,13 +182,13 @@ function setLocationHash(str, process)
         location.hash = '.';
     }
     if (process || process==undefined) {
-        processLocationHash();
+        cmsProcessLocationHash();
     }
 }
 
 var lastHash = '';
 
-function processLocationHash()
+function cmsProcessLocationHash()
 {
     if (location.hash == lastHash) { return true; }
     if (location.hash == '#.' || location.hash == '' || location.hash == '#') {
@@ -242,11 +227,11 @@ function processLocationHash()
 // =============================================================
 
 
-function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
+function cmsAjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
 {
     f.attr('target', container);
     f.submit(function(){
-        ajaxSave(f.attr('action'), f.serialize(), f.attr('method'), function(html) {
+        cmsAjaxSave(f.attr('action'), f.serialize(), f.attr('method'), function(html) {
             var container = f.attr('target');
             var rel = f.attr('rel');
             var btn_name = $('.submit:hidden').eq(0).attr('name');
@@ -267,7 +252,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
                         $(container).html(html);
                     }
                     $(container).find('form').eq(0).attr('rel', rel);
-                    AjaxifyForm(container, $(container).find('form').eq(0), onSubmit, onSave, onClose, validate);
+                    cmsAjaxifyForm(container, $(container).find('form').eq(0), onSubmit, onSave, onClose, validate);
                 }
             }
             if ($.isFunction(onSave)) {
@@ -283,7 +268,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
         $(this).after('<input class="submit" type="hidden" name="'+$(this).attr('name')+'" value="'+$(this).val()+'" />');
     });
     f.find('input[name=delete]').click(function() {
-        return confirm(i18n.cms.deleteWarning);
+        return confirm(cmsI18n.cms.deleteWarning);
     });
     f.find('input').bind('keydown', 'ctrl+return', function() {
         $(this).after('<input class="submit" type="hidden" name="save" value="save" />');
@@ -294,7 +279,7 @@ function AjaxifyForm(container, f, onSubmit, onSave, onClose, validate)
 
 // =============================================================
 
-function str_replace ( search, replace, subject ) {
+function cmsStrReplace ( search, replace, subject ) {
 
     // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
     // +   improved by: Gabriel Paderni
@@ -314,7 +299,7 @@ function str_replace ( search, replace, subject ) {
 
 	if(subject instanceof Array){
 		for(k in subject){
-			subject[k]=str_replace(search,replace,subject[k]);
+			subject[k]=cmsStrReplace(search,replace,subject[k]);
 		}
 		return subject;
 	}
@@ -331,6 +316,6 @@ function str_replace ( search, replace, subject ) {
 
 }
 
-function strtolower(str) {
+function cmsStrToLower(str) {
     return str.toLowerCase();
 }

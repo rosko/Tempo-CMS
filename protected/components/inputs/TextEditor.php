@@ -45,7 +45,7 @@ class TextEditor extends CInputWidget
         $baseUrl = Yii::app()->baseUrl;
         $value = $this->hasModel() ? $this->model{$this->attribute} : $this->value;
         $lang = Yii::app()->language;
-        $js = <<<EOD
+        $js = <<<JS
 
 //$('#{$id}_editorbtn').click(function() {
 //$(function(){
@@ -86,14 +86,14 @@ class TextEditor extends CInputWidget
 
 //});
 
-EOD;
+JS;
 
         foreach ($this->config as $k => $v) {
             $v = CJavaScript::encode($v);
             $js .= "  oFCKeditor->Config['{$k}'] = {$v};\n";
         }
 
-        $js .= <<<EOD
+        $js .= <<<JS
 $('form').submit(function() {
     FCKeditorAPI.GetInstance('{$name}').UpdateLinkedField();
 /*    var instanceName = '{$name}';
@@ -113,7 +113,7 @@ $('form').submit(function() {
         $('#' + instanceName).show();*/
 });
 
-EOD;
+JS;
         $cs->registerScript('Yii.TextEditorFCK#'.$id,$js);
 
         echo '<div style="overflow:scroll;width:'.($this->width+20).'px;height:'.$this->height.'px;" id="' . $this->htmlOptions['id'] .'_editor">' . $value  . '</div>';
@@ -134,9 +134,9 @@ EOD;
         $jsUrl = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         $themeBaseUrl = Yii::app()->theme->baseUrl;
 
-        $js = <<<EOD
+        $js = <<<JS
         var CKEDITOR_BASEPATH = '{$CkeditorPath}/';
-EOD;
+JS;
         $cs->registerScript('Yii.TextEditorCK#pre'.$id,$js,CClientScript::POS_HEAD);
 
         $cs->registerScriptFile($CkeditorPath.'/ckeditor.js');
@@ -194,7 +194,7 @@ EOD;
         }
         $conf = CJavaScript::encode($this->config);
 
-        $js = <<<EOD
+        $js = <<<JS
 
 var {$id}_e = CKEDITOR.replace('{$id}_editor', {$conf});
 
@@ -204,7 +204,7 @@ $('form').submit(function() {
     }
 });
 
-EOD;
+JS;
         $cs->registerScript('Yii.TextEditorCK#'.$id,$js);
 
         echo '<div style="width:'.($this->width).'px;height:'.$this->height.'px;" id="' . $id .'_editor">' . $value  . '</div>';

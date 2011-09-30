@@ -74,21 +74,21 @@ $this->beginWidget('ext.jsTree.CjsTree', array(
             'check_node_all' => array (
                 'label' => Yii::t('cms', 'Select all children pages'),
                 'icon' => 'create',
-                'action' => <<<EOD
-js:function(obj) {
+                'action' => 'js:function(obj) '.<<<JS
+{
     this.check_node_all(obj);
 }
-EOD
+JS
 ,
             ),
             'uncheck_node_all' => array (
                 'label' => Yii::t('cms', 'Deselect all children pages'),
                 'icon' => 'create',
-                'action' => <<<EOD
-js:function(obj) {
+                'action' => 'js:function(obj) '.<<<JS
+{
     this.uncheck_node_all(obj);
 }
-EOD
+JS
 ,
             ),
             'create' => false,
@@ -115,11 +115,11 @@ EOD
             'default'=>array(
                 'valid_children'=>array('default'),
                 'hover_node'=>($multiple ? true : false),
-                'select_node'=> <<<EOD
-js:function(obj) {
+                'select_node'=> 'js:function(obj) '.<<<JS
+{
     this.change_state(obj);
 }
-EOD
+JS
 ,
             ),
             'mainpage'=>array(

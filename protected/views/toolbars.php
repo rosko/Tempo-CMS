@@ -50,27 +50,27 @@ $menuCssFile = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('appli
                 'icon' => 'empty',
                 'title'=>Yii::t('cms', 'Edit mode'),
                 'checked'=>true,
-                'click' => <<<EOD
-js:function() { 
+                'click' => 'js:function()'.<<<JS
+ {
     var obj = $(this).find('input:checkbox:eq(0)');
     obj.attr('checked', !obj.attr('checked'));
     return false; 
     }
-EOD
+JS
             ),
 
             'exit' => array(
                 'icon' => 'exit',
                 'title' => Yii::t('cms', 'Exit'),
                 'cssClass'=>'right',
-                'click' => <<<EOD
-js:function(){
-            if (confirm('{$txtSureExit}')) {
-                location.href = '{$this->createUrl('site/logout')}';
-            }
-            return false;
-        }
-EOD
+                'click' => 'js:function()'.<<<JS
+{
+    if (confirm('{$txtSureExit}')) {
+        location.href = '{$this->createUrl('site/logout')}';
+    }
+    return false;
+}
+JS
             ),
         ),
     ));
@@ -99,18 +99,18 @@ EOD
             'edit' => Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model)) ? array(
                 'icon' => 'edit',
                 'title' => Yii::t('cms', 'Page properties'),
-                'click' => 'js:function(){ pageEditForm(); return false; }',
+                'click' => 'js:function(){ cmsPageEditForm(); return false; }',
             ):null,
             'pageadd' => Yii::app()->user->checkAccess('createPage', array('page'=>$model))?array(
                 'icon' => 'add',
                 'title' => Yii::t('cms', 'Create new page'),
-                'click' => 'js:function() { pageAddForm(); return false; }',
+                'click' => 'js:function() { cmsPageAddForm(); return false; }',
             ):null,
             'sitemap' =>  Yii::app()->user->checkAccess('createPage', array('page'=>$model))&&Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model))&&Yii::app()->user->checkAccess('deletePage', array('page'=>$model))?array(
                 'icon' => 'sitemap',
                 'title' => Yii::t('cms', 'Sitemap'),
-                'click' => <<<EOD
-js:function(){
+                'click' => 'js:function()'.<<<JS
+{
     var pageId = {$model->id};
     cmsLoadDialog('/?r=admin/siteMap&pageId='+pageId+'&language={$language}', {
         height: Math.ceil($(window).height()*0.5),
@@ -118,7 +118,7 @@ js:function(){
     });
     return false;
 }
-EOD
+JS
             ):null,
 
         ),
@@ -149,13 +149,13 @@ EOD
             'filemanager' => array(
                 'icon' => 'files',
                 'title' => Yii::t('cms', 'File manager'),
-                'click' => <<<EOD
-js:function(){
+                'click' => 'js:function()'.<<<JS
+{
             var url = '{$fckeditorPath}/editor/plugins/imglib/index.html';
             window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
                     return false;
                 }
-EOD
+JS
             ),
         ),
 
@@ -204,39 +204,39 @@ EOD
             'settings' => Yii::app()->user->checkAccess('updateSettings') ? array(
                 'icon' => 'settings',
                 'title' => Yii::t('cms', 'Site settings'),
-                'click' => <<<EOD
-js:function(){
+                'click' => 'js:function()'.<<<JS
+{
             cmsLoadDialog('/?r=admin/siteSettings&language={$language}');
             return false;
         }
-EOD
+JS
             ):null,
             'units'=> Yii::app()->user->checkAccess('manageUnit')?array(
                 'icon' => 'units',
                 'title' => Yii::t('cms', 'Units'),
-                'click' => <<<EOD
-js:function() {
-            cmsLoadDialog('/?r=unit/install&language={$language}', {
-                ajaxify: true,
-                onSave: function() {
-                    location.reload();
-                }
-            });
-            return false;
+                'click' => 'js:function()'.<<<JS
+ {
+    cmsLoadDialog('/?r=unit/install&language={$language}', {
+        ajaxify: true,
+        onSave: function() {
+            location.reload();
         }
-EOD
+    });
+    return false;
+}
+JS
             ):null,
             'users' =>  Yii::app()->user->checkAccess('updateUser')?array(
                 'icon' => 'user',
                 'title' => Yii::t('cms', 'Users'),
-                'click' => <<<EOD
-js:function() {
-            cmsLoadDialog('/?r=user/index&language={$language}', {
-                simpleClose: true
-            });
-            return false;
-        }
-EOD
+                'click' => 'js:function()'.<<<JS
+ {
+    cmsLoadDialog('/?r=user/index&language={$language}', {
+        simpleClose: true
+    });
+    return false;
+}
+JS
             ):null,
         ),
 
@@ -265,13 +265,13 @@ EOD
                 'icon' => 'empty',
                 'title'=>Yii::t('cms', 'Edit mode'),
                 'checked'=>true,
-                'click' => <<<EOD
-js:function() {
+                'click' => 'js:function()'.<<<JS
+ {
     var obj = $(this).find('input:checkbox:eq(0)');
     obj.attr('checked', !obj.attr('checked'));
     return false;
-    }
-EOD
+}
+JS
             ),
 
         ),
@@ -304,82 +304,82 @@ EOD
                 'add' => array(
                     'icon' => 'add',
                     'title' => Yii::t('cms', 'Add another unit'),
-                    'click' => <<<EOD
-js:function() {
-                cmsShowSelectUnitTypeDialog(this);
-                return false;
-            }
-EOD
+                    'click' => 'js:function()'.<<<JS
+ {
+    cmsShowSelectUnitTypeDialog(this);
+    return false;
+}
+JS
                 ),
                 'edit' => array(
                     'icon' => 'edit',
                     'title' => Yii::t('cms', 'Edit'),
-                    'click' => <<<EOD
-js:function() {
-                var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                pageUnitEditForm(pageUnit);
-                return false;
-            }
-EOD
+                    'click' => 'js:function()'.<<<JS
+ {
+    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
+    cmsPageUnitEditForm(pageUnit);
+    return false;
+}
+JS
                 ),
                 'move' => array(
                     'icon' => 'move',
                     'title' => Yii::t('cms', 'Unit location on pages'),
-                    'click' => <<<EOD
-js:function() {
+                    'click' => 'js:function()'.<<<JS
+ {
                 var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                fadeIn(pageUnit, 'selected');
+                cmsFadeIn(pageUnit, 'selected');
                 var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
                 var unitId = pageUnit.attr('rev');
-                pageUnitSetDialog({$model->id}, pageUnitId, unitId);
+                cmsPageUnitSetDialog({$model->id}, pageUnitId, unitId);
                 return false;
             }
-EOD
+JS
                 ),
                 'up' => array(
                     'icon' => 'up',
                     'title' => Yii::t('cms', 'Move up'),
-                    'click' => <<<EOD
-js:function() {
-                var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                if (pageUnit.prev().length) {
-                    pageUnit.insertBefore(pageUnit.prev());
-                    area = getAreaByPageUnit(pageUnit);
-                    var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-                    ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
-                }
-                return false;
-            }
-EOD
+                    'click' => 'js:function()'.<<<JS
+ {
+    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
+    if (pageUnit.prev().length) {
+        pageUnit.insertBefore(pageUnit.prev());
+        area = cmsGetAreaByPageUnit(pageUnit);
+        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
+        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
+    }
+    return false;
+}
+JS
                 ),
                 'down' => array(
                     'icon' => 'down',
                     'title' => Yii::t('cms', 'Move down'),
-                    'click' => <<<EOD
-js:function() {
-                var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                if (pageUnit.next().length) {
-                    pageUnit.insertAfter(pageUnit.next());
-                    area = getAreaByPageUnit(pageUnit);
-                    var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-                    ajaxSaveArea(area, getAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
-                }
-                return false;
-            }
-EOD
+                    'click' => 'js:function()'.<<<JS
+ {
+    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
+    if (pageUnit.next().length) {
+        pageUnit.insertAfter(pageUnit.next());
+        area = cmsGetAreaByPageUnit(pageUnit);
+        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
+        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
+    }
+    return false;
+}
+JS
                 ),
                 'delete' => array(
                     'icon' => 'delete',
                     'title' => Yii::t('cms', 'Delete the unit'),
-                    'click' => <<<EOD
-js:function() {
-                var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                fadeIn(pageUnit, 'selected');
-                $('#pageunitpanel').appendTo('body');
-                pageUnitDeleteDialog(pageUnit.attr('rev'), pageUnit.attr('id').replace('cms-pageunit-',''), {$model->id});
-                return false;
-            }
-EOD
+                    'click' => 'js:function()'.<<<JS
+ {
+    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
+    cmsFadeIn(pageUnit, 'selected');
+    $('#pageunitpanel').appendTo('body');
+    cmsPageUnitDeleteDialog(pageUnit.attr('rev'), pageUnit.attr('id').replace('cms-pageunit-',''), {$model->id});
+    return false;
+}
+JS
                 ),
             )
         ));

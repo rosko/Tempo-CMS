@@ -34,9 +34,9 @@ class TemplateSelect extends CInputWidget
         if ($this->hasModel() && (get_class($this->model) == 'Unit'))
         {
             $unitId = $this->model->id;
-            $injs = <<<EOD
+            $injs = <<<JS
    cmsReloadPageUnit($('.cms-pageunit[rev={$unitId}]').attr('id').replace('cms-pageunit-',''), '.cms-pageunit[rev={$unitId}]');
-EOD;
+JS;
         } else {
             $injs = '';
         }
@@ -44,8 +44,8 @@ EOD;
         $escapedId = str_replace('.', '\\\\.', $id);
         $txtTemplateEditor = Yii::t('cms', 'Template editor');
 
-        $js = <<<EOD
-js:cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escapedId}').val(), {
+        $js = 'js:'.<<<JS
+cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$('#{$escapedId}').val(), {
         title: '{$txtTemplateEditor}',
         id: 'filesEditor',
         className: 'filesEditor',
@@ -91,8 +91,7 @@ js:cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default=
         }
     });
     return false;
-EOD
-;
+JS;
 
         echo '<br /> ' . CHtml::link(Yii::t('cms', 'Edit templates'), '#', array('onclick' => $js));
 

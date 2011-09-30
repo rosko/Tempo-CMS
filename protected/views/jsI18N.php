@@ -1,5 +1,5 @@
-var i18n = {};
-i18n.cms = {
+var cmsI18n = {};
+cmsI18n.cms = {
     savingError: "<?=Yii::t('cms', 'Saving error. Attempt after ')?>",
     retryNow: "<?=Yii::t('cms', 'Retry now')?>",
     deleteWarning: "<?=Yii::t('cms', 'Are you really want delete?')?>",
@@ -16,14 +16,14 @@ i18n.cms = {
     deleteRecordWarning: "<?=Yii::t('cms', 'Are you really want delete this record?')?>"
 };
 
-function transliterate(str) {
+function cmsTransliterate(str) {
     var ret = str;
 <?php
 $transliteration = Page::transliteration();
 if (is_array($transliteration) && !empty($transliteration)) { ?>
     var _from = <?=CJavaScript::encode($transliteration[0]);?>;
     var _to = <?=CJavaScript::encode($transliteration[1]);?>;
-    ret = str_replace(_from, _to, str);
+    ret = cmsStrReplace(_from, _to, str);
 <?php } ?>
     return ret;
 }

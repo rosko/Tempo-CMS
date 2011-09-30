@@ -14,7 +14,7 @@
           <title>{$item.title}</title>
           <link>{$item.link}</link>
           <description><![CDATA[{strip}
-{if $item.image}<p><img src="{$item.image}" width="200" /></p>{else}{$item.description}{/if}
+{if $item.image}<p><img src="{$item.image}" width="300" /></p>{/if}{$item.description}
 {/strip}]]></description>
           <pubDate>{date("r", strtotime($item.updated))}</pubDate>
           <guid isPermaLink="true">{$item.link}</guid>

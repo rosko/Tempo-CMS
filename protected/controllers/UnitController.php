@@ -76,9 +76,14 @@ class UnitController extends Controller
         } else {
             $ret = false;
         }
-        if (!$unit && $content && (!$className || $recordId==0)) {
-            $unit = !empty($content->unit_id) ? $content->unit : new Unit;
+        if (!$unit && $content) {
+            if (!empty($content->unit_id)) {
+                $unit =  $content->unit;
+            } elseif ($content->scenario == 'add') {
+                $unit = new Unit;
+            }
         }
+
         $className = get_class($content);
         $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
         // Если блок новый, заполняем его исходными данными
@@ -130,8 +135,8 @@ class UnitController extends Controller
 			)
 		);
         if ($content->scenario == 'add')
-            $formArray['activeForm']['clientOptions']['afterValidate'] = <<<EOD
-js:function(f,d,h){ajaxSubmitForm(f,d,h, {
+            $formArray['activeForm']['clientOptions']['afterValidate'] = 'js:function(f,d,h)'.<<<JS
+{cmsAjaxSubmitForm(f,d,h, {
     onSuccess: function(html) {
 
         var params = $(html).find('form').attr('action').split('&');
@@ -175,7 +180,7 @@ js:function(f,d,h){ajaxSubmitForm(f,d,h, {
     }
 });
 }
-EOD;
+JS;
 
         if (substr($unitFormArray['elements'][0],0,2)!=Form::TAB_DELIMETER
                 || substr($unitFormArray['elements'][0],-2)!=Form::TAB_DELIMETER)
@@ -239,8 +244,9 @@ EOD;
                 if (isset($unit)) {                    
                     // Если нужно, создаем виртуальную страницу
                     if ($makePage && $content->hasAttribute('page_id') && $pageId>0) {
-                        $page = Page::model()->findByPk($content->page_id);
-                        if (!$page) {
+                        if ($content->page_id)
+                            $page = Page::model()->findByPk($content->page_id);
+                        if (empty($page)) {
                             $page = new Page;
                             $page->parent_id = $pageId;
                             $page->active = true;

@@ -60,7 +60,7 @@ class FeedHelper {
         Yii::app()->getController()->renderPartial('feed/rss', array(
             'channel'=>$channel,
             'items'=>$items,
-            'rssLink'=>'23',
+            'rssLink'=>Yii::app()->request->hostInfo.Yii::app()->request->url,
             'settings'=>array(
                 'global'=>Yii::app()->settings->model->getAttributes(),
             ),

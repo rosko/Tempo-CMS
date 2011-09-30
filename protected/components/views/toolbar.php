@@ -46,7 +46,7 @@ if (($p2 == 'wide' && ($p3 == 'left' || $p3 == 'right')) ||
 }
 
 $b = $config['location']['show'] == 'always' ? 'window' : "'body'";
-$js .= <<<EOD
+$js .= <<<JS
     function location{$id}(hoster)
     {
         if ($(hoster).length == 0) { return; }
@@ -61,27 +61,27 @@ $js .= <<<EOD
         var _h = $('#{$id}').height();
         var _l = l+{$l};
         var _t = t+{$t};
-EOD;
+JS;
 
 if ($config['location']['save']) {
     if ($config['location']['draggable']) {
-        $js .= <<<EOD
+        $js .= <<<JS
             _t = $.cookie('{$id}_top') ? $.cookie('{$id}_top') : _t;
             _l = $.cookie('{$id}_left') ? $.cookie('{$id}_left') : _l;
-EOD;
+JS;
     }
     if ($config['location']['resizable']) {
-        $js .= <<<EOD
+        $js .= <<<JS
             _w = $.cookie('{$id}_width') ? $.cookie('{$id}_width') : _w;
             _h = $.cookie('{$id}_height') ? $.cookie('{$id}_height') : _h;
-EOD;
+JS;
     }
 }
 
 $p = $config['location']['show'] == 'always' ? 'fixed' : 'absolute';
 $cursor = $config['location']['draggable'] ? 'move': 'auto';
 
-$js .= <<<EOD
+$js .= <<<JS
             if (_t > bh-_h) { _t = bh - _h; }
             if (_l > bw-_w) { _l = bw - _w; }
             if (_t < 0) { _t = 0; }
@@ -100,7 +100,7 @@ $js .= <<<EOD
         location{$id}('{$config['location']['selector']}');
 
         $('#{$id}')
-EOD;
+JS;
 
 if ($config['location']['show'] == 'always') {
     $js .= " .appendTo('{$config['location']['selector']}').{$config['functionShow']} ";
@@ -140,7 +140,7 @@ $js .= ";";
 
 if ($config['location']['show'] == 'hover') {
 
-    $js .= <<<EOD
+    $js .= <<<JS
             $('{$config['location']['selector']}').live('mouseenter', function() {
                 if (!$('{$config['location']['selector']}').hasClass('ui-draggable-dragging')) {
                     location{$id}(this);
@@ -151,10 +151,10 @@ if ($config['location']['show'] == 'hover') {
             }).live('mouseleave', function() {
                 $('#{$id}').appendTo('body').{$config['functionHide']};
             });
-EOD;
+JS;
 
 } elseif ($config['location']['show'] == 'click') {
-    $js .= <<<EOD
+    $js .= <<<JS
             $('{$config['location']['selector']}').live('click', function() {
                 var obj = $('#{$id}');
                 if (obj.css('display') == 'none' && !$('{$config['location']['selector']}').hasClass('ui-draggable-dragging')) {
@@ -165,7 +165,7 @@ EOD;
                 }
                 return false;
             });
-EOD;
+JS;
 }
 
 

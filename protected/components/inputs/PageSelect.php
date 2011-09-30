@@ -63,19 +63,19 @@ class PageSelect extends CInputWidget
         $textLinkJs = '';
         if ($this->textLinkId)
         {
-            $textLinkJs = <<<EOD
+            $textLinkJs = <<<JS
 $.ajax({
     url: '/?r=page/getUrl&pageId='+id+'&language='+$.data(document.body, 'language'),
     cache: false,
     beforeSend: function() {
-        cmsShowInfoPanel(cms_html_loading_image, 0);
+        cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
     },
     success: function(html) {
         cmsHideInfoPanel();
         $('#{$this->textLinkId}').val(html);
     }
 });
-EOD;
+JS;
         }
 
         $modelId = $this->hasModel()&&$this->excludeCurrent ? $this->model->id : 0;
@@ -90,7 +90,7 @@ EOD;
 
             if ($this->canClear) {
                 $txtClear = Yii::t('cms', 'Clear');
-                $js = <<<EOD
+                $js = <<<JS
 $( "<a>&nbsp;</a>" )
     .attr( "tabIndex", -1 )
     .attr( "title", "{$txtClear}" )
@@ -109,11 +109,11 @@ $( "<a>&nbsp;</a>" )
         return false;
     });
     
-EOD;
+JS;
             }
             $txtShowlist = Yii::t('cms', 'Show list');
             $txtLoading = Yii::t('cms', 'loading');
-            $js .= <<<EOD
+            $js .= <<<JS
 $( "<a>&nbsp;</a>" )
     .attr( "tabIndex", -1 )
     .attr( "title", "{$txtShowlist}" )
@@ -180,7 +180,7 @@ $('#{$id}_title').click(function() {
     $(this).click();
 });
 
-EOD;
+JS;
         }
         else
         {
@@ -192,7 +192,7 @@ EOD;
                 $checkedOnly = "#pagetree_{$id}-".implode(", #pagetree_{$id}-", $this->checkedOnly);
             }
 
-            $js = <<<EOD
+            $js = <<<JS
 
 $(function() {
     $.ajax({
@@ -221,14 +221,14 @@ $(function() {
     });
 });
 
-EOD;
+JS;
         }
 
         if ($this->hasModel() && $this->model->id == 1 && $this->attribute == 'parent_id')
         {
-            $js = <<<EOD
+            $js = <<<JS
 $('.field_parent_id').hide();
-EOD;
+JS;
         }
 
         $cs=Yii::app()->getClientScript();

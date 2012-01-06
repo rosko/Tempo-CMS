@@ -1,13 +1,20 @@
 <?php
 
-class UnitBlog extends Content
+class UnitBlog extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/newspaper.png';
-    const HIDDEN = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/newspaper.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitBlog.unit', 'Blog/news section', array(), null, $language);
+        return Yii::t('UnitBlog.main', 'Blog/news section', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -33,12 +40,12 @@ class UnitBlog extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'per_page' => Yii::t('UnitBlog.unit', 'Entries per page'),
+			'per_page' => Yii::t('UnitBlog.main', 'Entries per page'),
             'items' => '',
 		);
 	}
 
-	public function relations()
+    public function relations()
 	{
         return array_merge(parent::relations(), array(
 			'itemsCount'=>array(self::STAT, 'UnitBlogentry', 'blog_id'),
@@ -49,22 +56,22 @@ class UnitBlog extends Content
 	{
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitBlog.unit', 'Blog/news section')),
+                Form::tab(Yii::t('UnitBlog.main', 'Blog/news section')),
                 'items' => array(
                     'type'=>'RecordsGrid',
                     'makePage'=>true,
                     'className' => 'UnitBlogentry',
                     'foreignAttribute' => 'blog_id',
-                    'addButtonTitle'=>Yii::t('UnitBlog.unit', 'Create entry'),
+                    'addButtonTitle'=>Yii::t('UnitBlog.main', 'Create entry'),
                     'columns' => array(
                         'date',
                     ),
                     'order' => 'date DESC',
                 ),
-                Form::tab(Yii::t('UnitBlog.unit', 'Settings')),
+                Form::tab(Yii::t('UnitBlog.main', 'Settings')),
 				'per_page'=>array(
 					'type'=>'Slider',
-                    'hint'=>Yii::t('UnitBlog.unit', 'If zero choosed, accordingly site\'s general settings'),
+                    'hint'=>Yii::t('UnitBlog.main', 'If zero choosed, accordingly site\'s general settings'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 25,
@@ -118,8 +125,8 @@ class UnitBlog extends Content
     public function templateVars()
     {
         return array(
-            '{$items}' => Yii::t('UnitBlog.unit', 'Еntries'),
-            '{$pager}' => Yii::t('UnitBlog.unit', 'Pager'),
+            '{$items}' => Yii::t('UnitBlog.main', 'Еntries'),
+            '{$pager}' => Yii::t('UnitBlog.main', 'Pager'),
         );
     }
 
@@ -142,30 +149,32 @@ class UnitBlog extends Content
         );
     }
 
-    public function prepare($params)
+}
+
+class UnitBlogWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
+        parent::init();
         $items = UnitBlogentry::model()
                     ->public()
                     ->with('unit')
-                    ->selectPage($params['content']->pageNumber, $params['content']->per_page)
-                    ->findAll('blog_id = :id', array(':id'=>$params['content']->id));
+                    ->selectPage($this->params['content']->pageNumber, $this->params['content']->per_page)
+                    ->findAll('blog_id = :id', array(':id'=>$this->params['content']->id));
         
-        $params['items'] = array();
+        $this->params['items'] = array();
         foreach ($items as $item)
         {
-            $params['items'][] = $item->run(array(
+            $this->params['items'][] = $item->widget('UnitBlogentry', array(
                 'in_section'=>true
             ), true);
         }
-        $params['pager'] = $params['content']->renderPager(
+        $this->params['pager'] = $this->params['content']->renderPager(
                 count($items),
-                $params['content']->itemsCount,
-                $params['content']->pageNumber,
-                $params['content']->per_page);
-
-        return $params;
+                $this->params['content']->itemsCount,
+                $this->params['content']->pageNumber,
+                $this->params['content']->per_page);
     }
 
-
+    
 }

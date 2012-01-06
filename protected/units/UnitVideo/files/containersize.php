@@ -1,6 +1,6 @@
 <hr />
 <select id="<?=$className;?>_setsize">
-	<option value=""><?=Yii::t('UnitVideo.unit', 'Select size')?></option>
+	<option value=""><?=Yii::t('UnitVideo.main', 'Select size')?></option>
 <?php
     foreach ($sizes as $k => $v) {
     	?><option value="<?=$k?>"><?=$v?></option><?php

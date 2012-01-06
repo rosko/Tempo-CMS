@@ -1,13 +1,20 @@
 <?php
 
-class UnitImage extends Content
+class UnitImage extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/image.png';
-    const HIDDEN = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/image.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitImage.unit', 'Image', array(), null, $language);
+        return Yii::t('UnitImage.main', 'Image', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -36,7 +43,7 @@ class UnitImage extends Content
         return array_merge(parent::settings(__CLASS__), array(
             'show_border' => array(
                 'type'=>'checkbox',
-                'label'=>Yii::t('UnitImage.unit', 'Show border'),
+                'label'=>Yii::t('UnitImage.main', 'Show border'),
             )
         ));
     }
@@ -50,11 +57,11 @@ class UnitImage extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'image' => Yii::t('UnitImage.unit', 'Image'),
-			'width' => Yii::t('UnitImage.unit', 'Width'),
-			'height' => Yii::t('UnitImage.unit', 'Height'),
-			'url' => Yii::t('UnitImage.unit', 'Link'),
-            'target' => Yii::t('UnitImage.unit', 'Link target'),
+			'image' => Yii::t('UnitImage.main', 'Image'),
+			'width' => Yii::t('UnitImage.main', 'Width'),
+			'height' => Yii::t('UnitImage.main', 'Height'),
+			'url' => Yii::t('UnitImage.main', 'Link'),
+            'target' => Yii::t('UnitImage.main', 'Link target'),
 		);
 	}
 
@@ -86,7 +93,7 @@ JS;
 		
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitImage.unit', 'Image')),
+                Form::tab(Yii::t('UnitImage.main', 'Image')),
 				'image'=>array(
 					'type'=>'Link',
 					'size'=>40,
@@ -98,6 +105,9 @@ JS;
 				'width'=>array(
 					'type'=>'Slider',
 					'event'=>'none',
+                    'htmlOptions'=>array(
+                        'size'=>5,
+                    ),
 					'options'=>array(
 						'min' => 1,
 						'max' => 2000,
@@ -109,6 +119,9 @@ JS;
 				'height'=>array(
 					'type'=>'Slider',
 					'event'=>'none',
+                    'htmlOptions'=>array(
+                        'size'=>5,
+                    ),
 					'options'=>array(
 						'min' => 1,
 						'max' => 2000,
@@ -117,17 +130,18 @@ JS;
 						'change' => $changeHeight
 					)
 				),
-                Form::tab(Yii::t('UnitImage.unit', 'Link')),
+                Form::tab(Yii::t('UnitImage.main', 'Link')),
 				'url'=>array(
 					'type'=>'Link',
 					'size'=>40,
-					'showUploadButton'=>false
+					'showUploadButton'=>false,
+                    'showFileManagerButton'=>false,
 				),
                 'target'=>array(
                     'type'=>'dropdownlist',
                     'items'=> array(
-                        '' => Yii::t('UnitImage.unit', 'Current window'),
-                        '_blank' => Yii::t('UnitImage.unit', 'New window'),
+                        '' => Yii::t('UnitImage.main', 'Current window'),
+                        '_blank' => Yii::t('UnitImage.main', 'New window'),
                     ),
                 ),
 			),
@@ -168,4 +182,9 @@ JS;
         );
     }
 
+}
+
+class UnitImageWidget extends ContentWidget
+{
+    
 }

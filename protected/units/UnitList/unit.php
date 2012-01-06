@@ -1,13 +1,20 @@
 <?php
 
-class UnitList extends Content
+class UnitList extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/newspaper_link.png';
-    const HIDDEN = true;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/newspaper_link.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
+    
 	public function unitName($language=null)
     {
-        return Yii::t('UnitList.unit', 'List', array(), null, $language);
+        return Yii::t('UnitList.main', 'List', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -35,8 +42,8 @@ class UnitList extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-            'class_name' => Yii::t('UnitList.unit', 'List type'),
-			'rule' => Yii::t('UnitList.unit', 'Which entries to show'),
+            'class_name' => Yii::t('UnitList.main', 'List type'),
+			'rule' => Yii::t('UnitList.main', 'Which entries to show'),
 		);
 	}
 
@@ -70,7 +77,7 @@ class UnitList extends Content
     public function templateVars()
     {
         return array(
-            '{$items}' => Yii::t('UnitList.unit', 'Entries'),
+            '{$items}' => Yii::t('UnitList.main', 'Entries'),
         );
     }
 
@@ -106,19 +113,21 @@ class UnitList extends Content
         return $rule;
     }
 
-    public function prepare($params)
+}
+
+class UnitListWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
-        $params['items'] = array();
-        if (Yii::$classMap[$this->class_name]) {
-            $rule = $this->makeRule();
-            eval("\$items = {$this->class_name}::model()->{$rule}findAll();");
+        parent::init();
+        $this->params['items'] = array();
+        if (Yii::$classMap[$this->params['content']->class_name]) {
+            $rule = $this->params['content']->makeRule();
+            eval("\$items = {$this->params['content']->class_name}::model()->{$rule}findAll();");
             foreach ($items as $item)
             {
-                $params['items'][] = $item->run(array(), true);
+                $this->params['items'][] = $item->widget($this->params['content']->class_name, array(), true);
             }
-        }
-        return $params;
+        }        
     }
-
 }

@@ -3,15 +3,20 @@
 class Area extends CWidget
 {
     public $name;
+    public $pageUnits = array();
+    public $readOnly = false;
     
     public function run()
     {
         $page = Yii::app()->page->model;
-        $editArea = Yii::app()->user->checkAccess('updateContentPage', array('page'=>$page)) && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
-        if ($page) {
-            $pageUnits = $page->getUnits($this->name);
-        } else $pageUnits = array();
-
+        $editArea = !$this->readOnly && Yii::app()->user->checkAccess('updateContentPage', array('page'=>$page)) && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
+        if (!empty($this->pageUnits)) {
+            $pageUnits = $this->pageUnits;
+        } else {
+            if ($page) {
+                $pageUnits = $page->getUnits($this->name);
+            } else $pageUnits = array();
+        }
         $output = '';
 
         foreach ($pageUnits as $i => $pageUnit) {
@@ -29,7 +34,7 @@ class Area extends CWidget
             $properties = array(
                 'duration' => Yii::app()->settings->getValue('cacheTime'),
             );
-            if (constant($className.'::CACHE')) {
+            if (call_user_func(array($className, 'cacheable'))) {
                 if (method_exists($className, 'cacheDependencies')) {
                     $content = $pageUnit->unit->content;
                     $tmp = $content->cacheDependencies();
@@ -79,6 +84,7 @@ class Area extends CWidget
             'name'=>$this->name,
             'editArea'=>$editArea,
             'output'=>$output,
+            'readOnly'=>$this->readOnly,
         ));
     }
 }

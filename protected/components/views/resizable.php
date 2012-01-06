@@ -50,7 +50,7 @@
         stop: function(event, ui) {
             $('#infospan-<?=$pageUnit->id?>').remove();
             <?php if (is_array($o['attributes'])) { ?>
-            var data = 'Content[<?=$o['attributes'][0]?>]='+Math.round(ui.size.width)+'&Content[<?=$o['attributes'][1]?>]='+Math.round(ui.size.height);
+            var data = 'ContentModel[<?=$o['attributes'][0]?>]='+Math.round(ui.size.width)+'&ContentModel[<?=$o['attributes'][1]?>]='+Math.round(ui.size.height);
             <?php } else { ?>
             var s = $(event.target).children('<?=$selector?>');
             var data = 'attribute=<?=$o['attributes']?>&width='+Math.round(ui.size.width)+'&height='+Math.round(ui.size.height)+'&tag='+s.get(0).tagName+'&number='+$('#cms-pageunit-<?=$pageUnit->id?>').find('<?=$selector?>').index(s.get(0));

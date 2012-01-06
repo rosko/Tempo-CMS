@@ -1,15 +1,20 @@
 <?php
 
-class UnitBreadcrumbs extends Content
+class UnitBreadcrumbs extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/hand_point.png';
-    const HIDDEN = true;
-
-    const DEFAULT_SEPARATOR = ' &raquo; ';
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/hand_point.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitBreadcrumbs.unit', 'Breadcrumbs', array(), null, $language);
+        return Yii::t('UnitBreadcrumbs.main', 'Breadcrumbs', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -36,7 +41,7 @@ class UnitBreadcrumbs extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-            'separator'=> Yii::t('UnitBreadcrumbs.unit', 'Separator'),
+            'separator'=> Yii::t('UnitBreadcrumbs.main', 'Separator'),
 		);
 	}
 
@@ -47,7 +52,7 @@ class UnitBreadcrumbs extends Content
                 'separator'=>array(
                     'type'=>'text'
                 ),
-                Yii::t('UnitBreadcrumbs.unit', 'If empty, use \'<b>{separator}</b>\'', array('{separator}'=>UnitBreadcrumbs::DEFAULT_SEPARATOR)),
+                Yii::t('UnitBreadcrumbs.main', 'If empty, use \'<b>{separator}</b>\'', array('{separator}'=>UnitBreadcrumbs::DEFAULT_SEPARATOR)),
 			),
 		);
 	}
@@ -83,20 +88,25 @@ class UnitBreadcrumbs extends Content
     public function templateVars()
     {
         return array(
-            '{breadcrumbs separator=$separator homeLink=$homeLink  links=$links}' => Yii::t('UnitBreadcrumbs.unit', 'Breadcrumbs'),
-            '{$separator}' => Yii::t('UnitBreadcrumbs.unit', 'Separator'),
-            '{$homeLink}' => Yii::t('UnitBreadcrumbs.unit', 'Caption or link for homepage'),
-            '{$links}' => Yii::t('UnitBreadcrumbs.unit', 'Links'),
+            '{breadcrumbs separator=$separator homeLink=$homeLink  links=$links}' => Yii::t('UnitBreadcrumbs.main', 'Breadcrumbs'),
+            '{$separator}' => Yii::t('UnitBreadcrumbs.main', 'Separator'),
+            '{$homeLink}' => Yii::t('UnitBreadcrumbs.main', 'Caption or link for homepage'),
+            '{$links}' => Yii::t('UnitBreadcrumbs.main', 'Links'),
         );
     }
 
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
+}
 
-        $ids = explode(',', $params['page']->path);
+class UnitBreadcrumbsWidget extends ContentWidget
+{
+    const DEFAULT_SEPARATOR = ' &raquo; ';
+
+    public function init()
+    {
+        parent::init();
+        $ids = explode(',', $this->params['page']->path);
         $pages = Page::model()->findAll(array(
-            'condition' => '`id` IN ('.$params['page']->path.')',
+            'condition' => '`id` IN ('.$this->params['page']->path.')',
             'order' => '`path` DESC'
         ));
         $parents = array();
@@ -110,16 +120,15 @@ class UnitBreadcrumbs extends Content
             if ($id == 0 || $id == 1) continue;
             $links[$parents[$id]->title] = array('view/index', 'pageId'=>$parents[$id]->id, 'alias'=>$parents[$id]->alias, 'url'=>$parents[$id]->url);
         }
-        if ($params['page']->id != 1)
-            $links[] = $params['page']->title;
+        if ($this->params['page']->id != 1)
+            $links[] = $this->params['page']->title;
         else
             $links[] = '';
-        $params['links'] = $links;
+        $this->params['links'] = $links;
 
-        $params['separator'] = $params['content']->separator ? $params['content']->separator : self::DEFAULT_SEPARATOR;
+        $this->params['separator'] = $this->params['content']->separator ? $this->params['content']->separator : self::DEFAULT_SEPARATOR;
 
-        $params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('view/index', 'pageId'=>$parents[1]->id, 'alias'=>$parents[1]->alias, 'url'=>$parents[1]->url)) : $params['page']->title);
-
-        return $params;
-    }
+        $this->params['homeLink'] = ($parents ? CHtml::link($parents[1]->title, array('view/index', 'pageId'=>$parents[1]->id, 'alias'=>$parents[1]->alias, 'url'=>$parents[1]->url)) : $this->params['page']->title);
+        
+    }    
 }

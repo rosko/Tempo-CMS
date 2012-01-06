@@ -1,13 +1,20 @@
 <?php
 
-class UnitBlogentry extends Content
+class UnitBlogentry extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/newspaper_add.png';
-    const HIDDEN = true;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/newspaper_add.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitBlogentry.unit', 'Blog/news entry', array(), null, $language);
+        return Yii::t('UnitBlogentry.main', 'Blog/news entry', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -36,11 +43,11 @@ class UnitBlogentry extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'text' => Yii::t('UnitBlogentry.unit', 'Content'),
-			'date' => Yii::t('UnitBlogentry.unit', 'Date'),
-			'source' => Yii::t('UnitBlogentry.unit', 'Source'),
-			'url' => Yii::t('UnitBlogentry.unit', 'Link to source'),
-            'blog_id' => Yii::t('UnitBlogentry.unit', 'Blog/news section'),
+			'text' => Yii::t('UnitBlogentry.main', 'Content'),
+			'date' => Yii::t('UnitBlogentry.main', 'Date'),
+			'source' => Yii::t('UnitBlogentry.main', 'Source'),
+			'url' => Yii::t('UnitBlogentry.main', 'Link to source'),
+            'blog_id' => Yii::t('UnitBlogentry.main', 'Blog/news section'),
 		);
 	}
 
@@ -57,7 +64,7 @@ class UnitBlogentry extends Content
 
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitBlogentry.unit', 'Entry')),
+                Form::tab(Yii::t('UnitBlogentry.main', 'Entry')),
 				'text'=>array(
 					'type'=>'TextEditor',
                     'kind'=>'fck',
@@ -69,7 +76,7 @@ class UnitBlogentry extends Content
 				'date'=>array(
 					'type'=>'DateTimePicker',
 				),
-                Form::tab(Yii::t('UnitBlogentry.unit', 'Source')),
+                Form::tab(Yii::t('UnitBlogentry.main', 'Source')),
 				'source'=>array(
 					'type'=>'text',
 					'maxlength'=>64
@@ -103,14 +110,14 @@ class UnitBlogentry extends Content
     public function scopesLabels()
     {
         return array(
-            'public' => Yii::t('UnitBlogentry.unit', 'Published only'),
-            'imported' => Yii::t('UnitBlogentry.unit', 'With source'),
+            'public' => Yii::t('UnitBlogentry.main', 'Published only'),
+            'imported' => Yii::t('UnitBlogentry.main', 'With source'),
             'recently' => array(
-                Yii::t('UnitBlogentry.unit', 'Recent'),
-                'limit' => Yii::t('UnitBlogentry.unit', 'Quantity'),
+                Yii::t('UnitBlogentry.main', 'Recent'),
+                'limit' => Yii::t('UnitBlogentry.main', 'Quantity'),
              ),
             'section' => array(
-                Yii::t('UnitBlogentry.unit', 'From section'),
+                Yii::t('UnitBlogentry.main', 'From section'),
                 'blog_id' => ''
             )
         );
@@ -185,22 +192,24 @@ class UnitBlogentry extends Content
     public function templateVars()
     {
         return array(
-            '{$unitUrl}' => Yii::t('UnitBlogentry.unit', 'Link to blog/news entry (in case, when blog/news entry showed as a part of list or blog/news section)'),
-            '{$sectionUrl}' => Yii::t('UnitBlogentry.unit', 'Link to blog/news section'),
-            '{$sectionTitle}' => Yii::t('UnitBlogentry.unit', 'Name of blog/news section'),
+            '{$unitUrl}' => Yii::t('UnitBlogentry.main', 'Link to blog/news entry (in case, when blog/news entry showed as a part of list or blog/news section)'),
+            '{$sectionUrl}' => Yii::t('UnitBlogentry.main', 'Link to blog/news section'),
+            '{$sectionTitle}' => Yii::t('UnitBlogentry.main', 'Name of blog/news section'),
         );
     }
 
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
-        $params['unitUrl'] = $params['content']->getUnitUrl();
-        if ($params['content']->section) {
-            $params['sectionUrl'] = $params['content']->section->getUnitUrl();
-            $params['sectionTitle'] = $params['content']->section->unit->title;
-            
-        }
-        return $params;
-    }
+}
 
+class UnitBlogentryWidget extends ContentWidget
+{
+    public function init()
+    {
+        parent::init();
+        $this->params['unitUrl'] = $this->params['content']->getUnitUrl();
+        if ($this->params['content']->section) {
+            $this->params['sectionUrl'] = $this->params['content']->section->getUnitUrl();
+            $this->params['sectionTitle'] = $this->params['content']->section->unit->title;
+            
+        }    
+    }    
 }

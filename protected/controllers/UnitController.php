@@ -190,12 +190,12 @@ JS;
         if (method_exists($className, 'unitName')) {
             if (is_subclass_of($className, 'Content')) {
                 $caption = array(
-                    'icon' => constant($className.'::ICON'),
+                    'icon' => call_user_func(array($className, 'icon')),
                     'label' => call_user_func(array($className, 'unitName')),
                 );
             } else {
                 $caption = array(
-                    'icon' => constant($className.'::ICON'),
+                    'icon' => $content->icon(),
                     'label' => $content->unitName(),
                 );
             }

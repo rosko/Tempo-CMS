@@ -1,13 +1,20 @@
 <?php
 
-class UnitHeader extends Content
+class UnitHeader extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/text_heading_1.png';
-    const HIDDEN = false;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/text_heading_1.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitHeader.unit', 'Header', array(), null, $language);
+        return Yii::t('UnitHeader.main', 'Header', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -34,7 +41,7 @@ class UnitHeader extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-            'header'=> Yii::t('UnitHeader.unit', 'Header type'),
+            'header'=> Yii::t('UnitHeader.main', 'Header type'),
 		);
 	}
 
@@ -43,11 +50,20 @@ class UnitHeader extends Content
 		return array(
 			'elements'=>array(
                 'header'=>array(
-                    'type'=>'radiolist',
-                    'items'=>array(
-                        'h1' => Yii::t('UnitHeader.unit', 'First level'),
-                        'h2' => Yii::t('UnitHeader.unit', 'Second level'),
-                        'h3' => Yii::t('UnitHeader.unit', 'Third level'),
+                    'type'=>'ButtonSet',
+                    'buttons'=>array(
+                        'h1' => array(
+                            'caption'=>'H1',
+                            'title'=>Yii::t('UnitHeader.main', 'First level'),
+                        ),
+                        'h2' => array(
+                            'caption'=>'H2',
+                            'title'=>Yii::t('UnitHeader.main', 'Second level'),
+                        ),
+                        'h3' => array(
+                            'caption'=>'H3',
+                            'title'=>Yii::t('UnitHeader.main', 'Third level'),
+                        ),
                     ),
                 ),
 			),
@@ -65,12 +81,16 @@ class UnitHeader extends Content
         );
     }
 
-    public function prepare($params)
+}
+
+class UnitHeaderWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
-        if ($params['unit']->title == '') {
-            $params['unit']->title = '&nbsp;';
+        parent::init();
+        if ($this->params['unit']->title == '') {
+            $this->params['unit']->title = '&nbsp;';
         }
-        return $params;
+        
     }
 }

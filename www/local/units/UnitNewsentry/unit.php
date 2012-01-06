@@ -1,13 +1,20 @@
 <?php
 
-class UnitNewsentry extends Content
+class UnitNewsentry extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/newspaper_add.png';
-    const HIDDEN = true;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/newspaper_add.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitNewsentry.unit', 'News entry', array(), null, $language);
+        return Yii::t('UnitNewsentry.main', 'News entry', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -37,13 +44,13 @@ class UnitNewsentry extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'text' => Yii::t('UnitNewsentry.unit', 'Content'),
-			'date' => Yii::t('UnitNewsentry.unit', 'Date'),
-			'source' => Yii::t('UnitNewsentry.unit', 'Source'),
-			'url' => Yii::t('UnitNewsentry.unit', 'Link to source'),
-            'news_id' => Yii::t('UnitNewsentry.unit', 'News section'),
-            'annotation' => Yii::t('UnitNewsentry.unit', 'Annotation'),
-            'image' => Yii::t('UnitNewsentry.unit', 'Image'),
+			'text' => Yii::t('UnitNewsentry.main', 'Content'),
+			'date' => Yii::t('UnitNewsentry.main', 'Date'),
+			'source' => Yii::t('UnitNewsentry.main', 'Source'),
+			'url' => Yii::t('UnitNewsentry.main', 'Link to source'),
+            'news_id' => Yii::t('UnitNewsentry.main', 'News section'),
+            'annotation' => Yii::t('UnitNewsentry.main', 'Annotation'),
+            'image' => Yii::t('UnitNewsentry.main', 'Image'),
 		);
 	}
 /*
@@ -65,7 +72,7 @@ class UnitNewsentry extends Content
 
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitNewsentry.unit', 'Annotation')),
+                Form::tab(Yii::t('UnitNewsentry.main', 'Annotation')),
 				'annotation'=>array(
 					'type'=>'TextEditor',
                     'kind'=>'fck',
@@ -77,7 +84,7 @@ class UnitNewsentry extends Content
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
 					'onChange'=> "js:$('#cms-pageunit-'+pageUnitId).find('img').attr('src', $(this).val());",
                 ),
-                Form::tab(Yii::t('UnitNewsentry.unit', 'Entry')),
+                Form::tab(Yii::t('UnitNewsentry.main', 'Entry')),
                 'news_id'=> !empty($sectionsArray) ? array(
                     'type'=>'ComboBox',
                     'array'=>$sectionsArray,
@@ -89,7 +96,7 @@ class UnitNewsentry extends Content
 					'type'=>'TextEditor',
                     'kind'=>'fck',
 				),
-                Form::tab(Yii::t('UnitNewsentry.unit', 'Source')),
+                Form::tab(Yii::t('UnitNewsentry.main', 'Source')),
 				'source'=>array(
 					'type'=>'text',
 					'maxlength'=>64
@@ -125,14 +132,14 @@ class UnitNewsentry extends Content
     public function scopesLabels()
     {
         return array(
-            'public' => Yii::t('UnitNewsentry.unit', 'Published only'),
-            'imported' => Yii::t('UnitNewsentry.unit', 'With source'),
+            'public' => Yii::t('UnitNewsentry.main', 'Published only'),
+            'imported' => Yii::t('UnitNewsentry.main', 'With source'),
             'recently' => array(
-                Yii::t('UnitNewsentry.unit', 'Recent'),
-                'limit' => Yii::t('UnitNewsentry.unit', 'Quantity'),
+                Yii::t('UnitNewsentry.main', 'Recent'),
+                'limit' => Yii::t('UnitNewsentry.main', 'Quantity'),
              ),
             'section' => array(
-                Yii::t('UnitNewsentry.unit', 'From section'),
+                Yii::t('UnitNewsentry.main', 'From section'),
                 'news_id' => ''
             )
         );
@@ -198,22 +205,24 @@ class UnitNewsentry extends Content
     public function templateVars()
     {
         return array(
-            '{$unitUrl}' => Yii::t('UnitNewsentry.unit', 'Link to news entry (in case, when news entry showed as a part of list or news section)'),
-            '{$sectionUrl}' => Yii::t('UnitNewsentry.unit', 'Link to news section'),
-            '{$sectionTitle}' => Yii::t('UnitNewsentry.unit', 'Name of news section'),
+            '{$unitUrl}' => Yii::t('UnitNewsentry.main', 'Link to news entry (in case, when news entry showed as a part of list or news section)'),
+            '{$sectionUrl}' => Yii::t('UnitNewsentry.main', 'Link to news section'),
+            '{$sectionTitle}' => Yii::t('UnitNewsentry.main', 'Name of news section'),
         );
     }
 
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
-        $params['unitUrl'] = $params['content']->getUnitUrl();
-        if ($params['content']->section) {
-            $params['sectionUrl'] = $params['content']->section->getUnitUrl();
-            $params['sectionTitle'] = $params['content']->section->unit->title;
-            
-        }
-        return $params;
-    }
+}
 
+class UnitNewsentryWidget extends ContentWidget
+{
+    public function init()
+    {
+        parent::init();
+        $this->params['unitUrl'] = $this->params['content']->getUnitUrl();
+        if ($this->params['content']->section) {
+            $this->params['sectionUrl'] = $this->params['content']->section->getUnitUrl();
+            $this->params['sectionTitle'] = $this->params['content']->section->unit->title;
+            
+        }        
+    }
 }

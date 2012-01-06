@@ -7,7 +7,7 @@ class TextEditor extends CInputWidget
     public $config = array();
     public $skin = 'default';
     public $width = 800;
-    public $height = 400;
+    public $height = 300;
 
     public function run()
     {
@@ -168,7 +168,8 @@ JS;
 'NumberedList','BulletedList','-',
 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 ['Undo','Redo','-','RemoveFormat','-',
-'Link','Unlink','-','Table','-','Cut','Copy','Paste','PasteText','PasteFromWord'],
+'Link','Unlink','-','Table','-','Paste','PasteText','PasteFromWord','-',
+'TextColor','Outdent','Indent','Blockquote','-','Source']
 ]",
 
             'toolbar_Full'=>"js:[

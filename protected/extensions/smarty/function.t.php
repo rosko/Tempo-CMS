@@ -18,7 +18,7 @@ function smarty_function_t($params, &$smarty) {
         throw new CException(Yii::t('ESmartyViewRenderer.messages', 'You should specify both "cat" and "text" parameters.'));
     }
     if (empty($params['cat'])) {
-        $params['cat'] = $smarty->getTemplateVars('className') .'.unit';
+        $params['cat'] = $smarty->getTemplateVars('className') .'.main';
     }
     $text = $params['text'];
     $category = $params['cat'];

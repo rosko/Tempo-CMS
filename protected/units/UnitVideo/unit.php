@@ -1,13 +1,20 @@
 <?php
 
-class UnitVideo extends Content
+class UnitVideo extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/movies.png';
-    const HIDDEN = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/movies.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitVideo.unit', 'Video', array(), null, $language);
+        return Yii::t('UnitVideo.main', 'Video', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -36,11 +43,11 @@ class UnitVideo extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'video' => Yii::t('UnitVideo.unit', 'Video link'),
-			'width' => Yii::t('UnitVideo.unit', 'Width'),
-			'height' => Yii::t('UnitVideo.unit', 'Height'),
-            'html' => Yii::t('UnitVideo.unit', 'HTML'),
-            'show_link' => Yii::t('UnitVideo.unit', 'Display link'),
+			'video' => Yii::t('UnitVideo.main', 'Video link'),
+			'width' => Yii::t('UnitVideo.main', 'Width'),
+			'height' => Yii::t('UnitVideo.main', 'Height'),
+            'html' => Yii::t('UnitVideo.main', 'HTML'),
+            'show_link' => Yii::t('UnitVideo.main', 'Display link'),
 		);
 	}
 
@@ -72,7 +79,7 @@ JS;
     
         return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitVideo.unit', 'Video')),
+                Form::tab(Yii::t('UnitVideo.main', 'Video')),
 				'video'=>array(
 					'type'=>'Link',
 					'size'=>40,
@@ -115,9 +122,9 @@ JS;
 						'change' => $changeHeight
 					)
 				),
-                Form::tab(Yii::t('UnitVideo.unit', 'HTML')),                
+                Form::tab(Yii::t('UnitVideo.main', 'HTML')),                
                 'html'=>array(
-                    'hint'=>Yii::t('UnitVideo.unit', 'If the link to your video is not recognized, use the version with the html-code.'),
+                    'hint'=>Yii::t('UnitVideo.main', 'If the link to your video is not recognized, use the version with the html-code.'),
                     'type'=>'textarea',
                         'rows'=>6,
                         'cols'=>60
@@ -166,8 +173,15 @@ JS;
                 'pattern' => "|youtube\.com([^0-9\?\#\=]*)(\?v[=/])?(#p/u/)?([0-9]*/)?([a-zA-Z0-9\-]*)|msi",
                 'match' => 5,
                 'width' => 480,
-                'height' => 385,
+                'height' => 270,
                 'view' => 'youtube',
+            ),
+            'youtu.be' => array(
+                'pattern' => "|youtu\.be\/([a-zA-Z0-9\-]*)|msi",
+                'match' => 1,
+                'width' => 480,
+                'height' => 270,
+                'view' => 'youtube',                
             ),
             'vimeo.com' => array(
                 'pattern' => "|vimeo\.com(/video)?/([0-9]*)|msi",
@@ -296,7 +310,7 @@ JS;
                 $id = $matches[$arr['match']];
                 $w = $width ? $width : $arr['width'];
                 $h = $height ? $height : $arr['height'];
-                return Content::renderFile('UnitVideo', 'codes.'.$arr['view'], array(
+                return UnitVideo::renderFile('UnitVideo', 'codes.'.$arr['view'], array(
                     'id' => $id,
                     'width' => $w,
                     'height' => $h,
@@ -305,17 +319,6 @@ JS;
             }
         }
         return false;
-    }
-
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
-        $params['video'] = UnitVideo::getHtmlByUrl(
-            $params['content']->video,
-            $params['content']->width,
-            $params['content']->height,
-            $params['unit']->title);
-        return $params;
     }
 
     public function resizableObjects()
@@ -327,4 +330,20 @@ JS;
             ),
         );
     }
+}
+
+
+class UnitVideoWidget extends ContentWidget
+{
+    
+    public function init()
+    {
+        parent::init();
+        $this->params['video'] = UnitVideo::getHtmlByUrl(
+            $this->params['content']->video,
+            $this->params['content']->width,
+            $this->params['content']->height,
+            $this->params['unit']->title);
+    }
+    
 }

@@ -1,13 +1,20 @@
 <?php
 
-class UnitLangswitcher extends Content
+class UnitLangswitcher extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/style_go.png';
-    const HIDDEN = false;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/style_go.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitLangswitcher.unit', 'Language switcher', array(), null, $language);
+        return Yii::t('UnitLangswitcher.main', 'Language switcher', array(), null, $language);
     }
     
     public static function model($className=__CLASS__)
@@ -27,13 +34,6 @@ class UnitLangswitcher extends Content
 			array('unit_id', 'numerical', 'integerOnly'=>true),
 		);
 	}
-
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
-        $params['languages'] = I18nActiveRecord::getLangs();
-        return $params;
-    }
 
     public function scheme()
     {
@@ -64,4 +64,14 @@ class UnitLangswitcher extends Content
         );
     }
 
+}
+
+
+class UnitLangswitcherWidget extends ContentWidget
+{
+    public function init()
+    {
+        parent::init();
+        $this->params['languages'] = I18nActiveRecord::getLangs();        
+    }
 }

@@ -1,14 +1,25 @@
 <?php
 
-class UnitRegister extends Content
+class UnitRegister extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/user.png';
-    const HIDDEN = true;
-    const CACHE = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/user.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
+    
+    public function cacheable()
+    {
+        return false;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitRegister.unit', 'Registration and profile form', array(), null, $language);
+        return Yii::t('UnitRegister.main', 'Registration and profile form', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -37,17 +48,17 @@ class UnitRegister extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-            'fields' => Yii::t('UnitRegister.unit', 'Form fields'),
-            'fields_req' => Yii::t('UnitRegister.unit', 'Required fields'),
-            'profile_fields' => Yii::t('UnitRegister.unit', 'Editable fields in user profile'),
-            'profile_fields_req' => Yii::t('UnitRegister.unit', 'Required editable fields in user profile'),
-            'is_emailauth_req' => Yii::t('UnitRegister.unit', 'Is e-mail authorization needed?'),
-            'is_invite_req' => Yii::t('UnitRegister.unit', 'Is invite required?'),
-            'invites' => Yii::t('UnitRegister.unit', 'Invites'),
-            'notify_admin' => Yii::t('UnitRegister.unit', 'Notify administrator about new user'),
-            'notify_user' => Yii::t('UnitRegister.unit', 'Notify user after successfull registration'),
-            'agreement' => Yii::t('UnitRegister.unit', 'User agreement'),
-            'text' => Yii::t('UnitRegister.unit', 'Text'),
+            'fields' => Yii::t('UnitRegister.main', 'Form fields'),
+            'fields_req' => Yii::t('UnitRegister.main', 'Required fields'),
+            'profile_fields' => Yii::t('UnitRegister.main', 'Editable fields in user profile'),
+            'profile_fields_req' => Yii::t('UnitRegister.main', 'Required editable fields in user profile'),
+            'is_emailauth_req' => Yii::t('UnitRegister.main', 'Is e-mail authorization needed?'),
+            'is_invite_req' => Yii::t('UnitRegister.main', 'Is invite required?'),
+            'invites' => Yii::t('UnitRegister.main', 'Invites'),
+            'notify_admin' => Yii::t('UnitRegister.main', 'Notify administrator about new user'),
+            'notify_user' => Yii::t('UnitRegister.main', 'Notify user after successfull registration'),
+            'agreement' => Yii::t('UnitRegister.main', 'User agreement'),
+            'text' => Yii::t('UnitRegister.main', 'Text'),
 		);
 	}
 
@@ -122,7 +133,7 @@ class UnitRegister extends Content
         
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitRegister.unit', 'Settings')),
+                Form::tab(Yii::t('UnitRegister.main', 'Settings')),
                 'fields'=>array(
                     'type'=>'listbox',
                     'multiple'=>true,
@@ -144,17 +155,17 @@ class UnitRegister extends Content
                 'notify_user'=>array(
                     'type'=>'checkbox',
                 ),
-                Form::tab(Yii::t('UnitRegister.unit', 'Text')),
+                Form::tab(Yii::t('UnitRegister.main', 'Text')),
                 'text'=>array(
 					'type'=>'TextEditor',
                     'kind'=>'fck',
                 ),
-                Form::tab(Yii::t('UnitRegister.unit', 'User agreement')),
+                Form::tab(Yii::t('UnitRegister.main', 'User agreement')),
                 'agreement'=>array(
 					'type'=>'TextEditor',
                     'kind'=>'fck',
                 ),
-                Form::tab(Yii::t('UnitRegister.unit', 'Editing profile')),
+                Form::tab(Yii::t('UnitRegister.main', 'Editing profile')),
                 'profile_fields'=>array(
                     'type'=>'listbox',
                     'multiple'=>true,
@@ -188,17 +199,21 @@ class UnitRegister extends Content
         );
     }
 
-    public function prepare($params)
+}
+
+class UnitRegisterWidget extends ContentModel
+{
+    public function init()
     {
-        $params = parent::prepare($params);
-        if (isset($_GET[$this->urlParam('do')])) {
-            $params['doParam'] = $_GET[$this->urlParam('do')];
+        parent::init();
+        if (isset($_GET[$this->params['content']->urlParam('do')])) {
+            $params['doParam'] = $_GET[$this->params['content']->urlParam('do')];
         }
 
         if (($params['isGuest'] || $params['editMode']) && $params['doParam']!='edit') {
 
             $model=new User('register');
-            $makeForm = $model->makeForm('register', $this->fields, $this->fields_req);
+            $makeForm = $model->makeForm('register', $this->params['content']->fields, $this->params['content']->fields_req);
             $params['formElements'] = $makeForm['elements'];
             $params['formRules'] = $makeForm['rules'];
             
@@ -209,7 +224,7 @@ class UnitRegister extends Content
             }
 
             if ($this->proccessRequest()) {
-                if ($this->is_emailauth_req) {
+                if ($this->params['content']->is_emailauth_req) {
                     $params['waitingAuthCode'] = true;
                 } else {
                     $params['justRegistered'] = true;
@@ -233,14 +248,14 @@ class UnitRegister extends Content
                     $tpldata = array(
                         'model'=>$user,
                         'settings' => Yii::app()->settings->model->getAttributes(),
-                        'page' => $this->getUnitPageArray(),
+                        'page' => $this->params['content']->getUnitPageArray(),
                     );
-                    if ($this->notify_user) {
+                    if ($this->params['content']->notify_user) {
                         // send 'to_user_notify' mail
                         Yii::app()->messenger->send(
                             'email',
                             $user->email,
-                            Yii::t('UnitRegister.unit', 'Registration completed'),
+                            Yii::t('UnitRegister.main', 'Registration completed'),
                             Yii::app()->controller->renderPartial(
                                 $viewFileDir.'to_user_notify',
                                 $tpldata,
@@ -261,7 +276,7 @@ class UnitRegister extends Content
             if ($params['isGuest']) {
                 $params['accessDenied'] = true;
             } else {
-                $makeForm = $params['user']->makeForm('update', $this->profile_fields, $this->profile_fields_req);
+                $makeForm = $params['user']->makeForm('update', $this->params['content']->profile_fields, $this->params['content']->profile_fields_req);
                 $params['formElements'] = $makeForm['elements'];
                 $params['formRules'] = $makeForm['rules'];
 
@@ -279,23 +294,22 @@ class UnitRegister extends Content
                 {
                     $params['user']->attributes=$_POST['User'];
                     if ($params['user']->save()) {
-                        Yii::app()->user->setFlash('save-permanent', Yii::t('UnitRegister.unit','Profile edited successfully'));
+                        Yii::app()->user->setFlash('save-permanent', Yii::t('UnitRegister.main','Profile edited successfully'));
                         Yii::app()->controller->refresh();
                     }
                 }
             }
-        }
-
-        return $params;
+        }        
     }
-
+    
+    
     protected function proccessRequest($model=null)
     {
         if(isset($_POST['User']))
 		{
             if (!$model) {
                 $model = new User('register');
-                $model->makeForm('register', $this->fields, $this->fields_req);
+                $model->makeForm('register', $this->params['content']->fields, $this->params['content']->fields_req);
             }
             $tpldata = array();
 			$model->attributes=$_POST['User'];
@@ -310,14 +324,14 @@ class UnitRegister extends Content
                 $viewFileDir = $cfg['UnitRegister'].'.UnitRegister.templates.mail.';
                 $tpldata['model'] = $model->getAttributes();
                 $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
-                $tpldata['page'] = $this->getUnitPageArray();
+                $tpldata['page'] = $this->params['content']->getUnitPageArray();
 
-                if ($this->notify_admin) {
+                if ($this->params['content']->notify_admin) {
                     // send 'to_admin_notify' mail
                     Yii::app()->messenger->send(
                         'email',
                         Yii::app()->settings->getValue('adminEmail'),
-                        '['.$_SERVER['HTTP_HOST'].'] '. Yii::t('UnitRegister.unit', 'New user registration'),
+                        '['.$_SERVER['HTTP_HOST'].'] '. Yii::t('UnitRegister.main', 'New user registration'),
                         Yii::app()->controller->renderPartial(
                             $viewFileDir.'to_admin_notify',
                             $tpldata,
@@ -325,7 +339,7 @@ class UnitRegister extends Content
                         )
                     );
                 }
-                if ($this->is_emailauth_req) {
+                if ($this->params['content']->is_emailauth_req) {
                     $model->saveAttributes(array(
                         'authcode'=>User::hash($model->id.$model->login.time().rand())
                     ));
@@ -334,7 +348,7 @@ class UnitRegister extends Content
                     Yii::app()->messenger->send(
                         'email',
                         $model->email,
-                        Yii::t('UnitRegister.unit', 'Registration confirm'),
+                        Yii::t('UnitRegister.main', 'Registration confirm'),
                         Yii::app()->controller->renderPartial(
                             $viewFileDir.'to_user_confirm',
                             $tpldata,
@@ -346,12 +360,12 @@ class UnitRegister extends Content
                     $model->saveAttributes(array(
                         'active'=>true
                     ));
-                    if ($this->notify_user || $tpldata['generatedPassword']) {
+                    if ($this->params['content']->notify_user || $tpldata['generatedPassword']) {
                         // send 'to_user_notify' mail
                         Yii::app()->messenger->send(
                             'email',
                             $model->email,
-                            Yii::t('UnitRegister.unit', 'Registration completed'),
+                            Yii::t('UnitRegister.main', 'Registration completed'),
                             Yii::app()->controller->renderPartial(
                                 $viewFileDir.'to_user_notify',
                                 $tpldata,
@@ -370,5 +384,5 @@ class UnitRegister extends Content
 		}
         return false;
     }
-
+    
 }

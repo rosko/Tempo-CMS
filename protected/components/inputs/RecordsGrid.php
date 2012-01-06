@@ -17,7 +17,7 @@ class RecordsGrid extends CInputWidget
             $this->model = call_user_func(array($this->sectionType, 'model'))->findByPk($this->sectionId);
         }
 
-        if ($this->model instanceof Content) {
+        if ($this->model instanceof ContentModel) {
 
             $dataProvider=new CActiveDataProvider($this->className, array(
                 'criteria'=> array(
@@ -90,7 +90,7 @@ JS
                         'id'=>$id.'_check',
                     )
                 ),
-                $this->model instanceof Content ? array(
+                $this->model instanceof ContentModel ? array(
                     array(
                         'name'=>'title',
                         'type'=>'raw',

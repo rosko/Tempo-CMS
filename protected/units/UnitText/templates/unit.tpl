@@ -3,8 +3,3 @@
 {/if}
 
 {$content.text}
-
-{if $content.author}
-    <p>{t text='Author'}: {$content.author}</p>
-{/if}
-

@@ -1,13 +1,20 @@
 <?php
 
-class UnitText extends Content
+class UnitText extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/text_dropcaps.png';
-    const HIDDEN = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/text_dropcaps.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
 	
     public function unitName($language=null)
     {
-        return Yii::t('UnitText.unit', 'Text', array(), null, $language);
+        return Yii::t('UnitText.main', 'Text', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -26,7 +33,7 @@ class UnitText extends Content
 			array('text', 'required'),
             array('unit_id', 'required', 'on'=>'edit'),
 			array('unit_id', 'numerical', 'integerOnly'=>true),
-			array('author', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
+//			array('author', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
 		));
 	}
 
@@ -40,8 +47,8 @@ class UnitText extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'text' => Yii::t('UnitText.unit', 'Text'),
-			'author' => Yii::t('UnitText.unit', 'Author'),
+			'text' => Yii::t('UnitText.main', 'Text'),
+//			'author' => Yii::t('UnitText.main', 'Author'),
 		);
 	}
 	
@@ -51,13 +58,16 @@ class UnitText extends Content
 			'elements'=>array(
 				'text'=>array(
 					'type'=>'TextEditor',
-                    'kind'=>'fck',
+                    'kind'=>'ck',
+                    'config'=>array(
+                        'toolbar'=>'Basic',
+                    )
 				),
-				'author'=>array(
+/*				'author'=>array(
 					'type'=>'ComboBox',
 					'showAllValues' => true,
                     'canEdit' => true,
-				)
+				)*/
 			),
 		);
 	}
@@ -84,4 +94,9 @@ class UnitText extends Content
         );
     }
 
+}
+
+class UnitTextWidget extends ContentWidget
+{
+    
 }

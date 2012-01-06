@@ -174,7 +174,7 @@ class Unit extends I18nActiveRecord
                         $_units[$className] = array(
                             'name' => $u[$className],
                             'dir_alias' => $alias,
-                            'icon' => constant($className.'::ICON'),
+                            'icon' => call_user_func(array($className, 'icon')),
                             'installed' => in_array($className, $installed),
                         );
                     }
@@ -274,7 +274,7 @@ class Unit extends I18nActiveRecord
         self::loadTypes();
         $classNames = array_keys(self::loadConfig());
 		foreach ($classNames as $className) {
-            if (!Yii::app()->settings->getValue('simpleMode') || !constant($className.'::HIDDEN'))
+            if (!Yii::app()->settings->getValue('simpleMode') || !call_user_func(array($className, 'hidden')))
                 $ret[$className] = call_user_func(array($className, 'unitName'));
 
 		}

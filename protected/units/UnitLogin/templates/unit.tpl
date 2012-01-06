@@ -14,7 +14,7 @@
         <a href="#" onclick="$('#RememberForm{$unit.id}').slideUp();$('#LoginForm{$unit.id}').slideDown();return false;">{t text="Back to login form"}</a>
     </div>
 {else}
-    {dynamic callback=array('UnitLogin', 'dynamicGreetings')}
+    {dynamic callback=array('UnitLoginWidget', 'dynamicGreetings')}
     {form method='POST'}
         <input type="submit" name="logout" value="{t text='Logout'}" />
     </form>

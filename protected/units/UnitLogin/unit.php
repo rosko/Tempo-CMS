@@ -1,13 +1,20 @@
 <?php
 
-class UnitLogin extends Content
+class UnitLogin extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/user.png';
-    const HIDDEN = true;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/user.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitLogin.unit', 'Login Form', array(), null, $language);
+        return Yii::t('UnitLogin.main', 'Login Form', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -50,18 +57,8 @@ class UnitLogin extends Content
     public function templateVars()
     {
         return array(
-            '{$formButtons}' => Yii::t('UnitLogin.unit', 'LoginForm buttons'),
+            '{$formButtons}' => Yii::t('UnitLogin.main', 'LoginForm buttons'),
         );
-    }
-
-    public function dynamicGreetings()
-    {
-        if (Yii::app()->user->id)
-            $user = User::model()->findByPk(Yii::app()->user->id);
-        if ($user) {
-            return '<h3>' . Yii::t('UnitLogin.unit', 'Hello') . ', ' . $user->displayname . '!</h3>';
-        }
-        return '';
     }
 
     public function cacheVaryBy()
@@ -81,21 +78,25 @@ class UnitLogin extends Content
         return array('authcode');
     }
 
-    public function prepare($params)
+}
+
+class UnitLoginWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
-        $params['formButtons'] = array(
+        parent::init();
+        $this->params['formButtons'] = array(
             'login'=>array(
                 'type'=>'submit',
-                'label'=>Yii::t('UnitLogin.unit', 'Login'),
-                'title'=>Yii::t('UnitLogin.unit', 'Login'),
+                'label'=>Yii::t('UnitLogin.main', 'Login'),
+                'title'=>Yii::t('UnitLogin.main', 'Login'),
             ),
         );
-        $params['doRemember'] = isset($_POST['RememberForm']);
+        $this->params['doRemember'] = isset($_POST['RememberForm']);
 
         if ($this->proccessRequest()) {
-            if($params['doRemember']) {
-                $params['doneRemember'] = true;
+            if($this->params['doRemember']) {
+                $this->params['doneRemember'] = true;
 
             } else
                 Yii::app()->controller->refresh();
@@ -115,7 +116,7 @@ class UnitLogin extends Content
                 Yii::app()->controller->refresh();
             }
         }
-        return $params;
+        
     }
 
     protected function proccessRequest()
@@ -149,12 +150,12 @@ class UnitLogin extends Content
                     $viewFileDir = $cfg['UnitLogin'].'.UnitLogin.templates.mail.';
                     $tpldata['model'] = $user;
                     $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
-                    $tpldata['page'] = $this->getUnitPageArray();
+                    $tpldata['page'] = $this->params['content']->getUnitPageArray();
                     // send 'to_user_confirm' mail
                     Yii::app()->messenger->send(
                         'email',
                         $user->email,
-                        Yii::t('UnitLogin.unit', 'Password reset'),
+                        Yii::t('UnitLogin.main', 'Password reset'),
                         Yii::app()->controller->renderPartial(
                             $viewFileDir.'password_reset',
                             $tpldata,
@@ -168,5 +169,16 @@ class UnitLogin extends Content
         return false;
 
     }
+   
+    public function dynamicGreetings()
+    {
+        if (Yii::app()->user->id)
+            $user = User::model()->findByPk(Yii::app()->user->id);
+        if ($user) {
+            return '<h3>' . Yii::t('UnitLogin.main', 'Hello') . ', ' . $user->displayname . '!</h3>';
+        }
+        return '';
+    }
 
+    
 }

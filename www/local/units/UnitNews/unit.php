@@ -1,13 +1,20 @@
 <?php
 
-class UnitNews extends Content
+class UnitNews extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/newspaper.png';
-    const HIDDEN = false;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/newspaper.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitNews.unit', 'News section', array(), null, $language);
+        return Yii::t('UnitNews.main', 'News section', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -33,7 +40,7 @@ class UnitNews extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'per_page' => Yii::t('UnitNews.unit', 'Entries per page'),
+			'per_page' => Yii::t('UnitNews.main', 'Entries per page'),
             'items' => '',
 		);
 	}
@@ -49,21 +56,21 @@ class UnitNews extends Content
 	{
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitNews.unit', 'News section')),
+                Form::tab(Yii::t('UnitNews.main', 'News section')),
                 'items' => array(
                     'type'=>'RecordsGrid',
                     'className' => 'UnitNewsentry',
                     'foreignAttribute' => 'news_id',
-                    'addButtonTitle'=>Yii::t('UnitNews.unit', 'Create entry'),
+                    'addButtonTitle'=>Yii::t('UnitNews.main', 'Create entry'),
                     'columns' => array(
                         'date',
                     ),
                     'order' => 'date DESC',
                 ),
-                Form::tab(Yii::t('UnitNews.unit', 'Settings')),
+                Form::tab(Yii::t('UnitNews.main', 'Settings')),
 				'per_page'=>array(
 					'type'=>'Slider',
-                    'hint'=>Yii::t('UnitNews.unit', 'If zero choosed, accordingly site\'s general settings'),
+                    'hint'=>Yii::t('UnitNews.main', 'If zero choosed, accordingly site\'s general settings'),
 					'options'=>array(
 						'min' => 0,
 						'max' => 25,
@@ -102,8 +109,8 @@ class UnitNews extends Content
     public function templateVars()
     {
         return array(
-            '{$items}' => Yii::t('UnitNews.unit', 'Еntries'),
-            '{$pager}' => Yii::t('UnitNews.unit', 'Pager'),
+            '{$items}' => Yii::t('UnitNews.main', 'Еntries'),
+            '{$pager}' => Yii::t('UnitNews.main', 'Pager'),
         );
     }
 
@@ -119,30 +126,31 @@ class UnitNews extends Content
         );
     }
 
-    public function prepare($params)
+}
+
+class UnitNewsWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
+        parent::init();
         $items = UnitNewsentry::model()
                     ->public()
-                    ->selectPage($params['content']->pageNumber, $params['content']->per_page)
+                    ->selectPage($this->params['content']->pageNumber, $this->params['content']->per_page)
                     ->with('unit')
-                    ->findAll('news_id = :id', array(':id'=>$params['content']->id));
+                    ->findAll('news_id = :id', array(':id'=>$this->params['content']->id));
         
-        $params['items'] = array();
+        $this->params['items'] = array();
         foreach ($items as $item)
         {
-            $params['items'][] = $item->run(array(
+            $this->params['items'][] = $item->widget('UnitNewsentry', array(
                 'in_section'=>true,
             ), true);
         }
-        $params['pager'] = $params['content']->renderPager(
+        $this->params['pager'] = $this->params['content']->renderPager(
                 count($items),
-                $params['content']->itemsCount,
-                $params['content']->pageNumber,
-                $params['content']->per_page);
+                $this->params['content']->itemsCount,
+                $this->params['content']->pageNumber,
+                $this->params['content']->per_page);
 
-        return $params;
-    }
-
-
+   }
 }

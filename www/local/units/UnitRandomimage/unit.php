@@ -1,14 +1,25 @@
 <?php
 
-class UnitRandomimage extends Content
+class UnitRandomimage extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/image.png';
-    const HIDDEN = false;
-    const CACHE = false;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/image.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
+    
+    public function cacheable()
+    {
+        return false;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitRandomimage.unit', 'Random image', array(), null, $language);
+        return Yii::t('UnitRandomimage.main', 'Random image', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -36,18 +47,18 @@ class UnitRandomimage extends Content
 	public function attributeLabels()
 	{
 		return array(
-			'images' => Yii::t('UnitRandomimage.unit', 'Images'),
-			'width' => Yii::t('UnitRandomimage.unit', 'Width'),
-			'height' => Yii::t('UnitRandomimage.unit', 'Height'),
-			'url' => Yii::t('UnitRandomimage.unit', 'Link'),
-            'target' => Yii::t('UnitRandomimage.unit', 'Link target'),
+			'images' => Yii::t('UnitRandomimage.main', 'Images'),
+			'width' => Yii::t('UnitRandomimage.main', 'Width'),
+			'height' => Yii::t('UnitRandomimage.main', 'Height'),
+			'url' => Yii::t('UnitRandomimage.main', 'Link'),
+            'target' => Yii::t('UnitRandomimage.main', 'Link target'),
 		);
 	}
 
     public function templateVars()
     {
         return array(
-            '{$image}' => Yii::t('UnitRandomimage.unit', 'Random-selected image'),
+            '{$image}' => Yii::t('UnitRandomimage.main', 'Random-selected image'),
         );
     }
 
@@ -65,7 +76,7 @@ class UnitRandomimage extends Content
 	{
 		return array(
 			'elements'=>array(
-                Form::tab(Yii::t('UnitRandomimage.unit', 'Images')),
+                Form::tab(Yii::t('UnitRandomimage.main', 'Images')),
 				'images'=>array(
 					'type'=>'ListEdit',
 					//'size'=>40,
@@ -90,7 +101,7 @@ class UnitRandomimage extends Content
 						'step' => 1,
 					)
 				),
-                Form::tab(Yii::t('UnitRandomimage.unit', 'Link')),
+                Form::tab(Yii::t('UnitRandomimage.main', 'Link')),
 				'url'=>array(
 					'type'=>'Link',
 					'size'=>40,
@@ -99,8 +110,8 @@ class UnitRandomimage extends Content
                 'target'=>array(
                     'type'=>'dropdownlist',
                     'items'=> array(
-                        '' => Yii::t('UnitRandomimage.unit', 'Current window'),
-                        '_blank' => Yii::t('UnitRandomimage.unit', 'New window'),
+                        '' => Yii::t('UnitRandomimage.main', 'Current window'),
+                        '_blank' => Yii::t('UnitRandomimage.main', 'New window'),
                     ),
                 ),
 			),
@@ -122,14 +133,6 @@ class UnitRandomimage extends Content
         );
     }
 
-    public function prepare($params)
-    {
-        $params = parent::prepare($params);
-        $params['image'] = $params['content']->images[rand(0,count($params['content']->images)-1)];
-        return $params;
-    }
-
-
     public static function defaultObject()
 	{
 		$obj = new self;
@@ -149,4 +152,14 @@ class UnitRandomimage extends Content
         );
     }
 
+}
+
+
+class UnitRandomimageWidget extends ContentWidget
+{
+    public function init()
+    {
+        parent::init();
+        $this->params['image'] = $this->params['content']->images[rand(0,count($this->params['content']->images)-1)];
+    }
 }

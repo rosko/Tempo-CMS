@@ -1,5 +1,5 @@
     <?php
-    if(!constant($className.'::CACHE') || $this->beginCache(serialize($cacheVaryBy), $properties)) {
+    if(!call_user_func(array($className, 'cacheable')) || $this->beginCache(serialize($cacheVaryBy), $properties)) {
         $content = $pageUnit->unit->content;
         if ($content) { ?>
 
@@ -11,11 +11,11 @@
     rev="<?=$pageUnit->unit->id?>"
     content_id="<?=$content->id?>"
 >
-    <?=$content->run(array('pageUnit'=>$pageUnit));?>
+    <?=$content->widget($className, array('pageUnit'=>$pageUnit));?>
 </div>
 
     <?php
         }
-        if (constant($className.'::CACHE'))
+        if (call_user_func(array($className, 'cacheable')))
             $this->endCache();
     } ?>

@@ -1,0 +1,1 @@
+{if $pageUnits}{area name="{$areaId}" pageUnits=$pageUnits readOnly="true"}{/if}

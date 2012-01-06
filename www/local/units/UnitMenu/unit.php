@@ -1,13 +1,20 @@
 <?php
 
-class UnitMenu extends Content
+class UnitMenu extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/breeze.png';
-    const HIDDEN = true;
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/breeze.png';
+    }
+    
+    public function hidden()
+    {
+        return true;
+    }
 
     public function unitName($language=null)
     {
-        return Yii::t('UnitMenu.unit', 'Menu', array(), null, $language);
+        return Yii::t('UnitMenu.main', 'Menu', array(), null, $language);
     }
 
 	public static function model($className=__CLASS__)
@@ -34,7 +41,7 @@ class UnitMenu extends Content
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
 //			'items' => 'Items',
-            'recursive' => Yii::t('UnitMenu.unit', 'Levels'),
+            'recursive' => Yii::t('UnitMenu.main', 'Levels'),
 		);
 	}
 
@@ -49,7 +56,7 @@ class UnitMenu extends Content
 						'max' => 10,
 					)
 				),
-                Yii::t('UnitMenu.unit', 'If zero choosed, siblings pages will show'),
+                Yii::t('UnitMenu.main', 'If zero choosed, siblings pages will show'),
 /*				'items'=>array(
 					'type'=>'textarea',
 					'rows'=>7,
@@ -90,16 +97,17 @@ class UnitMenu extends Content
     public function templateVars()
     {
         return array(
-            '{$tree}'=>Yii::t('UnitMenu.unit', 'Menu items'),
+            '{$tree}'=>Yii::t('UnitMenu.main', 'Menu items'),
         );
     }
 
-    public function prepare($params)
+}
+
+class UnitMenuWidget extends ContentWidget
+{
+    public function init()
     {
-        $params = parent::prepare($params);
-        $params['tree'] = Page::model()->getTree();
-
-        return $params;
+        parent::init();
+        $this->params['tree'] = Page::model()->getTree();        
     }
-
 }

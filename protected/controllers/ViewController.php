@@ -53,8 +53,8 @@ class ViewController extends Controller
 		$pageUnit = PageUnit::model()->with('unit')->findByPk((int)$pageUnitId);
         if ($pageUnit) {
             $className = Unit::getClassNameByUnitType($pageUnit->unit->type);
-            $pageUnit->unit->content->run(array(
-                'pageunit'=>$pageUnit
+            $pageUnit->unit->content->widget($className, array(
+                'pageunit'=>$pageUnit,
             ));
         }
     }

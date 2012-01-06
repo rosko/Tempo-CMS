@@ -1,13 +1,20 @@
 <?php
 
-class UnitHtml extends Content
+class UnitHtml extends ContentModel
 {
-	const ICON = '/images/icons/fatcow/16x16/html.png';
-    const HIDDEN = false;
-
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/html.png';
+    }
+    
+    public function hidden()
+    {
+        return false;
+    }
+    
     public function unitName($language=null)
     {
-        return Yii::t('UnitHtml.unit', 'HTML', array(), null, $language);
+        return Yii::t('UnitHtml.main', 'HTML', array(), null, $language);
     }
 
     public static function model($className=__CLASS__)
@@ -40,7 +47,7 @@ class UnitHtml extends Content
 		return array(
 //			'id' => 'ID',
 //			'unit_id' => 'Unit',
-			'html' => Yii::t('UnitHtml.unit', 'HTML'),
+			'html' => Yii::t('UnitHtml.main', 'HTML'),
 		);
 	}
 
@@ -67,5 +74,10 @@ class UnitHtml extends Content
             'modify' => 'datetime',
             'html' => 'text',
         );
-    }
+    }   
+}
+
+class UnitHtmlWidget extends ContentWidget
+{
+    
 }

@@ -15,6 +15,7 @@ class PageUrlValidator extends CUniqueValidator
             '/view/page',
             '/login',
             '/users',
+            '/feed',
         );
     }
 

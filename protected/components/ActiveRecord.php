@@ -1,7 +1,31 @@
 <?php
 
-class ActiveRecord extends CActiveRecord {
+class ActiveRecord extends CActiveRecord 
+{
+    public function baseScheme()
+    {
+        return array(
+            'id' => 'pk',
+            'create' => 'timestamp not null default current_timestamp',
+            'modify' => 'timestamp',            
+        );
+    }
 
+    public function beforeSave()
+    {
+        if ($this->isNewRecord) 
+        {
+            if ($this->hasAttribute('create')) {
+                $this->create = new CDbExpression('NOW()');
+            }
+        } else {
+            if ($this->hasAttribute('modify')) {
+                $this->modify = new CDbExpression('NOW()');
+            }
+        }
+        return parent::beforeSave();
+    }
+    
     public function getAll($condition = '', $params = array(), $columns = '*')
     {
 //        if (is_string($condition)) {

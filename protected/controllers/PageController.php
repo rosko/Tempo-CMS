@@ -14,6 +14,28 @@
  */
 class PageController extends Controller
 {
+	public function filters()
+	{
+		return array('accessControl');
+	}
+
+	public function accessRules()
+	{
+		return array(
+			array('allow',
+				'actions'=>array('add', 'delete', 'deleteDialog', 'edit', 
+                    'fill', 'rename', 'sort', 'tree'),
+				'users'=>array('@'),
+			),
+            array('allow',
+                'actions'=>array('getUrl', 'hasChildren'),
+                'users'=>array('*'),                
+            ),
+			array('deny',
+				'users'=>array('*'),
+			),
+		);
+	}
     /**
      * Создает новую страницу
      */

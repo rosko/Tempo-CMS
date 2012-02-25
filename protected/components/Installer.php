@@ -16,6 +16,9 @@ class Installer extends CApplicationComponent
 
         if (method_exists($className, 'scheme') && $tableName) {
             $scheme = call_user_func(array($className, 'scheme'));
+            if (method_exists($className, 'baseScheme') && $tableName) {
+                $scheme = CMap::mergeArray(call_user_func(array($className, 'baseScheme')), $scheme);
+            }
             if (method_exists($className, 'i18n')) {
                 $i18n_columns = call_user_func(array($className, 'i18n'));
                 $langs = array_keys(I18nActiveRecord::getLangs());
@@ -71,7 +74,7 @@ class Installer extends CApplicationComponent
             $this->installTable($className);
         $this->installAuth();
         if ($withUnits)
-            Unit::install(array_keys(Unit::getAllUnits()));
+            ContentUnit::install(array_keys(ContentUnit::getAvailableUnits()));
 
     }
 

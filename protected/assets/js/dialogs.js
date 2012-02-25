@@ -56,6 +56,14 @@ function cmsOpenDialog(content, options) {
             if ($.isFunction(options.onOpen)) {
                 options.onOpen(this);
             }
+/*            var w = $(this).width();
+            var h = $(this).height();
+            var b = $(this).find('.cms-dialog');
+            b.addClass('nano')
+            b.wrapInner('<div class="content"></div>');
+            b.height(h-112).css('left','0px');
+            $(this).find('.cms-dialog').nanoScroller();*/
+            $('html').css('overflow', 'hidden');
         },
         onClose: function() {
             cmsFadeOut('.selected', 'selected');
@@ -63,6 +71,7 @@ function cmsOpenDialog(content, options) {
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);
             }
+            $('html').css('overflow', 'auto');
         }
     });
 }

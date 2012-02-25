@@ -8,9 +8,7 @@ class FilesEditorController extends Controller
 
 	public function filters()
 	{
-		return array(
-//			'accessControl', // perform access control for CRUD operations
-		);
+		return array('accessControl');
 	}
 
 	public function accessRules()
@@ -19,7 +17,7 @@ class FilesEditorController extends Controller
 			array('allow',
 				'actions'=>array('form', 'save', 'load', 'create', 'delete'
                 ),
-				'users'=>array('admin'),
+				'users'=>array('@'),
 			),
 			array('deny',
 				'users'=>array('*'),
@@ -68,7 +66,7 @@ class FilesEditorController extends Controller
                     }
                 }
 
-                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'unitName'))));
+                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'modelName'))));
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
@@ -112,7 +110,7 @@ class FilesEditorController extends Controller
                 $setts = call_user_func(array($name, 'settings'), $name);
                 foreach ($setts as $k => $v) {
                     $var = '{$settings.local.'.$k.'}';
-                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>call_user_func(array($name, 'unitName')))) . self::SUGGESTIONS_SEPARATOR . $v['label'];
+                    $suggestions[$var] = Yii::t('filesEditor', 'Settings for units «{name}»', array('{name}'=>call_user_func(array($name, 'modelName')))) . self::SUGGESTIONS_SEPARATOR . $v['label'];
                 }
             }
         } else {

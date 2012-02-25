@@ -78,7 +78,7 @@ $fields = $_fields;*/
 </div>
 <!-- <a href="#" id="<?=$id?>_data">data</a> //-->
 
-<div class="hidden">
+<div class="cms-hidden">
     <div id="<?=$id?>_sample">
     <?php foreach ($this->allowTypes as $type) { ?>
         <div id="<?=$id?>_sample_field_<?=$type?>">
@@ -107,7 +107,7 @@ $fields = $_fields;*/
 $('#<?=$id?>_fields').parents('form:eq(0)').submit(function() {
     $('#<?=$id?>_sample').remove();
     $('#<?=$id?>_fields').find('.FieldSet_field_rules').find('fieldset').each(function() {
-        if ($(this).hasClass('hidden') || $(this).css('display')=='none') {
+        if ($(this).hasClass('cms-hidden') || $(this).css('display')=='none') {
             $(this).remove();
         }
     });

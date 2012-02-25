@@ -57,7 +57,7 @@ class AreaEdit extends CInputWidget
                 },
                 start:function(event, ui) {
                     $(ui.helper).find('.cms-panel').hide();
-                    $('.cms-area').addClass('potential');
+                    $('.cms-area').addClass('cms-potential');
                     $('.cms-area').each(function() {
                         if ($(this).find('.cms-pageunit').length == 0)
                             $(this).addClass('cms-empty-area');
@@ -65,7 +65,7 @@ class AreaEdit extends CInputWidget
                     cmsAreaEmptyCheck();
                 },
                 stop:function(event, ui) {
-                    $('.cms-area').removeClass('potential').removeClass('cms-empty-area');
+                    $('.cms-area').removeClass('cms-potential').removeClass('cms-empty-area');
                     cmsAreaEmptyCheck();
                 }
             }).disableSelection();

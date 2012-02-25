@@ -1,6 +1,11 @@
 <div id="<?=$id?>_header">
     <input type="button" class="<?=$id?>_add" value="<?=$addButtonTitle ? $addButtonTitle : Yii::t('cms', 'Add')?>" />
 </div>
+<?php 
+if ($this->hasModel()) {
+    CHtml::activeHiddenField($this->model, $this->attribute);
+}
+?>
 
 <?=$recordsGrid?>
 
@@ -9,43 +14,42 @@
 </div>
 
 <script type="text/javascript">
-$('#<?=$id?>_check input').live('click', function() {
+$('#<?=$id?>_check input').die('click').live('click', function() {
     var check = $(this).attr('checked');
     var settings = $.fn.yiiGridView.settings['<?=$id?>'];
     $('#<?=$id?> .'+settings.tableClass+' > tbody > tr').each(function(i){
         if (check) {
-            $(this).addClass('selected');
+            $(this).addClass('cms-selected');
         } else {
-            $(this).removeClass('selected');
+            $(this).removeClass('cms-selected');
         }
     });
 });
 $('.<?=$id?>_add').click(function() {
-    var newPageId = 0;
-    
-    if (<?=$pageId?>) {
 
-        var url = '/?r=unit/edit&area=<?=$area?>&makePage=<?=(int)$this->makePage?>&pageId=<?=$pageId?>&type=<?=$type?>&sectionId=<?=$sectionId?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
+    <?php if ($pageId) { ?>
+
+        var url = '/?r=unit/edit&area=<?=$area?>&pageId=<?=$pageId?>&modelClass=<?=$className?>&sectionId=<?=$model->id?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
         cmsLoadDialog(url, {
             simpleClose: false,
+            onOpen: function(t) {
+                $(t).find('.field_title input:eq(0)').focus();
+            },
             onClose: function() {
                 $.fn.yiiGridView.update('<?=$id?>');
-                cmsReloadPageUnit(<?=$pageUnitId?>, '.cms-pageunit[rev=<?=$unitId?>]');
             }
         });
 
-    } else { 
+    <?php } else { 
         // Иначе просто создаем запись
+        ?>        
         if ($.fn.yiiGridView) {
             cmsRecordEditForm(0, '<?=$className?>', 0, '<?=$id?>');
         } else {
             cmsRecordEditForm(0, '<?=$className?>', 0);
-            $('#cmsRecordEditForm<?=$className?>_0').live('dialogbeforeclose', function() {
-                cmsReloadPageUnit(<?=$pageUnitId?>, '.cms-pageunit[rev=<?=$unitId?>]');
-            });
         }
 
-    }
+    <?php } ?>
 
 
 });

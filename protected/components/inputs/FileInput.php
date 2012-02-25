@@ -37,7 +37,7 @@ class FileInput extends CInputWidget
             print "</li><li>" . Yii::t('cms', 'or') . " ";
             echo CHtml::button(Yii::t('cms', 'Browse uploaded'), array(
                 'id' => $this->htmlOptions['id'] . '_button',
-                'class' => 'cms-button w200',
+                'class' => 'cms-button cms-w200',
             ));            
         }
         if ($this->showUploadButton)
@@ -89,7 +89,7 @@ var uploader = new qq.FileUploader({
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
                 '<div class="cms-drop-area"><span>{$txtDragHere}</span></div>' +
-                '<div class="cms-button w200">{$txtUpload}</div>' +
+                '<div class="cms-button cms-w200">{$txtUpload}</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
              '</div>',
     fileTemplate: '<li>' +

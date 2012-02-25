@@ -7,7 +7,7 @@ class TextEditor extends CInputWidget
     public $config = array();
     public $skin = 'default';
     public $width = 800;
-    public $height = 300;
+    public $height = 400;
 
     public function run()
     {
@@ -157,6 +157,8 @@ JS;
             'fillEmptyBlocks'=>true,
             'removeFormatTags'=>'code,del,dfn,div,font,ins,kbd,q,samp,span,tt,var,dl,dt,dd,form,input,button,textarea,label',
             'removeDialogTabs'=>'flash:advanced;image:advanced;link:advanced;image:Link',
+            'removePlugins'=>'elementspath,resize',
+            'resize_enabled'=>false,
             'format_tags'=>'p;h1;h2;h3;h4;h5;h6',
             'forceEnterMode'=>true,
             'forceSimpleAmpersand'=>true,

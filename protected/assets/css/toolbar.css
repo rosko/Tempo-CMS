@@ -18,11 +18,12 @@
 }
 .cms-menu ul li {
     float:left;
+    line-height:0.8em;
 }
 .cms-menu ul li a {
     background-color:white;
     background-repeat:no-repeat;
-    display:block;
+    display:inline-block;
     cursor:pointer;
     padding:7px;
     text-decoration: none;

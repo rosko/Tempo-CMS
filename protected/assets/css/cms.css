@@ -7,14 +7,6 @@
 	background:lightblue;
 }
 
-.top {
-	position:absolute;
-	top:0px;
-}
-.fixed {
-	position:fixed;
-}
-
 .cms-panel {
 	display:none;
 	z-index:100000;
@@ -121,19 +113,19 @@
 	padding:7px 5px 5px 7px;
 }
 
-.hidden {
+.cms-hidden {
 	display:none;
 }
-.selected {
+.cms-selected {
 	background-color:#FF4040 !important;
 }
-.potential {
+.cms-potential {
 	background-color:#F0F0FF !important;
 }
-form input, form label, form select {
+.cms-form input, .cms-form label, .cms-form select {
 	font-size:1.1em !important;
 }
-.hover {
+.cms-hover {
 	background-color:rgb(244, 255, 244) !important;
 }
 
@@ -148,40 +140,22 @@ div.cms-button, input.cms-button {
 	font-size:0.95em !important;
 }
 
-.w200 {
+.cms-w200 {
 	width:196px;
 	text-align: center;
 }
 
-.w100p {
+.cms-w100p {
     width:100%;
 }
 
-.w400 {
+.cms-w400 {
 	width:396px;
 	text-align: center;
 }
-input.w200 {
+input.cms-w200 {
 	width:210px;
 }
-
-/*
-.cms-unit-menu ul li
-{
-	display: inline;
-}
-
-.cms-unit-menu ul li a
-{
-	color:#ffffff;
-	background-color:transparent;
-	font-size:12px;
-	font-weight:bold;
-	text-decoration:none;
-	padding:5px 8px;
-}
-*/
-
 
 .cms-drop-area {
     position:absolute;
@@ -205,19 +179,18 @@ input.w200 {
 	display:inline-block;
 }
 
-.ui-widget {
-    font-size:1em !important;
-}
-
-
-.cke_dialog_background_cover {
-    display:none;
-}
-
 .cms-icon {
     display:block;
     float:left;
 }
 .cms-icon-inline {
     display:inline-block;
+}
+
+.ui-widget {
+    font-size:1em !important;
+}
+
+.cke_dialog_background_cover {
+    display:none;
 }

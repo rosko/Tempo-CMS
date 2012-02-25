@@ -11,7 +11,7 @@
                 <span class="cms-icon-inline cms-icon-small-delete"></span>
                 <a href="#" class="FieldSet_field_delete"><?=Yii::t('cms', 'Delete this field')?></a>
             </legend>
-            <div class="hidden FieldSet_field_options">
+            <div class="cms-hidden FieldSet_field_options">
                 <?php foreach($langs as $lang=>$language) { ?>
                 <div>
                     <input type="text" name="<?=$name?>[<?=$k?>][label][<?=$lang?>]" value="<?=$field['label'][$lang]?>" />
@@ -20,7 +20,7 @@
                 <?php } ?>
 
                 <a href="#" class="FieldSet_field_togglehint"><?=Yii::t('cms', 'Hint')?></a>
-                <fieldset class="hidden FieldSet_field_hint">
+                <fieldset class="cms-hidden FieldSet_field_hint">
                     <legend>
                         <input type="text" name="<?=$name?>[<?=$k?>][hint][<?=Yii::app()->language?>]" value="<?=$field['hint'][Yii::app()->language]?>" />
                     </legend>
@@ -51,7 +51,7 @@
 <?php } ?>
 
                 <br /><a href="#" class="FieldSet_field_togglerules"><?=Yii::t('cms', 'Validation rules')?></a>
-                <ul class="hidden FieldSet_field_rules">
+                <ul class="cms-hidden FieldSet_field_rules">
     <?php $rules = $FS->getTypeRules($field['type']);
         $form_array = array();
         $i=0;
@@ -68,7 +68,7 @@ foreach ($field['rules'] as $r) {
                            onclick="$(this).nextAll('fieldset:eq(0)').slideToggle('normal', function() {checkHeight<?=$id?>(this);});" />
                     <a onclick="$(this).prev().click();"><?=Yii::t('cms', ucfirst($rule));?></a>
 <?php if (!empty($FS->validators[$rule])) { ?>
-                <fieldset <?php if (!$checked) { ?>class="hidden"<?php } ?>>
+                <fieldset <?php if (!$checked) { ?>class="cms-hidden"<?php } ?>>
 <?php       $form_array = $FS->validators[$rule];
             foreach ($form_array as $_k => $_v) {
                 $form_array[$_k]['label'] = Yii::t('cms', ucfirst($_k));

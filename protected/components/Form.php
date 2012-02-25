@@ -134,7 +134,12 @@ JS;
 
 
                 } else $output.=$this->renderElement($element);
-            } else $output.=$this->renderElement($element);
+            } else {
+                //echo $element->name;
+                //$t = $this->renderElement($element);
+                //echo $t;
+                $output.=$this->renderElement($element);
+            }
         }
         if ($s_counter) {
             $output .= '</div>';

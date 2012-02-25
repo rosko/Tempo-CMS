@@ -30,9 +30,6 @@ class Page extends I18nActiveRecord
             array('access', 'safe'),
             array('author_id', 'safe'),
 		);
-        if ($this->virtual) {
-            $rules[] = array('parent_id', 'unsafe');
-        }
         if ($this->id==1) {
             $rules[] = array('alias, url', 'unsafe');
         }
@@ -64,9 +61,6 @@ class Page extends I18nActiveRecord
 		return array(
             'order' => array(
                 'order'=>'`order`',
-            ),
-            'real' => array(
-                'condition'=> '`virtual` IS NULL or `virtual` != 1',
             ),
 		);
 	}
@@ -149,14 +143,14 @@ class Page extends I18nActiveRecord
     }
 
 // 'bizRule'=>'return !empty(array_intersect(Yii::app()->user->roles, $params["page"]->access["{operation}Roles"])) || in_array(Yii::app()->user->id, $params["page"]->access["{operation}Users"]);',
-
+/*
     public function cacheVaryBy()
     {
         return array(
             'language'=>Yii::app()->language,
         );
     }
-
+*/
     public function childrenPages($id=0)
     {
         if ($id == 0)
@@ -222,7 +216,7 @@ class Page extends I18nActiveRecord
 	}
 
 
-	public static function getTree($exclude=array(),$exclude_children=true,$exclude_virtual=false)
+	public static function getTree($exclude=array(),$exclude_children=true)
 	{
 		$criteria['order'] = '`order`';
         $criteria['condition'] = '1';
@@ -231,10 +225,7 @@ class Page extends I18nActiveRecord
 			if (!is_array($exclude)) $exclude = array($exclude);
 			$criteria['condition'] .= ' AND `id` NOT IN ('.implode(',',$exclude).')';
 		}
-        if ($exclude_virtual) {
-            $criteria['condition'] .= ' AND (`virtual` IS NULL or `virtual` != 1)';
-        }
-		$pages = Page::model()->localized()->getAll($criteria);
+		$pages = Page::model()->getAll($criteria);
 		$tree = array();
 		foreach ($pages as $page) {
 			if ($exclude_children && !empty($exclude))
@@ -322,7 +313,7 @@ class Page extends I18nActiveRecord
 		PageUnit::model()->deleteAll('page_id = :page_id', array(':page_id' => $this->id));
 		
 		// Удаляем все блоки, которые больше нигде не размещены
-		$sql = 'SELECT `unit`.`id`, `unit`.`type`  FROM `' . Unit::tableName() . '` as `unit`
+		$sql = 'SELECT `unit`.`id`, `unit`.`class`  FROM `' . Unit::tableName() . '` as `unit`
 				LEFT JOIN `' . PageUnit::tableName() . '` as `pageunit` ON (`unit`.`id` = `pageunit`.`unit_id`)
 				WHERE `pageunit`.`id` IS NULL';
 		$pus = Yii::app()->db->createCommand($sql)->queryAll();
@@ -332,8 +323,9 @@ class Page extends I18nActiveRecord
 			foreach ($pus as $pu)
 			{
 				$ids[] = intval($pu['id']);
-                $tmp_class = Unit::getClassNameByUnitType($pu['type']);
-				call_user_func(array($tmp_class, 'model'))->deleteAll('unit_id = ' . intval($pu['id']));
+                $widgetClass = $pu['class'];
+                $modelClass = call_user_func(array($widgetClass,'modelClassName'));
+				call_user_func(array($modelClass, 'model'))->deleteAll('unit_id = ' . intval($pu['id']));
 			}
 			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
 			Yii::app()->db->createCommand($sql)->execute();
@@ -403,7 +395,6 @@ class Page extends I18nActiveRecord
     public function scheme()
     {
         return array(
-            'id' => 'pk',
             'parent_id' => 'integer unsigned',
             'path' => 'string',
             'title' => 'string',
@@ -416,11 +407,8 @@ class Page extends I18nActiveRecord
             'language' => 'char(32)',
             'alias' => 'char(64)',
             'url'=>'string',
-            'virtual'=>'boolean',
             'author_id'=>'integer unsigned',
             'editor_id'=>'integer unsigned',
-            'create'=>'datetime',
-            'modify'=>'datetime',
             'access'=>'text',
         );
     }

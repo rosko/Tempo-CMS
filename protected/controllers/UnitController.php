@@ -14,7 +14,28 @@
  */
 class UnitController extends Controller
 {
+	public function filters()
+	{
+		return array('accessControl');
+	}
 
+	public function accessRules()
+	{
+		return array(
+			array('allow',
+				'actions'=>array('check', 'delete', 'deleteDialog', 'edit', 'install',
+                    'move', 'set', 'setDialog'),
+				'users'=>array('@'),
+			),
+            array('allow',
+                'actions'=>array('ajax', 'getPageUnitsByUnitId'),
+                'users'=>array('*'),                
+            ),
+			array('deny',
+				'users'=>array('*'),
+			),
+		);
+	}
     /**
      * Обрабатывает запрос на редактирование блока
      *
@@ -26,16 +47,15 @@ class UnitController extends Controller
      * (используется, если предполагается создание нового блока)
      * @param string $area название области страницы где размещается блок
      * (используется, если предполагается создание нового блока)
-     * @param string $type тип блока
      * (используется, если предполагается создание нового блока)
-     * @param string $className имя класса редактируемой записи
+     * @param string $modelClass имя класса модели редактируемой записи
+     * @param string $widgetClass имя класса виджета редактируемого блока
      * @param int $recordId id редактируемой записи
      * @param int $sectionId
      * @param string foreignAttribute
-     * @param bool $makePage
      * @param string $return тип возвращаемого ответа (json, html)
      */
-    public function actionEdit($pageUnitId=0, $unitId=0, $pageId=0, $prevPageUnitId=0, $area='main', $type='', $className='', $recordId=0, $sectionId=0, $foreignAttribute='', $makePage=false, $return='html')
+    public function actionEdit($pageUnitId=0, $unitId=0, $pageId=0, $prevPageUnitId=0, $area='main', $modelClass='', $widgetClass='', $recordId=0, $sectionId=0, $foreignAttribute='', $return='html')
     {
         $ret = true;
         // Обрабатываем входящие параметры и находим (или создаем) необходимые объекты
@@ -43,55 +63,57 @@ class UnitController extends Controller
         $unitId = (int)$unitId;
         $recordId = (int)$recordId;
         $pageId = (int)$pageId;
-        $unit = null;
         // Если указан id страничного блока
         if ($pageUnitId>0) {
             $pageUnit = PageUnit::model()->with('unit')->findByPk($pageUnitId);
             if ($pageUnit) {
                 $unit = $pageUnit->unit;
+                $widgetClass = $unit->class;
                 $content = $unit->content;
                 $content->scenario = 'edit';
             }
         // Если указан id блока в общем
         } elseif ($unitId>0) {
             $unit = Unit::model()->findByPk($unitId);
+            $widgetClass = $unit->class;
             if ($unit) {
                 $content = $unit->content;
                 $content->scenario = 'edit';
             }
-        // Если указан класс и id любого объекта
-        } elseif ($recordId>0 && $className) {
-            $content = call_user_func(array($className, 'model'))->findByPk($recordId);
+        // Если указан класс и id модели
+        } elseif ($recordId>0 && $modelClass) {
+            $content = call_user_func(array($modelClass, 'model'))->findByPk($recordId);
             $content->scenario = 'edit';
-        // Если указан только тип или класс
-        } elseif ($type || $className) {
-            if ($type)
-                $className = Unit::getClassNameByUnitType($type);
-            if (method_exists($className, 'defaultObject')) {
-                $content = call_user_func(array($className, 'defaultObject'));
+        // Если указан только класс виджета
+        } elseif ($widgetClass || $modelClass) {
+            if ($widgetClass)
+                $modelClass = call_user_func(array($widgetClass,'modelClassName'));
+            if (method_exists($modelClass, 'defaultObject')) {
+                $content = call_user_func(array($modelClass, 'defaultObject'));
             } else {
-                $content = new $className;
+                $content = new $modelClass;
             }
             $content->scenario = 'add';
         } else {
             $ret = false;
         }
-        if (!$unit && $content) {
+        if (!isset($unit) && $content && $content->hasAttribute('unit_id')) {
             if (!empty($content->unit_id)) {
                 $unit =  $content->unit;
+                $widgetClass = $unit->class;
             } elseif ($content->scenario == 'add') {
                 $unit = new Unit;
             }
         }
 
-        $className = get_class($content);
+        $modelClass = get_class($content);
         $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
         // Если блок новый, заполняем его исходными данными
-        if ($unit && $unit->isNewRecord) {
-			$unit->type = Unit::getUnitTypeByClassName($className);
-			$unit->title = call_user_func(array($className, 'unitName'));
+        if (isset($unit) && $widgetClass && $unit->isNewRecord) {
+			$unit->class = $widgetClass;
+			$unit->title = call_user_func(array($modelClass, 'modelName'));
             foreach ($langs as $lang) {
-                $unit->{$lang.'_title'} = call_user_func(array($className, 'unitName'), $lang);
+                $unit->{$lang.'_title'} = call_user_func(array($modelClass, 'modelName'), $lang);
             }
         }
         // Если указывается внешний ключ
@@ -101,9 +123,9 @@ class UnitController extends Controller
         }
 
         // Делаем форму редактирования
-        $id = 'UnitEdit'.$className;
+        $id = 'UnitEdit'.$modelClass;
 
-        $unitFormArray = call_user_func(array($className, 'form'));
+        $unitFormArray = call_user_func(array($modelClass, 'form'));
         $unitFormArray['type'] = 'form';
         $unitFormArray['id'] = $id;
         $showTitle = true;
@@ -152,7 +174,7 @@ class UnitController extends Controller
         }
         var prevPageUnitId = '{$prevPageUnitId}';
         var areaName = '{$area}';
-        var type = '{$type}';
+        var widgetClass = '{$widgetClass}';
         var pageId = '{$pageId}';
         if ($('#cms-pageunit-'+pageUnitId).length==0) {
             if (prevPageUnitId != '0') {
@@ -160,7 +182,7 @@ class UnitController extends Controller
             } else {
                 var prevPageUnit = $('#cms-area-'+areaName).find('.cms-empty-area-buttons').eq(0);
             }
-            prevPageUnit.after('<div id="cms-pageunit-'+pageUnitId+'" class="cms-pageunit cms-unit-'+type+'" rel="'+type+'" rev="'+unitId+'" style="cursor:move;"></div>');
+            prevPageUnit.after('<div id="cms-pageunit-'+pageUnitId+'" class="cms-pageunit cms-unit-'+widgetClass+'" rel="'+widgetClass+'" rev="'+unitId+'" style="cursor:move;"></div>');
         }
         var pageUnit = $('#cms-pageunit-'+pageUnitId);
         if (pageUnit.length) {
@@ -187,16 +209,16 @@ JS;
         {
             $formArray['title']='';
         }
-        if (method_exists($className, 'unitName')) {
-            if (is_subclass_of($className, 'Content')) {
+        if (method_exists($modelClass, 'modelName')) {
+            if (is_subclass_of($modelClass, 'Content')) {
                 $caption = array(
-                    'icon' => call_user_func(array($className, 'icon')),
-                    'label' => call_user_func(array($className, 'unitName')),
+                    'icon' => call_user_func(array($modelClass, 'icon')),
+                    'label' => call_user_func(array($modelClass, 'modelName')),
                 );
             } else {
                 $caption = array(
                     'icon' => $content->icon(),
-                    'label' => $content->unitName(),
+                    'label' => $content->modelName(),
                 );
             }
         } else {
@@ -216,7 +238,7 @@ JS;
             if (Yii::app()->settings->getValue('showUnitAppearance')) {
                 $formArray['elements']['unit']['elements']['template'] = array(
                     'type'=>'TemplateSelect',
-                    'className'=>$className,
+                    'className'=>$modelClass,
                     'empty'=>Yii::t('cms', '«accordingly to general settings»'),
                 );
                 $unitFormArray['elements'][] = Form::tab(Yii::t('cms', 'Appearance'));
@@ -242,43 +264,6 @@ JS;
 			$content = $form['content']->model;
 			if ($form->validate()) {
                 if (isset($unit)) {                    
-                    // Если нужно, создаем виртуальную страницу
-                    if ($makePage && $content->hasAttribute('page_id') && $pageId>0) {
-                        if ($content->page_id)
-                            $page = Page::model()->findByPk($content->page_id);
-                        if (empty($page)) {
-                            $page = new Page;
-                            $page->parent_id = $pageId;
-                            $page->active = true;
-                        }
-                        $page->virtual = true;
-                        $page->title = $unit->title;
-                        $page->alias = Page::sanitizeAlias($unit->title);
-                        foreach ($langs as $lang) {
-                            $page->{$lang.'_title'} = $unit->{$lang.'_title'};
-                            $page->{$lang.'_alias'} = Page::sanitizeAlias($unit->{$lang.'_title'});
-                        }
-                        $allLangs = array_keys(I18nActiveRecord::getLangs());
-                        $allLangs[] = '';
-                        foreach($allLangs as $lang) {
-                            $prefix = ($lang != '') ? $lang.'_' : '';
-                            $urlParam = $prefix.'url';
-                            $aliasParam = $prefix.'alias';
-                            $titleParam = $prefix.'title';
-                            $page->$urlParam = $page->generateUrl(true, $aliasParam);
-                            $counter=1;
-                            while (!$page->validate(array($urlParam))) {
-                                $counter++;
-                                $page->$aliasParam = Page::sanitizeAlias($unit->$titleParam.' '.$counter);
-                                $page->$urlParam = $page->generateUrl(true, $aliasParam);
-                            }
-                        }
-                        $ret = $page->save();
-                        if ($ret) {
-                            $content->page_id = $page->id;
-                            $page->fill();
-                        }
-                    }
                     $isUnitNew = $unit->isNewRecord;
             		if ($ret && $unit->save(false)) {
                         $formArray['action'] .= '&unitId='.$unit->id;
@@ -297,7 +282,7 @@ JS;
                     }
                 } else {
                     $content->save(false);
-                    $formArray['action'] .= '&className='.get_class($content);
+                    $formArray['action'] .= '&modelClass='.get_class($content);
                     $formArray['action'] .= '&recordId='.$content->id;
                 }
 			}
@@ -531,24 +516,24 @@ JS;
      */
     public function actionInstall()
     {
-        $allUnits = Unit::getAllUnits();
+        $allUnits = ContentUnit::getAvailableUnits();
         $errors = array();
         if (isset($_POST['Units'])) {
             $units = array_keys($_POST['Units']);
-            Unit::install($units);
+            ContentUnit::install($units);
             $uninstall = array_diff(array_keys($allUnits), $units);
             foreach ($uninstall as $i=>$className) {
-                $sql = 'SELECT count(*) FROM `' . Unit::tableName() . '` WHERE `type` = :type';
+                $sql = 'SELECT count(*) FROM `' . Unit::tableName() . '` WHERE `class` = :class';
                 $command = Yii::app()->db->createCommand($sql);
-                $command->bindValue(':type', Unit::getUnitTypeByClassName($className), PDO::PARAM_STR);
+                $command->bindValue(':class', $className, PDO::PARAM_STR);
                 $exists = $command->queryScalar();
                 if ($exists) {
                     unset($uninstall[$i]);
                     $errors[] = Yii::t('cms', 'Can\`t unistall "{name}"', array('{name}'=>$allUnits[$className]['name']));
                 }
             }
-            Unit::uninstall($uninstall);
-            $allUnits = Unit::getAllUnits();
+            ContentUnit::uninstall($uninstall);
+            $allUnits = ContentUnit::getAvailableUnits();
         }
 
         $this->render('install', array(

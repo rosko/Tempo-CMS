@@ -15,7 +15,7 @@
     <input type="button" value="<?=Yii::t('cms', 'Add item')?>" id="<?=$id?>_additem" />
 </div>
 
-<div class="hidden">
+<div class="cms-hidden">
     <div id="<?=$id?>_sample">
         <?php Yii::app()->controller->renderPartial('application.components.inputs.views.ListEditField', array(
             'id'=>$id,

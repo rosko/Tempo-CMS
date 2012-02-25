@@ -5,8 +5,8 @@ $codemirrorPath=Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('appl
     'type' => $type,
     'name' => $name,
 ))?>">
-<input type="hidden" name="file" value="" />
-<input type="hidden" id="<?=$id?>_readonly" value="1" />
+<input type="cms-hidden" name="file" value="" />
+<input type="cms-hidden" id="<?=$id?>_readonly" value="1" />
 
     <h2><?=$title?></h2> 
     <h3 id="<?=$id?>_currentfile"><?=Yii::t('filesEditor', 'File')?>: <span></span></h3>
@@ -212,8 +212,8 @@ function loadFile(file, writable, button)
 
         HighlightDisable();
         $('#<?=$id?>_currentfile span').html($(button).parents('li:eq(0)').text());
-        $(button).css({'font-weight': 'bold'}).addClass('hover')
-            .parents('li:eq(0)').siblings().find('a').css('font-weight','normal').removeClass('hover');
+        $(button).css({'font-weight': 'bold'}).addClass('cms-hover')
+            .parents('li:eq(0)').siblings().find('a').css('font-weight','normal').removeClass('cms-hover');
         $('#<?=$id?>_readonly').val(!writable);
         $('#<?=$id?>_textarea').attr('readonly', !writable);
         $('#<?=$id?> input[type=submit]').attr('disabled', !writable);
@@ -352,7 +352,7 @@ $('#<?=$id?>_delete').click(function() {
             success: function(html) {
                 cmsHideInfoPanel();
                 $('#<?=$id?>_delete').appendTo('#<?=$id?>').hide();
-                $('#<?=$id?> ul.files li a.hover').parents('li:eq(0)').remove();
+                $('#<?=$id?> ul.files li a.cms-hover').parents('li:eq(0)').remove();
                 $('#<?=$id?> ul.files a[rev=]').click();
             }
         });

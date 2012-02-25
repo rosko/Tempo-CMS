@@ -19,19 +19,19 @@ class SiteSettingsForm extends CFormModel
             array('defaultsShowEmail, defaultsSendMessage', 'length', 'max'=>32),
             array('userExtraFields', 'safe'),
             array('slugTransliterate, slugLowercase', 'boolean'),
-
+            array('timezone', 'safe'),
         );
         // Правила для проверки настроек для юнитов
-        $unit_types = Unit::getTypes();
-        foreach ($unit_types as $unit_class) {
-            if (method_exists($unit_class, 'settingsRules')) {
-                $rules = call_user_func(array($unit_class, 'settingsRules'));
+        $units = ContentUnit::getInstalledUnits();
+        foreach ($units as $unitClass) {
+            if (method_exists($unitClass, 'settingsRules')) {
+                $rules = call_user_func(array($unitClass, 'settingsRules'));
                 if (is_array($rules) && !empty($rules)) {
                     foreach ($rules as $rule)
                     {
                         $params = explode(',',str_replace(' ', '', $rule[0]));
                         foreach ($params as $k => $v) {
-                            $params[$k] = $unit_class . '.' . $v;
+                            $params[$k] = $unitClass . '.' . $v;
                         }
                         $rule[0] = implode(',',$params);
                         $ret[] = $rule;
@@ -61,15 +61,16 @@ class SiteSettingsForm extends CFormModel
             'cacheTime' => Yii::t('cms', 'Cache time'),
             'slugTransliterate' => Yii::t('cms', 'Transliterate page slug'),
             'slugLowercase' => Yii::t('cms', 'Lowercase page slug'),
+            'timezone' => Yii::t('cms', 'Default timezone'),
 		);
-        $unit_types = Unit::getTypes();
-        foreach ($unit_types as $unit_class) {
-            if (method_exists($unit_class, 'settings')) {
-                $elems = call_user_func(array($unit_class, 'settings'), $unit_class);
+        $units = ContentUnit::getInstalledUnits();
+        foreach ($units as $unitClass) {
+            if (method_exists($unitClass, 'settings')) {
+                $elems = call_user_func(array($unitClass, 'settings'), $unitClass);
                 if (is_array($elems) && !empty($elems)) {
                     foreach ($elems as $k => $elem) {
                         if ($elem['label'])
-                            $ret[$unit_class.'.'.$k] = $elem['label'];
+                            $ret[$unitClass.'.'.$k] = $elem['label'];
                     }
                 }
             }
@@ -86,6 +87,7 @@ class SiteSettingsForm extends CFormModel
             'defaultsShowEmail'=>'registered',
             'defaultsSendMessage'=>'registered',
             'cacheTime'=>3600,
+            'timezone'=>Yii::app()->params['timezone'],
         );
     }
 
@@ -105,6 +107,10 @@ class SiteSettingsForm extends CFormModel
 
     public function form()
     {
+        $timezoneList =timezone_identifiers_list();
+        sort($timezoneList);
+        $timezoneList = array_combine($timezoneList, $timezoneList);
+        
         // Общие настроки
         $ret = array(
             'elements'=>array(
@@ -123,6 +129,10 @@ class SiteSettingsForm extends CFormModel
                 'language'=>array(
                     'type'=>'LanguageSelect',
                     'empty'=>null,
+                ),
+                'timezone'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>$timezoneList,
                 ),
                 'autoSave'=>array(
                     'type'=>'checkbox'
@@ -180,16 +190,16 @@ class SiteSettingsForm extends CFormModel
             ),
         );
         // Настройки для юнитов
-        $unit_types = Unit::getTypes();
+        $units = ContentUnit::getInstalledUnits();
         $ret['elements'][] = Form::tab(Yii::t('cms', 'Units settings'));
-        foreach ($unit_types as $unit_class) {
-            if (method_exists($unit_class, 'settings')) {
-                $elems = call_user_func(array($unit_class, 'settings'), $unit_class);
+        foreach ($units as $unitClass) {
+            if (method_exists($unitClass, 'settings')) {
+                $elems = call_user_func(array($unitClass, 'settings'), $unitClass);
                 if (is_array($elems) && !empty($elems)) {
-                    $ret['elements'][] = Form::section(call_user_func(array($unit_class, 'unitName')));
+                    $ret['elements'][] = Form::section(call_user_func(array($unitClass, 'modelName')));
                     foreach ($elems as $k => $elem)
                     {
-                        $ret['elements'][$unit_class.'.'.$k] = $elem;
+                        $ret['elements'][$unitClass.'.'.$k] = $elem;
                     }
                 }
             }

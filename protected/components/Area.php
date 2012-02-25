@@ -9,7 +9,7 @@ class Area extends CWidget
     public function run()
     {
         $page = Yii::app()->page->model;
-        $editArea = !$this->readOnly && Yii::app()->user->checkAccess('updateContentPage', array('page'=>$page)) && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
+        $editArea = !$this->readOnly && !Yii::app()->user->isGuest && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
         if (!empty($this->pageUnits)) {
             $pageUnits = $this->pageUnits;
         } else {
@@ -21,7 +21,8 @@ class Area extends CWidget
 
         foreach ($pageUnits as $i => $pageUnit) {
 
-            $className = Unit::getClassNameByUnitType($pageUnit->unit->type);
+            $widgetClass = $pageUnit->unit->class;
+            $modelClass= call_user_func(array($widgetClass,'modelClassName'));
 
             $cacheVaryBy = array(
                 'className'=>'Unit',
@@ -34,8 +35,8 @@ class Area extends CWidget
             $properties = array(
                 'duration' => Yii::app()->settings->getValue('cacheTime'),
             );
-            if (call_user_func(array($className, 'cacheable'))) {
-                if (method_exists($className, 'cacheDependencies')) {
+            if (call_user_func(array($widgetClass, 'cacheable'))) {
+                if (method_exists($modelClass, 'cacheDependencies')) {
                     $content = $pageUnit->unit->content;
                     $tmp = $content->cacheDependencies();
                     if (!empty($tmp) && is_array($tmp)) {
@@ -50,21 +51,22 @@ class Area extends CWidget
                     }
                 }
 
-                if (method_exists($className, 'cacheRequestTypes')) {
-                    $tmp = call_user_func(array($className, 'cacheRequestTypes'));
+                if (method_exists($widgetClass, 'cacheRequestTypes')) {
+                    $tmp = call_user_func(array($widgetClass, 'cacheRequestTypes'));
                     if (!empty($tmp) && is_array($tmp)) {
                         $properties['requestTypes'] = $tmp;
                     }
                 }
 
-                if (method_exists($className, 'urlParams')) {
-                    $tmp = call_user_func(array($className, 'urlParams'));
+                if (method_exists($widgetClass, 'urlParams')) {
+                    $tmp = call_user_func(array($widgetClass, 'urlParams'));
                     if (!empty($tmp) && is_array($tmp)) {
                         $properties['varyByParam'] = $tmp;
                     }
                 }
-                if (method_exists($className, 'cacheVaryBy')) {
-                    $tmp = call_user_func(array($className, 'cacheVaryBy'));
+
+                if (method_exists($widgetClass, 'cacheVaryBy')) {
+                    $tmp = call_user_func(array($widgetClass, 'cacheVaryBy'));
                     if (!empty($tmp) && is_array($tmp)) {
                         $cacheVaryBy = CMap::mergeArray($cacheVaryBy, $tmp);
                     }
@@ -73,7 +75,7 @@ class Area extends CWidget
 
             $output .= $this->render('pageUnit', array(
                 'pageUnit'=>$pageUnit,
-                'className'=>$className,
+                'widgetClass'=>$widgetClass,
                 'editArea'=>$editArea,
                 'cacheVaryBy'=>$cacheVaryBy,
                 'properties'=>$properties,

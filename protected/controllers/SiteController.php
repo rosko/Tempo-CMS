@@ -7,9 +7,7 @@ class SiteController extends Controller
     public function actions()
     {
         return array(
-            'captcha'=>array(
-                'class'=>'CCaptchaAction',
-            ),
+            'captcha'=>Yii::app()->params['captcha'],
         );
     }
     
@@ -26,7 +24,7 @@ class SiteController extends Controller
 
 	public function actionLogin()
 	{
-		if (Yii::app()->user->checkAccess('updateContentPage')) {
+		if (!Yii::app()->user->isGuest) {
 			if ($_SERVER['HTTP_REFERER'] && strpos($_SERVER['HTTP_REFERER'],'/site/login')===false &&
                  strpos($_SERVER['HTTP_REFERER'],'://'.$_SERVER['HTTP_HOST'])===false)
 				$this->redirect($_SERVER['HTTP_REFERER']);
@@ -73,20 +71,21 @@ class SiteController extends Controller
     {
         header('Content-Type: application/rss+xml');
         if (isset($_GET['unittype'])) {
+            $modelClass = 'Model'.$_GET['unittype'];
             $className = Unit::getClassNameByUnitType($_GET['unittype']);
-            Unit::loadTypes();
-            if (!FeedHelper::isFeedPresent($className, !isset($_GET['id'])))
+            ContentUnit::loadUnits();
+            if (!FeedHelper::isFeedPresent($modelClass, !isset($_GET['id'])))
                 throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
 
             // Фид определенного раздела
-            if (isset($_GET['id']) && ($content = call_user_func(array($className, 'model'))->findByPk(intval($_GET['id']))))
+            if (isset($_GET['id']) && ($content = call_user_func(array($modelClass, 'model'))->findByPk(intval($_GET['id']))))
             {
                 FeedHelper::renderFeed($type, $content);
             // Фид всех записей этого типа
             } 
             else
             {
-                FeedHelper::renderFeed($type, $className);
+                FeedHelper::renderFeed($type, $modelClass);
             }
         // Общий фид
         } else {

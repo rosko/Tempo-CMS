@@ -15,7 +15,7 @@ $_packages = array(
         'basePath'=>'application.vendors.topbox',
         'js'=>array('js/topbox.js'),
         'css'=>array('css/topbox.css'),
-        'depends'=>array('jquery'),
+        'depends'=>array('jquery'/*,'jquery.nanoscroller'*/),
     ),
     'cmsLib'=>array(
         'basePath'=>'application.assets',
@@ -57,6 +57,12 @@ $_packages = array(
         'basePath'=>'ext.jsTree.source',
         'js'=>array('jquery.jstree.js'),
         'depends'=>array('jquery'),
+    ),
+    'jquery.nanoscroller'=>array(
+        'basePath'=>'application.vendors.jquery-nanoscroller',
+        'js'=>array('jquery.nanoscroller.min.js'),
+        'css'=>array('nanoscroller.css'),
+        'depends'=>array('jquery'),        
     ),
 );
 

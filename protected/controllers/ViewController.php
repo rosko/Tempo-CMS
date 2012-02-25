@@ -31,7 +31,7 @@ class ViewController extends Controller
             throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
         }
         if ($page->redirect) {
-            if (!Yii::app()->user->checkAccess('updatePage', array('page'=>$page)))
+            if (Yii::app()->user->isGuest)
                 $this->redirect($page->redirect);
             else
                 Yii::app()->user->setFlash('redirect-permanent-hint', Yii::t('cms', 'This page has redirection to') . '<a href="'.$page->redirect . '">'.$page->redirect.'</a>. <a class="ui-button-icon" href="" onclick="$(\'#toolbar_edit\').click();return false;">'.Yii::t('cms', 'Page properties').'</a>');
@@ -52,8 +52,7 @@ class ViewController extends Controller
     {
 		$pageUnit = PageUnit::model()->with('unit')->findByPk((int)$pageUnitId);
         if ($pageUnit) {
-            $className = Unit::getClassNameByUnitType($pageUnit->unit->type);
-            $pageUnit->unit->content->widget($className, array(
+            $pageUnit->unit->content->widget($pageUnit->unit->class, array(
                 'pageunit'=>$pageUnit,
             ));
         }

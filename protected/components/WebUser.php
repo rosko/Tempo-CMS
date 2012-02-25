@@ -1,13 +1,19 @@
 <?php
 class WebUser extends CWebUser
 {
-    public function init()
+    private $_data=null;
+        
+    public function getData()
     {
-        $conf = Yii::app()->session->cookieParams;
-        $this->identityCookie = array(
-            'path' => $conf['path'],
-            'domain' => $conf['domain'],
-        );
-        parent::init();
+        if (!$this->_data && !Yii::app()->user->isGuest) {
+           $this->_data = User::model()->findByPk(Yii::app()->user->id);
+        }
+        return $this->_data;
     }
+    
+    public function setData($value)
+    {
+        $this->_data = $value;
+    }
+    
 }

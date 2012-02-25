@@ -96,17 +96,17 @@ JS
         'rows'=>1,
         'dblclick' => 'js:function() { return false; }',
         'buttons'=>array(
-            'edit' => Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model)) ? array(
+            'edit' => !Yii::app()->user->isGuest ? array(
                 'icon' => 'edit',
                 'title' => Yii::t('cms', 'Page properties'),
                 'click' => 'js:function(){ cmsPageEditForm(); return false; }',
             ):null,
-            'pageadd' => Yii::app()->user->checkAccess('createPage', array('page'=>$model))?array(
+            'pageadd' => !Yii::app()->user->isGuest ? array(
                 'icon' => 'add',
                 'title' => Yii::t('cms', 'Create new page'),
                 'click' => 'js:function() { cmsPageAddForm(); return false; }',
             ):null,
-            'sitemap' =>  Yii::app()->user->checkAccess('createPage', array('page'=>$model))&&Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model))&&Yii::app()->user->checkAccess('deletePage', array('page'=>$model))?array(
+            'sitemap' =>  !Yii::app()->user->isGuest ? array(
                 'icon' => 'sitemap',
                 'title' => Yii::t('cms', 'Sitemap'),
                 'click' => 'js:function()'.<<<JS
@@ -201,7 +201,7 @@ JS
         'rows'=>1,
         'dblclick' => 'js:function() { return false; }',
         'buttons'=>array(
-            'settings' => Yii::app()->user->checkAccess('updateSettings') ? array(
+            'settings' => !Yii::app()->user->isGuest ? array(
                 'icon' => 'settings',
                 'title' => Yii::t('cms', 'Site settings'),
                 'click' => 'js:function()'.<<<JS
@@ -211,7 +211,7 @@ JS
         }
 JS
             ):null,
-            'units'=> Yii::app()->user->checkAccess('manageUnit')?array(
+            'units'=> !Yii::app()->user->isGuest ? array(
                 'icon' => 'units',
                 'title' => Yii::t('cms', 'Units'),
                 'click' => 'js:function()'.<<<JS
@@ -226,7 +226,7 @@ JS
 }
 JS
             ):null,
-            'users' =>  Yii::app()->user->checkAccess('updateUser')?array(
+            'users' =>  !Yii::app()->user->isGuest ? array(
                 'icon' => 'user',
                 'title' => Yii::t('cms', 'Users'),
                 'click' => 'js:function()'.<<<JS
@@ -284,7 +284,7 @@ JS
 /*
  * Панель инструментов для блоков
  */
-    if (Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model))) {
+    if (!Yii::app()->user->isGuest) {
 
         $this->widget('Toolbar', array(
             'id' => 'pageunitpanel',
@@ -306,7 +306,7 @@ JS
                     'title' => Yii::t('cms', 'Add another unit'),
                     'click' => 'js:function()'.<<<JS
  {
-    cmsShowSelectUnitTypeDialog(this);
+    cmsShowSelectWidgetDialog(this);
     return false;
 }
 JS
@@ -328,7 +328,7 @@ JS
                     'click' => 'js:function()'.<<<JS
  {
                 var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                cmsFadeIn(pageUnit, 'selected');
+                cmsFadeIn(pageUnit, 'cms-selected');
                 var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
                 var unitId = pageUnit.attr('rev');
                 cmsPageUnitSetDialog({$model->id}, pageUnitId, unitId);
@@ -374,7 +374,7 @@ JS
                     'click' => 'js:function()'.<<<JS
  {
     var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-    cmsFadeIn(pageUnit, 'selected');
+    cmsFadeIn(pageUnit, 'cms-selected');
     $('#pageunitpanel').appendTo('body');
     cmsPageUnitDeleteDialog(pageUnit.attr('rev'), pageUnit.attr('id').replace('cms-pageunit-',''), {$model->id});
     return false;

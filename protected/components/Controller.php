@@ -10,6 +10,18 @@ class Controller extends CController
             Yii::app()->end();
         }
 
+        if (Yii::app()->settings->getValue('timezone')) {
+            $timezone = Yii::app()->settings->getValue('timezone');
+            if (Yii::app()->user->data && Yii::app()->user->data->timezone) {
+                $timezone = Yii::app()->user->data->timezone;
+            }
+            
+        	date_default_timezone_set($timezone);
+    		$tz = date("Z");
+            $tz = sprintf('%s%02d:%02d', ($tz < 0 ? '-' : '+'), abs($tz / 3600), abs($tz % 3600) / 60);
+            Yii::app()->db->createCommand('set @@session.time_zone = "' . $tz . '";')->execute();            
+        }
+        
         $language = 'en';
         $langs = array_keys(I18nActiveRecord::getLangs());
         if (Yii::app()->request->preferredLanguage && in_array(Yii::app()->request->preferredLanguage, $langs))
@@ -29,7 +41,7 @@ class Controller extends CController
         if (!Yii::app()->request->isAjaxRequest)
             Yii::app()->getClientScript()->registerCssFile(Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css')).'/icons/'.Yii::app()->params['icons'].'.css');
 
-        Unit::loadTypes();
+        ContentUnit::loadUnits();
 
         Yii::app()->getClientScript()->packages = require(Yii::getPathOfAlias('application.config').'/packages.php');
     }
@@ -70,7 +82,7 @@ class Controller extends CController
         $vars['cssUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css'));
         $vars['jsUrl'] = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.js'));
         $vars['page'] = Yii::app()->page->model;
-        $vars['editMode'] = Yii::app()->user->checkAccess('updateContentPage', array('page'=>$vars['page']));
+        $vars['editMode'] = !Yii::app()->user->isGuest;
         $vars['settings']['global'] = Yii::app()->settings->model->getAttributes();
 
 

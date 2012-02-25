@@ -9,7 +9,7 @@ function smarty_function_registercss($params, &$smarty){
     else
         $extension='.php';
 
-    $dir =  dirname(dirname($smarty->template_filepath)) . DIRECTORY_SEPARATOR .  'files';
+    $dir =  dirname(dirname($smarty->template_filepath)) . DIRECTORY_SEPARATOR .  'assets';
     $filename = $dir . DIRECTORY_SEPARATOR . $params['file'];
 
     if (is_file($filename)) {

@@ -1,6 +1,6 @@
 // =============================================================
 
-function cmsShowSelectUnitTypeDialog(t)
+function cmsShowSelectWidgetDialog(t)
 {
     var pageUnit = $(t).parents('.cms-pageunit');
     if (pageUnit.length) {
@@ -10,10 +10,10 @@ function cmsShowSelectUnitTypeDialog(t)
         var pageUnitId = '0';
     }
     var areaName = $(t).parents('.cms-area').eq(0).attr('id').replace('cms-area-','');
-    selectUnitTypeDialog = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
-    selectUnitTypeDialog.find('.cms-btn-pageunit-create').attr('rel', areaName);
-    selectUnitTypeDialog.find('.cms-btn-pageunit-create').attr('rev', pageUnitId);
-    cmsOpenDialog(selectUnitTypeDialog);
+    selectWidgetDialog = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
+    selectWidgetDialog.find('.cms-btn-pageunit-create').attr('rel', areaName);
+    selectWidgetDialog.find('.cms-btn-pageunit-create').attr('rev', pageUnitId);
+    cmsOpenDialog(selectWidgetDialog);
 }
 
 // =============================================================

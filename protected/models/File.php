@@ -14,14 +14,11 @@ class File extends ActiveRecord
     public function scheme()
     {
         return array(
-            'id' => 'pk',
             'filename' => 'string',
             'path' => 'string',
             'md5' => 'char(32)',
             'author_id'=>'integer unsigned',
             'editor_id'=>'integer unsigned',
-            'create'=>'datetime',
-            'modify'=>'datetime',
             'title' => 'string',
             'description' => 'text',
             'filesize' => 'integer unsigned', // размер файла

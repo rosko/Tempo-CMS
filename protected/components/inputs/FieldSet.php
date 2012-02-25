@@ -20,7 +20,7 @@ class FieldSet extends CInputWidget
         'Link',
         'Slider',
         'VisualTextAreaFCK',
-        'CCaptcha',
+        'Captcha',
     );
 
     // Обязательные атрибуты для полей
@@ -84,7 +84,7 @@ class FieldSet extends CInputWidget
     public $extraRules = array(
         'text'=>array('filter', 'match', 'type', 'default', 'url'),
         'file'=>array('file'),
-        'CCaptcha'=>array('captcha'),
+        'Captcha'=>array('captcha'),
         'Slider'=>array('numerical'),
         'checkbox'=>array('boolean'),
     );
@@ -281,7 +281,7 @@ class FieldSet extends CInputWidget
             'Link'=>Yii::t('cms', 'Link field'),
             'Slider'=>Yii::t('cms', 'Slider field'),
             'VisualTextAreaFCK'=>Yii::t('cms', 'Text editor'),
-            'CCaptcha'=>Yii::t('cms', 'Captcha'),
+            'Captcha'=>Yii::t('cms', 'Captcha'),
         );
     }
 

@@ -100,7 +100,7 @@ var uploader = new qq.FileUploader({
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
                 '<div class="cms-drop-area {$id}_drop"><span>{$txtDragHere}</span></div>' +
-                '<div class="cms-button w200">{$txtUpload}</div>' +
+                '<div class="cms-button cms-w200">{$txtUpload}</div>' +
                 '<ul class="qq-upload-list"></ul>' + 
              '</div>',
     fileTemplate: '<li>' +

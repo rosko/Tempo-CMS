@@ -13,6 +13,23 @@
  */
 class AdminController extends Controller
 {
+	public function filters()
+	{
+		return array('accessControl');
+	}
+
+	public function accessRules()
+	{
+		return array(
+			array('allow',
+				'actions'=>array('siteSettings', 'siteMap'),
+				'users'=>array('@'),
+			),
+			array('deny',
+				'users'=>array('*'),
+			),
+		);
+	}
     /**
      * Редактирует свойства сайта
      */

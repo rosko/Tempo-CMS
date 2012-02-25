@@ -7,7 +7,7 @@ class RecordsController extends Controller
 	public function filters()
 	{
 		return array(
-//			'accessControl', // perform access control for CRUD operations
+			'accessControl', 
 		);
 	}
 
@@ -15,9 +15,9 @@ class RecordsController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('create', 'view', 'delete', 'getUrl'
+				'actions'=>array('create', 'delete', 'getUrl'
                 ),
-				'users'=>array('*'),
+				'users'=>array('@'),
 			),
 			array('deny',
 				'users'=>array('*'),
@@ -25,13 +25,7 @@ class RecordsController extends Controller
 		);
 	}
 
-	// Отображает страницу
-	public function actionView()
-	{
-
-    }
-
-    public function actionCreate()
+	public function actionCreate()
     {
         if ($_REQUEST['class_name'])
         {
@@ -53,19 +47,15 @@ class RecordsController extends Controller
             echo '0';
     }
 
-    public function actionDelete()
+    public function actionDelete($className, $id)
     {
-        if ($_REQUEST['id'] && $_REQUEST['class_name']) {
-            $ids =  is_array($_REQUEST['id']) ? $_REQUEST['id'] : array($_REQUEST['id']);
-            $className = $_REQUEST['class_name'];
-            $ret = true;
-            foreach ($ids as $id) {
-                $model = call_user_func(array($className, 'model'))->findByPk($id);
-                $ret = $model->delete() && $ret;
-            }
-            echo (int)$ret;
-        } else
-            echo '0';
+        $ids =  is_array($id) ? $id : array($id);
+        $ret = true;
+        foreach ($ids as $id) {
+            $model = call_user_func(array($className, 'model'))->findByPk($id);
+            $ret = $model->delete() && $ret;
+        }
+        echo (int)$ret;
     }
 
     public function actionGetUrl()

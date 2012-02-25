@@ -2,7 +2,10 @@
 
 class User extends ActiveRecord
 {
-	const ICON = '/images/icons/fatcow/16x16/user.png';
+    public function icon()
+    {
+        return '/images/icons/fatcow/16x16/user.png';
+    }
 
     const ADMIN_LOGIN = 'admin';
     private static $_admin;
@@ -16,7 +19,7 @@ class User extends ActiveRecord
 		return parent::model($className);
 	}
 
-    public function unitName($language=null)
+    public function modelName($language=null)
     {
         return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
     }
@@ -57,17 +60,13 @@ class User extends ActiveRecord
                 'allowEmpty'=>!CCaptcha::checkRequirements() || !Yii::app()->user->isGuest,
                 'captchaAction'=>'site/captcha'),
             array('password, password_repeat, captcha', 'unsafe', 'on'=>'view'),
+            array('timezone', 'safe'),
 		);
 	}
 
     public function behaviors()
     {
         return array(
-            'CTimestampBehavior' => array(
-                'class' => 'zii.behaviors.CTimestampBehavior',
-                'createAttribute' => 'create',
-                'updateAttribute' => 'modify',
-            ),
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
                 'serialAttributes' => array('extra_fields'),
@@ -91,15 +90,13 @@ class User extends ActiveRecord
             'show_email'=>Yii::t('cms', 'Who can see your email address'),
             'send_message'=>Yii::t('cms', 'Who can send you an email through the site'),
             'extra_fields'=>Yii::t('cms', 'Extra fields'),
+            'timezone' => Yii::t('cms', 'Timezone'),
 		);
 	}
 
     public function scheme()
     {
         return array(
-            'id' => 'pk',
-            'create'=>'datetime',
-            'modify'=>'datetime',
             'login' => 'char(32)',
             'password' => 'char(64)',
             'email' => 'char(64)',
@@ -111,11 +108,16 @@ class User extends ActiveRecord
             'show_email'=>'char(32)',
             'send_message'=>'char(32)',
             'extra_fields'=>'text',
+            'timezone'=>'char(64)',
         );
     }
 
     public function form()
     {
+        $timezoneList =timezone_identifiers_list();
+        sort($timezoneList);
+        $timezoneList = array_combine($timezoneList, $timezoneList);
+        
         return array(
             'elements'=>array(
                 'login'=>array(
@@ -161,10 +163,14 @@ class User extends ActiveRecord
                     'type'=>'dropdownlist',
                     'items'=>User::roles(),
                 ),
+                'timezone'=>array(
+                    'type'=>'dropdownlist',
+                    'items'=>$timezoneList,
+                ),
                 'extra_fields'=>array(
                     'type'=>'Fields',
                     'config'=>User::extraFields(),
-                )
+                ),
             ),
         );
     }
@@ -239,6 +245,7 @@ class User extends ActiveRecord
         $user->active = true;
         $user->show_email = 'registered';
         $user->send_message = 'registered';
+        $user->timezone = Yii::app()->params['timezone'];
         $user->save(false);
     }
 

@@ -103,4 +103,21 @@ class I18nActiveRecord extends ActiveRecord
             $this->$attribute = Yii::t($className.'.unit', $value, array(), Yii::app()->sourceLanguage, $symbol);
         }
     }
+
+    public function getAll($condition = '', $params = array(), $columns = '*')
+    {
+        if (method_exists($this, 'i18n')) {
+            $l10nColumns = array();
+            foreach ($this->i18n() as $column) {
+                $l10nColumns[] = '`' . $this->getI18nFieldName($column) . '` as `' . $column . '`';
+            }
+        }
+        if (is_string($columns)) {
+            $columns .= ', ' . implode(',', $l10nColumns);
+        } elseif (is_array($columns)) {
+            $columns = array_merge($columns, $l10nColumns);
+        }
+        return parent::getAll($condition, $params, $columns);
+    }
+    
 }

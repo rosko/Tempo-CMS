@@ -59,7 +59,7 @@ cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
                 $('#filesEditor ul.files a.fileitem').each(function() {
                     html += '<option value="'+$(this).attr('rev')+'">'+$(this).text()+'</option>';
                 });
-                var selected = $('#filesEditor ul.files a.fileitem.hover');
+                var selected = $('#filesEditor ul.files a.fileitem.cms-hover');
                 if (selected.length) {
                    val = selected.attr('rev');
                 }
@@ -78,7 +78,7 @@ cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
                 $('#filesEditor ul.files a.fileitem').each(function() {
                     html += '<option value="'+$(this).attr('rev')+'">'+$(this).text()+'</option>';
                 });
-                var selected = $('#filesEditor ul.files a.fileitem.hover');
+                var selected = $('#filesEditor ul.files a.fileitem.cms-hover');
                 if (selected.length) {
                    val = selected.attr('rev');
                 }

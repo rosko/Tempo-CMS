@@ -1,6 +1,6 @@
 <?php
 
-class FileManagerController extends Controller
+class FileManagerController extends CController
 {
     public function actionIndex()
     {

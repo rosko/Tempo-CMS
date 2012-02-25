@@ -9,20 +9,17 @@ class Unit extends I18nActiveRecord
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units';
+		return Yii::app()->db->tablePrefix . 'widgets';
 	}
 
     public function scheme()
     {
         return array(
-            'id' => 'pk',
-            'type' => 'char(64)',
+            'class' => 'char(64)',
             'title' => 'string',
             'template' => 'char(32)',
             'author_id'=>'integer unsigned',
             'editor_id'=>'integer unsigned',
-            'create'=>'datetime',
-            'modify'=>'datetime',
             'access'=>'text',
         );
     }
@@ -30,8 +27,8 @@ class Unit extends I18nActiveRecord
 	public function rules()
 	{
 		return $this->localizedRules(array(
-			array('type', 'required'),
-			array('type', 'length', 'max'=>64),
+			array('class', 'required'),
+			array('class', 'length', 'max'=>64),
 			array('title', 'length', 'max'=>255),
 			array('template', 'length', 'max'=>32),
 		));
@@ -63,7 +60,7 @@ class Unit extends I18nActiveRecord
 	{
 		return array(
 //			'id' => 'ID',
-//			'type' => Yii::t('cms', 'Type),
+//			'class' => Yii::t('cms', 'Type),
 			'title' => Yii::t('cms', 'Title'),
             'template' => Yii::t('cms', 'Template'),
 		);
@@ -141,104 +138,23 @@ class Unit extends I18nActiveRecord
         );
     }
 
-    public function configFilename()
-    {
-        return Yii::getPathOfAlias('config.units').'.php';
-    }
-
-    public function loadConfig()
-    {
-        return include(self::configFilename());
-    }
-
-    public function getAllUnits()
-    {
-        $installed = array_keys(self::loadConfig());
-
-        $aliases = self::unitsDirsAliases();
-        $_units = array();
-        $units = array();
-        $u = array();
-        foreach ($aliases as $alias) {
-            $dirs = CFileHelper::findFiles(Yii::getPathOfAlias($alias), array(
-                'fileTypes'=>array('php'),
-                'level'=>1
-            ));
-            foreach ($dirs as $dir) {
-                if (basename($dir)=='unit.php') {
-                    $dir = dirname($dir);
-                    if (is_dir($dir)) {
-                        $className = basename($dir);
-                        Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
-                        $u[$className] = call_user_func(array($className, 'unitName'));
-                        $_units[$className] = array(
-                            'name' => $u[$className],
-                            'dir_alias' => $alias,
-                            'icon' => call_user_func(array($className, 'icon')),
-                            'installed' => in_array($className, $installed),
-                        );
-                    }
-                }
-            }
-        }
-        asort($u);
-        foreach ($u as $className => $name) {
-            $units[$className] = $_units[$className];
-        }
-        return $units;
-    }
-
-    public function install($classNames=null)
-    {
-        if (empty($classNames)) return false;
-        $config = self::loadConfig();
-        if (!is_array($classNames)) {
-            $classNames = array($classNames);
-        }
-        $units = self::getAllUnits();
-        foreach ($classNames as $className) {
-            Yii::app()->installer->installTable($className);
-            $config[$className] = $units[$className]['dir_alias'];
-        }
-        self::saveConfig($config);
-    }
-
-    public function uninstall($classNames)
-    {
-        $config = self::loadConfig();
-        if (!is_array($classNames)) {
-            $classNames = array($classNames);
-        }
-        if (empty($classNames)) return false;
-        foreach ($classNames as $className) {
-            if (isset($config[$className]))
-                unset($config[$className]);
-        }
-        self::saveConfig($config);
-    }
-
-    public function saveConfig($config)
-    {
-        if (is_array($config) && !empty($config)) {
-            $contents = "<?php\nreturn array(\n";
-            foreach ($config as $k => $v) {
-                $contents .= "\t'{$k}'=>'{$v}',\n";
-            }
-            $contents .= ");\n";
-            file_put_contents(self::configFilename(), $contents);
-        }
-    }
-
 	/**
      * Возвращает объект содержащий контент блока
+     * 
      * @return mixed объект содержащий контент блока
      */
     public function getContent()
 	{
-        $tmpClass = Unit::getClassNameByUnitType($this->type);
-		return call_user_func(array($tmpClass, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
+        $widgetClass = $this->class;
+        $modelClass = call_user_func(array($widgetClass, 'modelClassName'));
+		return call_user_func(array($modelClass, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
 	}
 
+    /**
+     * Находит одну страницу где размещен экземпляр юнита
+     *
+     * @return array свойства страницы
+     */
     public function getUnitPageArray()
     {
         $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
@@ -250,6 +166,14 @@ class Unit extends I18nActiveRecord
         return $page;
     }
 
+    /**
+     * Возвращает ссылку на одну страницу где размещен экземпляр юнита
+     * 
+     * @param bool $absolute указывает в каком виде нужно вернуть ссылку 
+     * (true - абсолютная ссылка, false - относительная)
+     * @param array $params дополнительные параметры для ссылки
+     * @return string ссылка 
+     */
     public function getUnitUrl($absolute=false, $params=array())
     {
         $page = $this->getUnitPageArray();
@@ -258,35 +182,6 @@ class Unit extends I18nActiveRecord
             return Yii::app()->controller->createAbsoluteUrl('view/index', $params);
         else
             return Yii::app()->controller->createUrl('view/index', $params);
-    }
-
-    /**
-     * Возвращает список типов блоков, установленных в CMS
-     * @return array список типов блоков, установленных в CMS
-     */
-    public static function getTypes()
-	{
-		return array_keys(self::getTypeNames());
-	}
-
-    public static function getTypeNames()
-	{
-        self::loadTypes();
-        $classNames = array_keys(self::loadConfig());
-		foreach ($classNames as $className) {
-            if (!Yii::app()->settings->getValue('simpleMode') || !call_user_func(array($className, 'hidden')))
-                $ret[$className] = call_user_func(array($className, 'unitName'));
-
-		}
-        asort($ret);
-		return $ret;
-	}
-
-    public static function loadTypes()
-    {
-        foreach (self::loadConfig() as $className => $alias) {
-            Yii::$classMap[$className] = Yii::getPathOfAlias($alias.'.'.$className.'.unit').'.php';
-        }
     }
 
 	public function beforeDelete()
@@ -628,7 +523,7 @@ class Unit extends I18nActiveRecord
 		}
 
     }
-
+/*    
     public static function getUnitTypeByClassName($className)
     {
         return strtolower(str_replace('Unit', '', $className));
@@ -643,5 +538,5 @@ class Unit extends I18nActiveRecord
             return 'Unit'.ucfirst(substr($unitType,4));
     }
 
-
+*/
 }

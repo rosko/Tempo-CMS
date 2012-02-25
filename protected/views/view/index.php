@@ -47,10 +47,10 @@ JS
 $js = '';
 $flashes = Yii::app()->user->getFlashes(false);
 
-$unitConfig = Unit::loadConfig();
-if (Yii::app()->user->hasState('askfill') && isset($unitConfig['UnitRegister']))  {
+$unitConfig = ContentUnit::loadConfig();
+if (Yii::app()->user->hasState('askfill') && isset($unitConfig['register']))  {
 
-    $registerUnit = UnitRegister::model()->find('unit_id > 0');
+    $registerUnit = ModelRegister::model()->find('unit_id > 0');
     if ($registerUnit) {
         $shortMessage = '<a href=\''.$registerUnit->getUnitUrl().'\'>'.Yii::t('cms', 'Please fill all required fields in your personal profile. And if necessary, change your password.').'</a>';
         $message = '<h3>'.Yii::t('cms', 'Attention') .'</h3><p>'.$shortMessage.'</p>';
@@ -120,9 +120,7 @@ $('.ajaxPager a').live('click', function() {
 JS;
 $cs->registerScript('ajaxPager', $js, CClientScript::POS_READY);
 
-if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
-    Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model)) ||
-    Yii::app()->user->checkAccess('deletePage', array('page'=>$model))) {
+if (!Yii::app()->user->isGuest) {
 
     $cs->registerPackage('cmsAdmin');
     $cs->registerPackage('jstree');
@@ -131,7 +129,7 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
         $this->pageTitle = '['.Yii::t('cms', 'Page unactive').'] ' . $this->pageTitle;
     }
 
-    if (Yii::app()->user->checkAccess('updateContentPage', array('page'=>$model))) {
+    if (!Yii::app()->user->isGuest) {
         $cs->registerScript('cms-area', <<<JS
 
             // Настройки и обработчики перещения юнитов на странице
@@ -157,7 +155,7 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
                 },
                 start:function(event, ui) {
                     $(ui.helper).find('.cms-panel').hide();
-                    $('.cms-area').addClass('potential');
+                    $('.cms-area').addClass('cms-potential');
                     $('.cms-area').each(function() {
                         if ($(this).find('.cms-pageunit').length == 0)
                             $(this).addClass('cms-empty-area');
@@ -165,7 +163,7 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
                     cmsAreaEmptyCheck();
                 },
                 stop:function(event, ui) {
-                    $('.cms-area').removeClass('potential').removeClass('cms-empty-area');
+                    $('.cms-area').removeClass('cms-potential').removeClass('cms-empty-area');
                     cmsAreaEmptyCheck();
                 }
             }).disableSelection();
@@ -174,9 +172,9 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
 
             cmsAreaEmptyCheck();
             $('.cms-pageunit').live('mouseenter', function() {
-                $(this).addClass('hover');
+                $(this).addClass('cms-hover');
             }).live('mouseleave', function() {
-                $(this).removeClass('hover');
+                $(this).removeClass('cms-hover');
             });
 
             $('.cms-pageunit').live('dblclick', function() {
@@ -187,11 +185,11 @@ if (Yii::app()->user->checkAccess('createPage', array('page'=>$model)) ||
 
             // Обработчик для выбора типа юнита при создании
             $('.cms-btn-pageunit-create').live('click', function() {
-                var type = $(this).attr('id').replace('cms-button-create-', '');
+                var widgetClass = $(this).attr('id').replace('cms-button-create-', '');
                 var areaName = $(this).attr('rel');
                 var prevPageUnitId = $(this).attr('rev');
                 var pageId = $('body').attr('rel');
-                var url = '/?r=unit/edit&pageId='+pageId+'&prevPageUnitId='+prevPageUnitId+'&area='+areaName+'&type='+type+'&return=html&language='+$.data(document.body, 'language');
+                var url = '/?r=unit/edit&pageId='+pageId+'&prevPageUnitId='+prevPageUnitId+'&area='+areaName+'&widgetClass='+widgetClass+'&return=html&language='+$.data(document.body, 'language');
                 cmsLoadDialog(url, {
                     simpleClose: false
                 });
@@ -230,20 +228,25 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
 
 ?>
 
-<div class="hidden">
+<div class="cms-hidden">
 
     <div id="cms-pageunit-add" class="cms-splash cms-pageunit-add">
         <h3><?=Yii::t('cms', 'Add unit')?></h3>
         <ul>
         <?php
-            $unit_types = Unit::getTypes();
-            $unit_types_count = count($unit_types);
-            $i=0;
-            foreach ($unit_types as $unit_class) {
+            $units = ContentWidget::getInstalledWidgets();
+            $units_count = count($units);
+            $i = 0;
+            foreach ($units as $unit) {
                 $i++;
-                $unit_type = Unit::getUnitTypeByClassName($unit_class);
-                ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$unit_type?>" title="<?=call_user_func(array($unit_class, 'unitName'))?>" href="#" ><img src="<?=call_user_func(array($unit_class, 'icon'))?>" alt="<?=call_user_func(array($unit_class, 'unitName'))?>" /> <?=call_user_func(array($unit_class, 'unitName'))?></a></li><?php
-                if ($i == ceil($unit_types_count/2)) {
+                ?><li> <ul><?php
+                foreach ($unit['widgets'] as $widget) {
+
+                    ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$widget['className']?>" title="<?=$widget['name']?>" href="#" ><img src="<?=$widget['icon']?>" alt="<?=$widget['name']?>" /> <?=$widget['name']?></a></li><?php                    
+                    
+                }
+                ?></ul></li><?php
+                if ($i == ceil($units_count/2)) {
                     ?></ul><ul><?php
                 }
             }

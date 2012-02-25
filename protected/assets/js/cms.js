@@ -240,10 +240,6 @@ function cmsAjaxSubmitForm(form, data, hasError, events)
                 //alert(pageunit.attr('rev'));
                 cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+unitId+']');
             }
-            // Или обновить таблицу записей
-            if (form.data('grid_id') !== undefined) {
-                $.fn.yiiGridView.update(form.data('grid_id'));
-            }
             if (html.substring(0,2) == '{"') {
                 var ret = jQuery.parseJSON(html);
                 if (ret) {
@@ -331,11 +327,12 @@ function cmsPageUnitEditForm(t)
     if (pageUnit.hasClass('selected')) {return;}
     cmsFadeIn(pageUnit, 'selected');
     pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-    unitType = pageUnit.attr('rel');
-    cmsLoadDialog('/?r=unit/edit&type='+unitType+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
+    widgetClass = pageUnit.attr('rel');
+    cmsLoadDialog('/?r=unit/edit&widgetClass='+widgetClass+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
         pageUnit: pageUnit,
         pageUnitId: pageUnitId,
         simpleClose: false,
+        width: 830,
         onClose: function() {
             cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+pageUnit.attr('rev')+']');
         }
@@ -495,14 +492,17 @@ function cmsPageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
 function cmsRecordEditForm(id, className, unitId, gridId)
 {
     var dlgId = 'cmsRecordEditForm'+className+'_'+id;
-    cmsLoadDialog('/?r=unit/edit&className='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
+    cmsLoadDialog('/?r=unit/edit&modelClass='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         id: dlgId,
         className: 'cmsRecordEditForm-'+className,
         title: cmsI18n.cms.editing,
+        gridId: gridId,
         onOpen: function() {
-            $('#'+dlgId).find('form').data('grid_id', gridId);
-            $('#'+dlgId).find('label[for="Unit_title"]:eq(0)').next().focus();
+            $('#'+dlgId).find('.field_title input:eq(0)').focus();
+        },
+        onClose: function() {
+            $.fn.yiiGridView.update(gridId);
         }
     });
 }

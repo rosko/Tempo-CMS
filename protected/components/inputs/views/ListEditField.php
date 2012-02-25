@@ -13,7 +13,7 @@
                 <a href="#" class="ListEdit_field_delete"><?=Yii::t('cms', 'Delete this item')?></a>
             </legend>
             <?php if ($LE->i18n) { ?>
-                <div class="hidden ListEdit_field_options">
+                <div class="cms-hidden ListEdit_field_options">
                     <?php foreach($langs as $lang=>$language) { ?>
                     <div>
                         <input type="text" name="<?=$name?>[<?=$i?>][<?=$lang?>]" value="<?=$item[$lang]?>" />

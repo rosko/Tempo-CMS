@@ -157,6 +157,13 @@ class WidgetVideo extends ContentWidget
                 'height' => 360,
                 'view' => 'utro',
             ),
+            'nbc.com' => array(
+                'pattern' => "|nbc\.com/[^/]*/video/[^/]*/([0-9]*)|msi",
+                'match' => 1,
+                'width' => 512,                
+                'height' => 347,
+                'view' => 'nbc',
+            ),
             $_SERVER['HTTP_HOST'] => array(
                 'pattern' => "|(.*)|msi",
                 'match' => 1,

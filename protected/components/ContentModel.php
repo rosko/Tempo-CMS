@@ -63,7 +63,7 @@ class ContentModel extends I18nActiveRecord
         );
         return $pathes;
     }
-
+/*
     public function getTemplates($className='', $basenameOnly=true)
     {
         if ($className == '')
@@ -102,7 +102,7 @@ class ContentModel extends I18nActiveRecord
 
         return $data;
     }
-
+*/
     public function getAllValuesBy($attr)
     {
         $attr = $this->getI18nFieldName($attr);

@@ -46,7 +46,7 @@ class ModelImage extends ContentModel
 
 	public static function form()
 	{
-		$className = 'image';
+		$className = __CLASS__;
 		$slideWidth = 'js:function(event,ui)'.<<<JS
  {
 	$('#{$className}_width').val(ui.value);
@@ -81,7 +81,7 @@ JS;
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
 					'onChange'=> "js:$('#cms-pageunit-'+pageUnitId).find('img').attr('src', $(this).val());"
 				),
-                Yii::app()->controller->renderPartial($cfg['UnitImage'].'.image.assets.imagesize'),
+                Yii::app()->controller->renderPartial($cfg['UnitImage'].'.image.assets.imagesize', compact('className'), true),
 				'width'=>array(
 					'type'=>'Slider',
 					'event'=>'none',

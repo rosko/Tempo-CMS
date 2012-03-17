@@ -88,7 +88,6 @@ class WidgetProfiles extends ContentWidget
 
                     if ($form->submitted('send')) {
                         $vm = $form->model;
-                        echo 'f';
                         if ($form->validate()) {
 
                             $cfg = ContentUnit::loadConfig();
@@ -256,8 +255,8 @@ class WidgetProfiles extends ContentWidget
     public static function dynamicFeedbackForm($params)
     {
         $user = User::model()->findByPk($params['id']);
-        if ($user && Yii::app()->user->checkAccess($user->send_message) && $user->id != Yii::app()->user->id && $user->email) {
-
+        if ($user && Yii::app()->user->checkAccess($user->send_message) && $user->id != Yii::app()->user->id && $user->email) 
+        {
             $vm = new VirtualModel($params['feedback_form'], 'FieldSet');
             $config = $vm->formMap;
             $config['id'] = sprintf('%x',crc32(serialize(array_keys($params['feedback_form']))));

@@ -238,7 +238,7 @@ JS;
             if (Yii::app()->settings->getValue('showUnitAppearance')) {
                 $formArray['elements']['unit']['elements']['template'] = array(
                     'type'=>'TemplateSelect',
-                    'className'=>$modelClass,
+                    'className'=>$widgetClass,
                     'empty'=>Yii::t('cms', '«accordingly to general settings»'),
                 );
                 $unitFormArray['elements'][] = Form::tab(Yii::t('cms', 'Appearance'));

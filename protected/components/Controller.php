@@ -107,10 +107,8 @@ class Controller extends CController
         }
     }
 
-	public function putDynamic($callback)
+	public function putDynamic($callback, $params)
 	{
-		$params=func_get_args();
-		array_shift($params);
         echo '<!-- dynamic '.base64_encode(serialize(array($callback,$params))).' -->';
 	}
 
@@ -128,7 +126,7 @@ class Controller extends CController
     protected function replaceDynamic($matches)
     {
         list($callback,$params)=unserialize(base64_decode($matches[1], true));
-        return call_user_func_array($callback, $params);
+        return call_user_func($callback, $params);
     }
 
 	/**

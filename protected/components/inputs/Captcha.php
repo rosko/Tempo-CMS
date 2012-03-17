@@ -23,6 +23,7 @@ class Captcha extends CInputWidget
             $this->htmlOptions['name']=$name;
         
         $this->widget('CCaptcha', array(
+            'id'=>$id,
             'captchaAction'=>$this->captchaAction,
             'showRefreshButton'=>$this->showRefreshButton,
             'clickableImage'=>$this->clickableImage,

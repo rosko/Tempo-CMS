@@ -10,6 +10,6 @@ function smarty_function_dynamic($params, &$smarty){
     if ($route == 'view/index') {
         Yii::app()->controller->putDynamic($callback,$params);
     } else {
-        echo call_user_func_array($callback, $params);
+        echo call_user_func($callback, $params);
     }    
 }

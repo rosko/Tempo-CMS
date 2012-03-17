@@ -48,7 +48,7 @@ class ModelVideo extends ContentModel
 
 	public static function form()
 	{
-		$className = 'video';
+		$className = __CLASS__;
 		$slideWidth = 'js:function(event,ui)'.<<<JS
  {
 	$('#{$className}_width').val(ui.value);
@@ -95,7 +95,8 @@ JS;
                         '640x505' => '640 × 505',
                         '960x745' => '960 × 745',
                     ),
-                )),
+                    'className' => $className,
+                ), true),
 				'width'=>array(
 					'type'=>'Slider',
 					'event'=>'none',

@@ -196,7 +196,7 @@ class SiteSettingsForm extends CFormModel
             if (method_exists($unitClass, 'settings')) {
                 $elems = call_user_func(array($unitClass, 'settings'), $unitClass);
                 if (is_array($elems) && !empty($elems)) {
-                    $ret['elements'][] = Form::section(call_user_func(array($unitClass, 'modelName')));
+                    $ret['elements'][] = Form::section(call_user_func(array($unitClass, 'name')));
                     foreach ($elems as $k => $elem)
                     {
                         $ret['elements'][$unitClass.'.'.$k] = $elem;

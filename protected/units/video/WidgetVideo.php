@@ -192,7 +192,7 @@ class WidgetVideo extends ContentWidget
                     'width' => $w,
                     'height' => $h,
                     'title' => $title,
-                ));
+                ), true);
             }
         }
         return false;

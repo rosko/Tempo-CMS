@@ -169,7 +169,10 @@ class FieldSet extends CInputWidget
             ),
         ),
         'captcha'=>array(
-            'captchaAction'=>'site/captcha',
+            'captchaAction'=>array(
+                'type'=>'hidden',
+                'value'=>'site/captcha',
+            ),
         ),
         'type'=>array(
             'type'=>array(

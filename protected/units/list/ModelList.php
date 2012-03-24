@@ -19,15 +19,15 @@ class ModelList extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_list';
+		return Yii::app()->db->tablePrefix . 'widgets_list';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
+            array('widget_id', 'required', 'on'=>'edit'),
 			array('class_name', 'required'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 			array('rule', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
 		);
 	}
@@ -36,7 +36,7 @@ class ModelList extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
             'class_name' => Yii::t('UnitList.main', 'List type'),
 			'rule' => Yii::t('UnitList.main', 'Which entries to show'),
 		);
@@ -63,7 +63,7 @@ class ModelList extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'class_name' => 'char(64)',
             'rule' => 'string',
         );

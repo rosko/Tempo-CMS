@@ -1,6 +1,6 @@
 <?php
 
-class ActiveRecord extends CActiveRecord 
+class ActiveRecord extends CActiveRecord
 {
     public function baseScheme()
     {
@@ -13,8 +13,8 @@ class ActiveRecord extends CActiveRecord
 
     public function beforeSave()
     {
-        if ($this->isNewRecord) 
-        {
+        if ($this->isNewRecord) {
+
             if ($this->hasAttribute('create')) {
                 $this->create = new CDbExpression('NOW()');
             }
@@ -28,14 +28,19 @@ class ActiveRecord extends CActiveRecord
     
     public function getAll($condition = '', $params = array(), $columns = '*')
     {
-//        if (is_string($condition)) {
-            $criteria=$this->getCommandBuilder()->createCriteria($condition,$params);
+        //if (is_string($condition)) {
+            $criteria = $this
+                ->getCommandBuilder()
+                ->createCriteria($condition, $params);
             $criteria->select = $columns;
-//        } else
-//            $criteria = $condition;
+        //} else {
+        //    $criteria = $condition;
+        //}
         $this->beforeFind($criteria);
-		$this->applyScopes($criteria);
-        return $this->getCommandBuilder()->createFindCommand($this->getTableSchema(), $criteria)->queryAll();
+        $this->applyScopes($criteria);
+        return $this
+            ->getCommandBuilder()
+            ->createFindCommand($this->getTableSchema(), $criteria)->queryAll();
     }
 
     public function getSql($columns='*')
@@ -43,21 +48,25 @@ class ActiveRecord extends CActiveRecord
         $criteria=$this->getCommandBuilder()->createCriteria();
         $criteria->select = $columns;
         $this->beforeFind($criteria);
-		$this->applyScopes($criteria);
+        $this->applyScopes($criteria);
 
         return array(
-            'sql' => $this->getCommandBuilder()->createFindCommand($this->getTableSchema(), $criteria)->getText(),
+            'sql' => $this
+                ->getCommandBuilder()
+                ->createFindCommand($this->getTableSchema(), $criteria)->getText(),
             'params' => $criteria->params,
         );
     }
 
     public function getColumn($condition = '', $params = array(), $columns = '*')
     {
-        $criteria=$this->getCommandBuilder()->createCriteria($condition,$params);
+        $criteria = $this->getCommandBuilder()->createCriteria($condition, $params);
         $criteria->select = $columns;
         $this->beforeFind($criteria);
-		$this->applyScopes($criteria);
-        return $this->getCommandBuilder()->createFindCommand($this->getTableSchema(), $criteria)->queryColumn();
+        $this->applyScopes($criteria);
+        return $this
+            ->getCommandBuilder()
+            ->createFindCommand($this->getTableSchema(), $criteria)->queryColumn();
     }
 
 }

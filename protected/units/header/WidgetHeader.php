@@ -25,8 +25,8 @@ class WidgetHeader extends ContentWidget
     public function init()
     {
         parent::init();
-        if ($this->params['unit']->title == '') {
-            $this->params['unit']->title = '&nbsp;';
+        if ($this->params['widget']->title == '') {
+            $this->params['widget']->title = '&nbsp;';
         }
         
     }

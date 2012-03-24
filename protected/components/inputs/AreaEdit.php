@@ -16,7 +16,7 @@ class AreaEdit extends CInputWidget
             $this->htmlOptions['name']=$name;
             
         if($this->hasModel()) {
-            $areaName = 'unit'.$this->model->unit->id.$id;
+            $areaName = 'widget'.$this->model->widget->id.$id;
             $modelId = $this->model->id;
             echo CHtml::activeHiddenField($this->model,$this->attribute,$this->htmlOptions);
         } else {
@@ -28,12 +28,12 @@ class AreaEdit extends CInputWidget
         $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
         Yii::app()->controller->widget('Area', array(
             'name'=>$areaName,
-            'pageUnits'=> PageUnit::model()->findAll(array(
+            'pageWidgets'=> PageWidget::model()->findAll(array(
                 'condition' => '`area` = :area',
                 'params' => array(
                     'area' => $areaName,
                 ),
-                'with' => array('unit'),
+                'with' => array('widget'),
                 'order' => '`order`'
             ))
         ));
@@ -42,24 +42,24 @@ class AreaEdit extends CInputWidget
 
             // Настройки и обработчики перещения юнитов на странице
             $('#cms-area-<?=$areaName?>').sortable({
-                placeholder: 'cms-pageunit-highlight',
+                placeholder: 'cms-pagewidget-highlight',
                 revert: true,
                 opacity:1,
                 forcePlaceholderSize:true,
-                cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
+                cancel:'.cms-pagewidget-menu,.cms-empty-area-buttons',
                 update:function(event, ui) {
-                    var pageUnitId = $(ui.item).attr('id').replace('cms-pageunit-','');
-                    var areaName = cmsGetAreaNameByPageUnit(ui.item);
+                    var pageWidgetId = $(ui.item).attr('id').replace('cms-pagewidget-','');
+                    var areaName = cmsGetAreaNameByPageWidget(ui.item);
                     if (!ui.sender) {
                         // Запрос на обновление текущей области
-                        cmsAjaxSaveArea(cmsGetAreaByPageUnit(ui.item), areaName, <?=$modelId?>, 'pageUnitId='+pageUnitId);
+                        cmsAjaxSaveArea(cmsGetAreaByPageWidget(ui.item), areaName, <?=$modelId?>, 'pageWidgetId='+pageWidgetId);
                     }
                 },
                 start:function(event, ui) {
                     $(ui.helper).find('.cms-panel').hide();
                     $('.cms-area').addClass('cms-potential');
                     $('.cms-area').each(function() {
-                        if ($(this).find('.cms-pageunit').length == 0)
+                        if ($(this).find('.cms-pagewidget').length == 0)
                             $(this).addClass('cms-empty-area');
                     });
                     cmsAreaEmptyCheck();
@@ -70,14 +70,14 @@ class AreaEdit extends CInputWidget
                 }
             }).disableSelection();
 
-            $('#cms-area-<?=$areaName?> .cms-pageunit').css('cursor', 'move');
+            $('#cms-area-<?=$areaName?> .cms-pagewidget').css('cursor', 'move');
 
             cmsAreaEmptyCheck();
 
 
 </script>
 <style type="text/css">
-    #cms-area-<?=$areaName?> #pageunitpanel_move_li {
+    #cms-area-<?=$areaName?> #pagewidgetpanel_move_li {
         display:none;
     }
 </style>

@@ -41,7 +41,7 @@ return array(
     '«as in general settings»' => '«согласно общих настроек сайта»',
 
     'Template' => 'Шаблон',
-    '[Unit "{name}" is empty on this page] - this messages showed in edit mode only' => '[Блок "{name}" на этой странице пуст] - это сообщение отображается только в режиме редактирования',
+    '[Widget "{name}" is empty on this page] - this messages showed in edit mode only' => '[Блок "{name}" на этой странице пуст] - это сообщение отображается только в режиме редактирования',
 
     'Properties' => 'Свойства',
 
@@ -86,14 +86,14 @@ return array(
     'Page url' => 'Полный адрес страницы',
 
     'General settings' => 'Общие настройки',
-    'Units settings' => 'Настройки блоков',
+    'Widgets settings' => 'Настройки блоков',
 
     'Sitename' => 'Название сайта',
     'Web-master\'s e-mail' => 'E-mail администратора',
     'Entries per page, by default' => 'Количество объектов на одной странице, по-умолчанию',
     'Simple edit mode' => 'Упрощенный режим управления сайтом',
     'Autosaving on editing (every 30 seconds)' => 'Автосохранение при редактировании (каждые 30 секунд)',
-    'Show "Appearance" tab for units' => 'Отображать для блоков закладку "Внешний вид"',
+    'Show "Appearance" tab for widgets' => 'Отображать для блоков закладку "Внешний вид"',
     'Graphic theme' => 'Тема оформления (дизайн) сайта',
 
     'Type' => 'Тип',
@@ -129,14 +129,14 @@ return array(
 
     'Select all children pages' => 'Отметить все дочерние страницы',
     'Deselect all children pages' => 'Снять отметки со всех дочернии страниц',
-    'Do you really want to delete this unit?' => 'Вы действительно хотите удалить этот блок?',
-    'Do you really want to delete this unit everywhere?' => 'Удаляемая информация будет безвозвратно потеряна.',
-    'Delete unit' => 'Удалить блок',
+    'Do you really want to delete this widget?' => 'Вы действительно хотите удалить этот блок?',
+    'Do you really want to delete this widget everywhere?' => 'Удаляемая информация будет безвозвратно потеряна.',
+    'Delete widget' => 'Удалить блок',
     'On this page' => 'Из этой страницы',
     'On all pages' => 'Со всех страниц',
     'Select' => 'Выбрать',
     
-    'Unit location on pages' => 'Размещение блока на страницах',
+    'Widget location on pages' => 'Размещение блока на страницах',
     'Check' => 'Отметить',
     'All pages' => 'Все страницы',
     'Current page only' => 'Только текущую страницу',
@@ -144,7 +144,7 @@ return array(
     'All pages, except current' => 'Все, кроме текущей',
     'All, except current and children pages' => 'Все, кроме текущей и ее дочерних страниц',
     'Nothing' => 'Ничего',
-    'Set unit on selected pages only' => 'Разместить блок только на отмеченных страницах',
+    'Set widget on selected pages only' => 'Разместить блок только на отмеченных страницах',
 
     'Page unactive' => 'Страница отключена',
     'Site settings' => 'Настройки всего сайта',
@@ -154,12 +154,12 @@ return array(
 
     'Really exit from site edit mode?' => 'Действительно выйти из режима управления сайтом?',
 
-    'Add another unit' => 'Добавить еще один блок',
+    'Add another widget' => 'Добавить еще один блок',
     'Move up' => 'Переместить выше',
     'Move down' => 'Переместить ниже',
-    'Delete the unit' => 'Удалить этот блок',
+    'Delete the widget' => 'Удалить этот блок',
 
-    'Add unit' => 'Добавить блок',
+    'Add widget' => 'Добавить блок',
 
     'Login' => 'Вход',
     'Sing in' => 'Войти',
@@ -173,12 +173,12 @@ return array(
     'Are you really want delete?' => 'Вы действительно хотите удалить? Данные будут удалены безвозвратно.',
     'Are you really want delete page?' => 'Вы действительно хотите удалить страницу? Данные на странице будут удалены безвозвратно.',
     'Saved' => 'Сохранено',
-    'Are you really want delete this unit?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.',
+    'Are you really want delete this widget?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.',
     'Editing' => 'Редактирование',
-    'Unit deleting' => 'Удаление блока',
-    'There are some units on page {page} where\'s located this unit.' => 'На странице {page}, где размещен удаляемый блок, также присутствуют какие-то другие информационные блоки. Возможно, вы добавили что-то самостоятельно на указанную страницу. Что делать?',
-    'Delete the unit only' => "Удалить только блок",
-    'Delete the unit and the whole page (where\'s unit located)' => "Удалить и блок, и страницу",
+    'Widget deleting' => 'Удаление блока',
+    'There are some widgets on page {page} where\'s located this widget.' => 'На странице {page}, где размещен удаляемый блок, также присутствуют какие-то другие информационные блоки. Возможно, вы добавили что-то самостоятельно на указанную страницу. Что делать?',
+    'Delete the widget only' => "Удалить только блок",
+    'Delete the widget and the whole page (where\'s widget located)' => "Удалить и блок, и страницу",
     'Are you really want delete this record?' => 'Вы действительно хотите удалить эту запись? Удаляемая информация будет безвозвратно потеряна.',
 
     'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.' => 'Ошибка! Проверьте конфигурационный файл "protected/config/config.php", верно ли настроено подключение к БД. Или удалите конфигурационный файл для установки системы заново.',

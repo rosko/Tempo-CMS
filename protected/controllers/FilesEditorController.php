@@ -66,7 +66,7 @@ class FilesEditorController extends Controller
                     }
                 }
 
-                $title = Yii::t('filesEditor', 'Unit &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'modelName'))));
+                $title = Yii::t('filesEditor', 'Widget &laquo;{name}&raquo; templates', array('{name}'=>call_user_func(array($name, 'modelName'))));
 
                 // Формируем подсказки:
                 $suggestions['{$editMode}'] = Yii::t('filesEditor', 'Edit mode flag');
@@ -76,22 +76,22 @@ class FilesEditorController extends Controller
                 {
                     $vars = call_user_func(array($name, 'templateVars'));
                     foreach ($vars as $k => $v) {
-                        $suggestions[$k] = Yii::t('filesEditor', 'Unit') . self::SUGGESTIONS_SEPARATOR . $v;
+                        $suggestions[$k] = Yii::t('filesEditor', 'Widget') . self::SUGGESTIONS_SEPARATOR . $v;
                     }
                 }
 
                 $objs = array(
                     'content'=>$name,
-                    'unit'=>'Unit',
-                    'pageUnit'=>'PageUnit',
+                    'widget'=>'Widget',
+                    'pageWidget'=>'PageWidget',
                     'page'=>'Page',
                     'user'=>'User',
                 );
                 $names = array(
-                    'unit'=>Yii::t('filesEditor', 'Unit'),
-                    'content'=>Yii::t('filesEditor', 'Unit'),
+                    'widget'=>Yii::t('filesEditor', 'Widget'),
+                    'content'=>Yii::t('filesEditor', 'Widget'),
                     'page'=>Yii::t('filesEditor', 'Showing page'),
-                    'pageUnit'=>Yii::t('filesEditor', 'Unit location'),
+                    'pageWidget'=>Yii::t('filesEditor', 'Widget location'),
                     'user'=>Yii::t('filesEditor', 'User'),
                 );
                 foreach ($objs as $param => $obj) {

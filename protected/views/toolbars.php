@@ -287,9 +287,9 @@ JS
     if (!Yii::app()->user->isGuest) {
 
         $this->widget('Toolbar', array(
-            'id' => 'pageunitpanel',
+            'id' => 'pagewidgetpanel',
             'location' => array(
-                'selector' => '.cms-pageunit',
+                'selector' => '.cms-pagewidget',
                 'position' => array('outter', 'left', 'top'),
                 'show' => 'hover',
                 'draggable' => false,
@@ -303,7 +303,7 @@ JS
             'buttons'=>array(
                 'add' => array(
                     'icon' => 'add',
-                    'title' => Yii::t('cms', 'Add another unit'),
+                    'title' => Yii::t('cms', 'Add another widget'),
                     'click' => 'js:function()'.<<<JS
  {
     cmsShowSelectWidgetDialog(this);
@@ -316,22 +316,22 @@ JS
                     'title' => Yii::t('cms', 'Edit'),
                     'click' => 'js:function()'.<<<JS
  {
-    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-    cmsPageUnitEditForm(pageUnit);
+    var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+    cmsPageWidgetEditForm(pageWidget);
     return false;
 }
 JS
                 ),
                 'move' => array(
                     'icon' => 'move',
-                    'title' => Yii::t('cms', 'Unit location on pages'),
+                    'title' => Yii::t('cms', 'Widget location on pages'),
                     'click' => 'js:function()'.<<<JS
  {
-                var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-                cmsFadeIn(pageUnit, 'cms-selected');
-                var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-                var unitId = pageUnit.attr('rev');
-                cmsPageUnitSetDialog({$model->id}, pageUnitId, unitId);
+                var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+                cmsFadeIn(pageWidget, 'cms-selected');
+                var pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+                var widgetId = pageWidget.attr('rev');
+                cmsPageWidgetSetDialog({$model->id}, pageWidgetId, widgetId);
                 return false;
             }
 JS
@@ -341,12 +341,12 @@ JS
                     'title' => Yii::t('cms', 'Move up'),
                     'click' => 'js:function()'.<<<JS
  {
-    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-    if (pageUnit.prev().length) {
-        pageUnit.insertBefore(pageUnit.prev());
-        area = cmsGetAreaByPageUnit(pageUnit);
-        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
+    var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+    if (pageWidget.prev().length) {
+        pageWidget.insertBefore(pageWidget.prev());
+        area = cmsGetAreaByPageWidget(pageWidget);
+        var pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageWidgetId='+pageWidgetId);
     }
     return false;
 }
@@ -357,12 +357,12 @@ JS
                     'title' => Yii::t('cms', 'Move down'),
                     'click' => 'js:function()'.<<<JS
  {
-    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-    if (pageUnit.next().length) {
-        pageUnit.insertAfter(pageUnit.next());
-        area = cmsGetAreaByPageUnit(pageUnit);
-        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageUnitId='+pageUnitId);
+    var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+    if (pageWidget.next().length) {
+        pageWidget.insertAfter(pageWidget.next());
+        area = cmsGetAreaByPageWidget(pageWidget);
+        var pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+        cmsAjaxSaveArea(area, cmsGetAreaName(area), {$model->id}, 'pageWidgetId='+pageWidgetId);
     }
     return false;
 }
@@ -370,13 +370,13 @@ JS
                 ),
                 'delete' => array(
                     'icon' => 'delete',
-                    'title' => Yii::t('cms', 'Delete the unit'),
+                    'title' => Yii::t('cms', 'Delete the widget'),
                     'click' => 'js:function()'.<<<JS
  {
-    var pageUnit = $(this).parents('.cms-pageunit').eq(0);
-    cmsFadeIn(pageUnit, 'cms-selected');
-    $('#pageunitpanel').appendTo('body');
-    cmsPageUnitDeleteDialog(pageUnit.attr('rev'), pageUnit.attr('id').replace('cms-pageunit-',''), {$model->id});
+    var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+    cmsFadeIn(pageWidget, 'cms-selected');
+    $('#pagewidgetpanel').appendTo('body');
+    cmsPageWidgetDeleteDialog(pageWidget.attr('rev'), pageWidget.attr('id').replace('cms-pagewidget-',''), {$model->id});
     return false;
 }
 JS

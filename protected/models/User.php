@@ -228,7 +228,7 @@ class User extends ActiveRecord
             ),
             'deleteOwn'=>array(
                 'label'=>'Delete own user',
-                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->id;',
+                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->id;',
                 'children'=>array('deleteUser'),
                 'defaultRoles'=>array('authenticated'),
             ),

@@ -19,15 +19,15 @@ class ModelText extends ContentModel
 	
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_text';
+		return Yii::app()->db->tablePrefix . 'widgets_text';
 	}
 
 	public function rules()
 	{
 		return $this->localizedRules(array(
 			array('text', 'required'),
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 //			array('author', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
 		));
 	}
@@ -41,7 +41,7 @@ class ModelText extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'text' => Yii::t('UnitText.main', 'Text'),
 //			'author' => Yii::t('UnitText.main', 'Author'),
 		);
@@ -70,7 +70,7 @@ class ModelText extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'text' => 'text',
             'author' => 'string',
         );

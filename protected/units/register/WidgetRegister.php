@@ -85,7 +85,7 @@ class WidgetRegister extends ContentWidget
                     $tpldata = array(
                         'model'=>$user,
                         'settings' => Yii::app()->settings->model->getAttributes(),
-                        'page' => $this->params['content']->getUnitPageArray(),
+                        'page' => $this->params['content']->getWidgetPageArray(),
                     );
                     if ($this->params['content']->notify_user) {
                         // send 'to_user_notify' mail
@@ -117,11 +117,11 @@ class WidgetRegister extends ContentWidget
                 $this->params['formElements'] = $makeForm['elements'];
                 $this->params['formRules'] = $makeForm['rules'];
 
-                $profileUnit = ModelProfiles::model()->find('unit_id > 0');
-                $profileUnitWidget = new WidgetProfiles;
-                if ($profileUnit)
-                    $this->params['profileUnitUrl'] = $profileUnit->getUnitUrl();
-                    $this->params['profileUnitUrlParams'] = $profileUnitWidget->urlParam('view').'='.$this->params['user']->id;
+                $profileModel = ModelProfiles::model()->find('widget_id > 0');
+                $profileWidget = new WidgetProfiles;
+                if ($profileModel)
+                    $this->params['profileWidgetUrl'] = $profileModel->getWidgetUrl();
+                    $this->params['profileWidgetUrlParams'] = $profileWidget->urlParam('view').'='.$this->params['user']->id;
 
                 if(isset($_REQUEST['ajax-validate']))
                 {
@@ -162,7 +162,7 @@ class WidgetRegister extends ContentWidget
                 $viewFileDir = $cfg['UnitRegister'].'.register.templates.mail.';
                 $tpldata['model'] = $model->getAttributes();
                 $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
-                $tpldata['page'] = $this->params['content']->getUnitPageArray();
+                $tpldata['page'] = $this->params['content']->getWidgetPageArray();
 
                 if ($this->params['content']->notify_admin) {
                     // send 'to_admin_notify' mail

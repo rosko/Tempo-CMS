@@ -69,7 +69,7 @@ class Installer extends CApplicationComponent
     public function installAll($withUnits=true)
     {
         // 'ARRights', 'AuthItem', 'AuthItemChild', 'AuthAssignment'
-        $classNames = array('User', 'Page', 'PageUnit', 'Unit');
+        $classNames = array('User', 'Page', 'PageWidget', 'Widget');
         foreach ($classNames as $className)
             $this->installTable($className);
         $this->installAuth();
@@ -148,7 +148,7 @@ class Installer extends CApplicationComponent
 
         $auth->assign('administrator', User::getAdmin()->id);
 
-        $classes = array('Page', 'Settings', 'Unit', 'User');
+        $classes = array('Page', 'Settings', 'Widget', 'User');
         foreach ($classes as $className) {
             if (method_exists($className, 'operations')) {
                 $a = call_user_func(array($className, 'operations'));

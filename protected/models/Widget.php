@@ -1,6 +1,6 @@
 <?php
 
-class Unit extends I18nActiveRecord
+class Widget extends I18nActiveRecord
 {
 	public static function model($className=__CLASS__)
 	{
@@ -42,7 +42,7 @@ class Unit extends I18nActiveRecord
 	public function relations()
 	{
 		return array(
-			'pages' => array(self::MANY_MANY, 'Page', Yii::app()->db->tablePrefix.'pages_units(unit_id,page_id)')
+			'pages' => array(self::MANY_MANY, 'Page', Yii::app()->db->tablePrefix.'pages_widgets(widget_id,page_id)')
 		);
 	}
 
@@ -70,31 +70,31 @@ class Unit extends I18nActiveRecord
     {
         return array(
             'create'=>array(
-                'label'=>'Create unit', // Право создавать блоки
+                'label'=>'Create widget', // Право создавать блоки
                 'defaultRoles'=>array('author', 'editor', 'administrator'),
             ),
             'read'=>array(
-                'label'=>'View unit', // Право просматривать блоки
+                'label'=>'View widget', // Право просматривать блоки
                 'defaultRoles'=>array('anybody'),
             ),
             'update'=>array(
-                'label'=>'Update unit', // Право редактировать блоки
+                'label'=>'Update widget', // Право редактировать блоки
                 'defaultRoles'=>array('editor' , 'administrator'),
             ),
             'updateAccess'=>array(
-                'label'=>'Update unit access', // Право редактировать права доступа к блокам
+                'label'=>'Update widget access', // Право редактировать права доступа к блокам
                 'defaultRoles'=>array('administrator'),
             ),
             'move'=>array(
-                'label'=>'Move unit', // Право перемещать блоки
+                'label'=>'Move widget', // Право перемещать блоки
                 'defaultRoles'=>array('administrator', 'editor'),
             ),
             'delete'=>array(
-                'label'=>'Delete unit', // Право удалять блоки
+                'label'=>'Delete widget', // Право удалять блоки
                 'defaultRoles'=>array('editor', 'administrator'),
             ),
             'manage'=>array(
-                'label'=>'Move unit', // Право инсталлировать/деинсталлировать юниты
+                'label'=>'Move widget', // Право инсталлировать/деинсталлировать юниты
                 'defaultRoles'=>array('administrator'),
             ),
         );
@@ -104,37 +104,29 @@ class Unit extends I18nActiveRecord
     {
         return array(
             'readOwn'=>array(
-                'label'=>'View own unit',
-                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
-                'children'=>array('readUnit'),
+                'label'=>'View own widget',
+                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->author_id;',
+                'children'=>array('readWidget'),
                 'defaultRoles'=>array('author', 'authenticated'),
             ),
             'updateOwn'=>array(
-                'label'=>'Edit own unit',
-                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
-                'children'=>array('updateUnit'),
+                'label'=>'Edit own widget',
+                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->author_id;',
+                'children'=>array('updateWidget'),
                 'defaultRoles'=>array('author', 'authenticated'),
             ),
             'updateAccessOwn'=>array(
-                'label'=>'Edit own unit access',
-                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
-                'children'=>array('updateAccessUnit'),
+                'label'=>'Edit own widget access',
+                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->author_id;',
+                'children'=>array('updateAccessWidget'),
                 'defaultRoles'=>array('author'),
             ),
             'deleteOwn'=>array(
-                'label'=>'Delete own unit',
-                'bizRule'=>'return Yii::app()->user->id==$params["unit"]->author_id;',
-                'children'=>array('deleteUnit'),
+                'label'=>'Delete own widget',
+                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->author_id;',
+                'children'=>array('deleteWidget'),
                 'defaultRoles'=>array('author'),
             ),
-        );
-    }
-
-    public function unitsDirsAliases()
-    {
-        return array(
-            'application.units',
-            'local.units'
         );
     }
 
@@ -147,7 +139,7 @@ class Unit extends I18nActiveRecord
 	{
         $widgetClass = $this->class;
         $modelClass = call_user_func(array($widgetClass, 'modelClassName'));
-		return call_user_func(array($modelClass, 'model'))->find('unit_id=:id', array(':id'=>$this->id));
+		return call_user_func(array($modelClass, 'model'))->find('widget_id=:id', array(':id'=>$this->id));
 	}
 
     /**
@@ -155,11 +147,11 @@ class Unit extends I18nActiveRecord
      *
      * @return array свойства страницы
      */
-    public function getUnitPageArray()
+    public function getWidgetPageArray()
     {
-        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
+        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageWidget::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.widget_id = :widget_id ORDER BY pu.id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
-        $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+        $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
         $page = $command->queryRow();
         $page['alias'] = $page[Yii::app()->language.'_alias'];
         $page['url'] = $page[Yii::app()->language.'_url'];
@@ -174,9 +166,9 @@ class Unit extends I18nActiveRecord
      * @param array $params дополнительные параметры для ссылки
      * @return string ссылка 
      */
-    public function getUnitUrl($absolute=false, $params=array())
+    public function getWidgetUrl($absolute=false, $params=array())
     {
-        $page = $this->getUnitPageArray();
+        $page = $this->getWidgetPageArray();
         $params = array_merge(array('pageId'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
         if ($absolute)
             return Yii::app()->controller->createAbsoluteUrl('view/index', $params);
@@ -196,13 +188,13 @@ class Unit extends I18nActiveRecord
      * @param integer pageId id страницы
      * @param string название области блоков
      * @param integer номер по порядку размещения блоков
-     * @return PageUnit
+     * @return PageWidget
      */
     public function setOnPage($pageId, $area, $order)
     {
         $pageId = (int)$pageId;
         // Раздвигаем последующие юниты
-        $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
+        $sql = 'UPDATE `' . PageWidget::tableName() . '` SET `order`=`order`+1 WHERE `page_id` = :page_id AND `area` = :area AND `order` > :order';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':page_id', $pageId, PDO::PARAM_INT);
         $command->bindValue(':area', $area, PDO::PARAM_STR);
@@ -210,71 +202,71 @@ class Unit extends I18nActiveRecord
         $command->execute();
 
         // Устанавливаем юнит
-        $pageUnit = new PageUnit;
-        $pageUnit->page_id = $pageId;
-        $pageUnit->unit_id = $this->id;
-        $pageUnit->order = $order+1;
-        $pageUnit->area = $area;
-        $pageUnit->save();
+        $pageWidget = new PageWidget;
+        $pageWidget->page_id = $pageId;
+        $pageWidget->widget_id = $this->id;
+        $pageWidget->order = $order+1;
+        $pageWidget->area = $area;
+        $pageWidget->save();
 
-        return $pageUnit;
+        return $pageWidget;
     }
 
     /**
      * Устанавливает юнит только на конкретных страницах
      * @param array id страниц, где должен быть размещен юнит
-     * @param integer id pageUnit'а, на основе которого делается размещение на других страницах
+     * @param integer id pageWidget'а, на основе которого делается размещение на других страницах
      * @return boolean true в случае удачной операции, false - в обратном случае
      */
-    public function setOnPagesOnly($pageIds, $pageUnitId)
+    public function setOnPagesOnly($pageIds, $pageWidgetId)
     {
         $transaction=Yii::app()->db->beginTransaction();
 		try
 		{
-            $pageUnit = PageUnit::model()->findByPk($pageUnitId);
-            if ($pageUnit) {
+            $pageWidget = PageWidget::model()->findByPk($pageWidgetId);
+            if ($pageWidget) {
                 if (empty($pageIds)) {
-                    $pageIds = array($pageUnit->page_id);
+                    $pageIds = array($pageWidget->page_id);
                 }
 
-                $sql = 'SELECT `page_id` FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id';
+                $sql = 'SELECT `page_id` FROM `' . PageWidget::tableName() . '` WHERE widget_id = :widget_id';
                 $command = Yii::app()->db->createCommand($sql);
-                $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+                $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
                 $curPageIds = $command->queryColumn();
 
-                // Удаляем лишние pageUnit`ы
+                // Удаляем лишние pageWidget`ы
                 $delPageIds = array_diff($curPageIds, $pageIds);
                 if (!empty($delPageIds)) {
-                    $sql = 'DELETE FROM `' . PageUnit::tableName() . '` WHERE unit_id = :unit_id AND `page_id` IN (' . implode(', ',$delPageIds) . ')';
+                    $sql = 'DELETE FROM `' . PageWidget::tableName() . '` WHERE widget_id = :widget_id AND `page_id` IN (' . implode(', ',$delPageIds) . ')';
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+                    $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
                     $command->execute();
 
-                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $delPageIds).') AND `area` = :area AND `order` > :order';
+                    $sql = 'UPDATE `' . PageWidget::tableName() . '` SET `order`=`order`-1 WHERE `page_id` IN ('.implode(', ', $delPageIds).') AND `area` = :area AND `order` > :order';
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
-                    $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
+                    $command->bindValue(':area', $pageWidget->area, PDO::PARAM_STR);
+                    $command->bindValue(':order', $pageWidget->order, PDO::PARAM_INT);
                     $command->execute();
                 }
 
-                // Добавляем необходимые pageUnit`ы
+                // Добавляем необходимые pageWidget`ы
                 $addPageIds = array_diff($pageIds, $curPageIds);
                 if (!empty($addPageIds)) {
-                    $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $addPageIds).') AND `area` = :area AND `order` >= :order';
+                    $sql = 'UPDATE `' . PageWidget::tableName() . '` SET `order`=`order`+1 WHERE `page_id` IN ('.implode(', ', $addPageIds).') AND `area` = :area AND `order` >= :order';
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
-                    $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
+                    $command->bindValue(':area', $pageWidget->area, PDO::PARAM_STR);
+                    $command->bindValue(':order', $pageWidget->order, PDO::PARAM_INT);
                     $command->execute();
 
-                    $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
+                    $sql = 'INSERT INTO `' . PageWidget::tableName() . '` (`page_id`, `widget_id`, `order`, `area`) VALUES ';
                     $sqlArr = array();
                     foreach ($addPageIds as $id)
                     {
-                        $sqlArr[] = '('.intval($id).', '.intval($this->id).', '.intval($pageUnit->order).', :area)';
+                        $sqlArr[] = '('.intval($id).', '.intval($this->id).', '.intval($pageWidget->order).', :area)';
                     }
                     $sql .= implode(',', $sqlArr);
                     $command = Yii::app()->db->createCommand($sql);
-                    $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
+                    $command->bindValue(':area', $pageWidget->area, PDO::PARAM_STR);
                     $command->execute();
                 }
             }
@@ -300,40 +292,40 @@ class Unit extends I18nActiveRecord
             // Если разместить блок вверху
             if ($onTop) {
                 // Оставить блок вверху, а то, что нужно подвинуть вниз
-                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
-                        INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
+                $sql = 'UPDATE `' . PageWidget::tableName() . '` as pu
+                        INNER JOIN (SELECT `order`, `page_id` FROM `' . PageWidget::tableName() . '`
                                     WHERE
                                         `page_id` IN ('.implode(', ', $pageIds) .')
                                         AND `area` = :area
                                         AND `order` = 0
-                                        AND `unit_id` != :unit_id
+                                        AND `widget_id` != :widget_id
                                     GROUP BY `page_id` ) as pu2
                                     ON pu.`page_id` = pu2.`page_id`
                         SET pu.`order` = pu.`order`+1
                         WHERE
                             pu.`area` = :area
                             AND pu2.`order` = 0
-                            AND pu.`unit_id` != :unit_id';
+                            AND pu.`widget_id` != :widget_id';
                 $command = Yii::app()->db->createCommand($sql);
                 $command->bindValue(':area', $area, PDO::PARAM_STR);
-                $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+                $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
                 $command->execute();
             } else {
                 // Иначе, опустить блок вниз
-                $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
-                        INNER JOIN (SELECT MAX(`order`) as `m`, `page_id` FROM `' . PageUnit::tableName() . '`
+                $sql = 'UPDATE `' . PageWidget::tableName() . '` as pu
+                        INNER JOIN (SELECT MAX(`order`) as `m`, `page_id` FROM `' . PageWidget::tableName() . '`
                                     WHERE
                                         `page_id` IN ('.implode(', ', $pageIds) .')
                                     AND `area` = :area
-                                    AND `unit_id` != :unit_id
+                                    AND `widget_id` != :widget_id
                                     GROUP BY `page_id` ) as pu2
                         ON pu.`page_id` = pu2.`page_id`
                         SET pu.`order` = pu2.`m`+1
                         WHERE
-                            pu.`unit_id` = :unit_id';
+                            pu.`widget_id` = :widget_id';
                 $command = Yii::app()->db->createCommand($sql);
                 $command->bindValue(':area', $area, PDO::PARAM_STR);
-                $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+                $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
                 $command->execute();
             }
         }
@@ -342,63 +334,63 @@ class Unit extends I18nActiveRecord
     /**
      * Обрабатывает перемещение блока
      * @param string название области 
-     * @param array массив идентификаторов pageUnit'ов размещенных на странице, где делается перемещение
-     * @param integer идентификатор перемещаемого pageUnit'а
+     * @param array массив идентификаторов pageWidget'ов размещенных на странице, где делается перемещение
+     * @param integer идентификатор перемещаемого pageWidget'а
      * @return boolean true в случае удачной операции, false - в обратном случае
      */
-    public function move($area, $pageUnitIds, $pageUnitId)
+    public function move($area, $pageWidgetIds, $pageWidgetId)
     {
         $transaction=Yii::app()->db->beginTransaction();
 		try
 		{
-            $pageUnit = PageUnit::model()->findByPk($pageUnitId);
-            $isNewArea = $pageUnit->area != $area;
+            $pageWidget = PageWidget::model()->findByPk($pageWidgetId);
+            $isNewArea = $pageWidget->area != $area;
 
             // Переносим блок в нужное место и сбрасываем сортировку
-            $sql = 'UPDATE `' . PageUnit::tableName() . '` SET `area` = :area, `order` = 0
-                    WHERE `unit_id` = :unit_id';
+            $sql = 'UPDATE `' . PageWidget::tableName() . '` SET `area` = :area, `order` = 0
+                    WHERE `widget_id` = :widget_id';
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(':area', $area, PDO::PARAM_STR);
-            $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+            $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
             $command->execute();
 
             // Двигаем блоки на освободившееся место
-            $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
-                    INNER JOIN ( SELECT `page_id` FROM `' . PageUnit::tableName() . '`
-                                WHERE `unit_id` = :unit_id ) as pu2
+            $sql = 'UPDATE `' . PageWidget::tableName() . '` as pu
+                    INNER JOIN ( SELECT `page_id` FROM `' . PageWidget::tableName() . '`
+                                WHERE `widget_id` = :widget_id ) as pu2
                     ON pu.`page_id` = pu2.`page_id`
                     SET pu.`order`= pu.`order`-1
                     WHERE
                         pu.`area` = :area
                         AND pu.`order` > :order';
             $command = Yii::app()->db->createCommand($sql);
-            $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-            $command->bindValue(':area', $pageUnit->area, PDO::PARAM_STR);
-            $command->bindValue(':order', $pageUnit->order, PDO::PARAM_INT);
+            $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
+            $command->bindValue(':area', $pageWidget->area, PDO::PARAM_STR);
+            $command->bindValue(':order', $pageWidget->order, PDO::PARAM_INT);
             $command->execute();
 
             // Выделяем списки блоков, которые идут перед и после перемещаемого блока
-            $pageUnitOrder = -1;
-            foreach ($pageUnitIds as $i=>$id) {
-                $pageUnitIds[$i] = intval($id);
-                if ($pageUnitId == $id) { $pageUnitOrder = $i; }
+            $pageWidgetOrder = -1;
+            foreach ($pageWidgetIds as $i=>$id) {
+                $pageWidgetIds[$i] = intval($id);
+                if ($pageWidgetId == $id) { $pageWidgetOrder = $i; }
             }
-            $ids = array_flip($pageUnitIds);
-            $sql = 'SELECT `unit_id`, `id` FROM `' . PageUnit::tableName() . '`
-                    WHERE `id` IN (' . implode(', ', $pageUnitIds) . ')';
+            $ids = array_flip($pageWidgetIds);
+            $sql = 'SELECT `widget_id`, `id` FROM `' . PageWidget::tableName() . '`
+                    WHERE `id` IN (' . implode(', ', $pageWidgetIds) . ')';
             $result = Yii::app()->db->createCommand($sql)->queryAll();
-            $unitIds = array();
+            $widgetIds = array();
             foreach ($result as $row) {
-                $unitIds[intval($ids[$row['id']])] = $row['unit_id'];
+                $widgetIds[intval($ids[$row['id']])] = $row['widget_id'];
             }
-            ksort($unitIds);
+            ksort($widgetIds);
 
             $preIds = array();
             $postIds = array();
-            foreach ($unitIds as $i=>$id) {
-                if ($i < $pageUnitOrder) {
+            foreach ($widgetIds as $i=>$id) {
+                if ($i < $pageWidgetOrder) {
                     $preIds[] = $id;
-                } elseif ($i > $pageUnitOrder) {
+                } elseif ($i > $pageWidgetOrder) {
                     $postIds[] = $id;
                 }
             }
@@ -414,29 +406,29 @@ class Unit extends I18nActiveRecord
             }
 
             // Находим страницы, где нужно правильно разместить перемещаемый блок
-            $sql = 'SELECT * FROM `' . PageUnit::tableName() . '`
+            $sql = 'SELECT * FROM `' . PageWidget::tableName() . '`
                     WHERE
-                        `page_id` IN  ( SELECT `page_id` FROM `' . PageUnit::tableName() . '`
-                                        WHERE `unit_id` = :unit_id )
+                        `page_id` IN  ( SELECT `page_id` FROM `' . PageWidget::tableName() . '`
+                                        WHERE `widget_id` = :widget_id )
                          AND `area` = :area
-                         AND `unit_id` != :unit_id
+                         AND `widget_id` != :widget_id
                     ORDER BY `order`';
             $command = Yii::app()->db->createCommand($sql);
             $command->bindValue(':area', $area, PDO::PARAM_STR);
-            $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
+            $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
             $result = $command->queryAll();
             $pages = array();
-            $pageUnits = array();
+            $pageWidgets = array();
             foreach ($result as $row) {
-                $pages[$row['page_id']][] = $row['unit_id'];
-                $pageUnits[$row['unit_id']][] = $row['id'];
-                $units[$row['unit_id']][] = $row['page_id'];
+                $pages[$row['page_id']][] = $row['widget_id'];
+                $pageWidgets[$row['widget_id']][] = $row['id'];
+                $widgets[$row['widget_id']][] = $row['page_id'];
             }
 
             // Отделяем страницы, где размещение пройдет просто, а где надо подумать
             $simplePages = $pages;
             foreach ($simplePages as $id=>$page) {
-                if (count(array_intersect($page, $unitIds))==0) {
+                if (count(array_intersect($page, $widgetIds))==0) {
                     unset($pages[$id]);
                 } else {
                     unset($simplePages[$id]);
@@ -464,49 +456,49 @@ class Unit extends I18nActiveRecord
                         break;
                     }
 
-                    if (isset($units[$id]) && !empty($units[$id]) && is_array($units[$id])) {
-                        $units[$id] = array_intersect($pageIds, $units[$id]);
+                    if (isset($widgets[$id]) && !empty($widgets[$id]) && is_array($widgets[$id])) {
+                        $widgets[$id] = array_intersect($pageIds, $widgets[$id]);
                     }
 
                     // Если юнит размещен на какой-то странице
-                    if (isset($units[$id]) && !empty($units[$id]) && is_array($units[$id])) {
+                    if (isset($widgets[$id]) && !empty($widgets[$id]) && is_array($widgets[$id])) {
                         // Подвинем соседей
-                        $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
-                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
+                        $sql = 'UPDATE `' . PageWidget::tableName() . '` as pu
+                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageWidget::tableName() . '`
                                             WHERE
-                                                `page_id` IN ('.implode(', ', $units[$id]).')
-                                            AND `unit_id` = :sibling_unit_id
+                                                `page_id` IN ('.implode(', ', $widgets[$id]).')
+                                            AND `widget_id` = :sibling_widget_id
                                             GROUP BY `page_id` ) as pu2
                                 ON pu.`page_id` = pu2.`page_id`
                                 SET pu.`order` = pu.`order`+1
                                 WHERE
                                     pu.`area` = :area
-                                    AND pu.`unit_id` != :unit_id
+                                    AND pu.`widget_id` != :widget_id
                                     AND pu.`order` '.($r['pre'] ? '>' : '>=') .' pu2.`order`';
                         $command = Yii::app()->db->createCommand($sql);
                         $command->bindValue(':area', $area, PDO::PARAM_STR);
-                        $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-                        $command->bindValue(':sibling_unit_id', $id, PDO::PARAM_INT);
+                        $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
+                        $command->bindValue(':sibling_widget_id', $id, PDO::PARAM_INT);
                         $command->execute();
 
                         // Установка перемещаемого блока в нужное место
-                        $sql = 'UPDATE `' . PageUnit::tableName() . '` as pu
-                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageUnit::tableName() . '`
+                        $sql = 'UPDATE `' . PageWidget::tableName() . '` as pu
+                                INNER JOIN (SELECT `order`, `page_id` FROM `' . PageWidget::tableName() . '`
                                             WHERE
-                                                `page_id` IN ('.implode(', ', $units[$id]).')
-                                            AND `unit_id` = :sibling_unit_id
+                                                `page_id` IN ('.implode(', ', $widgets[$id]).')
+                                            AND `widget_id` = :sibling_widget_id
                                             GROUP BY `page_id` ) as pu2
                                 ON pu.`page_id` = pu2.`page_id`
                                 SET pu.`order` = pu2.`order`'.($r['pre'] ? '+1' : '-1') .'
                                 WHERE
-                                    pu.`unit_id` = :unit_id';
+                                    pu.`widget_id` = :widget_id';
                         $command = Yii::app()->db->createCommand($sql);
-                        $command->bindValue(':unit_id', $this->id, PDO::PARAM_INT);
-                        $command->bindValue(':sibling_unit_id', $id, PDO::PARAM_INT);
+                        $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
+                        $command->bindValue(':sibling_widget_id', $id, PDO::PARAM_INT);
                         $command->execute();
 
                         // Из массива страниц убираем уже обработанные
-                        $pageIds = array_diff($pageIds, $units[$id]);
+                        $pageIds = array_diff($pageIds, $widgets[$id]);
                     } elseif (($id == 0)&&($k < 2)) {
                         $this->setOnPagesTopOrBottom($pageIds, $r['pre'], $area);
                         $pageIds = array();
@@ -524,18 +516,18 @@ class Unit extends I18nActiveRecord
 
     }
 /*    
-    public static function getUnitTypeByClassName($className)
+    public static function getWidgetTypeByClassName($className)
     {
-        return strtolower(str_replace('Unit', '', $className));
+        return strtolower(str_replace('Widget', '', $className));
     }
 
-    public static function getClassNameByUnitType($unitType)
+    public static function getClassNameByWidgetType($widgetType)
     {
-        $unitType = strtolower($unitType);
-        if (substr($unitType,0,4) != 'unit')
-            return 'Unit'.ucfirst($unitType);
+        $widgetType = strtolower($widgetType);
+        if (substr($widgetType,0,4) != 'widget')
+            return 'Widget'.ucfirst($widgetType);
         else
-            return 'Unit'.ucfirst(substr($unitType,4));
+            return 'Widget'.ucfirst(substr($widgetType,4));
     }
 
 */

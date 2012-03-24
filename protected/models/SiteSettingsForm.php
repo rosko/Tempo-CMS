@@ -13,7 +13,7 @@ class SiteSettingsForm extends CFormModel
             array('adminEmail', 'email'),
             array('defaultsPerPage', 'numerical', 'min'=>1, 'integerOnly'=>true),
             array('cacheTime', 'numerical', 'min'=>0, 'integerOnly'=>true),
-			array('simpleMode, autoSave, showUnitAppearance, ajaxPager, ajaxPagerScroll', 'boolean'),
+			array('simpleMode, autoSave, showWidgetAppearance, ajaxPager, ajaxPagerScroll', 'boolean'),
             array('theme', 'length', 'max'=>100),
             array('language', 'length', 'max'=>10),
             array('defaultsShowEmail, defaultsSendMessage', 'length', 'max'=>32),
@@ -50,7 +50,7 @@ class SiteSettingsForm extends CFormModel
             'defaultsPerPage' => Yii::t('cms', 'Entries per page, by default'),
 			'simpleMode' => Yii::t('cms', 'Simple edit mode'),
             'autoSave' => Yii::t('cms', 'Autosaving on editing (every 30 seconds)'),
-            'showUnitAppearance' => Yii::t('cms', 'Show "Appearance" tab for units'),
+            'showWidgetAppearance' => Yii::t('cms', 'Show "Appearance" tab for widgets'),
             'theme' => Yii::t('cms', 'Graphic theme'),
             'language' => Yii::t('cms', 'Main language'),
             'ajaxPager' => Yii::t('cms', 'Load pages in block without reloading whole web-page'),
@@ -155,7 +155,7 @@ class SiteSettingsForm extends CFormModel
 						'max'=>50
 					)
                 ),
-                'showUnitAppearance'=>array(
+                'showWidgetAppearance'=>array(
                     'type'=>'checkbox'
                 ),
                 'ajaxPager'=>array(

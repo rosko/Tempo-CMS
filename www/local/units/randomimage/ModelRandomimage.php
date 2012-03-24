@@ -19,15 +19,15 @@ class ModelRandomimage extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_randomimage';
+		return Yii::app()->db->tablePrefix . 'widgets_randomimage';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
+            array('widget_id', 'required', 'on'=>'edit'),
 			array('images, width, height', 'required'),
-			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
+			array('widget_id, width, height', 'numerical', 'integerOnly'=>true),
             array('images', 'type', 'type'=>'array'),
 			array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8')
@@ -111,7 +111,7 @@ class ModelRandomimage extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'images' => 'text',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',

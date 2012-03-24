@@ -94,7 +94,7 @@ function cmsCloseDialog()
 // function onLoad функция выполняемая при загрузке контента через ajax (первым параметром передается полученный из запроса html-код)
 // string className имя css-класса для диалога
 // string id id диалога
-// string pageUnitId id страничного блока к которому относится этот диалог
+// string pageWidgetId id страничного блока к которому относится этот диалог
 // function onSubmit функция выполняемая при отправке формы через диалог (первым параметром передается объект формы)
 // boolean ajaxify осуществлять ли отправку формы диалога через ajax
 // function onSave функция выполняемая при успешной отправке формы диалога (первым параметром передается html-код ответа)
@@ -127,8 +127,8 @@ function cmsLoadDialog(url, opts)
                 opts.id = '#cms-dialog-'+dlg.find('form').attr('id');
             }
             dlg.attr('id', opts.id)
-            if (opts.pageUnitId != undefined)
-                dlg.find('form').attr('rel', opts.pageUnitId);
+            if (opts.pageWidgetId != undefined)
+                dlg.find('form').attr('rel', opts.pageWidgetId);
             dlg.find('form').find('input[type="submit"]').click(function() {
                 $(this).parents('form').attr('rev', $(this).attr('name'));
             });

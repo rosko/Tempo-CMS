@@ -20,8 +20,6 @@ return CMap::mergeArray(array(
 	),
 
     'modules'=>array(
-        'install'=>array(
-        ),
         'tfilemanager'=>array(
             'import'=>array(
                 'application.modules.tfilemanager.components.*',
@@ -104,19 +102,19 @@ return CMap::mergeArray(array(
                     'site/feed',
                     'urlSuffix'=>'.xml',
                 ),
-                'feed/<unittype:\w+>.<type:\w+>'=>array(
+                'feed/<model:\w+>.<type:\w+>'=>array(
                     'site/feed',
                     'urlSuffix'=>'.xml',
                 ),
-                '<language:[A-Za-z-]+>/feed/<unittype:\w+>.<type:\w+>'=>array(
+                '<language:[A-Za-z-]+>/feed/<model:\w+>.<type:\w+>'=>array(
                     'site/feed',
                     'urlSuffix'=>'.xml',
                 ),
-                'feed/<unittype:\w+>/<id:\d+>.<type:\w+>'=>array(
+                'feed/<model:\w+>/<id:\d+>.<type:\w+>'=>array(
                     'site/feed',
                     'urlSuffix'=>'.xml',
                 ),
-                '<language:[A-Za-z-]+>/feed/<unittype:\w+>/<id:\d+>.<type:\w+>'=>array(
+                '<language:[A-Za-z-]+>/feed/<model:\w+>/<id:\d+>.<type:\w+>'=>array(
                     'site/feed',
                     'urlSuffix'=>'.xml',
                 ),
@@ -124,8 +122,8 @@ return CMap::mergeArray(array(
                 'site/captcha'=>'site/captcha',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
-                'unit/edit'=>'unit/edit',
-                'view/unit'=>'view/unit',
+                'widget/edit'=>'widget/edit',
+                'view/widget'=>'view/widget',
                 'filesEditor/save'=>'filesEditor/save',
                 'users'=>'user/index',
 

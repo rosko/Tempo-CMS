@@ -79,15 +79,15 @@ function <?=$className;?>_fixratio(w, h, ratio, height_const)
 function <?=$className;?>_makesize(value, is_height, uihandle)
 {
 	$('#<?=$className;?>_image').change();
-	var pageUnitId = $(uihandle).parents('form').eq(0).attr('rel');
+	var pageWidgetId = $(uihandle).parents('form').eq(0).attr('rel');
 	if (is_height) {
-		$('#cms-pageunit-'+pageUnitId).find('img').height(value);
-        $('#cms-pageunit-'+pageUnitId).find('img').parent('.ui-wrapper').height(value);
+		$('#cms-pagewidget-'+pageWidgetId).find('img').height(value);
+        $('#cms-pagewidget-'+pageWidgetId).find('img').parent('.ui-wrapper').height(value);
 		var w = $('#<?=$className;?>_width').val();
 		var h = value;
 	} else {
-		$('#cms-pageunit-'+pageUnitId).find('img').width(value);
-        $('#cms-pageunit-'+pageUnitId).find('img').parent('.ui-wrapper').width(value);
+		$('#cms-pagewidget-'+pageWidgetId).find('img').width(value);
+        $('#cms-pagewidget-'+pageWidgetId).find('img').parent('.ui-wrapper').width(value);
 		var w = value
 		var h = $('#<?=$className;?>_height').val();
 	}
@@ -100,16 +100,16 @@ function <?=$className;?>_makesize(value, is_height, uihandle)
 
 			var size = <?=$className;?>_fixratio(w, h, this.width/this.height, is_height);
 			if (is_height) {
-				$('#cms-pageunit-'+pageUnitId).find('img').width(size.width);
-                $('#cms-pageunit-'+pageUnitId).find('img').parent('.ui-wrapper').width(size.width);
+				$('#cms-pagewidget-'+pageWidgetId).find('img').width(size.width);
+                $('#cms-pagewidget-'+pageWidgetId).find('img').parent('.ui-wrapper').width(size.width);
 				$('#<?=$className;?>_width').val(size.width);
 				//$('#<?=$className;?>_width_slider').slider("option", "value", size.width);
 				var wi = 100*size.width/2000;
 				$('#<?=$className;?>_width_slider').find('.ui-slider-handle').eq(0).css('left', wi.toString() + '%');
 
 			} else {
-				$('#cms-pageunit-'+pageUnitId).find('img').height(size.height);
-                $('#cms-pageunit-'+pageUnitId).find('img').parent('.ui-wrapper').height(size.height);
+				$('#cms-pagewidget-'+pageWidgetId).find('img').height(size.height);
+                $('#cms-pagewidget-'+pageWidgetId).find('img').parent('.ui-wrapper').height(size.height);
 				$('#<?=$className;?>_height').val(size.height);
 				//$('#<?=$className;?>_height_slider').slider("option", "value", size.height);
 				var he = 100*size.height/2000;

@@ -63,7 +63,7 @@ JS;
 
 $js = '';
 
-if (Yii::app()->settings->getValue('showUnitAppearance') && $form['unit']->model) {
+if (Yii::app()->settings->getValue('showWidgetAppearance') && $form['widget']->model) {
     $txtAppearance = Yii::t('cms', 'Appearance');
     $js .= <<<JS
 

@@ -31,11 +31,11 @@ class TemplateSelect extends CInputWidget
             else
                 echo CHtml::dropDownList($name,$this->value,$data,$this->htmlOptions);
         }
-        if ($this->hasModel() && (get_class($this->model) == 'Unit'))
+        if ($this->hasModel() && (get_class($this->model) == 'Widget'))
         {
-            $unitId = $this->model->id;
+            $widgetId = $this->model->id;
             $injs = <<<JS
-   cmsReloadPageUnit($('.cms-pageunit[rev={$unitId}]').attr('id').replace('cms-pageunit-',''), '.cms-pageunit[rev={$unitId}]');
+   cmsReloadPageWidget($('.cms-pagewidget[rev={$widgetId}]').attr('id').replace('cms-pagewidget-',''), '.cms-pagewidget[rev={$widgetId}]');
 JS;
         } else {
             $injs = '';

@@ -1,5 +1,5 @@
-{if $unit.title}
-<h3>{$unit.title}</h3>
+{if $widget.title}
+<h3>{$widget.title}</h3>
 {/if}
 
 {if count($items)}

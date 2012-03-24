@@ -1,1 +1,1 @@
-{if $pageUnits}{area name="{$areaId}" pageUnits=$pageUnits readOnly="true"}{/if}
+{if $pageWidgets}{area name="{$areaId}" pageWidgets=$pageWidgets readOnly="true"}{/if}

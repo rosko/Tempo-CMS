@@ -76,7 +76,7 @@ class WidgetProfiles extends ContentWidget
                         ),
                     );
                     $config['activeForm'] = Form::ajaxify($config['id']);
-                    $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$this->params['pageUnit']->id.'&'.$this->params['profileVar'].'='.$profile->id;
+                    $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/widget&pageWidgetId='.$this->params['pageWidget']->id.'&'.$this->params['profileVar'].'='.$profile->id;
                     $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
                     $form = new Form($config, $vm);
 
@@ -98,12 +98,12 @@ class WidgetProfiles extends ContentWidget
                             }
                             $tpldata['profile'] = $profile->getAttributes();
                             $tpldata['settings'] = Yii::app()->settings->model->getAttributes();
-                            $tpldata['page'] = $this->params['content']->getUnitPageArray();
-                            $registerUnit = ModelRegister::model()->find('unit_id > 0');
-                            $registerUnitWidget = new WidgetRegister;
+                            $tpldata['page'] = $this->params['content']->getWidgetPageArray();
+                            $registerModel = ModelRegister::model()->find('widget_id > 0');
+                            $registerWidget = new WidgetRegister;
                             if ($registerUnit) {
-                                $tpldata['profileEditUrl'] = $registerUnit->getUnitUrl();
-                                $tpldata['profileEditUrlParams'] = $registerUnitWidget->urlParam('do').'=edit';
+                                $tpldata['profileEditUrl'] = $registerModel->getWidgetUrl();
+                                $tpldata['profileEditUrlParams'] = $registerWidget->urlParam('do').'=edit';
                             }
 
                             Yii::app()->messenger->send(
@@ -144,9 +144,9 @@ class WidgetProfiles extends ContentWidget
         $id = __CLASS__.$this->params['content']->id;
         $tableFields = $this->makeFields($this->params['content']->table_fields);
         $urlparams = (bool)Yii::app()->settings->getValue('ajaxPager') ? array(
-            'route'=>'view/unit',
+            'route'=>'view/widget',
             'params'=>array(
-                'pageUnitId'=>$this->params['pageUnit']['id'],
+                'pageWidgetId'=>$this->params['pageWidget']['id'],
             ),
         ) : array();
 
@@ -244,9 +244,9 @@ class WidgetProfiles extends ContentWidget
     public static function dynamicEditProfileLink($params)
     {
         if (Yii::app()->user->id == $params['id']) {
-            $registerUnit = ModelRegister::model()->find('unit_id > 0');
-            if ($registerUnit) {
-                return '<p>' . CHtml::link(Yii::t('UnitProfiles.main', 'Edit profile'), $registerUnit->getUnitUrl()) . '</p>';
+            $registerModel = ModelRegister::model()->find('widget_id > 0');
+            if ($registerModel) {
+                return '<p>' . CHtml::link(Yii::t('UnitProfiles.main', 'Edit profile'), $registerModel->getWidgetUrl()) . '</p>';
             }
         }
         return '';
@@ -268,12 +268,12 @@ class WidgetProfiles extends ContentWidget
             );
             $profileVar = 'view';
             $config['activeForm'] = Form::ajaxify($config['id']);
-            $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$params['pageUnitId'].'&'.$profileVar.'='.$user->id;
+            $config['activeForm']['clientOptions']['validationUrl'] = '/?r=view/widget&pageWidgetId='.$params['pageWidgetId'].'&'.$profileVar.'='.$user->id;
             $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
             $form = new Form($config, $vm);
 
             $ret = '<h3>' . Yii::t('UnitProfiles.main', 'Feedback form') . '</h3>' ;
-            if (Yii::app()->user->hasFlash('UnitProfilesSend-permanent'))
+            if (Yii::app()->user->hasFlash('WidgetProfilesSend-permanent'))
                 $ret .= Yii::t('UnitProfiles.main' , 'Your message was successfully sent');
             else
                 $ret .= '<div class="form">' . $form->render() . '</div>';

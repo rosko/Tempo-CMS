@@ -71,7 +71,7 @@ function cmsGetLastNotification()
     return $('#cms-notification .jnotify-item:last').text();
 }
 
-function cmsReloadPageUnit(pageUnitId, selector, onSuccess, data)
+function cmsReloadPageWidget(pageWidgetId, selector, onSuccess, data)
 {
     var pageId = $('body').attr('rel');
     var language = $('body').data('language');
@@ -81,7 +81,7 @@ function cmsReloadPageUnit(pageUnitId, selector, onSuccess, data)
             data = '&'+data;
     }
     $.ajax({
-        url: '/?r=view/unit&pageUnitId='+pageUnitId+'&pageId='+pageId+'&language='+language,
+        url: '/?r=view/widget&pageWidgetId='+pageWidgetId+'&pageId='+pageId+'&language='+language,
         data: locationString+data,
         async: false,
         cache: false,
@@ -207,14 +207,14 @@ function cmsProcessLocationHash()
                 if (key != 'r') {
                     var ppos = key.indexOf('_');
                     if (ppos > 0) {
-                        unit = key.substr(0,ppos);
-                        contentId = unit.match(/[0-9]*/gi).join('');
-                        rel = unit.substr(0, unit.indexOf(contentId));
-                        pageUnit = $('.pageunit[rel="'+rel+'"][content_id='+contentId+']');
-                        if (pageUnit.length) {
-                            $('#pageunitpanel').appendTo('body');
-                            pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-                            cmsReloadPageUnit(pageUnitId, '.pageunit[rev='+pageUnit.attr('rev')+']', null, arr.join('&'));
+                        widget = key.substr(0,ppos);
+                        contentId = widget.match(/[0-9]*/gi).join('');
+                        rel = widget.substr(0, widget.indexOf(contentId));
+                        pageWidget = $('.pagewidget[rel="'+rel+'"][content_id='+contentId+']');
+                        if (pageWidget.length) {
+                            $('#pagewidgetpanel').appendTo('body');
+                            pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+                            cmsReloadPageWidget(pageWidgetId, '.pagewidget[rev='+pageWidget.attr('rev')+']', null, arr.join('&'));
                         }
                     }
                 }

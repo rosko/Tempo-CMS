@@ -20,7 +20,7 @@ class ViewController extends Controller
 	public function actionIndex()
 	{
 //        TODO: Доделать перемещение блоков, бывают некритические ошибки
-//        $ret = PageUnit::checkIntegrity();
+//        $ret = PageWidget::checkIntegrity();
 //        if ($ret['percents'] > 0) {
 //            echo '<pre>';
 //            print_r ($ret);
@@ -46,14 +46,14 @@ class ViewController extends Controller
     /**
      * Отображает блок
      *
-     * @param int $pageUnitId id страничного блока
+     * @param int $pageWidgetId id страничного блока
      */
-    public function actionUnit($pageUnitId)
+    public function actionWidget($pageWidgetId)
     {
-		$pageUnit = PageUnit::model()->with('unit')->findByPk((int)$pageUnitId);
-        if ($pageUnit) {
-            $pageUnit->unit->content->widget($pageUnit->unit->class, array(
-                'pageUnit'=>$pageUnit,
+		$pageWidget = PageWidget::model()->with('widget')->findByPk((int)$pageWidgetId);
+        if ($pageWidget) {
+            $pageWidget->widget->content->widget($pageWidget->widget->class, array(
+                'pageWidget'=>$pageWidget,
             ));
         }
     }

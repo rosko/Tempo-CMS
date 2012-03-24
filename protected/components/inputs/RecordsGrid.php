@@ -12,12 +12,12 @@ class RecordsGrid extends CInputWidget
     {
         $recordExample = new $this->className;
         
-        if ($recordExample->hasAttribute('unit_id')) {
+        if ($recordExample->hasAttribute('widget_id')) {
 
             $dataProvider=new CActiveDataProvider($this->className, array(
                 'criteria'=> array(
                     'condition'=> $this->foreignAttribute . ' = :id',
-                    'with' => 'unit',
+                    'with' => 'widget',
                     'params'=>array(
                         ':id' => $this->model->id
                     ),
@@ -25,8 +25,8 @@ class RecordsGrid extends CInputWidget
                 'sort' => array(
                     'attributes' => array(
                         'title'=> array(
-                            'asc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit'),
-                            'desc' => 'unit.'.Unit::getI18nFieldName('title', 'Unit').' DESC',
+                            'asc' => 'widget.'.Widget::getI18nFieldName('title', 'Widget'),
+                            'desc' => 'widget.'.Widget::getI18nFieldName('title', 'Widget').' DESC',
                             'label' => 'Title',
                         ),
                         '*'
@@ -61,15 +61,15 @@ class RecordsGrid extends CInputWidget
 
         $pageId = 0;
         $area = '';
-        $pageUnitId = 0;
-        $unitId = 0;
-        if ($this->model && $this->model->hasAttribute('unit_id')) {
-            $pageUnit = PageUnit::model()->find('`unit_id` = :unit_id', array(':unit_id'=>$this->model->unit_id));
-            if ($pageUnit) {
-                $pageUnitId = $pageUnit->id;
-                $unitId = $this->model->unit_id;
-                $pageId = $pageUnit->page_id;
-                $area = $pageUnit->area;
+        $pageWidgetId = 0;
+        $widgetId = 0;
+        if ($this->model && $this->model->hasAttribute('widget_id')) {
+            $pageWidget = PageWidget::model()->find('`widget_id` = :widget_id', array(':widget_id'=>$this->model->widget_id));
+            if ($pageWidget) {
+                $pageWidgetId = $pageWidget->id;
+                $widgetId = $this->model->widget_id;
+                $pageId = $pageWidget->page_id;
+                $area = $pageWidget->area;
             }
         }
 
@@ -82,7 +82,7 @@ class RecordsGrid extends CInputWidget
             'selectableRows' => 2,
             'afterAjaxUpdate' => 'js:function(id, data)'.<<<JS
 {
-    cmsReloadPageUnit({$pageUnitId}, '.cms-pageunit[rev={$unitId}]');
+    cmsReloadPageWidget({$pageWidgetId}, '.cms-pagewidget[rev={$widgetId}]');
 }
 JS
 ,
@@ -104,12 +104,12 @@ JS
                         'id'=>$id.'_check',
                     )
                 ),
-                $recordExample->hasAttribute('unit_id') ? array(
+                $recordExample->hasAttribute('widget_id') ? array(
                     array(
                         'name'=>'title',
                         'type'=>'raw',
                         'header'=>Yii::t('cms', 'Title'),
-                        'value'=> 'CHtml::link(CHtml::encode($data->unit->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->unit->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
+                        'value'=> 'CHtml::link(CHtml::encode($data->widget->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->widget->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
                     ),
                 ) : array(),
                 $this->columns,
@@ -121,15 +121,15 @@ JS
                             'view'=>array(
                                 'label'=>Yii::t('cms', 'Go to page'),
                                 'url' => '"javascript:cmsGotoRecordPage({$data->id}, \'".get_class($data)."\')"',
-                                'visible' => '$data->hasAttribute("unit_id") && isset($data->unit)',
+                                'visible' => '$data->hasAttribute("widget_id") && isset($data->widget)',
                             ),
                             'update'=>array(
-                                'url' => '"javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".($data->hasAttribute("unit_id") && isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\');"',
+                                'url' => '"javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".($data->hasAttribute("widget_id") && isset($data->widget) ? $data->widget->id : 0)."\', \''.$id.'\');"',
                             ),
                             'del'=>array(
                                 'label'=>Yii::t('cms', 'Delete'),
                                 'imageUrl'=>'/images/delete.png',
-                                'url'=>'"javascript:cmsRecordDelete({$data->id}, \'".get_class($data)."\', \'".($data->hasAttribute("unit_id") && isset($data->unit) ? $data->unit->id : 0)."\', \''.$id.'\')"',
+                                'url'=>'"javascript:cmsRecordDelete({$data->id}, \'".get_class($data)."\', \'".($data->hasAttribute("widget_id") && isset($data->widget) ? $data->widget->id : 0)."\', \''.$id.'\')"',
                             ),
                         ),
                     ),
@@ -147,8 +147,8 @@ JS
             'recordsGrid' => $recordsGrid,
             'recordExample' => $recordExample,
             'model' => $this->model,
-            'pageUnitId' => $pageUnitId,
-            'unitId' => $unitId,
+            'pageWidgetId' => $pageWidgetId,
+            'widgetId' => $widgetId,
         ));
 
     }

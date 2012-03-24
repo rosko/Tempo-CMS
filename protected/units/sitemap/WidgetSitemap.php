@@ -34,7 +34,7 @@ class WidgetSitemap extends ContentWidget
     {
         parent::init();
         $model = $this->params['content']->page ? Page::model()->findByPk($this->params['content']->page) : $this->params['page'];
-        $this->params['title'] = $this->params['unit']->title ? $this->params['unit']->title : $model->title;
+        $this->params['title'] = $this->params['widget']->title ? $this->params['widget']->title : $model->title;
 
         $id = $this->params['content']->recursive ? $model->id : $model->parent_id;
         $this->params['items'] = array();

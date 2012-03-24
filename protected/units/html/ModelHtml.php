@@ -19,15 +19,15 @@ class ModelHtml extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_html';
+		return Yii::app()->db->tablePrefix . 'widgets_html';
 	}
 
 	public function rules()
 	{
 		return $this->localizedRules(array(
-            array('unit_id', 'required', 'on'=>'edit'),
+            array('widget_id', 'required', 'on'=>'edit'),
 			array('html', 'required'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 		));
 	}
 
@@ -41,7 +41,7 @@ class ModelHtml extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'html' => Yii::t('UnitHtml.main', 'HTML'),
 		);
 	}
@@ -63,7 +63,7 @@ class ModelHtml extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'html' => 'text',
         );
     }   

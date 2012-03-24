@@ -1,6 +1,6 @@
 {if $entries}
     
-<h2>{$unit.title}</h2>
+<h2>{$widget.title}</h2>
 
 {$pager}
 
@@ -31,7 +31,7 @@
 
 {else}
     
-    <h4><a href="{$url}">{$unit.title}</a></h4>
+    <h4><a href="{$url}">{$widget.title}</a></h4>
 
     <h2>{$entry.title}</h2>
 

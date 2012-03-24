@@ -23,9 +23,9 @@ function CmsCommand(url, data, method, success, silent)
 
 function cmsAjaxSaveArea(area, name, pageId, add_params)
 {
-    var url = '/?r=unit/move&pageId='+pageId+'&area='+name+'&'+add_params;
+    var url = '/?r=widget/move&pageId='+pageId+'&area='+name+'&'+add_params;
     var params = $(area).sortable('serialize', {
-        'key':'pageUnits[]'
+        'key':'pageWidgets[]'
     });
     cmsAjaxSave(url, params);
 }
@@ -188,14 +188,14 @@ function cmsTrim(string)
     return string.replace(/(^\s+)|(\s+$)/g, "");
 }
 
-function cmsGetAreaNameByPageUnit(pageUnit)
+function cmsGetAreaNameByPageWidget(pageWidget)
 {
-    return $(pageUnit).parents('.cms-area').eq(0).attr('id').replace('cms-area-', '');
+    return $(pageWidget).parents('.cms-area').eq(0).attr('id').replace('cms-area-', '');
 }
 
-function cmsGetAreaByPageUnit(pageUnit)
+function cmsGetAreaByPageWidget(pageWidget)
 {
-    return $(pageUnit).parents('.cms-area').eq(0);
+    return $(pageWidget).parents('.cms-area').eq(0);
 }
 
 function cmsGetAreaName(area)
@@ -233,12 +233,12 @@ function cmsAjaxSubmitForm(form, data, hasError, events)
                 events.onSuccess(html);
             }
 
-            var pageUnitId = form.attr('rel');
-            if (pageUnitId != undefined) {
-                var pageUnit = $('#cms-pageunit-'+pageUnitId);
-                var unitId = pageUnit.attr('rev');
-                //alert(pageunit.attr('rev'));
-                cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+unitId+']');
+            var pageWidgetId = form.attr('rel');
+            if (pageWidgetId != undefined) {
+                var pageWidget = $('#cms-pagewidget-'+pageWidgetId);
+                var widgetId = pageWidget.attr('rev');
+                //alert(pagewidget.attr('rev'));
+                cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+widgetId+']');
             }
             if (html.substring(0,2) == '{"') {
                 var ret = jQuery.parseJSON(html);
@@ -289,12 +289,12 @@ function cmsAjaxSubmitForm(form, data, hasError, events)
 function cmsAreaEmptyCheck()
 {
     $('.cms-area').each(function() {
-        if ($(this).find('.cms-pageunit').length > 0) {
+        if ($(this).find('.cms-pagewidget').length > 0) {
             $(this).find('.cms-empty-area-buttons').remove();
         } else {
-            var btn = $('<a class="cms-button w100p" title="'+cmsI18n.cms.addAnotherUnit+'" href="#">'+cmsI18n.cms.addUnit+'</a>')
+            var btn = $('<a class="cms-button w100p" title="'+cmsI18n.cms.addAnotherWidget+'" href="#">'+cmsI18n.cms.addWidget+'</a>')
                 .click(function() {
-                    cmsPageUnitAddForm(this);
+                    cmsPageWidgetAddForm(this);
                     return false;
                 });
             $(this).html('').append($('<div class="cms-empty-area-buttons"></div>').append(btn));
@@ -302,49 +302,49 @@ function cmsAreaEmptyCheck()
     });
 }
 
-function cmsPageUnitAddForm(t)
+function cmsPageWidgetAddForm(t)
 {
-    var pageUnit = $(t).parents('.cms-pageunit');
-    if (pageUnit.length) {
-        pageUnit  = pageUnit.eq(0);
-        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
+    var pageWidget = $(t).parents('.cms-pagewidget');
+    if (pageWidget.length) {
+        pageWidget  = pageWidget.eq(0);
+        var pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
     } else {
-        var pageUnitId = '0';
+        var pageWidgetId = '0';
     }
     var area_name = $(t).parents('.cms-area').eq(0).attr('id').replace('cms-area-','');
-    pageUnitAdd = $('#cms-pageunit-add').clone().attr('id', 'cms-pageunit-addsplash');
-    pageUnitAdd.find('.cms-btn-pageunit-create').attr('rel', area_name);
-    pageUnitAdd.find('.cms-btn-pageunit-create').attr('rev', pageUnitId);
-    cmsOpenDialog(pageUnitAdd);
+    pageWidgetAdd = $('#cms-pagewidget-add').clone().attr('id', 'cms-pagewidget-addsplash');
+    pageWidgetAdd.find('.cms-btn-pagewidget-create').attr('rel', area_name);
+    pageWidgetAdd.find('.cms-btn-pagewidget-create').attr('rev', pageWidgetId);
+    cmsOpenDialog(pageWidgetAdd);
 }
 
 // =============================================================
 
 
-function cmsPageUnitEditForm(t)
+function cmsPageWidgetEditForm(t)
 {
-    var pageUnit = $(t);
-    if (pageUnit.hasClass('selected')) {return;}
-    cmsFadeIn(pageUnit, 'selected');
-    pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-    widgetClass = pageUnit.attr('rel');
-    cmsLoadDialog('/?r=unit/edit&widgetClass='+widgetClass+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
-        pageUnit: pageUnit,
-        pageUnitId: pageUnitId,
+    var pageWidget = $(t);
+    if (pageWidget.hasClass('selected')) {return;}
+    cmsFadeIn(pageWidget, 'selected');
+    pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+    widgetClass = pageWidget.attr('rel');
+    cmsLoadDialog('/?r=widget/edit&widgetClass='+widgetClass+'&pageWidgetId='+pageWidgetId+'&language='+$.data(document.body, 'language'), {
+        pageWidget: pageWidget,
+        pageWidgetId: pageWidgetId,
         simpleClose: false,
         width: 830,
         onClose: function() {
-            cmsReloadPageUnit(pageUnitId, '.cms-pageunit[rev='+pageUnit.attr('rev')+']');
+            cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+pageWidget.attr('rev')+']');
         }
     });
 }
 
-function cmsPageUnitDeleteDialog(unitId, pageUnitId, pageId)
+function cmsPageWidgetDeleteDialog(widgetId, pageWidgetId, pageId)
 {
     $.ajax({
-        url: '/?r=unit/getPageUnitsByUnitId&pageId='+pageId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'),
-        pageUnitId: pageUnitId,
-        unitId: unitId,
+        url: '/?r=widget/getPageWidgetsByWidgetId&pageId='+pageId+'&widgetId='+widgetId+'&language='+$.data(document.body, 'language'),
+        pageWidgetId: pageWidgetId,
+        widgetId: widgetId,
         pageId: pageId,
         type: 'GET',
         cache: false,
@@ -356,13 +356,13 @@ function cmsPageUnitDeleteDialog(unitId, pageUnitId, pageId)
             var ids = jQuery.parseJSON(html);
             if (ids.length > 1)
             {
-                cmsLoadDialog('/?r=unit/deleteDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'));
+                cmsLoadDialog('/?r=widget/deleteDialog&pageId='+pageId+'&widgetId='+widgetId+'&pageWidgetId='+pageWidgetId+'&language='+$.data(document.body, 'language'));
             }
             else {
-                if (confirm(cmsI18n.cms.deleteUnitWarning))
+                if (confirm(cmsI18n.cms.deleteWidgetWarning))
                 {
-                    cmsAjaxSave('/?r=unit/delete&pageId='+pageId+'&pageUnitId[]='+pageUnitId+'&unitId='+unitId+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
-                        $('#cms-pageunit-'+pageUnitId).remove();
+                    cmsAjaxSave('/?r=widget/delete&pageId='+pageId+'&pageWidgetId[]='+pageWidgetId+'&widgetId='+widgetId+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+                        $('#cms-pagewidget-'+pageWidgetId).remove();
                         cmsAreaEmptyCheck();
                     });
                 } else {
@@ -374,9 +374,9 @@ function cmsPageUnitDeleteDialog(unitId, pageUnitId, pageId)
 
 }
 
-function cmsPageUnitSetDialog(pageId, pageUnitId, unitId)
+function cmsPageWidgetSetDialog(pageId, pageWidgetId, widgetId)
 {
-    cmsLoadDialog('/?r=unit/setDialog&pageId='+pageId+'&unitId='+unitId+'&pageUnitId='+pageUnitId+'&language='+$.data(document.body, 'language'), {
+    cmsLoadDialog('/?r=widget/setDialog&pageId='+pageId+'&widgetId='+widgetId+'&pageWidgetId='+pageWidgetId+'&language='+$.data(document.body, 'language'), {
         onLoad: function() {
             $.topbox.clear();
         }
@@ -489,10 +489,10 @@ function cmsPageDeleteDialog(pageId, onOneDelete, onChildrenDelete, onCancel)
 // =============================================================
 
 
-function cmsRecordEditForm(id, className, unitId, gridId)
+function cmsRecordEditForm(id, className, widgetId, gridId)
 {
     var dlgId = 'cmsRecordEditForm'+className+'_'+id;
-    cmsLoadDialog('/?r=unit/edit&modelClass='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
+    cmsLoadDialog('/?r=widget/edit&modelClass='+className+'&recordId='+id+'&language='+$.data(document.body, 'language'), {
         simpleClose: false,
         id: dlgId,
         className: 'cmsRecordEditForm-'+className,
@@ -507,16 +507,16 @@ function cmsRecordEditForm(id, className, unitId, gridId)
     });
 }
 
-function cmsRecordDelete(id, className, unitId, gridId)
+function cmsRecordDelete(id, className, widgetId, gridId)
 {
-    if (unitId > 0) {
+    if (widgetId > 0) {
         // Удаляем юнит
         $.ajax({
-            url:'/?r=unit/check&unitId='+unitId+'&className='+className+'&pageId='+id+'&language='+$.data(document.body, 'language'),
+            url:'/?r=widget/check&widgetId='+widgetId+'&className='+className+'&pageId='+id+'&language='+$.data(document.body, 'language'),
             cache: false,
             id: id,
             className: className,
-            unitId: unitId,
+            widgetId: widgetId,
             beforeSend: function() {
                 cmsShowInfoPanel(cmsHtmlLoadingImage, 0);
             },
@@ -526,22 +526,22 @@ function cmsRecordDelete(id, className, unitId, gridId)
                     var ret = jQuery.parseJSON(html);
                     if (ret.page) {
                         if (ret.page.similarToParent) {
-                            cmsRecordDeleteConfirm(unitId, gridId, '&withPage=1');
+                            cmsRecordDeleteConfirm(widgetId, gridId, '&withPage=1');
                         } else {
                             var buttons = {};
-                            buttons[cmsI18n.cms.deleteUnitOnly] = function() {
-                                cmsRecordDeleteConfirm(unitId, gridId);
+                            buttons[cmsI18n.cms.deleteWidgetOnly] = function() {
+                                cmsRecordDeleteConfirm(widgetId, gridId);
                                 $(this).dialog('close');
                             };
-                            buttons[cmsI18n.cms.deleteUnitAndPage] = function() {
-                                cmsRecordDeleteConfirm(unitId, gridId, '&withPage=1');
+                            buttons[cmsI18n.cms.deleteWidgetAndPage] = function() {
+                                cmsRecordDeleteConfirm(widgetId, gridId, '&withPage=1');
                                 $(this).dialog('close');
                             };
-                            var dlgId = 'UnitDeleteConform_'+unitId;
+                            var dlgId = 'WidgetDeleteConform_'+widgetId;
                             var dlg = $('#cms-dialog').clone().attr('id', dlgId).addClass('cms-dialog').appendTo('body');
-                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(cmsI18n.cms.deleteUnitRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
+                            dlg.html('<span class="ui-icon ui-icon-alert" style="float:left; margin:0 10px 100px 0;"></span>'+t(cmsI18n.cms.deleteWidgetRecordConfirm, {'{page}': '(<a target="_blank" href="'+ret.page.url+'">'+ret.page.title+'</a>)'}));
                             dlg.dialog({
-                                title: cmsI18n.cms.deletingUnit,
+                                title: cmsI18n.cms.deletingWidget,
                                 modal: true,
                                 zIndex: 10000,
                                 buttons: buttons,
@@ -551,10 +551,10 @@ function cmsRecordDelete(id, className, unitId, gridId)
                             });
                         }
                     } else {
-                        cmsRecordDeleteConfirm(unitId, gridId);
+                        cmsRecordDeleteConfirm(widgetId, gridId);
                     }
                 } else {
-                    cmsRecordDeleteConfirm(unitId, gridId);
+                    cmsRecordDeleteConfirm(widgetId, gridId);
                 }
             }
         });
@@ -569,7 +569,7 @@ function cmsRecordDelete(id, className, unitId, gridId)
     }
 }
 
-function cmsRecordDeleteConfirm(unitId, gridId, data, str)
+function cmsRecordDeleteConfirm(widgetId, gridId, data, str)
 {
     if (str == undefined) {
         var str = cmsI18n.cms.deleteRecordWarning;
@@ -579,7 +579,7 @@ function cmsRecordDeleteConfirm(unitId, gridId, data, str)
     }
     if (confirm(str))
     {
-        cmsAjaxSave('/?r=unit/delete&unitId='+unitId+'&pageUnitId=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
+        cmsAjaxSave('/?r=widget/delete&widgetId='+widgetId+'&pageWidgetId=all'+data+'&language='+$.data(document.body, 'language'), '', 'GET', function(ret) {
             if (gridId !== undefined) {
                 $.fn.yiiGridView.update(gridId);
             }

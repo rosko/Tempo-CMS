@@ -3,7 +3,7 @@
 
     $cs=Yii::app()->getClientScript();
     $cs->registerPackage('jstree');
-    $cs->registerScript('unitSetDialog', <<<JS
+    $cs->registerScript('widgetSetDialog', <<<JS
 
 $(function() {
     $('.cms-btn-pagemap-select').click(function() {
@@ -39,7 +39,7 @@ $(function() {
     });
 
 
-    $('#cms-pageunit-set-select').toggle(function() {
+    $('#cms-pagewidget-set-select').toggle(function() {
         $('#cms-dlg-select-set-page').show();
     }, function () {
         $('#cms-dlg-select-set-page').hide();
@@ -54,7 +54,7 @@ $(function() {
         return false;
     });
 
-    $('#cms-pageunit-set-select-ok').submit(function() {
+    $('#cms-pagewidget-set-select-ok').submit(function() {
         var checked = $('#pagetree_{$page_select_name}').jstree('get_checked');
         var ids = new Array();
         var cur_page = true;
@@ -70,17 +70,17 @@ $(function() {
         if (ids.length == 0) {
             cur_page = false;
         }
-        var url = '/?r=unit/set&unitId={$unitId}&pageUnitId={$pageUnitId}';
+        var url = '/?r=widget/set&widgetId={$widgetId}&pageWidgetId={$pageWidgetId}';
         var data = decodeURIComponent($.param({'pageIds': ids}));
         cmsAjaxSave(url, data, 'POST');
         if (cur_page) {
-            $('#cms-pageunit-{$pageUnitId}').remove();
+            $('#cms-pagewidget-{$pageWidgetId}').remove();
         }
         cmsCloseDialog();
         cmsAreaEmptyCheck();
         return false;
     });
-    $('#cms-pageunit-set-select-ok').parents('div:eq(0)').width(440);
+    $('#cms-pagewidget-set-select-ok').parents('div:eq(0)').width(440);
 
 });
 
@@ -90,7 +90,7 @@ JS
 ?>
 <div class="cms-caption">
 <img style="float:left;margin-right:1em;" valign="baseline" src="/images/icons/fatcow/32x32/application_cascade.png" />
-<h3><?=Yii::t('cms', 'Unit location on pages')?>:</h3>
+<h3><?=Yii::t('cms', 'Widget location on pages')?>:</h3>
 </div>
 <?=Yii::t('cms', 'Check')?>:
 <br />
@@ -108,7 +108,7 @@ JS
 <a href="#" class="cms-btn-pagemap-openall"><?=Yii::t('cms', 'Expand all')?></a> / <a href="#" class="cms-btn-pagemap-closeall"><?=Yii::t('cms', 'Collapse all')?></a>
 <br /><br />
 <?php
-    $pages = $unit->pages;
+    $pages = $widget->pages;
     $pagesIds = array();
     if ($pages && is_array($pages))
     {
@@ -128,6 +128,6 @@ JS
     ));
 ?>
 <br />
-<form id="cms-pageunit-set-select-ok">
-<input type="submit" value="<?=Yii::t('cms', 'Set unit on selected pages only')?>" />
+<form id="cms-pagewidget-set-select-ok">
+<input type="submit" value="<?=Yii::t('cms', 'Set widget on selected pages only')?>" />
 </form>

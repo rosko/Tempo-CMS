@@ -19,7 +19,7 @@ class ModelBlog_Entry extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'blogentries';
+		return Yii::app()->db->tablePrefix . 'blog_entries';
 	}
 
 	public function rules()
@@ -83,7 +83,7 @@ class ModelBlog_Entry extends ContentModel
 					'size'=>40,
 					'showPageSelectButton'=>false,
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-					'onChange'=> "js:$('#cms-pageunit-'+pageUnitId).find('img').attr('src', $(this).val());",
+					'onChange'=> "js:$('#cms-pagewidget-'+pageWidgetId).find('img').attr('src', $(this).val());",
                 ),
                 Form::tab(Yii::t('UnitBlog.main', 'Entry')),
                 'blog_id'=> !empty($sectionsArray) ? array(
@@ -206,7 +206,7 @@ class ModelBlog_Entry extends ContentModel
     public function feedItem()
     {
         return array(
-            'title'=>null, // тогда используется unit->title,
+            'title'=>null, // тогда используется widget->title,
             'description'=>'text',
             'updated'=>'date',
         );
@@ -215,7 +215,7 @@ class ModelBlog_Entry extends ContentModel
     public function templateVars()
     {
         return array(
-            '{$unitUrl}' => Yii::t('UnitBlog.main', 'Link to blog/news entry (in case, when blog/news entry showed as a part of list or blog/news section)'),
+            '{$widgetUrl}' => Yii::t('UnitBlog.main', 'Link to blog/news entry (in case, when blog/news entry showed as a part of list or blog/news section)'),
             '{$sectionUrl}' => Yii::t('UnitBlog.main', 'Link to blog/news section'),
             '{$sectionTitle}' => Yii::t('UnitBlog.main', 'Name of blog/news section'),
         );

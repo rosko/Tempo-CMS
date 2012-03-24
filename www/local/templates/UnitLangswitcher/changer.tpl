@@ -1,4 +1,4 @@
-<h4>{$unit.title}</h4>
+<h4>{$widget.title}</h4>
 <p>
 {foreach $languages as $symbol => $language}
     {if $page.parent_id == 0}

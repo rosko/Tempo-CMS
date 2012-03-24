@@ -1,6 +1,6 @@
 пываывва
 {if $content.header}
-<{$content.header}>{$unit.title}</{$content.header}>
+<{$content.header}>{$widget.title}</{$content.header}>
 {else}
-<h2>{$unit.title}</h2>
+<h2>{$widget.title}</h2>
 {/if}

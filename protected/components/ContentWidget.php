@@ -31,7 +31,7 @@ class ContentWidget extends CWidget
     public function init()
     {
         $this->params['className'] = get_class($this->content);
-        $this->params['unit'] = $this->content->unit;
+        $this->params['widget'] = $this->content->widget;
         $this->params['content'] = $this->content;
         $this->params['isGuest'] = Yii::app()->user->isGuest;
         $this->params['language'] = Yii::app()->language;
@@ -101,8 +101,8 @@ class ContentWidget extends CWidget
             $pagination->currentPage = $currentPage-1;
             $pagination->route = 'view/index';
             $params = $_GET;
-            if (Yii::app()->controller->id == 'view' && Yii::app()->controller->action->id == 'unit') {
-                unset($params['pageUnitId']);
+            if (Yii::app()->controller->id == 'view' && Yii::app()->controller->action->id == 'widget') {
+                unset($params['pageWidgetId']);
                 unset($params['_']);
             }
             $pagination->params = array_merge($params, array(
@@ -131,12 +131,12 @@ class ContentWidget extends CWidget
             }
         }
 
-        $className = call_user_func(array($this->params['unit']->class,'unitClassName'));
+        $className = call_user_func(array($this->params['widget']->class,'unitClassName'));
         $this->params['content'] = $this->content->attributes;
 
         $aliases = array();
-        $template = $this->params['unit']->template
-                        ? basename($this->params['unit']->template)
+        $template = $this->params['widget']->template
+                        ? basename($this->params['widget']->template)
                         : Yii::app()->settings->getValue($className.'.template');
 
         $dirs = $this->content->getTemplateDirAliases($className);
@@ -162,7 +162,7 @@ class ContentWidget extends CWidget
 
         $output .= $this->render($alias, $this->params, true);
         if (trim($output) == '' && $this->params['editMode'])  {
-            $output = Yii::t('cms', '[Unit "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($this->params['unit']['class'], 'name'))));
+            $output = Yii::t('cms', '[Widget "{name}" is empty on this page] - this messages showed in edit mode only', array('{name}' => call_user_func(array($this->params['widget']['class'], 'name'))));
         }
         echo $output . $output2;
         

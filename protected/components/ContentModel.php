@@ -11,7 +11,7 @@ class ContentModel extends I18nActiveRecord
     public function relations()
     {
         return array(
-            'unit' => array(self::BELONGS_TO, 'Unit', 'unit_id'),
+            'widget' => array(self::BELONGS_TO, 'Widget', 'widget_id'),
         );
     }
 
@@ -30,20 +30,20 @@ class ContentModel extends I18nActiveRecord
         return $this;        
     }
 
-    public function getUnitPageArray()
+    public function getWidgetPageArray()
     {
-        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageUnit::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.unit_id = :unit_id ORDER BY pu.id LIMIT 1';
+        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageWidget::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.widget_id = :widget_id ORDER BY pu.id LIMIT 1';
         $command = Yii::app()->db->createCommand($sql);
-        $command->bindValue(':unit_id', $this->unit_id, PDO::PARAM_INT);
+        $command->bindValue(':widget_id', $this->widget_id, PDO::PARAM_INT);
         $page = $command->queryRow();
         $page['alias'] = $page[Yii::app()->language.'_alias'];
         $page['url'] = $page[Yii::app()->language.'_url'];
         return $page;
     }
 
-    public function getUnitUrl($absolute=false, $params=array())
+    public function getWidgetUrl($absolute=false, $params=array())
     {
-        $page = $this->getUnitPageArray();
+        $page = $this->getWidgetPageArray();
         $params = array_merge(array('pageId'=>$page['id'], 'alias'=>$page['alias'], 'url'=>$page['url']), $params);
         if ($absolute)
             return Yii::app()->controller->createAbsoluteUrl('view/index', $params);
@@ -113,8 +113,8 @@ class ContentModel extends I18nActiveRecord
     // Обработка ajax-запроса
     public function ajax($vars)
     {
-        $unit = Unit::model()->findByPk($vars['unitId']);
-        $content = $unit->content;
+        $widget = Widget::model()->findByPk($vars['widgetId']);
+        $content = $widget->content;
         if ($content && !Yii::app()->user->isGuest) {
             if (isset($vars['ContentModel'])) {
                 $content->attributes=$vars['ContentModel'];
@@ -136,7 +136,7 @@ class ContentModel extends I18nActiveRecord
                 }
                 $content->{$vars['attribute']} = substr($html, 0, $t[1]) . str_replace($source, $repl, substr($html, $t[1], strlen($repl))) . substr($html, $t[1]+strlen($repl));
             }
-            echo $unit->save() && $content->save();
+            echo $widget->save() && $content->save();
         }
     }
     

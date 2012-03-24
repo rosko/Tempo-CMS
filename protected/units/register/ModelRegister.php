@@ -19,14 +19,14 @@ class ModelRegister extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_register';
+		return Yii::app()->db->tablePrefix . 'widgets_register';
 	}
 
 	public function rules()
 	{
 		return $this->localizedRules(array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
             array('is_emailauth_req, is_invite_req, notify_admin, notify_user', 'boolean'),
             array('fields, fields_req, profile_fields, profile_fields_req', 'type', 'type'=>'array'),
             array('invites, agreement, text', 'safe'),
@@ -37,7 +37,7 @@ class ModelRegister extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
             'fields' => Yii::t('UnitRegister.main', 'Form fields'),
             'fields_req' => Yii::t('UnitRegister.main', 'Required fields'),
             'profile_fields' => Yii::t('UnitRegister.main', 'Editable fields in user profile'),
@@ -55,7 +55,7 @@ class ModelRegister extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'fields' => 'text',
             'fields_req' => 'text',
             'profile_fields' => 'text', // поля, которые пользователь может заполнить в своем профиле

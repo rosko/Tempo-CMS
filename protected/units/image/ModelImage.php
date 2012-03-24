@@ -19,15 +19,15 @@ class ModelImage extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_image';
+		return Yii::app()->db->tablePrefix . 'widgets_image';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
+            array('widget_id', 'required', 'on'=>'edit'),
 			array('image, width, height', 'required'),
-			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
+			array('widget_id, width, height', 'numerical', 'integerOnly'=>true),
 			array('image, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8')
 		);
@@ -79,7 +79,7 @@ JS;
 					'size'=>40,
 					'showPageSelectButton'=>false,
 					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-					'onChange'=> "js:$('#cms-pageunit-'+pageUnitId).find('img').attr('src', $(this).val());"
+					'onChange'=> "js:$('#cms-pagewidget-'+pageWidgetId).find('img').attr('src', $(this).val());"
 				),
                 Yii::app()->controller->renderPartial($cfg['UnitImage'].'.image.assets.imagesize', compact('className'), true),
 				'width'=>array(
@@ -131,7 +131,7 @@ JS;
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'image' => 'string',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',

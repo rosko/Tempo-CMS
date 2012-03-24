@@ -1,18 +1,18 @@
     <?php
     if(!call_user_func(array($widgetClass, 'cacheable')) || $this->beginCache(serialize($cacheVaryBy), $properties)) {
-        $content = $pageUnit->unit->content;
+        $content = $pageWidget->widget->content;
         if ($content) { ?>
 
 <div
     <?php if ($editArea) { ?>title="<?php echo call_user_func(array($widgetClass, 'name')); ?>"<?php } ?>
-    id="cms-pageunit-<?=$pageUnit->id?>"
-    class="<?php if ($editArea) { ?>cms-pageunit <? } ?>pageunit cms-unit-<?=$pageUnit->unit->class?>"
-    rel="<?=$pageUnit->unit->class?>"
-    rev="<?=$pageUnit->unit->id?>"
+    id="cms-pagewidget-<?=$pageWidget->id?>"
+    class="<?php if ($editArea) { ?>cms-pagewidget <? } ?>pagewidget cms-widget-<?=$pageWidget->widget->class?>"
+    rel="<?=$pageWidget->widget->class?>"
+    rev="<?=$pageWidget->widget->id?>"
     content_id="<?=$content->id?>"
 >
 
-    <?=$content->widget($widgetClass, array('pageUnit'=>$pageUnit));?>
+    <?=$content->widget($widgetClass, array('pageWidget'=>$pageWidgets));?>
 </div>
 
     <?php

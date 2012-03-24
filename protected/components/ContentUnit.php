@@ -71,6 +71,7 @@ class ContentUnit extends CComponent
             ),
         );
     }
+
     public function settingsRules()
     {
         return array(
@@ -90,20 +91,22 @@ class ContentUnit extends CComponent
         $aliases = self::unitsDirsAliases();
         $tmp = array();
         $u = array();
-        
+
         // Пройдемся по каждой директории, где могут быть юниты
         foreach ($aliases as $alias) {
-            
+
             // В каждой директории находим директории юнитов
-            $dirs = CFileHelper::findFiles(Yii::getPathOfAlias($alias), array(
-                'level'=>0
-            ));
-            
-            foreach ($dirs as $dir) {
+            $basedir = Yii::getPathOfAlias($alias);
+            $handle=opendir($basedir);
+            while(($file=readdir($handle))!==false)
+            {
+                if($file==='.' || $file==='..')
+                    continue;
+                $dir=$basedir.DIRECTORY_SEPARATOR.$file;
                 if (is_dir($dir)) {
                     // Получаем имя класс юнита
                     $className = 'Unit'.ucfirst(basename($dir));
-                    $path = $dir.DIRECTORY_SEPARATOR.$unitClassName.'.php';
+                    $path = $dir.DIRECTORY_SEPARATOR.$className.'.php';
                     if (is_file($path)) {
                         require_once($path);
                         $u[$className] = call_user_func(array($className, 'name'));
@@ -113,10 +116,11 @@ class ContentUnit extends CComponent
                             'dir_alias' => $alias,
                             'icon' => call_user_func(array($className, 'icon')),
                             'installed' => in_array($className, $installed),
-                        );                        
+                        );
                     }
                 }
             }
+            closedir($handle);
         }
         // Сортировк по в алмафитном порядке по названиямм юнитов
         asort($u);
@@ -231,7 +235,7 @@ class ContentUnit extends CComponent
         if (!$withNames) {
             $units = array_keys($units);
         }
-		return $units;
+        return $units;
 	}
 
     public static function loadUnits()
@@ -281,5 +285,12 @@ class ContentUnit extends CComponent
         return $data;
     }
 
-    
+    public function unitsDirsAliases()
+    {
+        return array(
+            'application.units',
+            'local.units'
+        );
+    }
+
 }

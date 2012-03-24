@@ -3,7 +3,7 @@
     {$video}
 
     {if $content.show_link}
-        <p><a target="_blank" href="{$content.video}">{if $unit.title}{$unit.title}{else}{$content.video}{/if}</a></p>
+        <p><a target="_blank" href="{$content.video}">{if $widget.title}{$widget.title}{else}{$content.video}{/if}</a></p>
     {/if}
 
 {else}

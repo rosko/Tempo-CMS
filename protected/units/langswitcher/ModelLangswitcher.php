@@ -19,21 +19,21 @@ class ModelLangswitcher extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_langswitcher';
+		return Yii::app()->db->tablePrefix . 'widgets_langswitcher';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 		);
 	}
 
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
         );
     }
 

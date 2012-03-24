@@ -4,7 +4,7 @@ class Page extends I18nActiveRecord
 {
 	protected $_path;
     protected $_url = array();
-    protected $_units = null;
+    protected $_widgets = null;
 	
 	public static function model($className=__CLASS__)
 	{
@@ -164,7 +164,7 @@ class Page extends I18nActiveRecord
         return $this;
     }
 
-	public function _getUnits($area='', $exclude=false)
+	public function _getWidgets($area='', $exclude=false)
 	{
 		$condition = '`t`.`page_id` = :id';
 		$params = array(':id'=>$this->id);
@@ -179,40 +179,40 @@ class Page extends I18nActiveRecord
 			}
 		}
 		
-		return PageUnit::model()->findAll(array(
+		return PageWidget::model()->findAll(array(
 			'condition' => $condition,
-			'with' => array('unit'),
+			'with' => array('widget'),
 			'order' => '`t`.`area`, `t`.`order`',
 			'params' => $params
 		));
 	}
 
-	public function getUnits($area='', $exclude=false)
+	public function getWidgets($area='', $exclude=false)
 	{
-        if ($this->_units == null) {
-            $this->_units = PageUnit::model()->findAll(array(
+        if ($this->_widgets == null) {
+            $this->_widgets = PageWidget::model()->findAll(array(
                 'condition' => 'page_id = :id',
                 'params' => array(
                     'id' => $this->id,
                 ),
-                'with' => array('unit'),
+                'with' => array('widget'),
                 'order' => '`area`, `order`'
             ));
         }
-        $units = array();
+        $widgets = array();
 		if (!is_array($area)) {
 			$area = array($area);
 		}
-        foreach ($this->_units as $unit) {
+        foreach ($this->_widgets as $widget) {
             if ($area) {
                 if (!$exclude) {
-                    if (in_array($unit->area, $area)) $units[] = $unit;
+                    if (in_array($widget->area, $area)) $widgets[] = $widget;
                 } else {
-                    if (!in_array($unit->area, $area)) $units[] = $unit;
+                    if (!in_array($widget->area, $area)) $widgets[] = $widget;
                 }
-            } else $units[] = $unit;
+            } else $widgets[] = $widget;
         }
-        return $units;
+        return $widgets;
 	}
 
 
@@ -298,9 +298,9 @@ class Page extends I18nActiveRecord
             $param = $lang.'_url';
     		if ($this->_url[$lang] != $this->$param)
         	{
+                    $page->$param = $page->generateUrl(true, $lang.'_alias');
             	$children = $this->children;
                 foreach ($children as $page) {
-                    $page->$param = $page->generateUrl(true, $lang.'_alias');
     				$page->save(false);
         		}
             }
@@ -310,13 +310,17 @@ class Page extends I18nActiveRecord
 	
 	public function afterDelete()
 	{
-		PageUnit::model()->deleteAll('page_id = :page_id', array(':page_id' => $this->id));
+		PageWidget::model()->deleteAll('page_id = :page_id', array(':page_id' => $this->id));
 		
 		// Удаляем все блоки, которые больше нигде не размещены
-		$sql = 'SELECT `unit`.`id`, `unit`.`class`  FROM `' . Unit::tableName() . '` as `unit`
-				LEFT JOIN `' . PageUnit::tableName() . '` as `pageunit` ON (`unit`.`id` = `pageunit`.`unit_id`)
-				WHERE `pageunit`.`id` IS NULL';
+		$sql = 'SELECT `widget`.`id`, `widget`.`class`  FROM `' . Widget::tableName() . '` as `widget`
+				LEFT JOIN `' . PageWidget::tableName() . '` as `pagewidget` ON (`widget`.`id` = `pagewidget`.`widget_id`)
+
+
+
 		$pus = Yii::app()->db->createCommand($sql)->queryAll();
+				WHERE `pagewidget`.`id` IS NULL';
+
 		$ids = array();
 		if ($pus && is_array($pus))
 		{
@@ -325,9 +329,9 @@ class Page extends I18nActiveRecord
 				$ids[] = intval($pu['id']);
                 $widgetClass = $pu['class'];
                 $modelClass = call_user_func(array($widgetClass,'modelClassName'));
-				call_user_func(array($modelClass, 'model'))->deleteAll('unit_id = ' . intval($pu['id']));
+				call_user_func(array($modelClass, 'model'))->deleteAll('widget_id = ' . intval($pu['id']));
 			}
-			$sql = 'DELETE FROM `' . Unit::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
+			$sql = 'DELETE FROM `' . Widget::tableName() . '` WHERE `id` IN (' . implode(',',$ids) . ')';
 			Yii::app()->db->createCommand($sql)->execute();
 		}
         return parent::afterDelete();
@@ -514,13 +518,13 @@ class Page extends I18nActiveRecord
         );
     }
 
-    public function isSimilarTo($page, $areas=array(), $unitId=0)
+    public function isSimilarTo($page, $areas=array(), $widgetId=0)
     {
         $id = is_object($page) ? $page->id : $page;
-        $sql = 'SELECT `unit_id` FROM `' . PageUnit::tableName() . '`
+        $sql = 'SELECT `widget_id` FROM `' . PageWidget::tableName() . '`
                 WHERE `page_id` = :id
                       AND `area` ' . (!empty($areas) ? (is_array($areas) ? 'IN ('.implode(',',$areas).')' : ' = `area`') : 'NOT LIKE "main%"').'
-                      '.($unitId ? ' AND `unit_id` != '.intval($unitId) : '');
+                      '.($widgetId ? ' AND `widget_id` != '.intval($widgetId) : '');
         $command = Yii::app()->db->createCommand($sql);
         $command->bindParam(':id', $this->id, PDO::PARAM_INT);
         $arr = $command->queryColumn();
@@ -534,17 +538,17 @@ class Page extends I18nActiveRecord
 	// Проверяем каждую область и вставляем блоки с родительской страницы со всех областей, кроме main
 	public function fill()
 	{
-        $sql = 'SELECT * FROM `' . PageUnit::tableName() . '` WHERE `page_id` = :page_id AND `area` NOT LIKE "main%"';
+        $sql = 'SELECT * FROM `' . PageWidget::tableName() . '` WHERE `page_id` = :page_id AND `area` NOT LIKE "main%"';
         $command = Yii::app()->db->createCommand($sql);
         $command->bindValue(':page_id', $this->parent_id, PDO::PARAM_INT);
         $pus = $command->queryAll();
         if ($pus && is_array($pus))
         {
-            $sql = 'INSERT INTO `' . PageUnit::tableName() . '` (`page_id`, `unit_id`, `order`, `area`) VALUES ';
+            $sql = 'INSERT INTO `' . PageWidget::tableName() . '` (`page_id`, `widget_id`, `order`, `area`) VALUES ';
             $sql_arr = array();
             foreach ($pus as $pu)
             {
-                $sql_arr[] = '('.intval($this->id).', '.intval($pu['unit_id']).', '.intval($pu['order']).', "'.$pu['area'].'")';
+                $sql_arr[] = '('.intval($this->id).', '.intval($pu['widget_id']).', '.intval($pu['order']).', "'.$pu['area'].'")';
             }
             $sql .= implode(',', $sql_arr);
             $command = Yii::app()->db->createCommand($sql);

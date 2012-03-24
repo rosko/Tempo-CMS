@@ -30,7 +30,7 @@ class WidgetVideo extends ContentWidget
             $this->params['content']->video,
             $this->params['content']->width,
             $this->params['content']->height,
-            $this->params['unit']->title);
+            $this->params['widget']->title);
     }
     
     public static function getHtmlByUrl($url, $width=0, $height=0, $title='')

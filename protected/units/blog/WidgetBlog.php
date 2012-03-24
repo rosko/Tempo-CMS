@@ -53,7 +53,7 @@ class WidgetBlog extends ContentWidget
                         ->selectPage($this->pageNumber, $this->params['content']->per_page)
                         ->getAll('blog_id = :id', array(':id'=>$this->params['content']->id));
 
-            $urlPrefix = $this->params['content']->getUnitUrl(true, array(
+            $urlPrefix = $this->params['content']->getWidgetUrl(true, array(
                  $viewParam => '',
             ));
 
@@ -71,7 +71,7 @@ class WidgetBlog extends ContentWidget
             
         } else {
             
-            $this->params['url'] = $this->params['content']->getUnitUrl(true);            
+            $this->params['url'] = $this->params['content']->getWidgetUrl(true);
             $this->params['entry'] = ModelBlog_Entry::model()->findByPk(intval($_GET[$viewParam]));
             
             $this->template = 'entry';

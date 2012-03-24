@@ -19,14 +19,14 @@ class ModelVideo extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_video';
+		return Yii::app()->db->tablePrefix . 'widgets_video';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, width, height', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, width, height', 'numerical', 'integerOnly'=>true),
 			array('video', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
             array('html', 'length', 'max'=>3000, 'encoding'=>'UTF-8'),
             array('show_link', 'boolean')
@@ -37,7 +37,7 @@ class ModelVideo extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'video' => Yii::t('UnitVideo.main', 'Video link'),
 			'width' => Yii::t('UnitVideo.main', 'Width'),
 			'height' => Yii::t('UnitVideo.main', 'Height'),
@@ -133,7 +133,7 @@ JS;
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'video' => 'string',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',

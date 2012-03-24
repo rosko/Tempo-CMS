@@ -50,9 +50,9 @@ $flashes = Yii::app()->user->getFlashes(false);
 $unitConfig = ContentUnit::loadConfig();
 if (Yii::app()->user->hasState('askfill') && isset($unitConfig['register']))  {
 
-    $registerUnit = ModelRegister::model()->find('unit_id > 0');
-    if ($registerUnit) {
-        $shortMessage = '<a href=\''.$registerUnit->getUnitUrl().'\'>'.Yii::t('cms', 'Please fill all required fields in your personal profile. And if necessary, change your password.').'</a>';
+    $registerModel = ModelRegister::model()->find('widget_id > 0');
+    if ($registerModel) {
+        $shortMessage = '<a href=\''.$registerModel->getWidgetUrl().'\'>'.Yii::t('cms', 'Please fill all required fields in your personal profile. And if necessary, change your password.').'</a>';
         $message = '<h3>'.Yii::t('cms', 'Attention') .'</h3><p>'.$shortMessage.'</p>';
         if (Yii::app()->user->getState('askfill') == 'first') {
 
@@ -94,24 +94,24 @@ if ($js)
     $cs->registerScript('flashes', $js, CClientScript::POS_READY);
 
 if (Yii::app()->settings->getValue('ajaxPagerScroll')) {
-    $addjs = "$('body').scrollTo(pageUnit, 800);";
+    $addjs = "$('body').scrollTo(pageWidget, 800);";
 } else {
     $addjs = '';
 }
 
 $js = <<<JS
 $('.ajaxPager a').live('click', function() {
-    var pageUnit = $(this).parents('.pageunit').eq(0);
-    if (pageUnit.length) {
+    var pageWidget = $(this).parents('.pagewidget').eq(0);
+    if (pageWidget.length) {
         var pos = $(this).attr('href').indexOf('?');
         var data = '';
         if (pos > -1) {
             data = $(this).attr('href').substr(pos+1);
         }
-        var pageUnitId = pageUnit.attr('id').replace('cms-pageunit-','');
-        cmsAddToLocationHash(data, false, pageUnit.attr('rel')+pageUnit.attr('content_id')+'_page');
-        $('#pageunitpanel').appendTo('body');
-        cmsReloadPageUnit(pageUnitId, '.pageunit[rev='+pageUnit.attr('rev')+']', function() {
+        var pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
+        cmsAddToLocationHash(data, false, pageWidget.attr('rel')+pageWidget.attr('content_id')+'_page');
+        $('#pagewidgetpanel').appendTo('body');
+        cmsReloadPageWidget(pageWidgetId, '.pagewidget[rev='+pageWidget.attr('rev')+']', function() {
             {$addjs}
         }, '&'+data);
     }
@@ -135,29 +135,29 @@ if (!Yii::app()->user->isGuest) {
             // Настройки и обработчики перещения юнитов на странице
             $('.cms-area').sortable({
                 connectWith: '.cms-area',
-                placeholder: 'cms-pageunit-highlight',
+                placeholder: 'cms-pagewidget-highlight',
                 revert: true,
                 opacity:1,
                 forcePlaceholderSize:true,
-                cancel:'.cms-pageunit-menu,.cms-empty-area-buttons',
+                cancel:'.cms-pagewidget-menu,.cms-empty-area-buttons',
                 update:function(event, ui) {
-                    var pageUnitId = $(ui.item).attr('id').replace('cms-pageunit-','');
-                    var areaName = cmsGetAreaNameByPageUnit(ui.item);
+                    var pageWidgetId = $(ui.item).attr('id').replace('cms-pagewidget-','');
+                    var areaName = cmsGetAreaNameByPageWidget(ui.item);
                     if (ui.sender) {
                         // Запрос на обновление предыдущей области + перемещенному элементу указывается новое значение в area
     //                    var old_area = $(ui.sender).attr('id').replace('cms-area-', '');
-    //                    cmsAjaxSaveArea($(ui.sender), areaName, {$model->id}, 'pageUnitId='+pageUnitId+'&old_area='+old_area);
+    //                    cmsAjaxSaveArea($(ui.sender), areaName, {$model->id}, 'pageWidgetId='+pageWidgetId+'&old_area='+old_area);
 
                     } else {
                         // Запрос на обновление текущей области
-                        cmsAjaxSaveArea(cmsGetAreaByPageUnit(ui.item), areaName, {$model->id}, 'pageUnitId='+pageUnitId);
+                        cmsAjaxSaveArea(cmsGetAreaByPageWidget(ui.item), areaName, {$model->id}, 'pageWidgetId='+pageWidgetId);
                     }
                 },
                 start:function(event, ui) {
                     $(ui.helper).find('.cms-panel').hide();
                     $('.cms-area').addClass('cms-potential');
                     $('.cms-area').each(function() {
-                        if ($(this).find('.cms-pageunit').length == 0)
+                        if ($(this).find('.cms-pagewidget').length == 0)
                             $(this).addClass('cms-empty-area');
                     });
                     cmsAreaEmptyCheck();
@@ -168,28 +168,28 @@ if (!Yii::app()->user->isGuest) {
                 }
             }).disableSelection();
 
-            $('.cms-pageunit').css('cursor', 'move');
+            $('.cms-pagewidget').css('cursor', 'move');
 
             cmsAreaEmptyCheck();
-            $('.cms-pageunit').live('mouseenter', function() {
+            $('.cms-pagewidget').live('mouseenter', function() {
                 $(this).addClass('cms-hover');
             }).live('mouseleave', function() {
                 $(this).removeClass('cms-hover');
             });
 
-            $('.cms-pageunit').live('dblclick', function() {
+            $('.cms-pagewidget').live('dblclick', function() {
                 cmsClearSelection();
-                cmsPageUnitEditForm(this);
+                cmsPageWidgetEditForm(this);
                 return false;
             })
 
             // Обработчик для выбора типа юнита при создании
-            $('.cms-btn-pageunit-create').live('click', function() {
+            $('.cms-btn-pagewidget-create').live('click', function() {
                 var widgetClass = $(this).attr('id').replace('cms-button-create-', '');
                 var areaName = $(this).attr('rel');
-                var prevPageUnitId = $(this).attr('rev');
+                var prevPageWidgetId = $(this).attr('rev');
                 var pageId = $('body').attr('rel');
-                var url = '/?r=unit/edit&pageId='+pageId+'&prevPageUnitId='+prevPageUnitId+'&area='+areaName+'&widgetClass='+widgetClass+'&return=html&language='+$.data(document.body, 'language');
+                var url = '/?r=widget/edit&pageId='+pageId+'&prevPageWidgetId='+prevPageWidgetId+'&area='+areaName+'&widgetClass='+widgetClass+'&return=html&language='+$.data(document.body, 'language');
                 cmsLoadDialog(url, {
                     simpleClose: false
                 });
@@ -197,7 +197,7 @@ if (!Yii::app()->user->isGuest) {
             });
 
             // Отображение диалога "Заполнить страницу" на пустой странице
-            if ($('.pageunit').length == -1)
+            if ($('.pagewidget').length == -1)
             {
                 var pageId = $('body').attr('rel');
                 cmsLoadDialog('/?r=page/fill&pageId='+pageId, {
@@ -230,37 +230,37 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
 
 <div class="cms-hidden">
 
-    <div id="cms-pageunit-add" class="cms-splash cms-pageunit-add">
-        <h3><?=Yii::t('cms', 'Add unit')?></h3>
+    <div id="cms-pagewidget-add" class="cms-splash cms-pagewidget-add">
+        <h3><?=Yii::t('cms', 'Add widget')?></h3>
         <ul>
         <?php
-            $units = ContentWidget::getInstalledWidgets();
-            $units_count = count($units);
-            $i = 0;
-            foreach ($units as $unit) {
-                $i++;
-                ?><li> <ul><?php
-                foreach ($unit['widgets'] as $widget) {
+        $units = ContentWidget::getInstalledWidgets();
+        $units_count = count($units);
+        $i = 0;
+        foreach ($units as $unit) {
+            $i++;
+            ?><li> <ul><?php
+            foreach ($unit['widgets'] as $widget) {
 
-                    ?><li><a class="cms-button cms-btn-pageunit-create" id="cms-button-create-<?=$widget['className']?>" title="<?=$widget['name']?>" href="#" ><img src="<?=$widget['icon']?>" alt="<?=$widget['name']?>" /> <?=$widget['name']?></a></li><?php                    
-                    
-                }
-                ?></ul></li><?php
-                if ($i == ceil($units_count/2)) {
-                    ?></ul><ul><?php
-                }
+                ?><li><a class="cms-button cms-btn-pagewidget-create" id="cms-button-create-<?=$widget['className']?>" title="<?=$widget['name']?>" href="#" ><img src="<?=$widget['icon']?>" alt="<?=$widget['name']?>" /> <?=$widget['name']?></a></li><?php
+
             }
+            ?></ul></li><?php
+            if ($i == ceil($units_count/2)) {
+                ?></ul><ul><?php
+            }
+        }
         ?>
         </ul>
     </div>
 
-    <div id="cms-pageunit-edit">
+    <div id="cms-pagewidget-edit">
     </div>
 
-    <div id="cms-pageunit-delete" class="cms-splash">
+    <div id="cms-pagewidget-delete" class="cms-splash">
     </div>
 
-    <div id="cms-pageunit-set" class="cms-splash">
+    <div id="cms-pagewidget-set" class="cms-splash">
     </div>
 
     <div id="cms-page-fill" class="cms-splash">

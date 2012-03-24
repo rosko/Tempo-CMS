@@ -8,9 +8,9 @@ class ModelArea extends ContentModel
     }
     
     public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+    {
+        return parent::model($className);
+    }
 
     public function modelName($language=null)
     {
@@ -19,14 +19,14 @@ class ModelArea extends ContentModel
     
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_area';
+		return Yii::app()->db->tablePrefix . 'widgets_area';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, items', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, items', 'numerical', 'integerOnly'=>true),
 		);
 	}
 
@@ -34,7 +34,7 @@ class ModelArea extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'items' => '',
 		);
 	}
@@ -54,7 +54,7 @@ class ModelArea extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'items' => 'integer unsigned',
         );
     }

@@ -25,7 +25,7 @@ class FeedHelper {
                 $criteria['params'] = $p;
                 $criteria['limit'] = $limit;
                 $criteria = Yii::app()->getDb()->getCommandBuilder()->createCriteria($criteria);
-                $contents = call_user_func(array($itemsClassName, 'model'))->with('unit')->findAll($criteria);
+                $contents = call_user_func(array($itemsClassName, 'model'))->with('widget')->findAll($criteria);
                 $items = array();
                 foreach ($contents as $cont) {
                     $feed = $cont->feedItem();
@@ -35,10 +35,10 @@ class FeedHelper {
                         if ($attribute)
                             $item[$element] = $cont->{$attribute};
                     }
-                    if (!isset($item['title'])) $item['title'] = $cont->unit->title;
+                    if (!isset($item['title'])) $item['title'] = $cont->widget->title;
                     if ($cont->hasAttribute('modify'))
                         if (!isset($item['updated'])) $item['updated'] = $cont->modify;
-                    $item['link'] = $cont->getUnitUrl(true);
+                    $item['link'] = $cont->getWidgetUrl(true);
                     $items[] = $item;
                 }
             }
@@ -49,9 +49,9 @@ class FeedHelper {
                     $channel[$element] = $content->{$attribute};
             }
             if (!isset($channel['title']) || !$channel['title'])
-                $channel['title'] = $content->unit->title;
+                $channel['title'] = $content->widget->title;
             $channel['language'] = Yii::app()->language;
-            $channel['link'] = $content->getUnitUrl(true);
+            $channel['link'] = $content->getWidgetUrl(true);
             $channel['updated'] = date('r', strtotime($items[0]['updated']));
             
         } elseif (isset(Yii::$classMap[$content])) {

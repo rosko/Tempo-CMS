@@ -2,7 +2,7 @@
 	height:100px;
 }
 
-.cms-pageunit-highlight
+.cms-pagewidget-highlight
 {
 	background:lightblue;
 }
@@ -30,30 +30,30 @@
 	font-size:1.1em;
 }
 
-.cms-pageunit-menu {
+.cms-pagewidget-menu {
 	position:absolute;
 	cursor:default;
 }
-.cms-pageunit-menu ul {
+.cms-pagewidget-menu ul {
 	list-style:none;
 	margin:0px;
 	padding:0px;
 }
-.cms-pageunit-menu li {
+.cms-pagewidget-menu li {
 	display:block;
 	margin:6px 9px;
 }
-.cms-pageunit-menu li a {
+.cms-pagewidget-menu li a {
 	line-height:0px;
 	font-size:0px;
 }
 
-.cms-pageunit-add ul {
+.cms-pagewidget-add ul {
 	width:200px;
 	float:left;
 }
 
-#cms-pageunit-delete ul, #cms-pageunit-set ul  {
+#cms-pagewidget-delete ul, #cms-pagewidget-set ul  {
 	width:200px;
 }
 

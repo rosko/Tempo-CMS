@@ -19,14 +19,14 @@ class ModelSearch extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_search';
+		return Yii::app()->db->tablePrefix . 'widgets_search';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 		);
 	}
 
@@ -34,7 +34,7 @@ class ModelSearch extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
             
 		);
 	}
@@ -43,7 +43,7 @@ class ModelSearch extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             
         );
     }
@@ -58,7 +58,7 @@ class ModelSearch extends ContentModel
     public function content()
     {
         // TODO сделать поиск
-        // 1. Собрать все поля string и text для блоков и страниц (в Page, Unit, Unit...)
+        // 1. Собрать все поля string и text для блоков и страниц (в Page, Widget, Widget...)
         // 2. Произвести поиск по полям
         // 3. Вывести результаты
         return Yii::t('UnitSearch.main', 'Search').': '.$_GET['q'];

@@ -19,14 +19,14 @@ class ModelBreadcrumbs extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_breadcrumbs';
+		return Yii::app()->db->tablePrefix . 'widgets_breadcrumbs';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id', 'numerical', 'integerOnly'=>true),
 			array('separator', 'length', 'max'=>16, 'encoding'=>'UTF-8'),
 		);
 	}
@@ -35,7 +35,7 @@ class ModelBreadcrumbs extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
             'separator'=> Yii::t('UnitBreadcrumbs.main', 'Separator'),
 		);
 	}
@@ -55,7 +55,7 @@ class ModelBreadcrumbs extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'separator' => 'char(32)',
         );
     }

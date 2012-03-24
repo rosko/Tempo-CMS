@@ -19,14 +19,14 @@ class ModelBlog extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_blog';
+		return Yii::app()->db->tablePrefix . 'widgets_blog';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, per_page', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, per_page', 'numerical', 'integerOnly'=>true),
             array('items', 'safe'),
 		);
 	}
@@ -35,7 +35,7 @@ class ModelBlog extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'per_page' => Yii::t('UnitBlog.main', 'Entries per page'),
             'items' => '',
 		);
@@ -97,8 +97,8 @@ class ModelBlog extends ContentModel
     public function feed()
     {
         return array(
-            'title'=>null, // тогда используется unit->title
-            'description'=>null, // тогда используется unit->title
+            'title'=>null, // тогда используется widget->title
+            'description'=>null, // тогда используется widget->title
             'author'=>null, // тогда не используется, а можно указать имя поля с id автора (User)
             'items'=>array(
                 'ModelBlog_Entry',
@@ -112,17 +112,17 @@ class ModelBlog extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'per_page' => 'integer unsigned',
             'items' => 'integer unsigned',
         );
     }
 
     public function getSectionsArray() {
-        $attr = Unit::getI18nFieldName('title', 'Unit');
-        $sql = 'SELECT ns.`id`, u.`'.$attr.'` FROM `' . Unit::tableName() .'` as u
+        $attr = Widget::getI18nFieldName('title', 'Widget');
+        $sql = 'SELECT ns.`id`, u.`'.$attr.'` FROM `' . Widget::tableName() .'` as u
                 INNER JOIN `' . ModelBlog::tableName() . '` as ns
-                    ON u.id = ns.unit_id
+                    ON u.id = ns.widget_id
                 WHERE u.`class` = "WidgetBlog" ORDER BY u.`'.$attr.'`';
         $result = Yii::app()->db->createCommand($sql)->queryAll();
         $ret = array();

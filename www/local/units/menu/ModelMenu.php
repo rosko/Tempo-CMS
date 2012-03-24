@@ -19,14 +19,14 @@ class ModelMenu extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_menu';
+		return Yii::app()->db->tablePrefix . 'widgets_menu';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, recursive', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, recursive', 'numerical', 'integerOnly'=>true),
 		);
 	}
 
@@ -34,7 +34,7 @@ class ModelMenu extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 //			'items' => 'Items',
             'recursive' => Yii::t('UnitMenu.main', 'Levels'),
 		);
@@ -64,7 +64,7 @@ class ModelMenu extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'recursive' => 'integer unsigned',
             'items' => 'text',
         );

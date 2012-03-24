@@ -8,7 +8,7 @@ class Toolbar extends CWidget
 
     // Расположение
     public $location = array(
-        'selector' => '.cms-pageunit',
+        'selector' => '.cms-pagewidget',
         'position' => array(
             'outter',  // inner, outter, absolute
             'left',  // left, right, top, bottom, wide

@@ -19,14 +19,14 @@ class ModelProfiles extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_profiles';
+		return Yii::app()->db->tablePrefix . 'widgets_profiles';
 	}
 
 	public function rules()
 	{
 		return $this->localizedRules(array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, per_page', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, per_page', 'numerical', 'integerOnly'=>true),
             array('table_fields, displayed_fields', 'type', 'type'=>'array'),
             array('feedback_form', 'safe'),
 		));
@@ -36,7 +36,7 @@ class ModelProfiles extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
             'table_fields' => Yii::t('UnitProfiles.main', 'Fields in users table'),
             'displayed_fields' => Yii::t('UnitProfiles.main', 'Displayed fields in user profile'),
             'per_page' => Yii::t('UnitProfiles.main', 'Rows in table per page'),
@@ -47,7 +47,7 @@ class ModelProfiles extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'table_fields' => 'text', // поля отображаемые в таблице пользователей
             'displayed_fields' => 'text', // поля отображаемые при просмотре профиля пользователя
             'per_page' => 'integer unsigned', // количество профилей в таблице на одну страницу

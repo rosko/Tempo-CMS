@@ -61,11 +61,11 @@ class RecordsController extends Controller
     public function actionGetUrl()
     {
         if ($_REQUEST['id'] && $_REQUEST['className']) {
-            $unit_class = $_REQUEST['className'];
-            $content = call_user_func(array($unit_class, 'model'))->findByPk($_REQUEST['id']);
-            if ($content->unit_id) {
-                $unit = $content->unit;
-                echo $unit->getUnitUrl();
+            $widgetClass = $_REQUEST['className'];
+            $content = call_user_func(array($widgetClass, 'model'))->findByPk($_REQUEST['id']);
+            if ($content->widget_id) {
+                $widget = $content->widget;
+                echo $widget->getWidgetUrl();
             }
             
         }

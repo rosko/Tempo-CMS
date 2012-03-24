@@ -5,14 +5,14 @@ cmsI18n.cms = {
     deleteWarning: "<?=Yii::t('cms', 'Are you really want delete?')?>",
     deletePageWarning: "<?=Yii::t('cms', 'Are you really want delete page?')?>",
     saved: "<?=Yii::t('cms', 'Saved')?>",
-    addAnotherUnit: "<?=Yii::t('cms', 'Add another unit')?>",
-    addUnit: "<?=Yii::t('cms', 'Add unit')?>",
-    deleteUnitWarning: "<?=Yii::t('cms', 'Are you really want delete this unit?')?>",
+    addAnotherWidget: "<?=Yii::t('cms', 'Add another widget')?>",
+    addWidget: "<?=Yii::t('cms', 'Add widget')?>",
+    deleteWidgetWarning: "<?=Yii::t('cms', 'Are you really want delete this widget?')?>",
     editing: "<?=Yii::t('cms', 'Editing')?>",
-    deletingUnit: "<?=Yii::t('cms', 'Unit deleting')?>",
-    deleteUnitRecordConfirm: "<?=Yii::t('cms', 'There are some units on page {page} where\'s located this unit.')?>",
-    deleteUnitOnly: "<?=Yii::t('cms', 'Delete the unit only')?>",
-    deleteUnitAndPage: "<?=Yii::t('cms', 'Delete the unit and the whole page (where\'s unit located)')?>",
+    deletingWidget: "<?=Yii::t('cms', 'Widget deleting')?>",
+    deleteWidgetRecordConfirm: "<?=Yii::t('cms', 'There are some wigets on page {page} where\'s located this widget.')?>",
+    deleteWidgetOnly: "<?=Yii::t('cms', 'Delete the widget only')?>",
+    deleteWidgetAndPage: "<?=Yii::t('cms', 'Delete the widget and the whole page (where\'s widget located)')?>",
     deleteRecordWarning: "<?=Yii::t('cms', 'Are you really want delete this record?')?>"
 };
 

@@ -29,7 +29,7 @@ $('.<?=$id?>_add').click(function() {
 
     <?php if ($pageId) { ?>
 
-        var url = '/?r=unit/edit&area=<?=$area?>&pageId=<?=$pageId?>&modelClass=<?=$className?>&sectionId=<?=$model->id?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
+        var url = '/?r=widget/edit&area=<?=$area?>&pageId=<?=$pageId?>&modelClass=<?=$className?>&sectionId=<?=$model->id?>&foreignAttribute=<?=$foreignAttribute?>&language='+$.data(document.body, 'language');
         cmsLoadDialog(url, {
             simpleClose: false,
             onOpen: function(t) {

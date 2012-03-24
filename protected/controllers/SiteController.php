@@ -70,9 +70,8 @@ class SiteController extends Controller
     public function actionFeed($type='rss')
     {
         header('Content-Type: application/rss+xml');
-        if (isset($_GET['unittype'])) {
-            $modelClass = 'Model'.$_GET['unittype'];
-            $className = Unit::getClassNameByUnitType($_GET['unittype']);
+        if (isset($_GET['model'])) {
+            $modelClass = 'Model'.$_GET['model'];
             ContentUnit::loadUnits();
             if (!FeedHelper::isFeedPresent($modelClass, !isset($_GET['id'])))
                 throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));

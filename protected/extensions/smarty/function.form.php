@@ -21,10 +21,10 @@ function smarty_function_form($params, &$smarty)
             $cs->registerScriptFile($am->publish(Yii::getPathOfAlias('application.assets.js')).'/cms.js');
 
             $form_array['activeForm'] = Form::ajaxify($id);
-            $unit = $smarty->getTemplateVars('unit');
-            $pageUnit = $smarty->getTemplateVars('pageUnit');
+            $widget = $smarty->getTemplateVars('widget');
+            $pageWidget = $smarty->getTemplateVars('pageWidget');
             unset($form_array['activeForm']['focus']);
-            $form_array['activeForm']['clientOptions']['validationUrl'] = '/?r=view/unit&pageUnitId='.$pageUnit['id'].$params['ajaxUrlParams'];
+            $form_array['activeForm']['clientOptions']['validationUrl'] = '/?r=view/widget&pageWidgetId='.$pageWidget['id'].$params['ajaxUrlParams'];
             if ($params['enableAjax'] === 'validate') {
                 $form_array['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
             } else {
@@ -32,8 +32,8 @@ function smarty_function_form($params, &$smarty)
 {
     if (!h) {
         var params = f.serialize();
-        cmsAjaxSave('/?r=view/unit&pageUnitId={$pageUnit['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
-        //    cmsReloadPageUnit({$pageUnit['id']}, '.pageunit[rev={$unit['id']}]');
+        cmsAjaxSave('/?r=view/widget&pageWidgetId={$pageWidget['id']}{$params['ajaxUrlParams']}', params, f.attr('method'), function(html) {
+        //    cmsReloadPageWidget({$pageWidget['id']}, '.pagewidget[rev={$widget['id']}]');
         });
     }
 }

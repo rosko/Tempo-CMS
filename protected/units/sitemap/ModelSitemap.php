@@ -19,14 +19,14 @@ class ModelSitemap extends ContentModel
 
 	public function tableName()
 	{
-		return Yii::app()->db->tablePrefix . 'units_sitemap';
+		return Yii::app()->db->tablePrefix . 'widgets_sitemap';
 	}
 
 	public function rules()
 	{
 		return array(
-            array('unit_id', 'required', 'on'=>'edit'),
-			array('unit_id, length, recursive, page, per_page', 'numerical', 'integerOnly'=>true),
+            array('widget_id', 'required', 'on'=>'edit'),
+			array('widget_id, length, recursive, page, per_page', 'numerical', 'integerOnly'=>true),
             array('show_title', 'boolean'),
 		);
 	}
@@ -35,7 +35,7 @@ class ModelSitemap extends ContentModel
 	{
 		return array(
 //			'id' => 'ID',
-//			'unit_id' => 'Unit',
+//			'widget_id' => 'Widget',
 			'length' => Yii::t('UnitSitemap.main', 'Descriptions\' length'),
             'recursive' => Yii::t('UnitSitemap.main', 'Levels depth'),
             'page' => Yii::t('UnitSitemap.main', 'Parent page'),
@@ -86,7 +86,7 @@ class ModelSitemap extends ContentModel
     public function scheme()
     {
         return array(
-            'unit_id' => 'integer unsigned',
+            'widget_id' => 'integer unsigned',
             'length' => 'integer unsigned',
             'recursive' => 'integer unsigned',
             'page' => 'integer unsigned',

@@ -25,7 +25,7 @@ class WidgetArea extends ContentWidget
     public function init()
     {
         parent::init();
-        $this->params['areaId'] = 'widget'.$this->params['widget']->id.'UnitArea_items';
+        $this->params['areaId'] = 'widget'.$this->params['widget']->id.'ModelArea_items';
         $this->params['pageWidgets'] = PageWidget::model()->findAll(array(
             'condition' => '`area` = :area',
             'params' => array(
@@ -33,7 +33,7 @@ class WidgetArea extends ContentWidget
             ),
             'with' => array('widget'),
             'order' => '`order`'
-            ));
+        ));
     }
     
 }

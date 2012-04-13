@@ -66,7 +66,7 @@ function cmsOpenDialog(content, options) {
             $('html').css('overflow', 'hidden');
         },
         onClose: function() {
-            cmsFadeOut('.selected', 'selected');
+            cmsFadeOut('.cms-selected', 'cms-selected');
             $(content).html('');
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);

@@ -298,7 +298,7 @@ class Page extends I18nActiveRecord
             $param = $lang.'_url';
     		if ($this->_url[$lang] != $this->$param)
         	{
-                    $page->$param = $page->generateUrl(true, $lang.'_alias');
+                $this->$param = $this->generateUrl(true, $lang.'_alias');
             	$children = $this->children;
                 foreach ($children as $page) {
     				$page->save(false);

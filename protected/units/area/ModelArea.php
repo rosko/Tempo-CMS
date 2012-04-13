@@ -58,6 +58,10 @@ class ModelArea extends ContentModel
             'items' => 'integer unsigned',
         );
     }
-    
+
+    /*
+     * TODO: Сделать, чтобы при удалении области блоков также удалялись все блоки, которые были внутри области
+     */
+
 }
 

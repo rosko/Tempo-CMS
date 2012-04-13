@@ -127,6 +127,7 @@
 }
 .cms-hover {
 	background-color:rgb(244, 255, 244) !important;
+    outline:4px solid rgba(200,200,200,0.85);
 }
 
 input.cms-button,

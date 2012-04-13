@@ -8,7 +8,7 @@ class ContentUnit extends CComponent
         return false;
     }
 
-    // Возвращает ссілку на иконку юнита
+    // Возвращает ссылку на иконку юнита
     public function icon()
     {
         return false;

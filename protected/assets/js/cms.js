@@ -324,8 +324,8 @@ function cmsPageWidgetAddForm(t)
 function cmsPageWidgetEditForm(t)
 {
     var pageWidget = $(t);
-    if (pageWidget.hasClass('selected')) {return;}
-    cmsFadeIn(pageWidget, 'selected');
+    if (pageWidget.hasClass('cms-selected')) {return;}
+    cmsFadeIn(pageWidget, 'cms-selected');
     pageWidgetId = pageWidget.attr('id').replace('cms-pagewidget-','');
     widgetClass = pageWidget.attr('rel');
     cmsLoadDialog('/?r=widget/edit&widgetClass='+widgetClass+'&pageWidgetId='+pageWidgetId+'&language='+$.data(document.body, 'language'), {
@@ -366,7 +366,7 @@ function cmsPageWidgetDeleteDialog(widgetId, pageWidgetId, pageId)
                         cmsAreaEmptyCheck();
                     });
                 } else {
-                    cmsFadeOut('.selected', 'selected');
+                    cmsFadeOut('.cms-selected', 'cms-selected');
                 }
             }
         }

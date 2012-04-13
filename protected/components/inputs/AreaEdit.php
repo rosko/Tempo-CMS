@@ -52,7 +52,7 @@ class AreaEdit extends CInputWidget
                     var areaName = cmsGetAreaNameByPageWidget(ui.item);
                     if (!ui.sender) {
                         // Запрос на обновление текущей области
-                        cmsAjaxSaveArea(cmsGetAreaByPageWidget(ui.item), areaName, <?=$modelId?>, 'pageWidgetId='+pageWidgetId);
+                        cmsAjaxSaveArea(cmsGetAreaByPageWidget(ui.item), areaName, <?=intval($modelId)?>, 'pageWidgetId='+pageWidgetId);
                     }
                 },
                 start:function(event, ui) {

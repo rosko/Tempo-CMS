@@ -60,7 +60,7 @@ class Installer extends CApplicationComponent
                 }
             }
         }
-        if (method_exists($className, 'install') &&
+        if (method_exists($className, 'install') && $tableName &&
             (Yii::app()->db->createCommand()->select('count(*)')->from($tableName)->queryScalar()==0) ) {
             call_user_func(array($className, 'install'));
         }

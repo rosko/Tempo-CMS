@@ -144,10 +144,16 @@ class ContentUnit extends CComponent
         if (!is_array($classNames)) {
             $classNames = array($classNames);
         }
+        self::loadUnits(true);
         $units = self::getAvailableUnits();
         foreach ($classNames as $className) {
-            
-            Yii::app()->installer->installTable($className);
+
+            if (method_exists($className, 'models')) {
+                $models = call_user_func(array($className, 'models'));
+                foreach ($models as $modelClassName) {
+                    Yii::app()->installer->installTable($modelClassName);
+                }
+            }
             $config[$className] = $units[$className]['dir_alias'];
         }
         self::saveConfig($config);
@@ -191,17 +197,19 @@ class ContentUnit extends CComponent
             foreach ($config as $unitClassName => $dirAlias) {
                 $dir = strtolower(substr($unitClassName,4));
                 Yii::$classMap[$unitClassName] = $classmap[$unitClassName] = Yii::getPathOfAlias($dirAlias.'.'.$dir.'.'.$unitClassName).'.php';
-                $classes = array_merge(
-                    call_user_func(array($unitClassName, 'models')) , 
-                    call_user_func(array($unitClassName, 'widgets')) 
-                );
-                foreach ($classes as $className => $alias) {
-                    if (is_int($className)) {
-                        $className = $alias;
-                        $alias = $dirAlias . '.' . $dir . '.' . $className;
+                if (method_exists($unitClassName, 'models') && method_exists($unitClassName, 'widgets')) {
+                    $classes = array_merge(
+                        call_user_func(array($unitClassName, 'models')) ,
+                        call_user_func(array($unitClassName, 'widgets'))
+                    );
+                    foreach ($classes as $className => $alias) {
+                        if (is_int($className)) {
+                            $className = $alias;
+                            $alias = $dirAlias . '.' . $dir . '.' . $className;
+                        }
+                        $classmap[$className] = Yii::getPathOfAlias($alias).'.php';
                     }
-                    $classmap[$className] = Yii::getPathOfAlias($alias).'.php';
-                }                
+                }
             }
             if (!empty($classmap)) {
                 $contents = "<?php\nreturn array(\n";
@@ -229,7 +237,9 @@ class ContentUnit extends CComponent
         $units = array();
         $classNames = array_keys(self::loadConfig());
 		foreach ($classNames as $className) {
-            $units[$className] = call_user_func(array($className, 'name'));
+            if (is_subclass_of($className, 'ContentUnit')) {
+                $units[$className] = call_user_func(array($className, 'name'));
+            }
 		}
         asort($units);
         if (!$withNames) {
@@ -238,11 +248,35 @@ class ContentUnit extends CComponent
         return $units;
 	}
 
-    public static function loadUnits()
+    public static function loadUnits($all=false)
     {
         $config = include(self::classMapFilename());
         foreach ($config as $className => $path) {
             Yii::$classMap[$className] = $path;
+        }
+        // Подгружаем неисталированные юниты
+        if ($all) {
+            $units = self::getAvailableUnits();
+            foreach ($units as $unitClassName => $unit) {
+                if (!$unit['installed']) {
+                    $dirAlias = $unit['dir_alias'];
+                    $dir = strtolower(substr($unitClassName,4));
+                    Yii::$classMap[$unitClassName] = Yii::getPathOfAlias($dirAlias.'.'.$dir.'.'.$unitClassName).'.php';
+                    if (method_exists($unitClassName, 'models') && method_exists($unitClassName, 'widgets')) {
+                        $classes = array_merge(
+                            call_user_func(array($unitClassName, 'models')) ,
+                            call_user_func(array($unitClassName, 'widgets'))
+                        );
+                        foreach ($classes as $className => $alias) {
+                            if (is_int($className)) {
+                                $className = $alias;
+                                $alias = $dirAlias . '.' . $dir . '.' . $className;
+                            }
+                            Yii::$classMap[$className] = Yii::getPathOfAlias($alias).'.php';
+                        }
+                    }
+                }
+            }
         }
     }
 

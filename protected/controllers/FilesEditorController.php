@@ -47,7 +47,7 @@ class FilesEditorController extends Controller
                 else
                     $extension='.php';
 
-                $data = call_user_func(array($name, 'getTemplates'), $name, false);
+                $data = call_user_func(array($name, 'getTemplates'), $name, '', false);
                 $files[] = array(
                     'name' => '',
                     'title' => Yii::t('filesEditor', '«default»'),

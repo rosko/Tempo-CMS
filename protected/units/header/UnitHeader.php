@@ -4,7 +4,7 @@ class UnitHeader extends ContentUnit
 {
     public function name($language=null)
     {
-        return Yii::t('UnitHtml.main', 'HTML', array(), null, $language);
+        return Yii::t('UnitHeader.main', 'Header', array(), null, $language);
     }
     
     public function icon()

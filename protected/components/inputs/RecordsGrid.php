@@ -11,7 +11,7 @@ class RecordsGrid extends CInputWidget
     public function run()
     {
         $recordExample = new $this->className;
-        
+
         if ($recordExample->hasAttribute('widget_id')) {
 
             $dataProvider=new CActiveDataProvider($this->className, array(
@@ -39,8 +39,14 @@ class RecordsGrid extends CInputWidget
             ));
 
         } else {
-            
+
             $dataProvider=new CActiveDataProvider($this->className, array(
+                'criteria'=> array(
+                    'condition'=> $this->foreignAttribute . ' = :id',
+                    'params'=>array(
+                        ':id' => $this->model->id
+                    ),
+                ),
                 'sort' => array(
                     'defaultOrder' => $this->order,
                 ),
@@ -57,13 +63,11 @@ class RecordsGrid extends CInputWidget
             $id = __CLASS__.$this->className;
         }
 
-        $this->registerClientScript();
-
         $pageId = 0;
         $area = '';
         $pageWidgetId = 0;
         $widgetId = 0;
-        if ($this->model && $this->model->hasAttribute('widget_id')) {
+        if ($this->hasModel() && $this->model->hasAttribute('widget_id')) {
             $pageWidget = PageWidget::model()->find('`widget_id` = :widget_id', array(':widget_id'=>$this->model->widget_id));
             if ($pageWidget) {
                 $pageWidgetId = $pageWidget->id;
@@ -72,7 +76,6 @@ class RecordsGrid extends CInputWidget
                 $area = $pageWidget->area;
             }
         }
-
 
         $recordsGrid = $this->widget('zii.widgets.grid.CGridView', array(
             'id'=>$id,
@@ -143,9 +146,9 @@ JS
             'addButtonTitle' => $this->addButtonTitle,
             'pageId' => $pageId,
             'area' => $area,
+            'recordExample' => $recordExample,
             'className' => $this->className,
             'recordsGrid' => $recordsGrid,
-            'recordExample' => $recordExample,
             'model' => $this->model,
             'pageWidgetId' => $pageWidgetId,
             'widgetId' => $widgetId,
@@ -153,10 +156,4 @@ JS
 
     }
 
-    public function registerClientScript()
-    {
-        //$cs=Yii::app()->getClientScript();
-        //$cs->registerScriptFile('/js/jquery.ba-bbq.js');
-
-    }
 }

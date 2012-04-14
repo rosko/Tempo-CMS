@@ -1,5 +1,7 @@
 <div id="<?=$id?>_header">
+<?php if (!$recordExample->isMaxLimitReached()) { ?>
     <input type="button" class="<?=$id?>_add" value="<?=$addButtonTitle ? $addButtonTitle : Yii::t('cms', 'Add')?>" />
+<?php } ?>
 </div>
 <?php 
 if ($this->hasModel()) {

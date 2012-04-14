@@ -45,7 +45,7 @@ class UnitImage extends ContentUnit
     }
     public function settingsRules()
     {
-        return array_merge(parent::settingsRules(), array(
+        return array_merge(parent::settingsRules(__CLASS__), array(
             array('show_border', 'boolean')
         ));
     }

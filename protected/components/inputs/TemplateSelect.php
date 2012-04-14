@@ -3,7 +3,9 @@
 class TemplateSelect extends CInputWidget
 {
     public $className;
+    public $templateType;
     public $empty = '«default»';
+    public $hideDefault = true;
 
     public function run()
 	{
@@ -19,18 +21,30 @@ class TemplateSelect extends CInputWidget
         else
             $this->htmlOptions['name']=$name;
 
-        $className = $this->className;
-
-        $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
-        $data = call_user_func(array($className, 'templates'), $className);
-        if ($data != array()) {
-            $data = array_merge(array(''=>Yii::t('cms', $this->empty)), $data);
-
-            if($this->hasModel())
-                echo CHtml::activeDropDownList($this->model,$this->attribute,$data, $this->htmlOptions);
-            else
-                echo CHtml::dropDownList($name,$this->value,$data,$this->htmlOptions);
+        if (is_subclass_of($this->className, 'ContentWidget')) {
+            $unitClassName = call_user_func(array($this->className, 'unitClassName'));
+            $widgetClassName = $this->className;
+        } else {
+            $unitClassName = $this->className;
+            $widgetClassName = null;
         }
+
+        if ($this->templateType) {
+
+            $this->showTemplateSelectForType($this->templateType);
+
+        } else {
+
+            if ($widgetClassName) {
+                $this->showTemplateSelectForWidget($widgetClassName);
+            } else {
+                $widgets = call_user_func(array($unitClassName, 'widgets'));
+                foreach ($widgets as $widgetClassName) {
+                    $this->showTemplateSelectForWidget($widgetClassName);
+                }
+            }
+        }
+
         if ($this->hasModel() && (get_class($this->model) == 'Widget'))
         {
             $widgetId = $this->model->id;
@@ -94,6 +108,47 @@ cmsLoadDialog('/?r=filesEditor/form&type=templates&name={$className}&default='+$
 JS;
 
         echo '<br /> ' . CHtml::link(Yii::t('cms', 'Edit templates'), '#', array('onclick' => $js));
+
+    }
+
+    protected function showTemplateSelectForType($templateType, $htmlOptions='')
+    {
+        if (is_subclass_of($this->className, 'ContentWidget')) {
+            $className = call_user_func(array($this->className, 'unitClassName'));
+        } else {
+            $className = $this->className;
+        }
+        $data = array_keys(ContentUnit::getTemplates($className, $templateType));
+        $data = array_combine($data, $data);
+        if ($this->hideDefault)
+            unset($data['default']);
+        $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
+        $array_value = @unserialize($value);
+        if ($array_value !== false && isset($array_value[$templateType])) {
+            $value = $array_value[$templateType];
+        }
+
+        if (is_array($data)) {
+            $data = array_merge(array(''=>Yii::t('cms', $this->empty)), $data);
+            if (!$htmlOptions) {
+                $htmlOptions = $this->htmlOptions;
+            }
+            echo CHtml::dropDownList($htmlOptions['name'],$value,$data,$htmlOptions);
+        }
+
+    }
+
+    protected function showTemplateSelectForWidget($widgetClassName)
+    {
+        $templates = call_user_func(array($widgetClassName, 'templates'), $widgetClassName);
+        foreach ($templates as $templateType => $templateTypeTitle) {
+
+            $htmlOptions = $this->htmlOptions;
+            $htmlOptions['id'] .= '_'.$templateType;
+            $htmlOptions['name'] .= '['.$templateType.']';
+            echo CHtml::label($templateTypeTitle,$htmlOptions['id'],$this->htmlOptions);
+            $this->showTemplateSelectForType($templateType, $htmlOptions);
+        }
 
     }
 

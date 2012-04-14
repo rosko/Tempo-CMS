@@ -2,6 +2,9 @@
 
 class ModelBlog extends ContentModel
 {
+    public $entries;
+
+
     public function icon()
     {
         return '/images/icons/fatcow/16x16/newspaper.png';
@@ -27,7 +30,7 @@ class ModelBlog extends ContentModel
 		return array(
             array('widget_id', 'required', 'on'=>'edit'),
 			array('widget_id, per_page', 'numerical', 'integerOnly'=>true),
-            array('items', 'safe'),
+            array('entries', 'safe'),
 		);
 	}
 
@@ -37,7 +40,7 @@ class ModelBlog extends ContentModel
 //			'id' => 'ID',
 //			'widget_id' => 'Widget',
 			'per_page' => Yii::t('UnitBlog.main', 'Entries per page'),
-            'items' => '',
+            'entries' => '',
 		);
 	}
 
@@ -66,7 +69,7 @@ class ModelBlog extends ContentModel
 		return array(
 			'elements'=>array(
                 Form::tab(Yii::t('UnitBlog.main', 'Blog/news section')),
-                'items' => array(
+                'entries' => array(
                     'type'=>'RecordsGrid',
                     'className' => 'ModelBlog_Entry',
                     'foreignAttribute' => 'blog_id',
@@ -114,7 +117,7 @@ class ModelBlog extends ContentModel
         return array(
             'widget_id' => 'integer unsigned',
             'per_page' => 'integer unsigned',
-            'items' => 'integer unsigned',
+//            'items' => 'integer unsigned',
         );
     }
 

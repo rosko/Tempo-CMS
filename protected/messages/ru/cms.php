@@ -41,6 +41,7 @@ return array(
     '«as in general settings»' => '«согласно общих настроек сайта»',
 
     'Template' => 'Шаблон',
+    'Main template' => 'Основной шаблон',
     '[Widget "{name}" is empty on this page] - this messages showed in edit mode only' => '[Блок "{name}" на этой странице пуст] - это сообщение отображается только в режиме редактирования',
 
     'Properties' => 'Свойства',
@@ -86,7 +87,7 @@ return array(
     'Page url' => 'Полный адрес страницы',
 
     'General settings' => 'Общие настройки',
-    'Widgets settings' => 'Настройки блоков',
+    'Units settings' => 'Настройки блоков',
 
     'Sitename' => 'Название сайта',
     'Web-master\'s e-mail' => 'E-mail администратора',

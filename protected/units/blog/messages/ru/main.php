@@ -31,5 +31,7 @@ return array(
 
     'Annotation' => 'Аннотация',
     'Image' => 'Изображение',
+    'Main template' => 'Основной шаблон',
+    'Blog/news entry template' => 'Шаблон отображения записи',
         
 );

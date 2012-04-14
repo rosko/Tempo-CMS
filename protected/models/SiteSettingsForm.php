@@ -25,7 +25,7 @@ class SiteSettingsForm extends CFormModel
         $units = ContentUnit::getInstalledUnits();
         foreach ($units as $unitClass) {
             if (method_exists($unitClass, 'settingsRules')) {
-                $rules = call_user_func(array($unitClass, 'settingsRules'));
+                $rules = call_user_func(array($unitClass, 'settingsRules'), $unitClass);
                 if (is_array($rules) && !empty($rules)) {
                     foreach ($rules as $rule)
                     {

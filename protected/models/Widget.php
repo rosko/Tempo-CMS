@@ -17,7 +17,7 @@ class Widget extends I18nActiveRecord
         return array(
             'class' => 'char(64)',
             'title' => 'string',
-            'template' => 'char(32)',
+            'template' => 'text',
             'author_id'=>'integer unsigned',
             'editor_id'=>'integer unsigned',
             'access'=>'text',
@@ -30,7 +30,7 @@ class Widget extends I18nActiveRecord
 			array('class', 'required'),
 			array('class', 'length', 'max'=>64),
 			array('title', 'length', 'max'=>255),
-			array('template', 'length', 'max'=>32),
+			array('template', 'safe'),
 		));
 	}
 
@@ -52,6 +52,10 @@ class Widget extends I18nActiveRecord
                 'class' => 'zii.behaviors.CTimestampBehavior',
                 'createAttribute' => 'create',
                 'updateAttribute' => 'modify',
+            ),
+            'CSerializeBehavior' => array(
+                'class' => 'application.behaviors.CSerializeBehavior',
+                'serialAttributes' => array('template'),
             ),
         );
     }

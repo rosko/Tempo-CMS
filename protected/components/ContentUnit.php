@@ -72,10 +72,10 @@ class ContentUnit extends CComponent
         );
     }
 
-    public function settingsRules()
+    public function settingsRules($className)
     {
         return array(
-            array('template', 'length', 'max'=>32),
+            array('template', 'safe'),
         );
     }
 
@@ -280,7 +280,7 @@ class ContentUnit extends CComponent
         }
     }
 
-    public function getTemplates($className='', $basenameOnly=true)
+    public function getTemplates($className='', $templateType='')
     {
         if ($className == '')
             $className = get_class($this);
@@ -304,18 +304,15 @@ class ContentUnit extends CComponent
                 )));
             }
         $data = array();
-        if ($files != array()) {
-            //array_walk($files, 'basename');
-            if ($basenameOnly) {
-                foreach ($files as $k => $file) {
-                    $files[$k] = basename($file, $extension);
-                }
-                $data = array_combine($files, $files);
+        foreach ($files as $file)
+        {
+            if ($templateType) {
+                if (substr(basename($file, $extension),0,strlen($templateType)).'-' != $templateType.'-') continue;
+                $data[substr(basename($file, $extension),strlen($templateType)+1)] = $file;
             } else {
-                $data = $files;
+                $data[basename($file, $extension)] = $file;
             }
         }
-
         return $data;
     }
 

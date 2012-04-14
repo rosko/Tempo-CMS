@@ -15,6 +15,40 @@ class ContentModel extends I18nActiveRecord
         );
     }
 
+    /**
+     * Возвращает максимальное допустимое количество экземпляров данной модели
+     * -1 - ни одного нельзя
+     * 0 - без ограничений
+     * >0 - конкретное ограничение
+     *
+     * @return int
+     */
+    public function maxLimit()
+    {
+        return 0;
+    }
+
+    public function isMaxLimitReached()
+    {
+        if ($this->maxLimit() < 0) {
+            return true;
+        } elseif ($this->maxLimit() > 0) {
+            $count = Yii::app()->db->createCommand('SELECT count(*) FROM `' . $this->tableName() . '`')->queryScalar();
+            return $count >= $this->maxLimit();
+        } else {
+            return false;
+        }
+    }
+
+    public function beforeSave()
+    {
+        if ($this->isNewRecord && $this->isMaxLimitReached()) {
+            return false;
+        }
+        return parent::beforeSave();
+
+    }
+
     public function selectPage($number, $per_page=0)
     {
         if ($per_page<1)
@@ -63,46 +97,7 @@ class ContentModel extends I18nActiveRecord
         );
         return $pathes;
     }
-/*
-    public function getTemplates($className='', $basenameOnly=true)
-    {
-        if ($className == '')
-            $className = get_class($this);
 
-		if((Yii::app()->getViewRenderer())!==null)
-			$extension=Yii::app()->getViewRenderer()->fileExtension;
-		else
-			$extension='.php';
-
-        $files = array();
-        $pathes = self::getTemplateDirAliases($className);
-        foreach ($pathes as $path) {
-            $path = Yii::getPathOfAlias($path);
-            if (is_dir($path))
-                $files = array_merge($files, CFileHelper::findFiles($path, array(
-                    'fileTypes' => array(substr($extension,1)),
-                    'level' => 0,
-                    'exclude' => array(
-                        $className . $extension,
-                     ),
-                )));
-            }
-        $data = array();
-        if ($files != array()) {
-            //array_walk($files, 'basename');
-            if ($basenameOnly) {
-                foreach ($files as $k => $file) {
-                    $files[$k] = basename($file, $extension);
-                }
-                $data = array_combine($files, $files);
-            } else {
-                $data = $files;
-            }
-        }
-
-        return $data;
-    }
-*/
     public function getAllValuesBy($attr)
     {
         $attr = $this->getI18nFieldName($attr);

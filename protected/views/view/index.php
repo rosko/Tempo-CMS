@@ -242,8 +242,13 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
             ?><li> <ul><?php
             foreach ($unit['widgets'] as $widget) {
 
-                ?><li><a class="cms-button cms-btn-pagewidget-create" id="cms-button-create-<?=$widget['className']?>" title="<?=$widget['name']?>" href="#" ><img src="<?=$widget['icon']?>" alt="<?=$widget['name']?>" /> <?=$widget['name']?></a></li><?php
+                $modelClassName = call_user_func(array($widget['className'],'modelClassName'));
+                $model = CActiveRecord::model($modelClassName);
+                if (!$model->isMaxLimitReached()) {
 
+                    ?><li><a class="cms-button cms-btn-pagewidget-create" id="cms-button-create-<?=$widget['className']?>" title="<?=$widget['name']?>" href="#" ><img src="<?=$widget['icon']?>" alt="<?=$widget['name']?>" /> <?=$widget['name']?></a></li><?php
+
+                }
             }
             ?></ul></li><?php
             if ($i == ceil($units_count/2)) {

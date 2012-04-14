@@ -240,6 +240,7 @@ JS;
                 $formArray['elements']['widget']['elements']['template'] = array(
                     'type'=>'TemplateSelect',
                     'className'=>$widgetClass,
+                    'hideDefault'=>false,
                     'empty'=>Yii::t('cms', '«accordingly to general settings»'),
                 );
                 $widgetFormArray['elements'][] = Form::tab(Yii::t('cms', 'Appearance'));
@@ -266,6 +267,9 @@ JS;
 			if ($form->validate()) {
                 if (isset($widget)) {
                     $isWidgetNew = $widget->isNewRecord;
+                    if ($isWidgetNew && $content->isMaxLimitReached()) {
+                        $ret = false;
+                    }
             		if ($ret && $widget->save(false)) {
                         $formArray['action'] .= '&widgetId='.$widget->id;
             			// Если блок новый, размещаем его на текущей странице

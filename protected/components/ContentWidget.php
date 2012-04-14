@@ -24,7 +24,7 @@ class ContentWidget extends CWidget
     public function templates()
     {
         return array(
-            'main' => Yii::t('cms', 'Template'),
+            'main' => Yii::t('cms', 'Main template'),
         );
     }
 
@@ -39,6 +39,7 @@ class ContentWidget extends CWidget
         unset($get['alias'],$get['pageId'],$get['url'],$get['language']);
         $this->params['getParams'] = http_build_query($get);
         $this->params['user'] = Yii::app()->user->data;
+        $this->params['templateType'] = 'main';
         $this->params['page'] = Yii::app()->page->model;
         $this->params['editMode'] = !Yii::app()->user->isGuest;
         $this->params['settings']['global'] = Yii::app()->settings->model->getAttributes();
@@ -135,16 +136,22 @@ class ContentWidget extends CWidget
         $this->params['content'] = $this->content->attributes;
 
         $aliases = array();
-        $template = $this->params['widget']->template
-                        ? basename($this->params['widget']->template)
+        $template = $this->params['widget']->template[$this->params['templateType']]
+                        ? basename($this->params['widget']->template[$this->params['templateType']])
                         : Yii::app()->settings->getValue($className.'.template');
+        if ($this->params['widget']->template[$this->params['templateType']]) {
+            $template = basename($this->params['widget']->template[$this->params['templateType']]);
+        } else {
+            $tpl = Yii::app()->settings->getValue($className.'.template');
+            $template = $tpl[$this->params['templateType']];
+        }
 
         $dirs = $this->content->getTemplateDirAliases($className);
         if ($template)
             foreach ($dirs as $s)
-                $aliases[] = $s . '.'. $template;
+                $aliases[] = $s . '.'. $this->params['templateType'].'-'.$template;
         foreach ($dirs as $s)
-            $aliases[] = $s . '.main-default';
+            $aliases[] = $s . '.'.$this->params['templateType'].'-default';
 
         foreach ($aliases as $a) {
             if (Yii::app()->controller->getViewFile($a)!==false) {

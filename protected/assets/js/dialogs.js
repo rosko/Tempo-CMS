@@ -20,6 +20,9 @@ function cmsOpenDialog(content, options) {
     if (options.simpleClose == undefined) {
         options.simpleClose = true;
     }
+    if (options.width == undefined) {
+//        options.width = Math.max(Math.ceil($('body').width()*0.8),900);
+    }
     if (options.buttons == undefined) {
         options.buttons = {};
         $(content).find('input[type=submit]').each(function() {

@@ -62,7 +62,7 @@ class ModelText extends ContentModel
 					'type'=>'ComboBox',
 					'showAllValues' => true,
                     'canEdit' => true,
-				)*/
+				),*/
 			),
 		);
 	}

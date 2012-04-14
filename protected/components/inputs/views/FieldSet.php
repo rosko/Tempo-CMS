@@ -205,8 +205,8 @@ function checkHeight<?=$id?>(t) {
     if (!tab.length) {
         tab = $(t).parents('form:eq(0)');
     }
-    if ($(tab).height() > $(window).height()*0.65) {
-        $(tab).height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
+    if ($(tab).height() > $(window).height()*0.7) {
+        $(tab).height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
     } else {
         $(tab).height('auto');
     }

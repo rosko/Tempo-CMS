@@ -265,6 +265,12 @@ function cmsAjaxSubmitForm(form, data, hasError, events)
         $('#'+form.attr('id')+' .errorMessage').hide().html('');
         $('#'+form.attr('id')+' .row').removeClass('error');
         $.each(data, function(i,item){
+            var classList =$('#'+i.replace('.','\\.')).parent('.row:eq(0)').attr('class').split(/\s+/);
+            $.each( classList, function(index, className){
+                if (className.slice(0,6) === 'field_') {
+                    $('#'+form.attr('id')+' .cms-form-langswitcher a[rel="'+className+'"]').click();
+                }
+            });
             $('#'+i.replace('.','\\.')+'_em_').show().html(item.toString());
             $('#'+i.replace('.','\\.')).parent('.row:eq(0)').addClass('error');
             $('#'+i.replace('.','\\.')).parentsUntil('#'+form.attr('id')).each(function() {
@@ -332,7 +338,6 @@ function cmsPageWidgetEditForm(t)
         pageWidget: pageWidget,
         pageWidgetId: pageWidgetId,
         simpleClose: false,
-        width: 830,
         onClose: function() {
             cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+pageWidget.attr('rev')+']');
         }

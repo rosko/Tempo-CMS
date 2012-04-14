@@ -58,7 +58,7 @@ class I18nActiveRecord extends ActiveRecord
         $lang = substr($name,0,2);
         $langs = self::getLangs();
         if (in_array($lang, array_keys($langs))) {
-            return $this->getAttributeLabel(substr($name,3)) . ' [' . Yii::t('languages', $langs[$lang]) . ']';
+            return $this->getAttributeLabel(substr($name,3));// . ' [' . Yii::t('languages', $langs[$lang]) . ']';
         } else {
             return parent::generateAttributeLabel($name);
         }

@@ -1,14 +1,6 @@
 <?php
 $cs = Yii::app()->getClientScript();
 
-if ($showTitle === false) {
-    $js = "$('#{$form->uniqueId} .field_title').hide();";
-    $cs->registerScript('hide_title', $js, CClientScript::POS_READY);
-} else {
-    $js = "$('#{$form->uniqueId} .field_title').prependTo('#{$form->uniqueId} .ui-tabs-panel:eq(0)')";
-    $cs->registerScript('move_title', $js, CClientScript::POS_READY);
-}
-
 if (get_class($form->model)=='Page') {
     $js = '';
     if ($form->model->id != 1) {
@@ -59,6 +51,22 @@ JS;
         }
     }
     $cs->registerScript('page_js', $js, CClientScript::POS_READY);
+
+} else {
+
+    if ($showTitle === false) {
+        $js = "$('#{$form->uniqueId} .field_title').hide();";
+        $cs->registerScript('hide_title', $js, CClientScript::POS_READY);
+    } else {
+        $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+        if (empty($langs)) {
+            $js = "$('#{$form->uniqueId} .field_title').prependTo('#{$form->uniqueId} .ui-tabs-panel:eq(0)')";
+        } else {
+            $js = "$('#{$form->uniqueId}_field_title').prependTo('#{$form->uniqueId} .ui-tabs-panel:eq(0)')";
+        }
+        $cs->registerScript('move_title', $js, CClientScript::POS_READY);
+    }
+
 }
 
 $js = '';
@@ -81,8 +89,8 @@ JS;
 
 $js .= <<<JS
     if (!$('#{$form->uniqueId} .ui-tabs-panel').length) {
-        if ($('#{$form->uniqueId}').height() > $(window).height()*0.65) {
-            $('#{$form->uniqueId}').height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
+        if ($('#{$form->uniqueId}').height() > $(window).height()*0.7) {
+            $('#{$form->uniqueId}').height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
         }
     }
 
@@ -91,7 +99,7 @@ JS;
 if ($js)
     $cs->registerScript('form', $js, CClientScript::POS_READY);
 ?>
-<div class="form" id="<?=$form->uniqueId?>">
+<div class="cms-form" id="<?=$form->uniqueId?>">
 <?php if ($caption) { ?>
     <div class="cms-caption">
         <span class="cms-icon-big-<?=$caption['icon']?> cms-icon"></span>

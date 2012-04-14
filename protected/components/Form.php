@@ -27,33 +27,65 @@ class Form extends CForm
         $(function() {
 HTML;
         if (is_subclass_of($className, 'I18nActiveRecord')) {
-            $langs = array_keys(call_user_func(array($className, 'getLangs'), Yii::app()->language));
+            $langs = call_user_func(array($className, 'getLangs'), Yii::app()->language);
+            $allLangs = call_user_func(array($className, 'getLangs'));
             if (!empty($langs)) {
                 foreach ($this->_config['elements'] as $k => $v) {
                     if (in_array($k, call_user_func(array($className, 'i18n'))) && is_array($v)) {
-                        $txtButton = Yii::t('languages', 'Translations');
+                        $txtButton = Yii::t('languages', $allLangs[Yii::app()->language]);
                         $js .= <<<JS
-    //$('<br />').appendTo('#{$this->uniqueId} .field_{$k}');
-    button = $('<span></span>').button({
-        text: false,
-        label: '{$txtButton}',
-        icons: {
-            primary: 'ui-icon-script'
-        }
-    }).appendTo('#{$this->uniqueId} .field_{$k}');
-    fieldset = $('<fieldset></fieldset>')
+    fieldset = $('<div></div>')
         .attr('id', '{$this->uniqueId}_field_{$k}')
-        .css('display', 'none')
-        .appendTo('#{$this->uniqueId} .field_{$k}');
-    button.click(function() {
-        $('#{$this->uniqueId}_field_{$k}').slideToggle();
-    });
+        .insertBefore('#{$this->uniqueId} .field_{$k}');
+    langbuttons = $('<span>[</span>')
+        .attr('id', '{$this->uniqueId}_langbuttons_{$k}')
+        .addClass('cms-form-langswitcher')
+        .appendTo(fieldset);
+
+    $('#{$this->uniqueId} .field_{$k}').appendTo(fieldset);
+    button = $('<a href="#"></a>')
+        .text('{$txtButton}')
+        .addClass('cms-form-langswitcher-active')
+        .attr('rel', 'field_{$k}')
+        .click(function(){
+            $('#{$this->uniqueId}_field_{$k}').find('div.row').hide();
+            $('#{$this->uniqueId} .field_{$k}').show();
+            $('#{$this->uniqueId}_langbuttons_{$k} a').removeClass('cms-form-langswitcher-active');
+            $(this).addClass('cms-form-langswitcher-active');
+            $('#{$this->uniqueId}_langbuttons_{$k}').appendTo('#{$this->uniqueId} .field_{$k} label');
+            return false;
+        })
+        .appendTo(langbuttons);
+    $('#{$this->uniqueId}_langbuttons_{$k}').appendTo('#{$this->uniqueId} .field_{$k} label');
+
     
 JS;
-                        foreach ($langs as $lang) {
-                            $this->getElements()->add($lang.'_'.$k, $v);
-                            $js .= "$('#{$this->uniqueId} .field_{$lang}_{$k}').appendTo(fieldset);\n";
+                        foreach ($langs as $langId => $langName) {
+                            $this->getElements()->add($langId.'_'.$k, $v);
+                            $txtButton = Yii::t('languages', $langName);
+                            $js .= <<<JS
+
+    $('#{$this->uniqueId} .field_{$langId}_{$k}').hide().appendTo(fieldset);
+    button = $('<a href="#"></a>')
+        .text('{$txtButton}')
+        .attr('rel', 'field_{$langId}_{$k}')
+        .click(function(){
+            $('#{$this->uniqueId}_field_{$k}').find('div.row').hide();
+            $('#{$this->uniqueId} .field_{$langId}_{$k}').show();
+            $('#{$this->uniqueId}_langbuttons_{$k} a').removeClass('cms-form-langswitcher-active');
+            $(this).addClass('cms-form-langswitcher-active');
+            $('#{$this->uniqueId}_langbuttons_{$k}').appendTo('#{$this->uniqueId} .field_{$langId}_{$k} label');
+            return false;
+        })
+        .appendTo(langbuttons);
+
+JS;
                         }
+
+                        $js .= <<<JS
+    langbuttons.append(']');
+JS;
+
                     }
                 }
             }
@@ -156,8 +188,8 @@ JS;
 				}
 			},
             show: function(event, ui) {
-                if ($(ui.panel).height() > $(window).height()*0.65) {
-                    $(ui.panel).height(Math.ceil($(window).height()*0.65)).css({'overflow-y':'auto'});
+                if ($(ui.panel).height() > $(window).height()*0.7) {
+                    $(ui.panel).height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
                 }
             }
         });

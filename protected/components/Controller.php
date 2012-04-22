@@ -10,6 +10,9 @@ class Controller extends CController
             Yii::app()->end();
         }
 
+        ini_set('mbstring.internal_encoding', 'UTF-8');
+        ini_set('mbstring.func_overload', 2);
+
         if (Yii::app()->settings->getValue('timezone')) {
             $timezone = Yii::app()->settings->getValue('timezone');
             if (Yii::app()->user->data && Yii::app()->user->data->timezone) {

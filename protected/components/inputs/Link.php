@@ -34,7 +34,7 @@ class Link extends CInputWidget
                 echo CHtml::textField($name,$this->value,$this->htmlOptions);
         if ($this->showFileManagerButton)
         {
-            print "</li><li>" . Yii::t('cms', 'or') . " ";
+            echo "</li><li>" . Yii::t('cms', 'or') . " ";
             echo CHtml::button(Yii::t('cms', 'Browse uploaded'), array(
                 'id' => $this->htmlOptions['id'] . '_button',
                 'class' => 'cms-button',
@@ -42,18 +42,18 @@ class Link extends CInputWidget
         }
         if ($this->showUploadButton)
         {
-            print "</li><li>" . Yii::t('cms', 'or') . " <div id='".$this->htmlOptions['id']."_file'></div>";
+            echo "</li><li>" . Yii::t('cms', 'or') . " <div id='".$this->htmlOptions['id']."_file'></div>";
         }
         if ($this->showPageSelectButton)
         {
-            print "</li><li>" . Yii::t('cms', 'or') . " " . Yii::t('cms', 'Select page') . "<br />";
+            echo "</li><li>" . Yii::t('cms', 'or') . " " . Yii::t('cms', 'Select page') . "<br />";
             $this->widget('PageSelect', array(
                 'textLinkId' => $this->htmlOptions['id'],
                 'name' => 'PageSelect',
                 'id' => $this->htmlOptions['id'] . '_PageSelect'
             ));
         }
-        print "</li></ul>";
+        echo "</li></ul>";
         
         
     }
@@ -64,15 +64,15 @@ class Link extends CInputWidget
         $extensions = CJavaScript::jsonEncode($this->extensions);
         $cs=Yii::app()->getClientScript();
         $am=Yii::app()->getAssetManager();
-        $fckeditorPath = $am->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
         $js = '';
         if ($this->showFileManagerButton)
         {
+            $_ext = implode(',', $this->extensions);
             $js .= <<<JS
 
 $('#{$id}_button').click(function() {
-	var url = '{$fckeditorPath}/editor/plugins/imglib/index.html#returnto={$id}';
-	window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
+	var url = '/?r=files/manager&extensions={$_ext}&returnto={$id}';
+	window.open( url, 'imglib','width=1050, height=550, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
 });
 $('#{$id}').dblclick(function() {
     $('#{$id}_button').click();
@@ -82,6 +82,7 @@ JS;
 
         if ($this->showUploadButton)
         {
+            /*
             $fileuploaderPath = $am->publish(Yii::getPathOfAlias('application.vendors.file-uploader'));
             $cs->registerCssFile($fileuploaderPath.'/client/fileuploader.css');
             $cs->registerScriptFile($fileuploaderPath.'/client/jquery.fileuploader.js');
@@ -96,7 +97,7 @@ JS;
             $js .= <<<JS
 var uploader = new qq.FileUploader({
     element: $('#{$id}_file')[0],
-    action: '{$fileuploaderPath}/server/php.php',
+    action: '/?r=files/manager&cmd=upload&datedir=1',
     allowedExtensions: {$extensions},
     template: '<div class="qq-uploader">' + 
                 '<div class="cms-drop-area {$id}_drop"><span>{$txtDragHere}</span></div>' +
@@ -142,7 +143,16 @@ var uploader = new qq.FileUploader({
     }
 });    
 JS;
-            
+*/
+            $elfinderPath = $am->publish(Yii::getPathOfAlias('application.vendors.elfinder2'));
+
+            $cs->registerCssFile($elfinderPath.'/css/elfinder.min.css', 'screen');
+            $cs->registerScriptFile($elfinderPath.'/js/elfinder.min.js');
+            $cs->registerCssFile($elfinderPath.'/css/theme.css', 'screen');
+
+            $csrfTokenName = Yii::app()->getRequest()->csrfTokenName;
+            $csrfToken = Yii::app()->getRequest()->getCsrfToken();
+
         }
 
         if ($this->onChange !== null) {

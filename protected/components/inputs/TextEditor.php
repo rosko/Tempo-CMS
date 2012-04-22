@@ -6,7 +6,7 @@ class TextEditor extends CInputWidget
     public $toolbarSet = 'CMS';
     public $config = array();
     public $skin = 'default';
-    public $width = 800;
+    public $width = 850;
     public $height = 400;
 
     public function run()
@@ -164,13 +164,19 @@ JS;
             'forceSimpleAmpersand'=>true,
             'width'=>$this->width,
             'height'=>$this->height,
+            'filebrowserBrowseUrl' => '/?r=files/manager&mode=file',
+            'filebrowserImageBrowseUrl' => '/?r=files/manager&mode=image',
+            'filebrowserFlashBrowseUrl' => '/?r=files/manager&mode=flash',
+            //'filebrowserUploadUrl' => '/?r=files/manager&mode=file',
+            //'filebrowserImageUploadUrl' => '/?r=files/manager&mode=image',
+            //'filebrowserFlashUploadUrl' => '/?r=files/manager&mode=flash',
             'toolbar'=>'Full',
             'toolbar_Basic'=>"js:[
 ['Bold','Italic','Strike','-','Subscript','Superscript','-',
 'NumberedList','BulletedList','-',
 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 ['Undo','Redo','-','RemoveFormat','-',
-'Link','Unlink','-','Table','-','Paste','PasteText','PasteFromWord','-',
+'Image','-','Link','Unlink','-','Table','-','Paste','PasteText','PasteFromWord','-',
 'TextColor','Outdent','Indent','Blockquote','-','Source']
 ]",
 

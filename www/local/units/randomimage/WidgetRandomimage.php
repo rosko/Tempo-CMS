@@ -31,6 +31,18 @@ class WidgetRandomimage extends ContentWidget
     public function init()
     {
         parent::init();
-        $this->params['image'] = $this->params['content']->images[rand(0,count($this->params['content']->images)-1)];
+        $keys = array_keys($this->params['content']->images);
+        $image = $this->params['content']->images[$keys[rand(0,count($keys)-1)]];
+        $image['filename'] = ImageHelper::resizeDown(
+            $image['filename'],
+            $this->params['content']->width,
+            $this->params['content']->height
+        );
+        $this->params['image'] = $image;
+        if (isset($image['data'][Yii::app()->language.'_caption'])) {
+            $this->params['caption'] = $image['data'][Yii::app()->language.'_caption'];
+        } else {
+            $this->params['caption'] = $this->params['widget']->title;
+        }
     }
 }

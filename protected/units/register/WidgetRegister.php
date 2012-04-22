@@ -43,8 +43,9 @@ class WidgetRegister extends ContentWidget
     public function init()
     {
         parent::init();
-        if (isset($_GET[$this->urlParam('do')])) {
-            $this->params['doParam'] = $_GET[$this->urlParam('do')];
+
+        if (Yii::app()->request->getQuery($this->urlParam('do')) !== null) {
+            $this->params['doParam'] = Yii::app()->request->getQuery($this->urlParam('do'));
         }
 
         if (($this->params['isGuest'] || $this->params['editMode']) && $this->params['doParam']!='edit') {
@@ -54,7 +55,7 @@ class WidgetRegister extends ContentWidget
             $this->params['formElements'] = $makeForm['elements'];
             $this->params['formRules'] = $makeForm['rules'];
             
-            if(isset($_REQUEST['ajax-validate']))
+            if(Yii::app()->request->getParam('ajax-validate') !== null)
             {
                 echo CActiveForm::validate($model);
                 Yii::app()->end();
@@ -67,10 +68,10 @@ class WidgetRegister extends ContentWidget
                     $this->params['justRegistered'] = true;
                 }
             }
-            if ($_REQUEST['authcode']) {
-                $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
+            if (Yii::app()->request->getParam('authocode')) {
+                $user = User::model()->find('`authcode`=:authcode', array('authcode' => Yii::app()->request->getParam('authocode')));
                 if ($user) {
-                    $identity = new AuthCodeIdentity($_REQUEST['authcode']);
+                    $identity = new AuthCodeIdentity(Yii::app()->request->getParam('authocode'));
                     $identity->authenticate();
                     if($identity->errorCode===UserIdentity::ERROR_NONE) {
                         Yii::app()->user->login($identity);
@@ -123,14 +124,14 @@ class WidgetRegister extends ContentWidget
                     $this->params['profileWidgetUrl'] = $profileModel->getWidgetUrl();
                     $this->params['profileWidgetUrlParams'] = $profileWidget->urlParam('view').'='.$this->params['user']->id;
 
-                if(isset($_REQUEST['ajax-validate']))
+                if(Yii::app()->request->getParam('ajax-validate') !== null)
                 {
                     echo CActiveForm::validate($this->params['user']);
                     Yii::app()->end();
                 }
-                if(isset($_POST['User']))
+                if (Yii::app()->request->getPost('User') !== null)
                 {
-                    $this->params['user']->attributes=$_POST['User'];
+                    $this->params['user']->attributes = Yii::app()->request->getPost('User');
                     if ($this->params['user']->save()) {
                         Yii::app()->user->setFlash('save-permanent', Yii::t('UnitRegister.main','Profile edited successfully'));
                         Yii::app()->controller->refresh();
@@ -143,14 +144,14 @@ class WidgetRegister extends ContentWidget
     
     protected function proccessRequest($model=null)
     {
-        if(isset($_POST['User']))
+        if (Yii::app()->request->getPost('User') !== null)
 		{
             if (!$model) {
                 $model = new User('register');
                 $model->makeForm('register', $this->params['content']->fields, $this->params['content']->fields_req);
             }
             $tpldata = array();
-			$model->attributes=$_POST['User'];
+			$model->attributes = Yii::app()->request->getPost('User');
             if ($model->password == '') {
                 $model->password = $model->password_repeat = $tpldata['generatedPassword'] = User::generatePassword();
                 $model->askfill = true;

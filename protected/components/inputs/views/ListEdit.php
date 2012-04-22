@@ -38,12 +38,12 @@ $('#<?=$id?>_fields').find('.ListEdit_field_toggleoptions').die('click').live('c
     options = $(this).parents('.ListEdit_field:eq(0)').find('.ListEdit_field_options');
     if (options.css('display')=='none') {
         options.slideDown('normal', function() {
-            checkHeight<?=$id?>(this);
+            cmsDialogResize(this);
         });
         $(this).text('<?=Yii::t('cms', 'Hide translates')?>');
     } else {
         options.slideUp('normal', function() {
-            checkHeight<?=$id?>(this);
+            cmsDialogResize(this);
         });
         $(this).text('<?=Yii::t('cms', 'Show translates')?>');
     }
@@ -53,7 +53,7 @@ $('#<?=$id?>_fields').find('.ListEdit_field_toggleoptions').die('click').live('c
 $('#<?=$id?>_fields').find('.ListEdit_field_delete').die('click').live('click', function(){
     $(this).parents('.ListEdit_field:eq(0)').fadeOut('normal', function(){
         $(this).remove();
-        checkHeight<?=$id?>(this);
+        cmsDialogResize(this);
     });
     return false;
 });
@@ -67,7 +67,7 @@ $('#<?=$id?>_additem').click(function(){
     field.html(field.html().replace(new RegExp(s, 'gm'), '<?=$name?>['+num+']'));
 
     field.appendTo('#<?=$id?>_fields');
-    checkHeight<?=$id?>(this);
+    cmsDialogResize(this);
     return false;
 });
 
@@ -79,15 +79,4 @@ function getMaxNum<?=$id?>() {
     return max;
 }
 
-function checkHeight<?=$id?>(t) {
-    tab = $(t).parents('.ui-tabs-panel:eq(0)');
-    if (!tab.length) {
-        tab = $(t).parents('form:eq(0)');
-    }
-    if ($(tab).height() > $(window).height()*0.7) {
-        $(tab).height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
-    } else {
-        $(tab).height('auto');
-    }
-}
 </script>

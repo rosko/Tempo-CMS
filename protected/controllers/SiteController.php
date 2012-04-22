@@ -70,14 +70,15 @@ class SiteController extends Controller
     public function actionFeed($type='rss')
     {
         header('Content-Type: application/rss+xml');
-        if (isset($_GET['model'])) {
-            $modelClass = 'Model'.$_GET['model'];
+        if (Yii::app()->request->getQuery('model') !== null) {
+            $modelClass = 'Model'.ucfirst(Yii::app()->request->getQuery('model'));
             ContentUnit::loadUnits();
-            if (!FeedHelper::isFeedPresent($modelClass, !isset($_GET['id'])))
+            if (!FeedHelper::isFeedPresent($modelClass, Yii::app()->request->getQuery('id')===null))
                 throw new CHttpException(404,Yii::t('cms', 'The requested page does not exist.'));
 
             // Фид определенного раздела
-            if (isset($_GET['id']) && ($content = call_user_func(array($modelClass, 'model'))->findByPk(intval($_GET['id']))))
+            if ((Yii::app()->request->getQuery('id') !== null)
+                && ($content = call_user_func(array($modelClass, 'model'))->findByPk(intval(Yii::app()->request->getQuery('id')))))
             {
                 FeedHelper::renderFeed($type, $content);
             // Фид всех записей этого типа

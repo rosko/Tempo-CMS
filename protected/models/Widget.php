@@ -2,6 +2,8 @@
 
 class Widget extends I18nActiveRecord
 {
+    protected $_widgetPage;
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -153,13 +155,16 @@ class Widget extends I18nActiveRecord
      */
     public function getWidgetPageArray()
     {
-        $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageWidget::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.widget_id = :widget_id ORDER BY pu.id LIMIT 1';
-        $command = Yii::app()->db->createCommand($sql);
-        $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
-        $page = $command->queryRow();
-        $page['alias'] = $page[Yii::app()->language.'_alias'];
-        $page['url'] = $page[Yii::app()->language.'_url'];
-        return $page;
+        if (empty($this->_widgetPage)) {
+            $sql = 'SELECT p.* FROM `'.Page::tableName().'`  as p INNER JOIN `' . PageWidget::tableName() . '` as pu ON pu.page_id = p.id WHERE pu.widget_id = :widget_id ORDER BY pu.id LIMIT 1';
+            $command = Yii::app()->db->createCommand($sql);
+            $command->bindValue(':widget_id', $this->id, PDO::PARAM_INT);
+            $page = $command->queryRow();
+            $page['alias'] = $page[Yii::app()->language.'_alias'];
+            $page['url'] = $page[Yii::app()->language.'_url'];
+            $this->_widgetPage = $page;
+        }
+        return $this->_widgetPage;
     }
 
     /**

@@ -195,3 +195,39 @@ input.cms-w200 {
 .cke_dialog_background_cover {
     display:none;
 }
+
+.cms-filemanager {
+    font-size:1.5em !important;
+}
+.cms-filemanager .elfinder-dialog-resize label {
+    display:inline-block;
+}
+
+.cms-filemanager-filename {
+    display:block;
+    padding-right:20px;
+    max-width:300px;
+    vertical-align: middle;
+}
+.cms-filemanager-filesize {
+    display:block;
+    padding-right:20px;
+    max-width:200px;
+    font-weight: normal;
+    vertical-align: middle;
+}
+.cms-filemanager-fileimage {
+    padding:3px 20px 3px 5px;
+    float: left;
+}
+.cms-filemanager-filedelete, .cms-filemanager-fileedit {
+    font-size:2em;
+    text-decoration: none;
+    line-height: 0.9em;
+    vertical-align: middle;
+    float:right;
+    padding-right: 5px;
+}
+.cms-filemanager-fileedit {
+    font-size:1.5em;
+}

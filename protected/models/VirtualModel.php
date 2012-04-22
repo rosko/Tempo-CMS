@@ -24,8 +24,27 @@ class VirtualModel extends CModel
     {
         if (!is_null($config)) {
             if ($format == 'FieldSet') {
-                $inputConfig = $config;
+                $_inputConfig = $config;
+                $inputConfig = array();
                 $config = array();
+                foreach ($_inputConfig as $key => $field) {
+                    if (isset($field['i18n']) && $field['i18n']) {
+                        unset($field['i18n']);
+                        $langs = I18nActiveRecord::getLangs();
+                        foreach ($langs as $langId => $langTitle) {
+                            $_field = $field;
+                            if (is_string($_field['label']) && $_field['label'])
+                                $_field['label'] .= ' [' . Yii::t('languages', $langTitle) . ']';
+                            if (is_string($_field['hint']) && $_field['hint'])
+                                    $_field['hint'] .= ' [' . Yii::t('languages', $langTitle) . ']';
+                            $_field['name'] = $langId . '_' . $_field['name'];
+                            $inputConfig[] = $_field;
+                        }
+                    } else {
+                        $inputConfig[] = $field;
+                    }
+                }
+
                 foreach ($inputConfig as $key => $field) {
 
                     $name = $field['name'];
@@ -33,8 +52,10 @@ class VirtualModel extends CModel
                     if (isset($default[$name]))
                         $field['default'] = $default[$name];
 
-                    $field['label'] = $field['label'][Yii::app()->language];
-                    $field['hint'] = $field['hint'][Yii::app()->language];
+                    if (is_array($field['label']))
+                        $field['label'] = $field['label'][Yii::app()->language];
+                    if (is_array($field['hint']))
+                        $field['hint'] = $field['hint'][Yii::app()->language];
 
                     if (isset($field['rules'])) foreach ($field['rules'] as $i => $rule) {
                         array_unshift($rule, $name);

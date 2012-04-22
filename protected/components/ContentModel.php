@@ -15,40 +15,6 @@ class ContentModel extends I18nActiveRecord
         );
     }
 
-    /**
-     * Возвращает максимальное допустимое количество экземпляров данной модели
-     * -1 - ни одного нельзя
-     * 0 - без ограничений
-     * >0 - конкретное ограничение
-     *
-     * @return int
-     */
-    public function maxLimit()
-    {
-        return 0;
-    }
-
-    public function isMaxLimitReached()
-    {
-        if ($this->maxLimit() < 0) {
-            return true;
-        } elseif ($this->maxLimit() > 0) {
-            $count = Yii::app()->db->createCommand('SELECT count(*) FROM `' . $this->tableName() . '`')->queryScalar();
-            return $count >= $this->maxLimit();
-        } else {
-            return false;
-        }
-    }
-
-    public function beforeSave()
-    {
-        if ($this->isNewRecord && $this->isMaxLimitReached()) {
-            return false;
-        }
-        return parent::beforeSave();
-
-    }
-
     public function selectPage($number, $per_page=0)
     {
         if ($per_page<1)
@@ -129,7 +95,9 @@ class ContentModel extends I18nActiveRecord
                 if ($repl == $t[0]) {
                     $repl = str_ireplace('<'.$vars['tag'], '<'.$vars['tag'].' height="'.intval($vars['height']).'"', $repl);
                 }
-                $content->{$vars['attribute']} = substr($html, 0, $t[1]) . str_replace($source, $repl, substr($html, $t[1], strlen($repl))) . substr($html, $t[1]+strlen($repl));
+                $repl = preg_replace("/width:[\s]+?([\d]*)px/msi", 'width: '.intval($vars['width']).'px', $repl);
+                $repl = preg_replace("/height:[\s]+?([\d]*)px/msi", 'height: '.intval($vars['height']).'px', $repl);
+                $content->{$vars['attribute']} = substr($html, 0, $t[1]) . str_replace($source, $repl, substr($html, $t[1], strlen($source))) . substr($html, $t[1]+strlen($source));
             }
             echo $widget->save() && $content->save();
         }

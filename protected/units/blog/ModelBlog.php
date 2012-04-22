@@ -73,16 +73,7 @@ class ModelBlog extends ContentModel
                     'type'=>'RecordsGrid',
                     'className' => 'ModelBlog_Entry',
                     'foreignAttribute' => 'blog_id',
-                    'addButtonTitle'=>Yii::t('UnitBlog.main', 'Create entry'),
-                    'columns' => array(
-                        array(
-                            'name'=>'title',
-                            'type'=>'raw',
-                            'value'=> 'CHtml::link(CHtml::encode($data->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', 0, \'".$this->grid->id."\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
-                        ),
-                        'date',
-                    ),
-                    'order' => 'date DESC',
+                    'addButtonTitle' => Yii::t('UnitBlog.main', 'Create entry'),
                 ),
                 Form::tab(Yii::t('UnitBlog.main', 'Settings')),
 				'per_page'=>array(
@@ -100,10 +91,10 @@ class ModelBlog extends ContentModel
     public function feed()
     {
         return array(
-            'title'=>null, // тогда используется widget->title
-            'description'=>null, // тогда используется widget->title
-            'author'=>null, // тогда не используется, а можно указать имя поля с id автора (User)
-            'items'=>array(
+            'title' => null, // тогда используется widget->title
+            'description' => null, // тогда используется widget->title
+            'author' => null, // тогда не используется, а можно указать имя поля с id автора (User)
+            'items' => array(
                 'ModelBlog_Entry',
                 'condition'=>'`blog_id` = :id AND `date` <= NOW()',
                 'order'=>'`date` DESC',
@@ -117,7 +108,6 @@ class ModelBlog extends ContentModel
         return array(
             'widget_id' => 'integer unsigned',
             'per_page' => 'integer unsigned',
-//            'items' => 'integer unsigned',
         );
     }
 

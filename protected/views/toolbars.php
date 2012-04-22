@@ -36,11 +36,11 @@ $menuCssFile = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('appli
                 'title'=>Yii::t('cms', 'Information'),
                 'click' => 'js:function() { return false; }',
             ),
-            'bookmarks'=>array(
+/*            'bookmarks'=>array(
                 'icon' => 'bookmark',
                 'title'=>Yii::t('cms', 'Bookmarks'),
                 'click' => 'js:function() { return false; }',
-            ),
+            ),*/
             'system'=>array(
                 'icon' => 'system',
                 'title'=>Yii::t('cms', 'System'),
@@ -123,11 +123,91 @@ JS
 
         ),
 
-    )
-);
+    ));
 
+    $buttons = array(
+        'filemanager' => array(
+            'icon' => 'files',
+            'title' => Yii::t('cms', 'File manager'),
+            'click' => 'js:function()'.<<<JS
+{
+                    cmsLoadDialog('/?r=files/manager&language={$language}', {
+                        simpleClose: false,
+                        onClose: function() {
+                            $('.elfinder-quicklook').remove();
+                        },
+                        onOpen: function(t) {
+                            cmsDialogResize(t);
+                        }
+                    });
+                    return false;
+                }
+JS
+        ),
+    );
+    $units = ContentUnit::getInstalledUnits(true);
+    $modelToolbars = '';
+    foreach ($units as $unitClassName => $unitName) {
+        $widgets = call_user_func(array($unitClassName, 'widgets'));
+        $models = array();
+        foreach ($widgets as $widgetClassName) {
+            $models[] = call_user_func(array($widgetClassName, 'modelClassName'));
+        }
+        $models = array_diff(call_user_func(array($unitClassName, 'models')), $models);
+        foreach ($models as $modelClassName) {
 
-    $fckeditorPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.vendors.fckeditor'));
+            $buttons[$modelClassName] = array(
+                'icon' => 'data',
+                'title' => call_user_func(array($modelClassName, 'modelName')),
+                'click' => 'js:function()'. <<<JS
+{
+                        cmsLoadDialog('/?r=records/list&className={$modelClassName}&language={$language}');
+                        return false;
+}
+JS
+            );
+            $modelToolbars .= $this->widget('Toolbar', array(
+                    'id' => 'info_'.$modelClassName,
+                    'cssClass' => $menuCssClass,
+                    'cssFile' => $menuCssFile,
+                    'location' => array(
+                        'selector' => '#info_menu_'.$modelClassName.'_li',
+                        'position' => array('outter', 'right', 'top'),
+                        'show' => 'hover',
+                        'draggable' => false,
+                    ),
+                    'iconSize' => 'small',
+                    'showTitles' => true,
+                    'vertical' => true,
+                    'rows' => 1,
+                    'dblclick' => 'js:function() { return false; }',
+                    'buttons' => array(
+                        'add' => array(
+                            'icon' => 'add',
+                            'title' => Yii::t('cms', 'Add'),
+                            'click' => 'js:function()'. <<<JS
+{
+                                    cmsRecordEditForm(0, '{$modelClassName}', 0);
+                                    return false;
+}
+JS
+                        ),
+                        'list' => array(
+                            'icon' => 'list',
+                            'title' => Yii::t('cms', 'List all'),
+                            'click' => 'js:function()'. <<<JS
+{
+                                    cmsLoadDialog('/?r=records/list&className={$modelClassName}&language={$language}');
+                                    return false;
+}
+JS
+                        ),
+                    ),
+                ), true
+            );
+        }
+    }
+
     $this->widget('Toolbar', array(
         'id' => 'info_menu',
         'cssClass'=>$menuCssClass,
@@ -145,22 +225,11 @@ JS
         'vertical'=>true,
         'rows'=>1,
         'dblclick' => 'js:function() { return false; }',
-        'buttons'=>array(
-            'filemanager' => array(
-                'icon' => 'files',
-                'title' => Yii::t('cms', 'File manager'),
-                'click' => 'js:function()'.<<<JS
-{
-            var url = '{$fckeditorPath}/editor/plugins/imglib/index.html';
-            window.open( url, 'imglib','width=800, height=600, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
-                    return false;
-                }
-JS
-            ),
-        ),
+        'buttons' => $buttons,
 
     ));
-
+    echo $modelToolbars;
+/*
     $this->widget('Toolbar', array(
         'id' => 'bookmarks_menu',
         'cssClass'=>$menuCssClass,
@@ -182,7 +251,7 @@ JS
         ),
 
     ));
-
+*/
     $this->widget('Toolbar', array(
         'id' => 'system_menu',
         'cssClass'=>$menuCssClass,
@@ -231,7 +300,7 @@ JS
                 'title' => Yii::t('cms', 'Users'),
                 'click' => 'js:function()'.<<<JS
  {
-    cmsLoadDialog('/?r=user/index&language={$language}', {
+    cmsLoadDialog('/?r=records/list&className=User&language={$language}', {
         simpleClose: true
     });
     return false;
@@ -317,6 +386,16 @@ JS
                     'click' => 'js:function()'.<<<JS
  {
     var pageWidget = $(this).parents('.cms-pagewidget').eq(0);
+    if (pageWidget.data('editParams')) {
+        if (pageWidget.data('editParams').modelClass && pageWidget.data('editParams').recordId) {
+            cmsRecordEditForm(
+                pageWidget.data('editParams').recordId,
+                pageWidget.data('editParams').modelClass,
+                pageWidget.attr('rev'),
+                null);
+            return false;
+        }
+    }
     cmsPageWidgetEditForm(pageWidget);
     return false;
 }

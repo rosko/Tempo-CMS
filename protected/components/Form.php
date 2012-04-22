@@ -188,9 +188,7 @@ JS;
 				}
 			},
             show: function(event, ui) {
-                if ($(ui.panel).height() > $(window).height()*0.7) {
-                    $(ui.panel).height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
-                }
+                cmsDialogResize(ui.panel);
             }
         });
 JS;

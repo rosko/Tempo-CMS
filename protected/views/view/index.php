@@ -239,7 +239,6 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
         $i = 0;
         foreach ($units as $unit) {
             $i++;
-            ?><li> <ul><?php
             foreach ($unit['widgets'] as $widget) {
 
                 $modelClassName = call_user_func(array($widget['className'],'modelClassName'));
@@ -250,7 +249,6 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
 
                 }
             }
-            ?></ul></li><?php
             if ($i == ceil($units_count/2)) {
                 ?></ul><ul><?php
             }

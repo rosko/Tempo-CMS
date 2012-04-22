@@ -319,3 +319,34 @@ function cmsStrReplace ( search, replace, subject ) {
 function cmsStrToLower(str) {
     return str.toLowerCase();
 }
+
+function cmsReadableFileSize(size) {
+    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = 0;
+    while(size >= 1024) {
+        size /= 1024;
+        ++i;
+    }
+    return size.toFixed(1) + ' ' + units[i];
+}
+
+function cmsFileBaseName(path) {
+    var parts = path.split( '/' );
+    return parts[parts.length-1];
+}
+
+function cmsFileExtension(filename) {
+    return filename.split('.').pop();
+}
+
+function cmsFileSize(filename, handler) {
+    $.ajax({
+        type: "HEAD",
+        url: filename,
+        complete: function (jqXHR) {
+            if ($.isFunction(handler)) {
+                handler(jqXHR.getResponseHeader("Content-length"));
+            }
+        }
+    });
+}

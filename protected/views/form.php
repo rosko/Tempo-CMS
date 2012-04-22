@@ -89,9 +89,7 @@ JS;
 
 $js .= <<<JS
     if (!$('#{$form->uniqueId} .ui-tabs-panel').length) {
-        if ($('#{$form->uniqueId}').height() > $(window).height()*0.7) {
-            $('#{$form->uniqueId}').height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
-        }
+        cmsDialogResize('#{$form->uniqueId}');
     }
 
 JS;

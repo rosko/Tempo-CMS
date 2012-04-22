@@ -12,6 +12,14 @@ class RecordsGrid extends CInputWidget
     {
         $recordExample = new $this->className;
 
+        if (!$this->order) {
+            if (method_exists($recordExample, 'listDefaultOrder')) {
+                $this->order = call_user_func(array($recordExample, 'listDefaultOrder'));
+            } elseif ($recordExample->hasAttribute('create')) {
+                $this->order = $recordExample->hasAttribute('create') . ' DESc';
+            }
+        }
+
         if ($recordExample->hasAttribute('widget_id')) {
 
             $dataProvider=new CActiveDataProvider($this->className, array(
@@ -40,24 +48,28 @@ class RecordsGrid extends CInputWidget
 
         } else {
 
-            $dataProvider=new CActiveDataProvider($this->className, array(
-                'criteria'=> array(
-                    'condition'=> $this->foreignAttribute . ' = :id',
-                    'params'=>array(
-                        ':id' => $this->model->id
-                    ),
-                ),
+            $config = array(
                 'sort' => array(
                     'defaultOrder' => $this->order,
                 ),
                 'pagination'=> array(
                     'pageSize' => Yii::app()->settings->getValue('defaultsPerPage')
                 ),
-            ));
+            );
+            if ($this->hasModel() && $this->foreignAttribute) {
+                $config['criteria'] = array(
+                    'condition' => $this->foreignAttribute . ' = :id',
+                    'params' => array(
+                        ':id' => $this->model->id
+                    ),
+                );
+
+            }
+            $dataProvider=new CActiveDataProvider($this->className, $config);
 
         }
 
-        if ($this->model) {
+        if ($this->hasModel()) {
             $id = __CLASS__.'_'.get_class($this->model).'_'.$this->model->id;
         } else {
             $id = __CLASS__.$this->className;
@@ -89,17 +101,6 @@ class RecordsGrid extends CInputWidget
 }
 JS
 ,
-            'selectionChanged' => 'js:function(id)'.<<<JS
- {
-    var settings = $.fn.yiiGridView.settings[id];
-    $('#'+id+' .'+settings.tableClass+' > tbody > tr').each(function(i){
-            $(this).find('input[type=checkbox]:eq(0)').attr('checked', $(this).hasClass('cms-selected'));
-    });
-    var sel = $.fn.yiiGridView.getSelection(id);
-    return true;
-}
-JS
-,
             'columns'=> array_merge(
                 array(
                     array(
@@ -107,14 +108,22 @@ JS
                         'id'=>$id.'_check',
                     )
                 ),
-                $recordExample->hasAttribute('widget_id') ? array(
+                method_exists($recordExample, 'listColumns') ? call_user_func(array($recordExample, 'listColumns'))
+                  : ($recordExample->hasAttribute('widget_id') ? array(
                     array(
                         'name'=>'title',
                         'type'=>'raw',
                         'header'=>Yii::t('cms', 'Title'),
                         'value'=> 'CHtml::link(CHtml::encode($data->widget->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'".$data->widget->id."\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
                     ),
-                ) : array(),
+                ) : ($recordExample->hasAttribute(Yii::app()->language.'_title') ? array(
+                    array(
+                        'name'=>'title',
+                        'type'=>'raw',
+                        'header'=>Yii::t('cms', 'Title'),
+                        'value'=> 'CHtml::link(CHtml::encode($data->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', \'0\', \''.$id.'\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
+                    ),
+                ) : array())),
                 $this->columns,
                 array(
                     array(

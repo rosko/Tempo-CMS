@@ -123,7 +123,7 @@ function cmsLoadDialog(url, opts)
             var dlg = $('#cms-dialog').clone().css({'visibility':'hidden'});
             if (opts.className != undefined)
                 dlg.addClass(opts.className)
-            dlg.addClass('cms-dialog')
+            dlg.addClass('cms-dialog');
             dlg.appendTo('body');
             dlg.html(html);
             if (opts.id == undefined) {
@@ -156,3 +156,18 @@ function cmsLoadDialog(url, opts)
 
 }
 
+function cmsDialogResize(elem)
+{
+    $(window).trigger('resize.topbox');
+    var div = $(elem).parents('.ui-tabs-panel:eq(0)');
+    var prc = 0.8;
+    if (!div.length) {
+        div = $(elem).parents('form:eq(0)');
+        prc = 0.7;
+    }
+    if ($(div).height() > $(window).height()*prc) {
+        $(div).height(Math.ceil($(window).height()*prc)).css({'overflow-y':'auto'});
+    } else {
+        $(div).height('');
+    }
+}

@@ -37,7 +37,22 @@ class CSerializeBehavior extends CActiveRecordBehavior {
 	* 
 	* @param CModelEvent event parameter
 	*/
-	public function beforeSave($event) {		
+
+    protected function prepareSerialAttributes()
+    {
+        if (method_exists($this->getOwner(), 'i18n')) {
+            $langs = array_keys(I18nActiveRecord::getLangs(Yii::app()->language));
+            $intersect = array_intersect($this->serialAttributes, $this->getOwner()->i18n());
+            foreach ($intersect as $attribute) {
+                foreach ($langs as $lang) {
+                    $this->serialAttributes[] = $lang.'_'.$attribute;
+                }
+            }
+        }
+    }
+
+	public function beforeSave($event) {
+        $this->prepareSerialAttributes();
         if (count($this->serialAttributes)) {
             foreach($this->serialAttributes as $attribute) {
                 $_att = $this->getOwner()->$attribute;
@@ -64,7 +79,8 @@ class CSerializeBehavior extends CActiveRecordBehavior {
 	 */
 	public function afterSave($event)
 	{
-		if(count($this->serialAttributes)) {
+        $this->prepareSerialAttributes();
+        if(count($this->serialAttributes)) {
 			foreach($this->serialAttributes as $attribute) {
 				$_att = $this->getOwner()->$attribute;
 				if(!empty($_att)
@@ -81,7 +97,8 @@ class CSerializeBehavior extends CActiveRecordBehavior {
 	}
     
     public function afterFind($event)
-    {		
+    {
+        $this->prepareSerialAttributes();
         if(count($this->serialAttributes)) {
             foreach($this->serialAttributes as $attribute) {				
                 $_att = $this->getOwner()->$attribute;

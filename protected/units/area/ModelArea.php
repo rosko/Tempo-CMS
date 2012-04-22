@@ -43,9 +43,9 @@ class ModelArea extends ContentModel
 	{
 		return array(
             'title' => false,
-			'elements'=>array(
-				'items'=>array(
-					'type'=>'AreaEdit',
+			'elements' => array(
+				'items' => array(
+					'type' => 'AreaEdit',
 				),
 			),
 		);
@@ -59,9 +59,23 @@ class ModelArea extends ContentModel
         );
     }
 
-    /*
-     * TODO: Сделать, чтобы при удалении области блоков также удалялись все блоки, которые были внутри области
-     */
+    public function beforeDelete()
+    {
+        $pageWidgets = PageWidget::model()->findAll(array(
+            'condition' => '`area` = :area',
+            'params' => array(
+                'area' => 'widget'.$this->widget->id.'ModelArea_items',
+            ),
+            'with' => array('widget'),
+            'order' => '`order`'
+        ));
+        foreach ($pageWidgets as $pageWidget)
+        {
+            $pageWidget->widget->delete();
+            $pageWidget->delete();
+        }
+        return parent::beforeDelete();
+    }
 
 }
 

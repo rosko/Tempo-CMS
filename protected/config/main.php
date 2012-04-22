@@ -59,6 +59,9 @@ return CMap::mergeArray(array(
 		'errorHandler'=>array(
             'errorAction'=>'site/error',
         ),
+        'format'=>array(
+            'class'=>'Formatter',
+        ),
         'installer'=>array(
             'class'=>'Installer',
         ),
@@ -124,8 +127,8 @@ return CMap::mergeArray(array(
                 "site/logout"=>'site/logout',
                 'widget/edit'=>'widget/edit',
                 'view/widget'=>'view/widget',
+                'records/list' => 'records/list',
                 'filesEditor/save'=>'filesEditor/save',
-                'users'=>'user/index',
 
                 "<language:[A-Za-z-]+>/<alias:{$aliasPattern}>:<pageId:\d+>"=>'view/index',
                 "<alias:{$aliasPattern}>:<pageId:\d+>"=>'view/index',

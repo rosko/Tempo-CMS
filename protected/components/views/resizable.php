@@ -59,7 +59,7 @@
                     'top': '',
                     'left': ''
                 });
-                cmsAjaxSave('/?r=widget/ajax&widgetId=<?=$Widget->id?>', data, 'POST');
+                cmsAjaxSave('/?r=widget/ajax&widgetId=<?=$widget->id?>', data, 'POST');
             }
         }).parent('.ui-wrapper').css({
             'position': 'relative',
@@ -70,8 +70,11 @@
             'z-index':'1'
         });
         $('#cms-pagewidget-<?=$pageWidget->id?>').find('<?=$selector?>').each(function(){
-            if ($(this).attr('align'))
-                $(this).parent('.ui-wrapper').css('float', $(this).attr('align'));
+            var align = '';
+            if ($(this).attr('align')) align = $(this).attr('align');
+            if ($(this).css('float')) align = $(this).css('float');
+            if (align)
+                $(this).parent('.ui-wrapper').css('float', align);
         });
     }
 <?php } ?>

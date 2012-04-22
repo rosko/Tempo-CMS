@@ -21,7 +21,8 @@ class User extends ActiveRecord
 
     public function modelName($language=null)
     {
-        return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
+        return Yii::t('cms', 'Users', array(), null, $language);
+        //return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
     }
 
 	public function tableName()
@@ -487,4 +488,51 @@ class User extends ActiveRecord
     {
         return $this->login . ', ' . $this->email . ', ' . $this->displayname;
     }
+
+    public function listColumns()
+    {
+        return array(
+            'id',
+            'login',
+            'email',
+            'displayname',
+            'active:boolean',
+        );
+    }
+
+    public function listDefaultOrder()
+    {
+        return 'login ASC';
+    }
+
+    public function listOperations()
+    {
+        return array(
+            'block' => array(
+                'title' => Yii::t('cms', 'Block'),
+                'click' => 'js:'.<<<JS
+function(gridId, elem) {
+                    var ids = $.fn.yiiGridView.getSelection(gridId);
+                    cmsAjaxSave('/?r=records/massUpdate&className=User&'+$.param({id: ids})+'&fieldName=active&fieldValue=0', '', 'GET', function(){
+                        $.fn.yiiGridView.update(gridId);
+                    });
+                    return false;
+}
+JS
+            ),
+            'unblock' => array(
+                'title' => Yii::t('cms', 'Unblock'),
+                'click' => 'js:'.<<<JS
+function(gridId, elem) {
+                    var ids = $.fn.yiiGridView.getSelection(gridId);
+                    cmsAjaxSave('/?r=records/massUpdate&className=User&'+$.param({id: ids})+'&fieldName=active&fieldValue=1', '', 'GET', function(){
+                        $.fn.yiiGridView.update(gridId);
+                    });
+                    return false;
+}
+JS
+            ),
+        );
+    }
+
 }

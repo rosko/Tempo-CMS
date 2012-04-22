@@ -10,9 +10,17 @@
     rel="<?=$pageWidget->widget->class?>"
     rev="<?=$pageWidget->widget->id?>"
     content_id="<?=$content->id?>"
+    <?php
+    if (method_exists($widgetClass, 'editParams')) {
+        $params = call_user_func(array($widgetClass, 'editParams'));
+        if (is_array($params)) {
+            echo "data-edit-params='".CJSON::encode($params)."'";
+        }
+    }
+    ?>
 >
 
-    <?=$content->widget($widgetClass, array('pageWidget'=>$pageWidgets));?>
+    <?=$content->widget($widgetClass, array('pageWidget'=>$pageWidget));?>
 </div>
 
     <?php

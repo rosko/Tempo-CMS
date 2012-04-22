@@ -26,10 +26,11 @@ class ModelImage extends ContentModel
 	{
 		return array(
             array('widget_id', 'required', 'on'=>'edit'),
-			array('image, width, height', 'required'),
+			array('width, height', 'required'),
 			array('widget_id, width, height', 'numerical', 'integerOnly'=>true),
-			array('image, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
-            array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8')
+			array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
+            array('target', 'length', 'max'=>50, 'encoding'=>'UTF-8'),
+            array('image', 'safe'),
 		);
 	}
 
@@ -74,13 +75,15 @@ JS;
 		return array(
 			'elements'=>array(
                 Form::tab(Yii::t('UnitImage.main', 'Image')),
-				'image'=>array(
-					'type'=>'Link',
-					'size'=>40,
-					'showPageSelectButton'=>false,
-					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-					'onChange'=> "js:$('#cms-pagewidget-'+pageWidgetId).find('img').attr('src', $(this).val());"
-				),
+                'image' => array(
+                    'type' => 'FileManager',
+                    'width' => 900,
+                    'height' => 350,
+                    'options' => array(
+                        'onlyMimes' => array('image/jpeg', 'image/gif', 'image/png'),
+                    ),
+                ),
+                Form::tab(Yii::t('UnitImage.main', 'Size & link')),
                 Yii::app()->controller->renderPartial($cfg['UnitImage'].'.image.assets.imagesize', compact('className'), true),
 				'width'=>array(
 					'type'=>'Slider',
@@ -110,12 +113,12 @@ JS;
 						'change' => $changeHeight
 					)
 				),
-                Form::tab(Yii::t('UnitImage.main', 'Link')),
 				'url'=>array(
-					'type'=>'Link',
-					'size'=>40,
+					'type'=>'text',
+					'size'=>40,/*
+                    'showPageSelectButton'=>false,
 					'showUploadButton'=>false,
-                    'showFileManagerButton'=>false,
+                    'showFileManagerButton'=>false,*/
 				),
                 'target'=>array(
                     'type'=>'dropdownlist',
@@ -127,12 +130,22 @@ JS;
 			),
 		);
 	}
+
+    public function behaviors()
+    {
+        return array(
+            'CSerializeBehavior' => array(
+                'class' => 'application.behaviors.CSerializeBehavior',
+                'serialAttributes' => array('image'),
+            ),
+        );
+    }
 	
     public function scheme()
     {
         return array(
             'widget_id' => 'integer unsigned',
-            'image' => 'string',
+            'image' => 'text',
             'width' => 'integer unsigned',
             'height' => 'integer unsigned',
             'url' => 'string',

@@ -120,12 +120,12 @@ $('#<?=$id?>_fields').find('.FieldSet_field_toggleoptions').die('click').live('c
     options = $(this).parents('.FieldSet_field:eq(0)').find('.FieldSet_field_options');
     if (options.css('display')=='none') {
         options.slideDown('normal', function() {
-            checkHeight<?=$id?>(this);
+            cmsDialogResize(this);
         });
         $(this).text('<?=Yii::t('cms', 'Hide options')?>');
     } else {
         options.slideUp('normal', function() {
-            checkHeight<?=$id?>(this);
+            cmsDialogResize(this);
         });
         $(this).text('<?=Yii::t('cms', 'Show options')?>');        
     }    
@@ -133,19 +133,19 @@ $('#<?=$id?>_fields').find('.FieldSet_field_toggleoptions').die('click').live('c
 });
 $('#<?=$id?>_fields').find('.FieldSet_field_togglehint').die('click').live('click', function(){
     $(this).parents('.FieldSet_field:eq(0)').find('.FieldSet_field_hint').slideToggle('normal', function(){
-        checkHeight<?=$id?>(this);
+        cmsDialogResize(this);
     });
     return false;
 });
 $('#<?=$id?>_fields').find('.FieldSet_field_togglerules').die('click').live('click', function(){
     $(this).parents('.FieldSet_field:eq(0)').find('.FieldSet_field_rules').slideToggle('normal', function(){
-        checkHeight<?=$id?>(this);
+        cmsDialogResize(this);
     });
     return false;
 });
 $('#<?=$id?>_fields').find('.FieldSet_field_toggleattrs').die('click').live('click', function(){
     $(this).parents('.FieldSet_field:eq(0)').find('.FieldSet_field_attrs').slideToggle('normal', function(){
-        checkHeight<?=$id?>(this);
+        cmsDialogResize(this);
     });
     return false;
 });
@@ -154,7 +154,7 @@ $('#<?=$id?>_fields').find('.FieldSet_field_toggleattrs').die('click').live('cli
 $('#<?=$id?>_fields').find('.FieldSet_field_delete').die('click').live('click', function(){
     $(this).parents('.FieldSet_field:eq(0)').fadeOut('normal', function(){
         $(this).remove();
-        checkHeight<?=$id?>(this);
+        cmsDialogResize(this);
     });
     return false;
 });
@@ -179,7 +179,7 @@ $('#<?=$id?>_addfield').click(function(){
     s = s.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
     field.html(field.html().replace(new RegExp(s, 'gm'), '<?=$name?>['+num+']'));
     field.appendTo('#<?=$id?>_fields');
-    checkHeight<?=$id?>(this);
+    cmsDialogResize(this);
     return false;
 });
 
@@ -200,15 +200,5 @@ function getMaxNum<?=$id?>() {
     return max;
 }
 
-function checkHeight<?=$id?>(t) {
-    tab = $(t).parents('.ui-tabs-panel:eq(0)');
-    if (!tab.length) {
-        tab = $(t).parents('form:eq(0)');
-    }
-    if ($(tab).height() > $(window).height()*0.7) {
-        $(tab).height(Math.ceil($(window).height()*0.7)).css({'overflow-y':'auto'});
-    } else {
-        $(tab).height('auto');
-    }
-}
+
 </script>

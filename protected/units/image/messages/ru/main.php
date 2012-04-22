@@ -4,6 +4,7 @@ return array(
     'Width' => 'Ширина',
     'Height' => 'Высота',
     'Link' => 'Ссылка',
+    'Size & link' => 'Размер и ссылка',
     'Link target' => 'Где открывать ссылку',
     'Current window' => 'В этом же окне',
     'New window' => 'В новом окне',

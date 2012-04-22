@@ -28,8 +28,8 @@ class ModelBlog_Entry extends ContentModel
 			array('title', 'required'),
 			array('blog_id', 'numerical', 'integerOnly'=>true),
 			array('source', 'length', 'max'=>64, 'encoding'=>'UTF-8'),
-            array('title, image, url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
-            array('date, text, annotation', 'safe'),
+            array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
+            array('image, date, text, annotation', 'safe'),
 		));
 	}
 
@@ -78,12 +78,13 @@ class ModelBlog_Entry extends ContentModel
                         'toolbar'=>'Basic',
                     ),
 				),
-                'image'=>array(
-					'type'=>'Link',
-					'size'=>40,
-					'showPageSelectButton'=>false,
-					'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-					'onChange'=> "js:$('#cms-pagewidget-'+pageWidgetId).find('img').attr('src', $(this).val());",
+                'image' => array(
+                    'type' => 'FileManager',
+                    'width' => 900,
+                    'height' => 350,
+                    'options' => array(
+                        'onlyMimes' => array('image/jpeg', 'image/gif', 'image/png'),
+                    ),
                 ),
                 Form::tab(Yii::t('UnitBlog.main', 'Entry')),
                 'blog_id'=> !empty($sectionsArray) ? array(
@@ -116,12 +117,22 @@ class ModelBlog_Entry extends ContentModel
 		);
 	}
 
+    public function behaviors()
+    {
+        return array(
+            'CSerializeBehavior' => array(
+                'class' => 'application.behaviors.CSerializeBehavior',
+                'serialAttributes' => array('image'),
+            ),
+        );
+    }
+
     public function scheme()
     {
         return array(
             'title' => 'string',
             'annotation' => 'text',
-            'image' => 'string',
+            'image' => 'text',
             'text' => 'text',
             'date' => 'timestamp',
             'source' => 'string',
@@ -203,12 +214,20 @@ class ModelBlog_Entry extends ContentModel
 		return $this;
     }
 
+    public function getLink()
+    {
+        return $this->section->widget->getWidgetUrl(true, array(
+            'view' => $this->id . '_' . Page::sanitizeAlias($this->title),
+        ));
+    }
+
     public function feedItem()
     {
         return array(
-            'title'=>null, // тогда используется widget->title,
-            'description'=>'text',
-            'updated'=>'date',
+            'title' => null, // тогда используется widget->title,
+            'description' => 'text',
+            'updated' => 'date',
+            'link' => 'link',
         );
     }
 
@@ -228,4 +247,56 @@ class ModelBlog_Entry extends ContentModel
         }
         return parent::beforeSave();
     }
+
+    public function listColumns()
+    {
+        return array(
+            array(
+                'name'=>Yii::app()->language.'_title',
+                'type'=>'raw',
+                'value'=> 'CHtml::link(CHtml::encode($data->title), "#", array("onclick" => "js:javascript:cmsRecordEditForm({$data->id}, \'".get_class($data)."\', 0, \'".$this->grid->id."\');return false; ", "title"=>"'.Yii::t('cms','Edit').'", "ondblclick"=>""))',
+            ),
+            array(
+                'name'=>'blog_id',
+                'value' => '$data->section->widget->title',
+            ),
+            'date',
+        );
+    }
+
+    public function listDefaultOrder()
+    {
+        return 'date DESC';
+    }
+
+    public function listOperations()
+    {
+        $sectionsArray = ModelBlog::getSectionsArray();
+        $sectionHtml = array();
+        foreach ($sectionsArray as $id => $title) {
+            $sectionHtml[] = '<option value="'.intval($id).'">'.$title.'</option>';
+        }
+        $sectionHtml = implode('', $sectionHtml);
+        $okButton = Yii::t('UnitBlog.main', 'Move');
+
+        return array(
+            'move' => array(
+                'title' => Yii::t('UnitBlog.main', 'Move to'),
+                'click' => 'js:'.<<<JS
+function(gridId, elem) {
+                    $('#'+gridId+'_footeradv').html('<select id="'+gridId+'_section">{$sectionHtml}</select> <input id="'+gridId+'_sectionselect" type="button" value="{$okButton}" />');
+                    $('#'+gridId+'_sectionselect').click(function(){
+                        var sectionId = $('#'+gridId+'_section').val();
+                        var ids = $.fn.yiiGridView.getSelection(gridId);
+                        cmsAjaxSave('/?r=records/massUpdate&className=ModelBlog_Entry&'+$.param({id: ids})+'&fieldName=blog_id&fieldValue='+sectionId, '', 'GET', function(){
+                            $.fn.yiiGridView.update(gridId);
+                        });
+                    });
+                    return false;
+}
+JS
+            ),
+        );
+    }
+
 }

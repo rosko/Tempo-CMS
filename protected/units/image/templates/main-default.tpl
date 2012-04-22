@@ -4,7 +4,7 @@
        {if $content.target} target="{$content.target}" {/if}>
 {/if}
 
-<img src="{$content.image}" width="{$content.width}" height="{$content.height}"
+<img src="{$content.image.filename}" width="{$content.width}" height="{$content.height}"
      {if $widget.title} alt="{$widget.title}" {/if} />
 
 {if $content.url}

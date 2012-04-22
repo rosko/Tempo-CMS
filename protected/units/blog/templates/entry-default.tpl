@@ -6,20 +6,20 @@
 <p>{t text='Date'}: {dateformat pattern="d MMMM yyyy" time=$entry.date}</p>
 {/if}
 
-{$entry.text}    
+{$entry.text}
 
 {if $entry.source || $entry.url}
-    <li>
-        {if $entry.source}{t text='Source'}:{/if}
+<li>
+    {if $entry.source}{t text='Source'}:{/if}
 
-        {if $entry.url}<a href="{$entry.url}">{/if}
+    {if $entry.url}<a href="{$entry.url}">{/if}
 
-        {if $entry.source}
-            {$entry.source}
+    {if $entry.source}
+        {$entry.source}
         {else}
-            {t text='Source'}
-        {/if}
+        {t text='Source'}
+    {/if}
 
-        {if $entry.url}</a>{/if}
-    </li>
+    {if $entry.url}</a>{/if}
+</li>
 {/if}

@@ -503,11 +503,18 @@ function cmsRecordEditForm(id, className, widgetId, gridId)
         className: 'cmsRecordEditForm-'+className,
         title: cmsI18n.cms.editing,
         gridId: gridId,
+        widgetId: widgetId,
         onOpen: function() {
             $('#'+dlgId).find('.field_title input:eq(0)').focus();
         },
         onClose: function() {
-            $.fn.yiiGridView.update(gridId);
+            if (gridId) {
+                $.fn.yiiGridView.update(gridId);
+            }
+            if (widgetId) {
+                var pageWidgetId = $('.cms-pagewidget[rev='+widgetId+']:eq(0)').attr('id').replace('cms-pagewidget-','');
+                cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+widgetId+']');
+            }
         }
     });
 }

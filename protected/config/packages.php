@@ -20,7 +20,7 @@ $_packages = array(
     'cmsLib'=>array(
         'basePath'=>'application.assets',
         'js'=>array('js/lib.js'),
-        'css'=>array('css/cms.css'),
+        'css'=>array('css/cms.css', 'css/form.css'),
         'depends'=>array('jquery', 'cmsJs18N', 'jnotify', 'scrollTo'),
     ),
     'cmsAdmin'=>array(

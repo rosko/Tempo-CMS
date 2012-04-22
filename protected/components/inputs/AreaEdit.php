@@ -18,6 +18,10 @@ class AreaEdit extends CInputWidget
         if($this->hasModel()) {
             $areaName = 'widget'.$this->model->widget->id.$id;
             $modelId = $this->model->id;
+            if ($this->model->isNewRecord) {
+                echo Yii::t('cms', 'Please save before using it.');
+                return;
+            }
             echo CHtml::activeHiddenField($this->model,$this->attribute,$this->htmlOptions);
         } else {
             $areaName = $name;

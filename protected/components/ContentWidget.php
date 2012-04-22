@@ -4,7 +4,7 @@ class ContentWidget extends CWidget
 {
     public $params;
     public $content;
-    public $template='main';
+//    public $templateType='main';
     
     public function name($language=null)
     {
@@ -133,12 +133,9 @@ class ContentWidget extends CWidget
         }
 
         $className = call_user_func(array($this->params['widget']->class,'unitClassName'));
-        $this->params['content'] = $this->content->attributes;
+        $this->params['content'] = $this->params['content']->attributes;
 
         $aliases = array();
-        $template = $this->params['widget']->template[$this->params['templateType']]
-                        ? basename($this->params['widget']->template[$this->params['templateType']])
-                        : Yii::app()->settings->getValue($className.'.template');
         if ($this->params['widget']->template[$this->params['templateType']]) {
             $template = basename($this->params['widget']->template[$this->params['templateType']]);
         } else {

@@ -100,9 +100,12 @@
     height:16px;
     background-repeat:no-repeat;
 }
-
-
-
+.cms-icon-small-list {
+    background-image:url('/images/icons/fatcow/16x16/application_view_list.png');
+    width:16px;
+    height:16px;
+    background-repeat:no-repeat;
+}
 
 
 .cms-icon-big-empty {
@@ -204,6 +207,12 @@
 }
 .cms-icon-big-system {
     background-image:url('/images/icons/fatcow/32x32/system_monitor.png');
+    width:32px;
+    height:32px;
+    background-repeat:no-repeat;
+}
+.cms-icon-big-list {
+    background-image:url('/images/icons/fatcow/32x32/application_view_list.png');
     width:32px;
     height:32px;
     background-repeat:no-repeat;

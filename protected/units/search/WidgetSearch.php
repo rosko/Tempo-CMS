@@ -25,6 +25,6 @@ class WidgetSearch extends ContentWidget
     public function init()
     {
         parent::init();
-        $this->params['q'] = $_GET['q'];        
+        $this->params['q'] = Yii::app()->request->getQuery('q');
     }
 }

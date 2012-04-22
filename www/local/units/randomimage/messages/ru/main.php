@@ -9,4 +9,7 @@ return array(
     'Current window' => 'В этом же окне',
     'New window' => 'В новом окне',
     'Random-selected image' => 'Слуйчано выбранное изображение',
+    'Size' => 'Размер',
+    'Size & link' => 'Размер и ссылка',
+    'Caption' => 'Надпись',
 );

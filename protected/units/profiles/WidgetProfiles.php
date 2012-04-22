@@ -53,9 +53,9 @@ class WidgetProfiles extends ContentWidget
         $this->params['profileVar'] = $this->urlParam('view');
         $blank = true;
 
-        if (!empty($_REQUEST[$this->params['profileVar']])) {
+        if (Yii::app()->request->getParam($this->params['profileVar']) !== null) {
 
-            $profile = User::model()->findByPk(intval($_REQUEST[$this->params['profileVar']]));
+            $profile = User::model()->findByPk(intval(Yii::app()->request->getParam($this->params['profileVar'])));
             if ($profile) {
 
                 $this->params['details'] = Yii::app()->controller->widget('zii.widgets.CDetailView', array(
@@ -80,7 +80,7 @@ class WidgetProfiles extends ContentWidget
                     $config['activeForm']['clientOptions']['afterValidate'] = "js:function(f,d,h){if (!h) {return true;}}";
                     $form = new Form($config, $vm);
 
-                    if(isset($_REQUEST['ajax-validate']))
+                    if(Yii::app()->request->getParam('ajax-validate') !== null)
                     {
                         echo CActiveForm::validate($vm);
                         Yii::app()->end();

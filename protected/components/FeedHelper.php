@@ -6,11 +6,23 @@ class FeedHelper {
     {
         $limit = 10;
 
-        if ($content===null) {
-            
-        } elseif (is_object($content) && is_subclass_of($content, 'Content')) {
+        if (is_string($content) && isset(Yii::$classMap[$content])) {
+            $params = array(
+                'items' => array(
+                    $content,
+                    'order'=>'`create` DESC',
+                ),
+            );
+        }
 
-            $params = $content->feed();
+        if ($content===null) {
+
+
+            
+        } elseif (isset($params) || (is_object($content) && is_subclass_of($content, 'ContentModel'))) {
+
+            if (!isset($params))
+                $params = $content->feed();
             $itemsClassName = $params['items'][0];
             unset($params['items'][0]);
             if (isset(Yii::$classMap[$itemsClassName])) {
@@ -25,7 +37,7 @@ class FeedHelper {
                 $criteria['params'] = $p;
                 $criteria['limit'] = $limit;
                 $criteria = Yii::app()->getDb()->getCommandBuilder()->createCriteria($criteria);
-                $contents = call_user_func(array($itemsClassName, 'model'))->with('widget')->findAll($criteria);
+                $contents = call_user_func(array($itemsClassName, 'model'))->findAll($criteria);
                 $items = array();
                 foreach ($contents as $cont) {
                     $feed = $cont->feedItem();
@@ -38,25 +50,28 @@ class FeedHelper {
                     if (!isset($item['title'])) $item['title'] = $cont->widget->title;
                     if ($cont->hasAttribute('modify'))
                         if (!isset($item['updated'])) $item['updated'] = $cont->modify;
-                    $item['link'] = $cont->getWidgetUrl(true);
                     $items[] = $item;
                 }
             }
             unset($params['items']);
             $channel = array();
-            foreach ($params as $element => $attribute) {
-                if ($content->hasAttribute($attribute))
-                    $channel[$element] = $content->{$attribute};
-            }
-            if (!isset($channel['title']) || !$channel['title'])
-                $channel['title'] = $content->widget->title;
             $channel['language'] = Yii::app()->language;
-            $channel['link'] = $content->getWidgetUrl(true);
+            if (is_object($content)) {
+                foreach ($params as $element => $attribute) {
+                    if ($content->hasAttribute($attribute))
+                        $channel[$element] = $content->{$attribute};
+                }
+                $channel['link'] = $content->getWidgetUrl(true);
+                if (!isset($channel['title']) || !$channel['title'])
+                    $channel['title'] = $content->widget->title;
+            } else {
+                $channel['title'] = call_user_func(array($content, 'modelName'));
+                $channel['link'] = Yii::app()->createAbsoluteUrl('view/index');
+            }
             $channel['updated'] = date('r', strtotime($items[0]['updated']));
             
-        } elseif (isset(Yii::$classMap[$content])) {
-            
         }
+
         Yii::app()->getController()->renderPartial('feed/rss', array(
             'channel'=>$channel,
             'items'=>$items,

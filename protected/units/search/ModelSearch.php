@@ -61,7 +61,7 @@ class ModelSearch extends ContentModel
         // 1. Собрать все поля string и text для блоков и страниц (в Page, Widget, Widget...)
         // 2. Произвести поиск по полям
         // 3. Вывести результаты
-        return Yii::t('UnitSearch.main', 'Search').': '.$_GET['q'];
+        return Yii::t('UnitSearch.main', 'Search') . ': ' . Yii::app()->request->getQuery('q');
     }
 
 }

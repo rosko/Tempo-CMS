@@ -1,6 +1,6 @@
 <?php
 return array(
-    'Blog/news section' => 'Блог/новости',
+    'Blog/news' => 'Блог/новости',
     'Entries per page' => 'Новостей на одной странице',
     'Settings' => 'Настройки',
     'If zero choosed, accordingly site\'s general settings' => 'Если выбран 0, то согласно общих настроек сайта.',
@@ -33,5 +33,8 @@ return array(
     'Image' => 'Изображение',
     'Main template' => 'Основной шаблон',
     'Blog/news entry template' => 'Шаблон отображения записи',
+
+    'Move to' => 'Переместить в',
+    'Move' => 'Переместить',
         
 );

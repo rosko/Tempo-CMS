@@ -38,13 +38,13 @@ class WidgetLogin extends ContentWidget
     {
         parent::init();
         $this->params['formButtons'] = array(
-            'login'=>array(
-                'type'=>'submit',
-                'label'=>Yii::t('UnitLogin.main', 'Login'),
-                'title'=>Yii::t('UnitLogin.main', 'Login'),
+            'login' => array(
+                'type' => 'submit',
+                'label' => Yii::t('UnitLogin.main', 'Login'),
+                'title' => Yii::t('UnitLogin.main', 'Login'),
             ),
         );
-        $this->params['doRemember'] = isset($_POST['RememberForm']);
+        $this->params['doRemember'] = Yii::app()->request->getPost('RememberForm') !== null;
 
         if ($this->proccessRequest()) {
             if($this->params['doRemember']) {
@@ -53,17 +53,17 @@ class WidgetLogin extends ContentWidget
             } else
                 Yii::app()->controller->refresh();
         }
-        if (!empty($_REQUEST['authcode'])) {
-            $user = User::model()->find('`authcode`=:authcode', array('authcode'=>$_REQUEST['authcode']));
+        if (Yii::app()->request->getParam('authcode') !== null) {
+            $user = User::model()->find('`authcode`=:authcode', array('authcode' => Yii::app()->request->getParam('authcode')));
             if ($user) {
-                $identity = new AuthCodeIdentity($_REQUEST['authcode']);
+                $identity = new AuthCodeIdentity(Yii::app()->request->getParam('authcode'));
                 $identity->authenticate();
-                if($identity->errorCode===UserIdentity::ERROR_NONE) {
+                if($identity->errorCode === UserIdentity::ERROR_NONE) {
                     Yii::app()->user->login($identity);
                 }
                 $user->saveAttributes(array(
-                    'authcode'=>'',
-                    'askfill'=>true,
+                    'authcode' => '',
+                    'askfill' => true,
                 ));
                 Yii::app()->controller->refresh();
             }
@@ -79,25 +79,24 @@ class WidgetLogin extends ContentWidget
     
     protected function proccessRequest()
     {
-        if(isset($_POST['logout'])) {
+        if (Yii::app()->request->getPost('logout') !== null) {
             Yii::app()->user->logout();
             Yii::app()->controller->refresh();
             return true;
         }
-		if(isset($_POST['LoginForm']))
-		{
-            $model=new LoginForm;
-			$model->attributes=$_POST['LoginForm'];
+		if (Yii::app()->request->getPost('LoginForm') !== null) {
+            $model = new LoginForm;
+			$model->attributes = Yii::app()->request->getPost('LoginForm');
 			if($model->validate() && $model->login()) {
                 Yii::app()->controller->refresh();
                 return true;
 			}
 		}
-        if(isset($_POST['RememberForm']))
+        if (Yii::app()->request->getPost('RememberForm') !== null)
         {
-            $model=new RememberForm;
-            $model->attributes=$_POST['RememberForm'];
-            if($model->validate()) {
+            $model = new RememberForm;
+            $model->attributes = Yii::app()->request->getPost('RememberForm');
+            if ($model->validate()) {
 
                 $user = User::model()->find('`login` = :username OR `email` = :username', array('username'=>$model->username));
                 if ($user) {

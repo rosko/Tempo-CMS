@@ -65,7 +65,7 @@ foreach ($field['rules'] as $r) {
             ?>
 
                 <li><input name="<?=$name?>[<?=$k?>][rules][<?=$i?>][0]" value="<?=$rule?>" <?php if ($checked) { echo 'checked'; } ?> type="checkbox"
-                           onclick="$(this).nextAll('fieldset:eq(0)').slideToggle('normal', function() {checkHeight<?=$id?>(this);});" />
+                           onclick="$(this).nextAll('fieldset:eq(0)').slideToggle('normal', function() {cmsDialogResize(this);});" />
                     <a onclick="$(this).prev().click();"><?=Yii::t('cms', ucfirst($rule));?></a>
 <?php if (!empty($FS->validators[$rule])) { ?>
                 <fieldset <?php if (!$checked) { ?>class="cms-hidden"<?php } ?>>

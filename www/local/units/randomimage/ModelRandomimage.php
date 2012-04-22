@@ -26,7 +26,7 @@ class ModelRandomimage extends ContentModel
 	{
 		return array(
             array('widget_id', 'required', 'on'=>'edit'),
-			array('images, width, height', 'required'),
+			array('width, height', 'required'),
 			array('widget_id, width, height', 'numerical', 'integerOnly'=>true),
             array('images', 'type', 'type'=>'array'),
 			array('url', 'length', 'max'=>255, 'encoding'=>'UTF-8'),
@@ -64,23 +64,64 @@ class ModelRandomimage extends ContentModel
 
 	public static function form()
 	{
-		return array(
+        $className = __CLASS__;
+        $slideWidth = 'js:function(event,ui)'.<<<JS
+ {
+	$('#{$className}_width').val(ui.value);
+	{$className}_makesize(ui.value, false, ui.handle);
+}
+JS;
+        $changeWidth = 'js:function(event,ui)'.<<<JS
+ {
+	{$className}_makesize(ui.value, false, ui.handle);
+}
+JS;
+        $slideHeight = 'js:function(event,ui)'.<<<JS
+ {
+	$('#{$className}_height').val(ui.value);
+	{$className}_makesize(ui.value, true, ui.handle);
+}
+JS;
+        $changeHeight = 'js:function(event,ui)'.<<<JS
+ {
+	{$className}_makesize(ui.value, true, ui.handle);
+}
+JS;
+        $cfg = ContentUnit::loadConfig();
+
+        return array(
 			'elements'=>array(
                 Form::tab(Yii::t('UnitRandomimage.main', 'Images')),
-				'images'=>array(
-					'type'=>'ListEdit',
-					//'size'=>40,
-					//'showPageSelectButton'=>false,
-					//'extensions'=>array('jpg', 'jpeg', 'gif', 'png'),
-				),
-				'width'=>array(
+                'images' => array(
+                    'type' => 'FileManager',
+                    'width' => 900,
+                    'height' => 350,
+                    'multiple' => true,
+                    'options' => array(
+                        'onlyMimes' => array('image/jpeg', 'image/gif', 'image/png'),
+                    ),
+                    'element' => array(
+                        array(
+                            'name' => 'caption',
+                            'type' => 'text',
+                            'size' => 40,
+                            'label' => Yii::t('UnitRandomimage.main', 'Caption'),
+                            'i18n' => true,
+                        ),
+                    ),
+                ),
+                Form::tab(Yii::t('UnitRandomimage.main', 'Size & link')),
+                Yii::app()->controller->renderPartial($cfg['UnitImage'].'.image.assets.imagesize', compact('className'), true),
+                'width'=>array(
 					'type'=>'Slider',
 					'event'=>'none',
 					'options'=>array(
 						'min' => 1,
 						'max' => 2000,
 						'step' => 1,
-					)
+                        'slide' => $slideWidth,
+                        'change' => $changeWidth,
+                    )
 				),
 				'height'=>array(
 					'type'=>'Slider',
@@ -89,13 +130,14 @@ class ModelRandomimage extends ContentModel
 						'min' => 1,
 						'max' => 2000,
 						'step' => 1,
-					)
+                        'slide' => $slideHeight,
+                        'change' => $changeHeight,
+                    )
 				),
-                Form::tab(Yii::t('UnitRandomimage.main', 'Link')),
 				'url'=>array(
-					'type'=>'Link',
+					'type'=>'text',
 					'size'=>40,
-					'showUploadButton'=>false
+					//'showUploadButton'=>false
 				),
                 'target'=>array(
                     'type'=>'dropdownlist',

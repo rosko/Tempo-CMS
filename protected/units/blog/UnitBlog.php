@@ -4,7 +4,7 @@ class UnitBlog extends ContentUnit
 {
     public function name($language=null)
     {
-        return Yii::t('UnitBlog.main', 'Blog/news section', array(), null, $language);
+        return Yii::t('UnitBlog.main', 'Blog/news', array(), null, $language);
     }
     
     public function icon()

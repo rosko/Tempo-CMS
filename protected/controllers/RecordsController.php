@@ -15,7 +15,7 @@ class RecordsController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('create', 'delete', 'getUrl'
+				'actions'=>array('create', 'delete', 'getUrl', 'fields', 'list', 'massUpdate',
                 ),
 				'users'=>array('@'),
 			),
@@ -47,8 +47,9 @@ class RecordsController extends Controller
             echo '0';
     }
 
-    public function actionDelete($className, $id)
+    public function actionDelete($className)
     {
+        $id = Yii::app()->request->getQuery('id');
         $ids =  is_array($id) ? $id : array($id);
         $ret = true;
         foreach ($ids as $id) {
@@ -69,6 +70,45 @@ class RecordsController extends Controller
             }
             
         }
+    }
+
+    public function actionFields($id, $name)
+    {
+        $config = @unserialize(base64_decode(Yii::app()->request->getPost('config')));
+        $value = @unserialize(base64_decode(Yii::app()->request->getPost('value')));
+        if (is_array($config)) {
+            $this->widget('Fields', array(
+                'id' => $id,
+                'name' => $name,
+                'config' => $config,
+                'value' => $value,
+            ));
+        } else {
+            throw new CHttpException(500,Yii::t('cms', 'The requested page does not exist.'));
+        }
+    }
+
+    public function actionList($className)
+    {
+        $title = call_user_func(array($className, 'modelName'));
+        $this->render('list', array(
+                'className' => $className,
+                'title' => $title,
+            )
+        );
+    }
+
+    public function actionMassUpdate($className, $fieldName, $fieldValue)
+    {
+        $id = Yii::app()->request->getQuery('id');
+        $ids =  is_array($id) ? $id : array($id);
+        $ret = true;
+        foreach ($ids as $id) {
+            $model = call_user_func(array($className, 'model'))->findByPk($id);
+            $model->{$fieldName} = $fieldValue;
+            $ret = $model->save(false) && $ret;
+        }
+        echo (int)$ret;
     }
 
 }

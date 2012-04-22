@@ -11,23 +11,95 @@ if ($this->hasModel()) {
 
 <?=$recordsGrid?>
 
+<?php
+$confirmText = Yii::t('cms', 'Are you really want delete?');
+$operations = array(
+    'delete' => array(
+        'title' => Yii::t('cms', 'Delete'),
+        'click' => 'js:function(gridId, elem)'.<<<JS
+{
+    if (confirm('{$confirmText}')) {
+        var ids = $.fn.yiiGridView.getSelection(gridId);
+        cmsAjaxSave('/?r=records/delete&className={$className}&'+$.param({id: ids}), '', 'GET', function(){
+            $.fn.yiiGridView.update(gridId);
+        });
+    }
+}
+JS
+    ),
+);
+
+if (method_exists($recordExample, 'listOperations')) {
+    $operations = array_merge($operations, call_user_func(array($recordExample, 'listOperations')));
+}
+
+foreach ($operations as $opName => $opParams) {
+    if (!isset($opParams['type'])) {
+        $operations[$opName]['type'] = 'option';
+    }
+}
+
+?>
+
+
 <div id="<?=$id?>_footer">
+
+    <a href="#select-all" id="<?=$id?>_selectall"><?php echo Yii::t('cms', 'Select all'); ?></a> /
+    <a href="#unselect-all" id="<?=$id?>_unselectall"><?php echo Yii::t('cms', 'Unselect all'); ?></a><br />
+    <label for="<?=$id?>_operationtype"><?php echo Yii::t('cms', 'With selected'); ?>:</label>
+    <select id="<?=$id?>_operationtype">
+        <option selected="selected"></option>
+        <?php foreach ($operations as $opName => $opParams) { ?>
+        <<?=$opParams['type']?> value="<?=$opName?>"><?=$opParams['title']?></<?=$opParams['type']?>>
+        <?php } ?>
+    </select>
+    <input type="button" id="<?=$id?>_operationdo" value="<?php echo Yii::t('cms', 'Ok'); ?>" />
+
+    <div id="<?=$id?>_footeradv"></div>
     
 </div>
 
 <script type="text/javascript">
-$('#<?=$id?>_check input').die('click').live('click', function() {
-    var check = $(this).attr('checked');
+
+<?php foreach ($operations as $opName => $opParams) { ?>
+    var <?=$opName?>_operation_<?=$id?> = <?=CJavaScript::encode($opParams['click']);?>;
+<?php } ?>
+
+
+$('#<?=$id?>_selectall').click(function() {
     var settings = $.fn.yiiGridView.settings['<?=$id?>'];
     $('#<?=$id?> .'+settings.tableClass+' > tbody > tr').each(function(i){
-        if (check) {
-            $(this).addClass('cms-selected');
-        } else {
-            $(this).removeClass('cms-selected');
-        }
+        $(this).addClass('selected');
+        $(this).find('input[type=checkbox]').attr('checked', true);
     });
+    $('#<?=$id?>_check input').attr('checked', true);
+    return false;
 });
-$('.<?=$id?>_add').click(function() {
+
+$('#<?=$id?>_unselectall').click(function() {
+    var settings = $.fn.yiiGridView.settings['<?=$id?>'];
+    $('#<?=$id?> .'+settings.tableClass+' > tbody > tr').each(function(i){
+        $(this).removeClass('selected');
+        $(this).find('input[type=checkbox]').attr('checked', false);
+    });
+    $('#<?=$id?>_check input').attr('checked', false);
+    return false;
+});
+
+$('#<?=$id?>_operationtype').bind('change', function() {
+    $('#<?=$id?>_operationdo').click();
+});
+
+$('#<?=$id?>_operationdo').click(function() {
+    $('#<?=$id?>_footeradv').html('');
+    var funcName = $('#<?=$id?>_operationtype').val() + '_operation_<?=$id?>';
+    if ($.isFunction(window[funcName])) {
+        window[funcName]('<?=$id?>', this);
+    }
+    return false;
+});
+
+    $('.<?=$id?>_add').click(function() {
 
     <?php if ($pageId) { ?>
 

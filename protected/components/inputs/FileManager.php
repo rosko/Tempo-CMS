@@ -3,12 +3,6 @@
 // - Сделать глобальную настройку, чтобы внешние файлы автоматически подкачивались в хранилище сайта.
 // И чтобы ссылка ставилась на уже скачанный файл
 
-// - Как править шаблон списка номеров страниц?
-//   - Реализовать - это как поставляемые с юнитами smarty-функции
-// - Подключить файлменеджер к полю выбору шаблона (кнопка "редактировать шаблон"), чтобы при клике на кнопку, высвечивался файлменеджер и сразу же автоматом окошко редактора шаблона
-// - Подключить codemirror и текущий редактор шаблонов к файлменеджеру.
-// - Сделать редактор шаблонов и стилей темы оформления
-
 class FileManager extends CInputWidget
 {
     public $multiple = false;
@@ -182,7 +176,7 @@ function(data, fm) {
         }
         var filesize = cmsReadableFileSize(filename.size);
         if (filename.width && filename.height) {
-            filesize += '<br />'+filename.width+'&times'+filename.height;
+            filesize += '<br />'+filename.width+'&times;'+filename.height;
         }
         if ((i==0 && {$multiple}==0) || {$multiple}) {
             $.ajax({

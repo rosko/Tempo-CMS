@@ -112,5 +112,49 @@ class ContentModel extends I18nActiveRecord
             echo $output;
         }
     }
-    
+
+    public static function getInstalledModels($flatten=false)
+    {
+        $units = ContentUnit::getInstalledUnits(true);
+        $return = array();
+
+        $unitConfig = ContentUnit::loadConfig();
+
+        foreach ($units as $unitClassName => $name) {
+            $unit = array(
+                'className' => $unitClassName,
+                'name' => $name,
+                'icon' => call_user_func(array($unitClassName, 'icon')),
+                'models' => array(),
+            );
+            $dir = strtolower(substr($unitClassName,4));
+            $models = call_user_func(array($unitClassName, 'models'));
+            foreach ($models as $className => $alias) {
+                if (is_int($className)) {
+                    $className = $alias;
+                    $alias = $unitConfig[$unitClassName]. '.' . $dir . '.' . $className;
+                }
+                $unit['models'][] = array(
+                    'className' => $className,
+                    'name' => call_user_func(array($className, 'modelName')),
+                    'icon' => call_user_func(array($className, 'icon')),
+                );
+            }
+            $return[] = $unit;
+        }
+
+        if ($flatten) {
+            $units = $return;
+            $models = array();
+            foreach ($units as $unit) {
+                foreach ($unit['models'] as $model) {
+                    $models[$model['className']] = $model['name'];
+                }
+            }
+            $return = $models;
+        }
+
+        return $return;
+    }
+
 }

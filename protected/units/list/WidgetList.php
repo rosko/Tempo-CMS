@@ -29,13 +29,22 @@ class WidgetList extends ContentWidget
         // Сейчас функция нацелена на виджеты, но нужно переделать на модели.
         // Правда, тогда не ясно в каком виде выводить полученную информацию.
         // Где взять шаблоны?
-        if (Yii::$classMap[$this->params['content']->class_name]) {
+        if (Yii::$classMap[$this->params['content']->class_name] &&
+                method_exists($this->params['content']->class_name, 'feedItem')) {
             $rule = $this->params['content']->makeRule();
-            $modelClass = call_user_func(array($this->params['content']->class_name, 'modelClassName'));
+            $modelClass = $this->params['content']->class_name;
+            $feed = call_user_func(array($this->params['content']->class_name, 'feedItem'));
             eval("\$items = {$modelClass}::model()->{$rule}findAll();");
-            foreach ($items as $item)
+            foreach ($items as $itemSource)
             {
-                $this->params['items'][] = $item->widget($this->params['content']->class_name, array(), true);
+                $item = $itemSource->attributes;
+                foreach ($feed as $element => $attribute)
+                {
+                    if ($attribute)
+                        $item[$element] = $itemSource->{$attribute};
+                }
+
+                $this->params['items'][] = $item;
             }
         }        
     }

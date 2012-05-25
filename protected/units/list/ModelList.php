@@ -48,9 +48,7 @@ class ModelList extends ContentModel
 			'elements'=>array(
                 'class_name'=>array(
                     'type'=>'ComboBox',
-                    // Тут должен быть список моделей всех юнитов
-                    'array' => array(),
-                    //'array'=>ContentUnit::getInstalledUnits(true),
+                    'array'=>ContentModel::getInstalledModels(true),
                 ),
 				'rule'=> array(
                     'type' => 'Scopes',

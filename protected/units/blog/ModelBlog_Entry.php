@@ -112,7 +112,7 @@ class ModelBlog_Entry extends ContentModel
                     'showFileManagerButton'=>false,
                     'showUploadButton'=>false
 					//'maxlength'=>255
-				),                
+				),
 			),
 		);
 	}
@@ -202,8 +202,8 @@ class ModelBlog_Entry extends ContentModel
 			'limit'=>$limit,
             'order'=>'date DESC',
 		));
-		return $this;
-	}
+        return $this;
+}
 	
     public function section($id=0)
     {
@@ -224,7 +224,8 @@ class ModelBlog_Entry extends ContentModel
     public function feedItem()
     {
         return array(
-            'title' => null, // тогда используется widget->title,
+            'title' => 'title', // если null, тогда используется widget->title,
+            'short' => 'annotation',
             'description' => 'text',
             'updated' => 'date',
             'link' => 'link',

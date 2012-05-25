@@ -58,7 +58,7 @@ HTML;
         .appendTo(langbuttons);
     $('#{$this->uniqueId}_langbuttons_{$k}').appendTo('#{$this->uniqueId} .field_{$k} label');
 
-    
+
 JS;
                         foreach ($langs as $langId => $langName) {
                             $this->getElements()->add($langId.'_'.$k, $v);
@@ -149,7 +149,7 @@ HTML;
                 } elseif (substr($element->content,0,$sd_len)==Form::SECTION_DELIMETER
                     && substr($element->content,-$sd_len)==Form::SECTION_DELIMETER) {
                     $title = substr($element->content,$sd_len,-$sd_len);
-                    
+
                     if ($s_counter) {
                         $output .= '</div>';
                     } else {

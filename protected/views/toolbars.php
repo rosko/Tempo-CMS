@@ -131,17 +131,10 @@ JS
             'title' => Yii::t('cms', 'File manager'),
             'click' => 'js:function()'.<<<JS
 {
-                    cmsLoadDialog('/?r=files/manager&language={$language}', {
-                        simpleClose: false,
-                        onClose: function() {
-                            $('.elfinder-quicklook').remove();
-                        },
-                        onOpen: function(t) {
-                            cmsDialogResize(t);
-                        }
-                    });
-                    return false;
-                }
+            var url = '/?r=files/manager&language={$language}';
+            window.open( url, 'filemanager','width=950, height=550, location=0, status=no, toolbar=no, menubar=no, scrollbars=yes, resizable=yes');
+            return false;
+}
 JS
         ),
     );

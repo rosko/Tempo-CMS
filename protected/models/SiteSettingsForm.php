@@ -20,6 +20,7 @@ class SiteSettingsForm extends CFormModel
             array('userExtraFields', 'safe'),
             array('slugTransliterate, slugLowercase', 'boolean'),
             array('timezone', 'safe'),
+            array('pageOnError403, pageOnError404', 'numerical', 'integerOnly'=>true),
         );
         // Правила для проверки настроек для юнитов
         $units = ContentUnit::getInstalledUnits();
@@ -62,7 +63,9 @@ class SiteSettingsForm extends CFormModel
             'slugTransliterate' => Yii::t('cms', 'Transliterate page slug'),
             'slugLowercase' => Yii::t('cms', 'Lowercase page slug'),
             'timezone' => Yii::t('cms', 'Default timezone'),
-		);
+            'pageOnError403' => Yii::t('cms', 'Show page on error 403 (access denied)'),
+            'pageOnError404' => Yii::t('cms', 'Show page on error 404 (page not found)'),
+        );
         $units = ContentUnit::getInstalledUnits();
         foreach ($units as $unitClass) {
             if (method_exists($unitClass, 'settings')) {
@@ -142,6 +145,12 @@ class SiteSettingsForm extends CFormModel
                 ),
                 'slugLowercase'=>array(
                     'type'=>'checkbox'
+                ),
+                'pageOnError403'=>array(
+                    'type'=>'PageSelect',
+                ),
+                'pageOnError404'=>array(
+                    'type'=>'PageSelect',
                 ),
                 Form::tab(Yii::t('cms', 'Appearance')),
                 'theme'=>array(

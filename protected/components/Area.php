@@ -8,6 +8,13 @@ class Area extends CWidget
     
     public function run()
     {
+        if ($this->name == 'main') {
+            $hideMainAreaOn = array('site/login');
+            if (in_array(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id, $hideMainAreaOn) ||
+                (Yii::app()->errorHandler->error && (!Yii::app()->page->model || (Yii::app()->page->model && Yii::app()->page->model->id == 1))))
+                return false;
+        }
+
         $page = Yii::app()->page->model;
         $editArea = !$this->readOnly && !Yii::app()->user->isGuest && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
         if (!empty($this->pageWidgets)) {

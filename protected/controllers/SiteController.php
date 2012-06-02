@@ -17,8 +17,18 @@ class SiteController extends Controller
 	    {
 	    	if(Yii::app()->request->isAjaxRequest)
 	    		echo $error['message'];
-	    	else
+	    	else {
+                $id = 1;
+                if ($error['code'] == 403 && Yii::app()->settings->getValue('pageOnError403')) {
+                    $id = Yii::app()->settings->getValue('pageOnError403');
+                } elseif ($error['code'] == 404 && Yii::app()->settings->getValue('pageOnError404')) {
+                    $id = Yii::app()->settings->getValue('pageOnError404');
+                }
+                $page = Page::model()->findbyPk(intval($id));
+                if (!$page) $page = Page::model()->findbyPk(1);
+                Yii::app()->page->model = $page;
 	        	$this->render('error', $error);
+            }
 	    }
 	}
 

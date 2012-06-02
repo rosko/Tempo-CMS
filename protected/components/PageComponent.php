@@ -57,5 +57,10 @@ class PageComponent extends CApplicationComponent
 		return $this->_model;
 
     }
+
+    public function setModel($model)
+    {
+        $this->_model = $model;
+    }
     
 }

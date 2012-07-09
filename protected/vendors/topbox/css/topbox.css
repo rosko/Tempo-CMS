@@ -10,7 +10,7 @@
   line-height: 1.4em;
   font-size:90%;
 
-  position: fixed;
+  position: absolute;
   top: 0px;
   background-color: #fff;
   color: #000;

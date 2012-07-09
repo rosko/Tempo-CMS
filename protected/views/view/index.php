@@ -277,7 +277,9 @@ $this->renderPartial('/toolbars', compact('model', 'language'));
 
     <div id="cms-dialog">
     </div>
+
 </div>
+<div id="cms-modal" class="cms-modal"><div class="cms-modal-inner"></div></div>
 
 <?php
 }

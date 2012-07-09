@@ -231,3 +231,26 @@ input.cms-w200 {
 .cms-filemanager-fileedit {
     font-size:1.5em;
 }
+
+.cms-lock {
+    overflow: hidden;
+}
+
+.cms-modal {
+}
+
+.cms-lock .cms-modal {
+    /* show modal shim and content when it's opened */
+    display: block;
+
+    /* shim will stay fixed and will take all the space available */
+    position: fixed;
+    bottom: 0; left: 0; top: 0; right: 0;
+
+    /* if modal content doesn't fit inside the shim, display scrollbars */
+    overflow: auto;
+}
+
+.cms-modal-inner {
+    width:100%;
+}

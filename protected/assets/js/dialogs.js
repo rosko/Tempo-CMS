@@ -42,7 +42,7 @@ function cmsOpenDialog(content, options) {
         closeOnEsc: options.simpleClose,
         theme: 'classic',
         width: options.width,
-        height: options.height,
+        //height: options.height,
         speed: 500,
         easing: 'swing',
         buttons: options.buttons,
@@ -66,7 +66,13 @@ function cmsOpenDialog(content, options) {
             b.wrapInner('<div class="content"></div>');
             b.height(h-112).css('left','0px');
             $(this).find('.cms-dialog').nanoScroller();*/
-            $('html').css('overflow', 'hidden');
+            // $('html').css('overflow', 'hidden');
+            var el = 'body';
+            // IE < 8
+            if(document.all && !document.querySelector) {
+                el = 'html';
+            }
+            $(el).addClass('cms-lock');
         },
         onClose: function() {
             cmsFadeOut('.cms-selected', 'cms-selected');
@@ -74,7 +80,14 @@ function cmsOpenDialog(content, options) {
             if ($.isFunction(options.onClose)) {
                 options.onClose(this);
             }
-            $('html').css('overflow', 'auto');
+            //$('html').css('overflow', 'auto');
+            var el = 'body';
+            // IE < 8
+            if(document.all && !document.querySelector) {
+                el = 'html';
+            }
+            $(el).removeClass('cms-lock');
+
         }
     });
 }
@@ -159,6 +172,7 @@ function cmsLoadDialog(url, opts)
 function cmsDialogResize(elem)
 {
     $(window).trigger('resize.topbox');
+    return false;
     var div = $(elem).parents('.ui-tabs-panel:eq(0)');
     var prc = 0.8;
     if (!div.length) {

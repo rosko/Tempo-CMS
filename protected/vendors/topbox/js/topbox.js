@@ -91,7 +91,7 @@
                 'opacity'   : 0,
                 'visibility': 'hidden'
             })
-            .appendTo("body")
+            .appendTo("#cms-modal .cms-modal-inner")
             .css({
                 'left' : ($(window).width()/2-box.width()/2),
                 'top'  : ((-1.5) * box.height())

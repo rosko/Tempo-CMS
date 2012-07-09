@@ -122,9 +122,6 @@
 .cms-potential {
 	background-color:#F0F0FF !important;
 }
-.cms-form input, .cms-form label, .cms-form select {
-	font-size:1.1em !important;
-}
 .cms-hover {
 	background-color:rgb(244, 255, 244) !important;
     outline:4px solid rgba(200,200,200,0.85);

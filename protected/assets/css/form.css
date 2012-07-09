@@ -44,6 +44,7 @@ div.cms-form textarea,
 div.cms-form select
 {
 	margin: 0.2em 0 0.5em 0;
+    font-size: 1.2em;
 }
 
 div.cms-form fieldset
@@ -51,19 +52,21 @@ div.cms-form fieldset
 	border: 1px solid #DDD;
 	padding: 10px;
 	margin: 0 0 10px 0;
-    -moz-border-radius:7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
 }
 
 div.cms-form label
 {
-	font-weight: bold;
-	font-size: 0.9em;
 	display: block;
+    font-size:1em !important;
 }
 
 div.cms-form .row
 {
-	margin: 5px 0;
+	padding: 5px 0;
+    border-top: 1px solid #DDD;
 }
 
 div.cms-form .hint

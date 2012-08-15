@@ -1,9 +1,14 @@
 <?php
 
+// Делать установку defaultRules из подключенного поведения AccessCBehavior
+
 class Installer extends CApplicationComponent
 {
+    var $ipFilters = array();
+
     public function installTable($className, $tableName='')
     {
+        if (!$this->allowAccess()) return false;
         if (!is_object($className) && !class_exists($className))
             return false;
 
@@ -37,6 +42,9 @@ class Installer extends CApplicationComponent
             }
             if (!Yii::app()->db->createCommand('show tables like "'.$tableName.'"')->queryColumn()) {
                 Yii::app()->db->createCommand()->createTable($tableName, $columns, $options);
+                if (method_exists($className, 'install')) {
+                    call_user_func(array($className, 'install'));
+                }
             } elseif (method_exists($className, 'getTableSchema')) {
                 $tableSchema = call_user_func(array($className, 'model'))->getTableSchema();
                 $simpleScheme = self::getSimpleScheme($tableSchema);
@@ -60,22 +68,57 @@ class Installer extends CApplicationComponent
                 }
             }
         }
-        if (method_exists($className, 'install') && $tableName &&
-            (Yii::app()->db->createCommand()->select('count(*)')->from($tableName)->queryScalar()==0) ) {
-            call_user_func(array($className, 'install'));
-        }
     }
 
     public function installAll($withUnits=true)
     {
-        // 'ARRights', 'AuthItem', 'AuthItemChild', 'AuthAssignment'
-        $classNames = array('User', 'Page', 'PageWidget', 'Widget');
-        foreach ($classNames as $className)
+        if (!$this->allowAccess()) return false;
+        $classNames = array('AccessItem', 'Role', 'UserRole', 'User', 'Page', 'PageWidget', 'Widget');
+
+        foreach ($classNames as $className) {
+
             $this->installTable($className);
-        $this->installAuth();
+
+            $this->installDefaultAccess($className);
+
+        }
+
         if ($withUnits)
             ContentUnit::install(array_keys(ContentUnit::getAvailableUnits()));
 
+    }
+
+    protected function installDefaultAccess($acoClass)
+    {
+        $sql = 'select count(*) from `' . AccessItem::tableName() . '` where `aco_class` = :aco_class';
+        $alreadyInstalled = Yii::app()->getDb()->createCommand($sql)->queryScalar(array('aco_class' => $acoClass));
+
+        $defaultRules = AccessCBehavior::getDefaultRulesByClassName($acoClass);
+
+        if ($alreadyInstalled == 0 && !empty($defaultRules)) {
+
+            $items = array();
+
+            foreach ($defaultRules as $action => $params) {
+
+                if (is_array($params)) foreach ($params as $aroClass => $datas) {
+
+                    if (is_array($datas)) foreach ($datas as $data) {
+
+                        $aroKey = $data[0];
+                        $aroValue = $data[1];
+                        $isDeny = isset($data['deny']) ? $data['deny'] : false;
+
+                        $items[] = "('{$acoClass}', '', '', '{$aroClass}', '{$aroKey}', '{$aroValue}', '{$action}', '{$isDeny}')";
+
+                    }
+                }
+            }
+
+            $sql = 'insert into `' . AccessItem::tableName() . '` (`aco_class`, `aco_key`, `aco_value`, `aro_class`, `aro_key`, `aro_value`, `action`, `is_deny`) values ' . implode(', ', $items);
+            return Yii::app()->getDb()->createCommand($sql)->execute();
+
+        }
     }
 
     protected static function getSimpleScheme($tableSchema) {
@@ -118,66 +161,21 @@ class Installer extends CApplicationComponent
         return $ret;
     }
 
-    public function installAuth()
+    protected function allowAccess()
     {
-        $auth=Yii::app()->authManager;
-        if (count($auth->getAuthItems()) > 0) {
-            return false;
-        }
-
-        if (method_exists($auth, 'clearAll'))
-            $auth->clearAll();
-        $auth->createRole('anybody', 'Anybody');
-
-        $bizRule='return Yii::app()->user->isGuest;';
-        $role = $auth->createRole('guest', 'Guest', $bizRule);
-        $role->addChild('anybody');
-
-        $bizRule='return !Yii::app()->user->isGuest;';
-        $role = $auth->createRole('authenticated', 'Authenticated user', $bizRule);
-        $role->addChild('anybody');
-
-        $role = $auth->createRole('author', 'Author');
-        $role->addChild('authenticated');
-
-        $role = $auth->createRole('editor', 'Editor');
-        $role->addChild('authenticated');
-
-        $role = $auth->createRole('administrator', 'Administrator');
-        $role->addChild('authenticated');
-
-        $auth->assign('administrator', User::getAdmin()->id);
-
-        $classes = array('Page', 'Settings', 'Widget', 'User');
-        foreach ($classes as $className) {
-            if (method_exists($className, 'operations')) {
-                $a = call_user_func(array($className, 'operations'));
-                foreach ($a as $operation => $params) {
-                    $auth->createOperation($operation.$className, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
-                    if (is_array($params['defaultRoles']))
-                        foreach ($params['defaultRoles'] as $role) {
-                            $auth->addItemChild($role, $operation.$className);
-                        }
-                }
-            }
-            if (method_exists($className, 'tasks')) {
-                $a = call_user_func(array($className, 'tasks'));
-                foreach ($a as $task => $params) {
-                    $auth->createTask($task.$className, $params['label'], isset($params['bizRule']) ? $params['bizRule'] : null);
-                    if (is_array($params['children']))
-                        foreach ($params['children'] as $operation) {
-                            $auth->addItemChild($task.$className, $operation);
-                        }
-                    if (is_array($params['defaultRoles']))
-                        foreach ($params['defaultRoles'] as $role) {
-                            $auth->addItemChild($role, $task.$className);
-                        }
-                }
-            }
-        }
-        if (method_exists($auth, 'save'))
-            $auth->save();
-        return true;
-
+        return $this->allowIp(Yii::app()->request->userHostAddress);
     }
+
+    protected function allowIp($ip)
+    {
+        if(empty($this->ipFilters))
+            return false;
+        foreach($this->ipFilters as $filter)
+        {
+            if($filter==='*' || $filter===$ip || (($pos=strpos($filter,'*'))!==false && !strncmp($ip,$filter,$pos)))
+                return true;
+        }
+        return false;
+    }
+
 }

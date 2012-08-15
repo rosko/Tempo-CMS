@@ -64,7 +64,7 @@ class WidgetProfiles extends ContentWidget
                 ), true);
                 $this->params['profile'] = $profile->getAttributes();
 
-                if (Yii::app()->user->checkAccess($profile->send_message) && $profile->id != $this->params['user']->id && $profile->email) {
+                if (Yii::app()->user->hasRole($profile->send_message) && $profile->id != $this->params['user']->id && $profile->email) {
 
                     $vm = new VirtualModel($this->params['content']->feedback_form, 'FieldSet');                    
                     $config = $vm->formMap;
@@ -226,12 +226,12 @@ class WidgetProfiles extends ContentWidget
                     $fields[$key] = array(
                         'name'=>'email',
                         'value'=>$user->email,
-                        'visible'=>Yii::app()->user->checkAccess($user->show_email) || $user->id == Yii::app()->user->id,
+                        'visible'=>Yii::app()->user->hasRole($user->show_email) || $user->id == Yii::app()->user->id,
                     );
                 } else {
                     $fields[$key] = array(
                         'name'=>'email',
-                        'value'=>'Yii::app()->user->checkAccess($data->show_email) ? $data->email : ""',
+                        'value'=>'Yii::app()->user->hasRole($data->show_email) ? $data->email : ""',
                     );
                 }
             }
@@ -255,7 +255,7 @@ class WidgetProfiles extends ContentWidget
     public static function dynamicFeedbackForm($params)
     {
         $user = User::model()->findByPk($params['id']);
-        if ($user && Yii::app()->user->checkAccess($user->send_message) && $user->id != Yii::app()->user->id && $user->email) 
+        if ($user && Yii::app()->user->hasRole($user->send_message) && $user->id != Yii::app()->user->id && $user->email)
         {
             $vm = new VirtualModel($params['feedback_form'], 'FieldSet');
             $config = $vm->formMap;

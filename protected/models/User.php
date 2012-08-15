@@ -13,6 +13,7 @@ class User extends ActiveRecord
     public $captcha;
 
     public $password_repeat='';
+    protected $__roles = array();
 
 	public static function model($className=__CLASS__)
 	{
@@ -22,7 +23,6 @@ class User extends ActiveRecord
     public function modelName($language=null)
     {
         return Yii::t('cms', 'Users', array(), null, $language);
-        //return $this->login ? $this->login : Yii::t('cms', 'New user', array(), null, $language);
     }
 
 	public function tableName()
@@ -62,6 +62,7 @@ class User extends ActiveRecord
                 'captchaAction'=>'site/captcha'),
             array('password, password_repeat, captcha', 'unsafe', 'on'=>'view'),
             array('timezone', 'safe'),
+            array('_roles', 'safe'),
 		);
 	}
 
@@ -71,11 +72,47 @@ class User extends ActiveRecord
             'CSerializeBehavior' => array(
                 'class' => 'application.behaviors.CSerializeBehavior',
                 'serialAttributes' => array('extra_fields'),
-            )
+            ),
+            'RelationsBehavior' => array(
+                'class' => 'application.behaviors.RelationsBehavior',
+            ),
+            'access' => array(
+                'class' => 'application.behaviors.AccessRBehavior',
+                'fullAccess' => array(
+                    array(
+                        'login' => self::ADMIN_LOGIN,
+                    ),
+                    array(
+                        'roles' => Role::ADMINISTRATOR,
+                    ),
+                ),
+                'attributes' => array('login', 'roles'),
+            ),
         );
     }
 
-	public function attributeLabels()
+    public function getRoles()
+    {
+        if (empty($this->__roles)) {
+
+            $roles = array(Role::ANYBODY, Role::AUTHENTICATED);
+            $_roles = $this->getRelated('_roles');
+            foreach ($_roles as $role) {
+                $roles[] = $role['name'];
+            }
+            $this->__roles = $roles;
+
+        }
+
+        return $this->__roles;
+    }
+
+    public function setRoles($roles)
+    {
+        $this->__roles = $roles;
+    }
+
+    public function attributeLabels()
 	{
 		return array(
 			'id' => Yii::t('cms', 'ID'),
@@ -92,7 +129,8 @@ class User extends ActiveRecord
             'send_message'=>Yii::t('cms', 'Who can send you an email through the site'),
             'extra_fields'=>Yii::t('cms', 'Extra fields'),
             'timezone' => Yii::t('cms', 'Timezone'),
-		);
+            '_roles' => Yii::t('cms', 'Roles'),
+        );
 	}
 
     public function scheme()
@@ -112,6 +150,14 @@ class User extends ActiveRecord
             'timezone'=>'char(64)',
         );
     }
+
+    public function searchAttributes()
+    {
+        return array(
+            'login', 'email', 'displayname',
+        );
+    }
+
 
     public function form()
     {
@@ -158,11 +204,11 @@ class User extends ActiveRecord
                 ),
                 'show_email'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::roles(),
+                    'items'=>Role::all(),
                 ),
                 'send_message'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::roles(),
+                    'items'=>Role::all(),
                 ),
                 'timezone'=>array(
                     'type'=>'dropdownlist',
@@ -172,67 +218,19 @@ class User extends ActiveRecord
                     'type'=>'Fields',
                     'config'=>User::extraFields(),
                 ),
+                '_roles'=>array(
+                    'type'=>'Select2',
+                    'related'=>'_roles',
+                    'showAttribute'=>'title',
+                ),
             ),
         );
     }
 
-    public function roles()
-    {
-        $roles = Yii::app()->getAuthManager()->getRoles();
-        $ret = array(''=>Yii::t('cms', 'Nobody'));
-        foreach ($roles as $role) {
-            $ret[$role->name] = Yii::t('cms', $role->description);
-        }
-        return $ret;
-    }
-
-    public function operations()
+    public function relations()
     {
         return array(
-            'create'=>array(
-                'label'=>'Add user', // Право создавать пользователей
-                'defaultRoles'=>array('administrator', 'guest'),
-            ),
-            'read'=>array(
-                'label'=>'View user', // Право просматривать данные пользователей
-                'defaultRoles'=>array('authenticated'),
-            ),
-            'update'=>array( // Право редактировать пользователей
-                'label'=>'Update user',
-                'defaultRoles'=>array('administrator'),
-            ),
-            'updateAccess'=>array( // Право редактировать права доступа пользователей
-                'label'=>'Update user access',
-                'defaultRoles'=>array('administrator'),
-            ),
-            'delete'=>array( // Право удалять пользователей
-                'label'=>'Delete user',
-                'defaultRoles'=>array('administrator'),
-            ),
-        );
-    }
-
-    public function tasks()
-    {
-        return array(
-            'readOwn'=>array(
-                'label'=>'View own user',
-                'bizRule'=>'return Yii::app()->user->id==$params["user"]->id;',
-                'children'=>array('readUser'),
-                'defaultRoles'=>array('authenticated'),
-            ),
-            'updateOwn'=>array(
-                'label'=>'Edit own user',
-                'bizRule'=>'return Yii::app()->user->id==$params["user"]->id;',
-                'children'=>array('updateUser'),
-                'defaultRoles'=>array('authenticated'),
-            ),
-            'deleteOwn'=>array(
-                'label'=>'Delete own user',
-                'bizRule'=>'return Yii::app()->user->id==$params["widget"]->id;',
-                'children'=>array('deleteUser'),
-                'defaultRoles'=>array('authenticated'),
-            ),
+            '_roles' => array(self::MANY_MANY, 'Role', UserRole::tableName() . '(user_id,role_id)'),
         );
     }
 
@@ -242,12 +240,18 @@ class User extends ActiveRecord
         $user->login = self::ADMIN_LOGIN;
         $user->displayname  = Yii::app()->params['admin']['displayname'];
         $user->email = Yii::app()->params['admin']['email'];
-        $user->password = self::hash(Yii::app()->params['admin']['password']);
+        $user->password = Yii::app()->params['admin']['password'];
         $user->active = true;
-        $user->show_email = 'registered';
-        $user->send_message = 'registered';
+        $user->show_email = Role::AUTHENTICATED;
+        $user->send_message = Role::AUTHENTICATED;
         $user->timezone = Yii::app()->params['timezone'];
         $user->save(false);
+
+        $role = Role::model()->findByAttributes(array('name' => Role::ADMINISTRATOR));
+        $userRole = new UserRole;
+        $userRole->user_id = $user->id;
+        $userRole->role_id = $role->id;
+        $userRole->save(false);
     }
 
     public static function hash($string)
@@ -487,6 +491,15 @@ class User extends ActiveRecord
     public function getFullname()
     {
         return $this->login . ', ' . $this->email . ', ' . $this->displayname;
+    }
+
+    public static function defaultObject()
+    {
+        $obj = new self;
+        $obj->timezone = Yii::app()->settings->getValue('timezone');
+        $obj->send_message = Yii::app()->settings->getValue('defaultsSendMessage');
+        $obj->show_email = Yii::app()->settings->getValue('defaultsShowEmail');
+        return $obj;
     }
 
     public function listColumns()

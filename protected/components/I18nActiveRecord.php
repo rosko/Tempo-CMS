@@ -44,6 +44,14 @@ class I18nActiveRecord extends ActiveRecord
         return $ret;
     }
 
+    public function hasAttribute($name)
+    {
+        if (in_array($name, $this->i18n())) {
+            $name = Yii::app()->language . '_' . $name;
+        }
+        return isset($this->getMetaData()->columns[$name]);
+    }
+
     public static function getLangs($language='')
     {
         $langs = Language::loadConfig();
@@ -80,6 +88,19 @@ class I18nActiveRecord extends ActiveRecord
             }
             $rule[0] = implode(',',array_merge($fields, $f));
             $ret[] = $rule;
+        }
+        return $ret;
+    }
+
+    public function localizedAttributes($attributes)
+    {
+        $ret = array();
+        if (is_array($attributes)) foreach ($attributes as $attribute) {
+            if (in_array($attribute, $this->i18n())) {
+                $ret[] = Yii::app()->language . '_' . $attribute;
+            } else {
+                $ret[] = $attribute;
+            }
         }
         return $ret;
     }

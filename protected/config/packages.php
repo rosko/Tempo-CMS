@@ -64,6 +64,12 @@ $_packages = array(
         'css'=>array('nanoscroller.css'),
         'depends'=>array('jquery'),        
     ),
+    'select2'=>array(
+        'basePath'=>'application.vendors.select2',
+        'js'=>array('select2.min.js'),
+        'css'=>array('select2.css'),
+        'depends'=>array('jquery'),
+    ),
 );
 
 if (!empty(Yii::app()->params['juiThemeUrl'])) {

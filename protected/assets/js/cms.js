@@ -512,8 +512,11 @@ function cmsRecordEditForm(id, className, widgetId, gridId)
                 $.fn.yiiGridView.update(gridId);
             }
             if (widgetId) {
-                var pageWidgetId = $('.cms-pagewidget[rev='+widgetId+']:eq(0)').attr('id').replace('cms-pagewidget-','');
-                cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+widgetId+']');
+                var $b = $('.cms-pagewidget[rev='+widgetId+']:eq(0)');
+                if ($b.length) {
+                    var pageWidgetId = $b.attr('id').replace('cms-pagewidget-','');
+                    cmsReloadPageWidget(pageWidgetId, '.cms-pagewidget[rev='+widgetId+']');
+                }
             }
         }
     });

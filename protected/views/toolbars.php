@@ -300,6 +300,18 @@ JS
 }
 JS
             ):null,
+            'roles' =>  !Yii::app()->user->isGuest ? array(
+                'icon' => 'user',
+                'title' => Yii::t('cms', 'User roles'),
+                'click' => 'js:function()'.<<<JS
+ {
+    cmsLoadDialog('/?r=records/list&className=Role&language={$language}', {
+        simpleClose: true
+    });
+    return false;
+}
+JS
+            ):null,
         ),
 
     ));

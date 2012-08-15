@@ -57,7 +57,6 @@ class AdminController extends Controller
 		if ($form->submitted('refresh')) {
             if ($form->model->validate()) {
                 Yii::app()->settings->saveAll($form->model->getAttributes());
-                Yii::app()->installer->installAll(false);
                 echo '1';
             } else {
                 echo '0';

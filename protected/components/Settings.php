@@ -25,16 +25,6 @@ class Settings extends CApplicationComponent
         }
     }
     
-    public function operations()
-    {
-        return array(
-            'update'=>array(
-                'label'=>'Manage settings', 
-                'defaultRoles'=>array('administrator'),
-            ),
-        );
-    }
-
     public function loadAll()
     {
         $tmp = null;

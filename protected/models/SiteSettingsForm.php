@@ -87,8 +87,8 @@ class SiteSettingsForm extends CFormModel
             'adminEmail'=>Yii::app()->params['admin']['email'],
             'defaultsPerPage'=>10,
             'language'=>Yii::app()->language,
-            'defaultsShowEmail'=>'registered',
-            'defaultsSendMessage'=>'registered',
+            'defaultsShowEmail'=>Role::AUTHENTICATED,
+            'defaultsSendMessage'=>Role::AUTHENTICATED,
             'cacheTime'=>3600,
             'timezone'=>Yii::app()->params['timezone'],
         );
@@ -176,11 +176,11 @@ class SiteSettingsForm extends CFormModel
                 Form::tab(Yii::t('cms', 'Users')),
                 'defaultsShowEmail'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::roles(),
+                    'items'=>Role::all(),
                 ),
                 'defaultsSendMessage'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>User::roles(),
+                    'items'=>Role::all(),
                 ),
                 'userExtraFields'=>array(
                     'type'=>'FieldSet',

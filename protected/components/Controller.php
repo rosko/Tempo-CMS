@@ -41,6 +41,10 @@ class Controller extends CController
         }
         Yii::app()->language = $language;
 
+//        $e = Yii::app()->user->checkAccess('read', array('object' => array('Page', 1)));
+//        echo intval($e);
+//        Yii::app()->end();
+
         if (!Yii::app()->request->isAjaxRequest)
             Yii::app()->getClientScript()->registerCssFile(Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets.css')).'/icons/'.Yii::app()->params['icons'].'.css');
 

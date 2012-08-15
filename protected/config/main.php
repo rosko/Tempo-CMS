@@ -13,38 +13,20 @@ return CMap::mergeArray(array(
     'defaultController' => 'page',
 
 	'import'=>array(
-		'application.models.*',
+        'application.models.*',
 		'application.components.*',
 		'application.components.inputs.*',
+        'application.behaviors.*',
         'ext.yiidebugtb.*',
 	),
 
     'modules'=>array(
-        'tfilemanager'=>array(
-            'import'=>array(
-                'application.modules.tfilemanager.components.*',
-            ),
-        ),
     ),
 
     'components'=>array(
         'assetManager'=>array(
             'linkAssets'=>true,
         ),
-        'authManager'=>array(
-            'class'=>'CPhpAuthManager',
-            'authFile'=>Yii::getPathOfAlias('local.runtime.auth').'.php',
-            'defaultRoles'=>array('anybody', 'guest', 'authenticated'),
-        ),
-/*        'authManager'=>array(
-            'class'=>'AuthManager',
-            'connectionID'=>'db',
-            'defaultRoles'=>array('anybody', 'guest', 'authenticated'),
-            'itemTable'=>$config['components']['db']['tablePrefix'].'auth_item',
-            'itemChildTable'=>$config['components']['db']['tablePrefix'].'auth_itemchild',
-            'assignmentTable'=>$config['components']['db']['tablePrefix'].'auth_assigment',
-            'rightsTable'=>$config['components']['db']['tablePrefix'].'rights',
-        ),*/
         'cache'=>array(
             'class'=>'system.caching.CFileCache',
             'directoryLevel'=>1,
@@ -64,6 +46,7 @@ return CMap::mergeArray(array(
         ),
         'installer'=>array(
             'class'=>'Installer',
+            'ipFilters'=>array('127.0.0.1'),
         ),
 		'log'=>array(
 			'class'=>'CLogRouter',
@@ -125,9 +108,11 @@ return CMap::mergeArray(array(
                 'site/captcha'=>'site/captcha',
                 "site/login"=>'site/login',
                 "site/logout"=>'site/logout',
+                "console/rebuild" => "site/rebuild",
                 'widget/edit'=>'widget/edit',
                 'view/widget'=>'view/widget',
                 'records/list' => 'records/list',
+                'records/search' => 'records/search',
                 'filesEditor/save'=>'filesEditor/save',
 
                 "<language:[A-Za-z-]+>/<alias:{$aliasPattern}>:<pageId:\d+>"=>'view/index',

@@ -110,4 +110,9 @@ class SiteController extends Controller
         $this->renderPartial('/jsI18N');
     }
 
+    public function actionRebuild()
+    {
+        Yii::app()->installer->installAll();
+    }
+
 }

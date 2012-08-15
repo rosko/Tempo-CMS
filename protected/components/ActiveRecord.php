@@ -97,4 +97,9 @@ class ActiveRecord extends CActiveRecord
             ->createFindCommand($this->getTableSchema(), $criteria)->queryColumn();
     }
 
+    public function searchAttributes()
+    {
+        return array();
+    }
+
 }

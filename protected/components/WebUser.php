@@ -5,19 +5,24 @@ class WebUser extends CWebUser
         
     public function getData()
     {
-        if (!$this->_data && !$this->isGuest) {
-            try
-            {
-                $this->_data = User::model()->with('_roles')->findByPk($this->id);
-            }
-            catch(Exception $e)
-            {
-                if (Yii::app()->db->active) {
-                    Yii::app()->installer->installAll();
+        if (!$this->isGuest) {
+            if (!$this->_data) {
+                try
+                {
                     $this->_data = User::model()->with('_roles')->findByPk($this->id);
-                } else
-                    echo Yii::t('cms', 'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.');
+                }
+                catch(Exception $e)
+                {
+                    if (Yii::app()->db->active) {
+                        Yii::app()->installer->installAll();
+                        $this->_data = User::model()->with('_roles')->findByPk($this->id);
+                    } else
+                        echo Yii::t('cms', 'Error! Check configuration file "protected/config/config.php", is database setting correct. Or delete configuration file for installing system.');
+                }
             }
+        } else {
+            $this->_data = new User;
+            $this->_data->roles = $this->getGuestRoles();
         }
         return $this->_data;
     }
@@ -34,11 +39,7 @@ class WebUser extends CWebUser
 
     public function getRoles()
     {
-        if (!$this->isGuest && $this->data) {
-            return $this->data->roles;
-        } else {
-            return $this->getGuestRoles();
-         }
+        return $this->data->roles;
     }
 
     public function hasRole($role)
@@ -51,14 +52,7 @@ class WebUser extends CWebUser
         if($allowCaching && $params===array() && isset($this->_access[$operation]))
             return $this->_access[$operation];
 
-        if ($this->isGuest) {
-            $user = new User;
-            $user->roles = $this->getGuestRoles();
-        } else {
-            $user = $this->data;
-        }
-
-        $access = $user->may($operation, isset($params['object']) ? $params['object'] : array());
+        $access = $this->data->may($operation, isset($params['object']) ? $params['object'] : array());
 
         if($allowCaching && $params===array())
             $this->_access[$operation]=$access;

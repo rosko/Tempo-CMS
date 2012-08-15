@@ -88,8 +88,8 @@ class ModelBlog_Entry extends ContentModel
                 ),
                 Form::tab(Yii::t('UnitBlog.main', 'Entry')),
                 'blog_id'=> !empty($sectionsArray) ? array(
-                    'type'=>'ComboBox',
-                    'array'=>$sectionsArray,
+                    'type'=>'Select2',
+                    'data' => $sectionsArray,
                 ) : '',
 				'date'=>array(
 //					'type'=>'DateTimePicker',

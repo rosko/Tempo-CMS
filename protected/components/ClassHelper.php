@@ -13,12 +13,11 @@ class ClassHelper
                     ($behavior['class'] == $behaviorClassName ||
                         strpos($behavior['class'], $behaviorClassName) !== false)) {
 
-                    if (isset($behavior[$property]) && is_array($behavior[$property]))
+                    if (isset($behavior[$property]))
                         return $behavior[$property];
                 }
             }
         }
-        return array();
     }
 
 }

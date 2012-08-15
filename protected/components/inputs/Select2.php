@@ -29,34 +29,15 @@ class Select2 extends CInputWidget
 
         $defaultOptions = array(
             'width' => '100%',
-            'ajax' => array(
-                'dataType' => 'json',
-                'data' => 'js:'.<<<DATA
-    function(term,page) {
-        return {
-            searchValue: term,
-            page: page
-        };
-    }
-DATA
-,
-                'results' => 'js:'.<<<DATA
-    function (data,page) {
-        return {results: data.results, more: data.more};
-    }
-DATA
-
-            ),
         );
 
-        $this->options = CMap::mergeArray($defaultOptions, $this->options);
         if (!$this->searchAttribute) $this->searchAttribute = $this->showAttribute;
         $element = '';
 
         if ($this->hasModel()) {
 
             // Если используется совместно с relations
-            if ($this->related) {
+            if ($this->related != null) {
 
                 $relations = $this->model->relations();
                 if (isset($relations[$this->related])) {
@@ -85,8 +66,26 @@ DATA
                         $this->options['multiple'] = true;
 
                     } else {
-                        $selected[] = $items;
+                        $selected[] = $items->attributes;
                     }
+
+                    $this->defaultOptions['ajax'] = array(
+                            'dataType' => 'json',
+                            'data' => 'js:'.<<<DATA
+    function(term,page) {
+        return {
+            searchValue: term,
+            page: page
+        };
+    }
+DATA
+                        ,
+                            'results' => 'js:'.<<<DATA
+    function (data,page) {
+        return {results: data.results, more: data.more};
+    }
+DATA
+                    );
 
                     $this->options['ajax']['url'] = Yii::app()->createAbsoluteUrl('records/search', array(
                         'className' => $relation[1],
@@ -128,6 +127,7 @@ DATA;
         }
         echo $element;
 
+        $this->options = CMap::mergeArray($defaultOptions, $this->options);
         Yii::app()->clientScript->registerPackage('select2');
 
         $options = $this->options ? CJavaScript::encode($this->options) : '';

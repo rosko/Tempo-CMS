@@ -20,6 +20,73 @@ class AccessRBehavior extends CActiveRecordBehavior
     public function may($action, $object)
     {
         // 1. Проверяем на наличие полного доступа (fullAccess)
+        if ($this->checkFullAccess()) return true;
+
+        // 2. Выбираем из БД все правила, которые относятся к нужному действию,
+        //     а также к вопрошающему и контролируемому объектам
+
+        $params = array('action' => $action);
+        $acoWhere = array(
+            '(`aco_key` = "" AND `aco_value` = "")'
+        );
+
+        if (is_object($object)) {
+
+            $params[':aco_class'] = get_class($object);
+            $acoWhere[] = '(`aco_key` = "id" AND `aco_value` = :aco_id)';
+            $params['aco_id'] = $object->id;
+            $cAttributes = AccessCBehavior::getAttributesByClassName($params['aco_class']);
+            foreach ($cAttributes as $index => $attrName) {
+                if ($object->hasAttribute($attrName) || $object->hasProperty($attrName)) {
+                    $acoWhere[] = '(`aco_key` = :aco_'.$index.' AND `aco_value` = :aco_'.$attrName.')';
+                    $params['aco_'.$index] = $attrName;
+                    $params['aco_'.$attrName] = $object->{$attrName};
+                }
+            }
+
+        } elseif (is_array($object)) {
+
+            $params['aco_class'] = $object[0];
+            $acoWhere[] = '(`aco_key` = "id" AND `aco_value` = :aco_id)';
+            $params['aco_id'] = $object[1];
+
+        } else {
+
+            $params['aco_class'] = $object;
+
+        }
+
+        $aroWhere = self::generateAroWhereStatement($this->getOwner(), $params);
+
+        $sql = 'SELECT * FROM`' . AccessItem::tableName() . '`
+                WHERE `action` = :action
+                  AND `aco_class` = :aco_class
+                  AND `aro_class` = :aro_class
+                  AND ( ' . implode(' OR ' , $acoWhere) . ' )
+                  AND ( ' . $aroWhere . ' )
+                ORDER BY `is_deny` DESC';
+
+        $accessItems = Yii::app()->db->createCommand($sql)->bindValues($params)->queryAll();
+
+        // 3. Просматриваем все правила и определяем результат
+        if (count($accessItems) == 0) return false;
+
+        foreach ($accessItems as $accessItem) {
+            if ($accessItem['is_deny']) return false;
+        }
+
+        return true;
+    }
+
+    public static function getAttributesByClassName($className)
+    {
+        $ret = ClassHelper::getBehaviorPropertyByClassName($className, 'AccessRBehavior', 'attributes');
+        if (empty($ret)) $ret = array();
+        return $ret;
+    }
+
+    public function checkFullAccess()
+    {
         foreach ($this->fullAccess as $fullAccessItem) {
 
             $itemAllow = true;
@@ -73,59 +140,30 @@ class AccessRBehavior extends CActiveRecordBehavior
                 }
             }
         }
+    }
 
-        // 2. Выбираем из БД все правила, которые относятся к нужному действию,
-        //     а также к вопрошающему и контролируемому объектам
-
-        $params = array('action' => $action);
-        $acoWhere = array(
-            '(`aco_key` = "" AND `aco_value` = "")'
+    public static function generateAroWhereStatement($model, &$params, $alias='')
+    {
+        $where = array(
+            '('.$alias.'`aro_key` = "" AND '.$alias.'`aro_value` = "")',
         );
 
-        if (is_object($object)) {
-
-            $params[':aco_class'] = get_class($object);
-            $acoWhere[] = '(`aco_key` = "id" AND `aco_value` = :aco_id)';
-            $params['aco_id'] = $object->id;
-            $cAttributes = AccessCBehavior::getAttributesByClassName($params['aco_class']);
-            foreach ($cAttributes as $index => $attrName) {
-                if ($object->hasAttribute($attrName) || $object->hasProperty($attrName)) {
-                    $acoWhere[] = '(`aco_key` = :aco_'.$index.' AND `aco_value` = :aco_'.$attrName.')';
-                    $params['aco_'.$index] = $attrName;
-                    $params['aco_'.$attrName] = $object->{$attrName};
-                }
-            }
-
-        } elseif (is_array($object)) {
-
-            $params['aco_class'] = $object[0];
-            $acoWhere[] = '(`aco_key` = "id" AND `aco_value` = :aco_id)';
-            $params['aco_id'] = $object[1];
-
-        } else {
-
-            $params['aco_class'] = $object;
-
+        $params['aro_class'] = get_class($model);
+        if ($model->id) {
+            $where[] = '('.$alias.'`aro_key` = "id" AND '.$alias.'`aro_value` = :aro_id)';
+            $params['aro_id'] = $model->id;
         }
-
-        $aroWhere = array(
-            '(`aro_key` = "" AND `aro_value` = "")',
-            '(`aro_key` = "id" AND `aro_value` = :aro_id)',
-        );
-
-        $params['aro_class'] = get_class($this->getOwner());
-        $params['aro_id'] = $this->getOwner()->id;
         $rAttributes = self::getAttributesByClassName($params['aro_class']);
         foreach ($rAttributes as $index => $attrName) {
-            if ($this->getOwner()->hasAttribute($attrName) || $this->getOwner()->hasProperty($attrName)) {
+            if ($model->hasAttribute($attrName) || $model->hasProperty($attrName)) {
 
-                $attrValue = $this->getOwner()->{$attrName};
+                $attrValue = $model->{$attrName};
 
                 if (is_array($attrValue)) {
 
                     foreach ($attrValue as $attrValueItemKey => $attrValueItemValue) {
 
-                        $aroWhere[] = '(`aro_key` = :aro_'.$index.'_'.$attrValueItemKey.' AND `aro_value` = :aro_'.$attrName.'_'.$attrValueItemKey.')';
+                        $where[] = '('.$alias.'`aro_key` = :aro_'.$index.'_'.$attrValueItemKey.' AND '.$alias.'`aro_value` = :aro_'.$attrName.'_'.$attrValueItemKey.')';
                         $params['aro_'.$index.'_'.$attrValueItemKey] = $attrName;
                         $params['aro_'.$attrName.'_'.$attrValueItemKey] = $attrValueItemValue;
 
@@ -133,7 +171,7 @@ class AccessRBehavior extends CActiveRecordBehavior
 
                 } else {
 
-                    $aroWhere[] = '(`aro_key` = :aro_'.$index.' AND `aro_value` = :aro_'.$attrName.')';
+                    $where[] = '('.$alias.'`aro_key` = :aro_'.$index.' AND '.$alias.'`aro_value` = :aro_'.$attrName.')';
                     $params['aro_'.$index] = $attrName;
                     $params['aro_'.$attrName] = $attrValue;
 
@@ -141,30 +179,9 @@ class AccessRBehavior extends CActiveRecordBehavior
 
             }
         }
+        return implode(' OR ' , $where);
 
-        $sql = 'SELECT * FROM`' . AccessItem::tableName() . '`
-                WHERE `action` = :action
-                  AND `aco_class` = :aco_class
-                  AND `aro_class` = :aro_class
-                  AND ( ' . implode(' OR ' , $acoWhere). ' )
-                  AND ( ' . implode(' OR ' , $aroWhere). ' )
-                ORDER BY `is_deny` DESC';
 
-        $accessItems = Yii::app()->db->createCommand($sql)->bindValues($params)->queryAll();
-
-        // 3. Просматриваем все правила и определяем результат
-        if (count($accessItems) == 0) return false;
-
-        foreach ($accessItems as $accessItem) {
-            if ($accessItem['is_deny']) return false;
-        }
-
-        return true;
-    }
-
-    public static function getAttributesByClassName($className)
-    {
-        return ClassHelper::getBehaviorPropertyByClassName($className, 'AccessRBehavior', 'attributes');
     }
 
 }

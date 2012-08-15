@@ -102,4 +102,28 @@ class ActiveRecord extends CActiveRecord
         return array();
     }
 
+    protected function query($criteria,$all=false)
+    {
+        $this->beforeFind();
+        $this->applyScopes($criteria);
+        try {
+            $this->allowed();
+        } catch(Exception $e) { }
+
+        if(empty($criteria->with))
+        {
+            if(!$all)
+                $criteria->limit=1;
+            $command=$this->getCommandBuilder()->createFindCommand($this->getTableSchema(),$criteria);
+            return $all ? $this->populateRecords($command->queryAll(), true, $criteria->index) : $this->populateRecord($command->queryRow());
+        }
+        else
+        {
+            $finder=new CActiveFinder($this,$criteria->with);
+            return $finder->query($criteria,$all);
+        }
+    }
+
+
+
 }

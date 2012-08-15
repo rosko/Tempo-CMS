@@ -36,7 +36,7 @@ class WidgetBreadcrumbs extends ContentWidget
         parent::init();
         $ids = explode(',', $this->params['page']->path);
         $pages = Page::model()->findAll(array(
-            'condition' => '`id` IN ('.$this->params['page']->path.')',
+            'condition' => 't.`id` IN ('.$this->params['page']->path.')',
             'order' => '`path` DESC'
         ));
         $parents = array();

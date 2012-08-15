@@ -27,6 +27,21 @@ class AccessCBehavior extends CActiveRecordBehavior
         return $ret;
     }
 
+    public function beforeFind($event)
+    {
+        $this->getOwner()->allowed('read');
+    }
+
+    public function beforeDelete($event)
+    {
+        $event->isValid = Yii::app()->user->checkAccess('delete', array('object' => $this->getOwner()));
+    }
+
+    public function beforeSave($event)
+    {
+        $event->isValid = Yii::app()->user->checkAccess($this->getOwner()->getIsNewRecord() ? 'create' : 'update', array('object' => $this->getOwner()));
+    }
+
     public function allowed($action='read')
     {
         if (ClassHelper::getBehaviorPropertyByClassName(get_class($this->getOwner()), 'AccessCBehavior', 'class')) {

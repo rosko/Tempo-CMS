@@ -154,15 +154,17 @@ class Page extends I18nActiveRecord
 
     public static function getTree($exclude = array(), $exclude_children = true)
     {
-        $criteria['order'] = '`order`';
+        $criteria['order'] = 't.`order`';
         $criteria['condition'] = '1';
         if (!empty($exclude)) {
             if (!is_array($exclude)) {
                 $exclude = array($exclude);
             }
-            $criteria['condition'] .= ' AND `id` NOT IN (' . implode(',', $exclude) . ')';
+            $criteria['condition'] .= ' AND t.`id` NOT IN (' . implode(',', $exclude) . ')';
         }
-        $pages = Page::model()->getAll($criteria);
+        Page::model()->setPopulateMode(false);
+        $pages = Page::model()->allowed('read')->findAll($criteria);
+        Page::model()->setPopulateMode(true);
         $tree = array();
         foreach ($pages as $page) {
             if ($exclude_children && !empty($exclude)) {

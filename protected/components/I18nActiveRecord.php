@@ -105,6 +105,21 @@ class I18nActiveRecord extends ActiveRecord
         return $ret;
     }
 
+    public function populateRecord($attributes,$callAfterFind=true)
+    {
+        if ($this->getPopulateMode()) {
+            return parent::populateRecord($attributes,$callAfterFind);
+        } else {
+            if (method_exists($this, 'i18n')) {
+                foreach ($this->i18n() as $attr) {
+                    $attributes[$attr] = $attributes[Yii::app()->language.'_'.$attr];
+                }
+            }
+            return $attributes;
+        }
+    }
+
+
     public function getI18nFieldName($attr, $className='', $language='')
     {
         if (isset($this) && !$className)
@@ -125,20 +140,4 @@ class I18nActiveRecord extends ActiveRecord
         }
     }
 
-    public function getAll($condition = '', $params = array(), $columns = '*')
-    {
-        if (method_exists($this, 'i18n')) {
-            $l10nColumns = array();
-            foreach ($this->i18n() as $column) {
-                $l10nColumns[] = '`' . $this->getI18nFieldName($column) . '` as `' . $column . '`';
-            }
-        }
-        if (is_string($columns)) {
-            $columns .= ', ' . implode(',', $l10nColumns);
-        } elseif (is_array($columns)) {
-            $columns = array_merge($columns, $l10nColumns);
-        }
-        return parent::getAll($condition, $params, $columns);
-    }
-    
 }

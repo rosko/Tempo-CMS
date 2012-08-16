@@ -72,10 +72,12 @@ class WidgetBlog extends ContentWidget
 
         } else {
 
+            ModelBlog_Entry::model()->setPopulateMode(false);
             $entries = ModelBlog_Entry::model()
                         ->public()
                         ->selectPage($this->pageNumber, $this->params['content']->per_page)
-                        ->getAll('blog_id = :id', array(':id'=>$this->params['content']->id));
+                        ->findAll('blog_id = :id', array(':id'=>$this->params['content']->id));
+            ModelBlog_Entry::model()->setPopulateMode(true);
 
             $this->params['entries'] = array();
              foreach ($entries as $entry) {

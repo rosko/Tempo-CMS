@@ -69,7 +69,7 @@ class Select2 extends CInputWidget
                         $selected[] = $items->attributes;
                     }
 
-                    $this->defaultOptions['ajax'] = array(
+                    $defaultOptions['ajax'] = array(
                             'dataType' => 'json',
                             'data' => 'js:'.<<<DATA
     function(term,page) {

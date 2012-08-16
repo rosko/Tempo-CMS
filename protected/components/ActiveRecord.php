@@ -2,6 +2,8 @@
 
 class ActiveRecord extends CActiveRecord
 {
+    private $_populateMode = true;
+
     public function baseScheme()
     {
         return array(
@@ -53,24 +55,26 @@ class ActiveRecord extends CActiveRecord
         }
         return parent::beforeSave();
     }
-    
-    public function getAll($condition = '', $params = array(), $columns = '*')
+
+    public function setPopulateMode($mode)
     {
-        //if (is_string($condition)) {
-            $criteria = $this
-                ->getCommandBuilder()
-                ->createCriteria($condition, $params);
-            $criteria->select = $columns;
-        //} else {
-        //    $criteria = $condition;
-        //}
-        $this->beforeFind($criteria);
-        $this->applyScopes($criteria);
-        return $this
-            ->getCommandBuilder()
-            ->createFindCommand($this->getTableSchema(), $criteria)->queryAll();
+        $this->_populateMode = $mode;
     }
 
+    public function getPopulateMode()
+    {
+        return $this->_populateMode;
+    }
+
+    public function populateRecord($attributes,$callAfterFind=true)
+    {
+        if ($this->getPopulateMode()) {
+            return parent::populateRecord($attributes,$callAfterFind);
+        } else {
+            return $attributes;
+        }
+    }
+    
     public function getSql($columns='*')
     {
         $criteria=$this->getCommandBuilder()->createCriteria();

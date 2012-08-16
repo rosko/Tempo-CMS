@@ -54,10 +54,12 @@ class WidgetSitemap extends ContentWidget
 
     public function getTree($id, $params, $recursive=0, $start=false)
     {
+        Page::model()->setPopulateMode(false);
         if ($start)
-            $items = Page::model()->order()->selectPage($this->pageNumber, $params['content']->per_page)->childrenPages($id)->getAll();
+            $items = Page::model()->order()->selectPage($this->pageNumber, $params['content']->per_page)->childrenPages($id)->findAll();
         else
-            $items = Page::model()->order()->childrenPages($id)->getAll();
+            $items = Page::model()->order()->childrenPages($id)->findAll();
+        Page::model()->setPopulateMode(true);
         if ($recursive > 1) {
             foreach ($items as $k => $item)
             {

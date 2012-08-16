@@ -42,9 +42,11 @@ class AccessCBehavior extends CActiveRecordBehavior
         $event->isValid = Yii::app()->user->checkAccess($this->getOwner()->getIsNewRecord() ? 'create' : 'update', array('object' => $this->getOwner()));
     }
 
-    public function allowed($action='read')
+    public function allowed($action='read', $force=false)
     {
-        if (ClassHelper::getBehaviorPropertyByClassName(get_class($this->getOwner()), 'AccessCBehavior', 'class')) {
+        // Не позволяем запускать условие два раза в одном запросе
+        if (($force || !isset($this->getOwner()->getDbCriteria()->params['aco_class']) || !isset($this->getOwner()->getDbCriteria()->params['aro_class']))
+            && ClassHelper::getBehaviorPropertyByClassName(get_class($this->getOwner()), 'AccessCBehavior', 'class')) {
 
             $user = Yii::app()->user->data;
 

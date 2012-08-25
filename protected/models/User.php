@@ -204,11 +204,11 @@ class User extends ActiveRecord
                 ),
                 'show_email'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>Role::all(),
+                    'items'=>Role::builtInRoles(),
                 ),
                 'send_message'=>array(
                     'type'=>'dropdownlist',
-                    'items'=>Role::all(),
+                    'items'=>Role::builtInRoles(),
                 ),
                 'timezone'=>array(
                     'type'=>'dropdownlist',
@@ -296,7 +296,7 @@ class User extends ActiveRecord
 
     public static function getByLogin($login)
     {
-        return self::$_admin = self::model()->find('`login` = :login', array(':login'=>$login));
+        return self::model()->find('`login` = :login', array(':login'=>$login));
     }
 
     public static function getAdmin()
@@ -546,6 +546,40 @@ function(gridId, elem) {
 JS
             ),
         );
+    }
+
+    public function getFewRecordsTitle($attrName, $attrValue)
+    {
+        if ($attrName == 'roles') {
+
+            $builtInRoles = Role::builtInRoles();
+            if (isset($builtInRoles[$attrValue])) {
+
+                return $builtInRoles[$attrValue];
+
+            } else {
+
+                $role = Role::model()->findByAttributes(array('name' => $attrValue));
+                if ($role) {
+                    return $role->title;
+                } else {
+                    return parent::getFewRecordsTitle($attrName, $attrValue);
+                }
+
+            }
+
+        } elseif ($attrName == 'login') {
+
+            $user = User::getByLogin($attrValue);
+            if ($user) {
+                return $user->getFullname();
+            } else {
+                return parent::getFewRecordsTitle($attrName, $attrValue);
+            }
+
+        } else {
+            return parent::getFewRecordsTitle($attrName, $attrValue);
+        }
     }
 
 }

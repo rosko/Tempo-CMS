@@ -113,6 +113,7 @@ return CMap::mergeArray(array(
                 'view/widget'=>'view/widget',
                 'records/list' => 'records/list',
                 'records/search' => 'records/search',
+                'records/multiSearch' => 'records/multiSearch',
                 'filesEditor/save'=>'filesEditor/save',
 
                 "<language:[A-Za-z-]+>/<alias:{$aliasPattern}>:<pageId:\d+>"=>'view/index',
@@ -146,6 +147,7 @@ return CMap::mergeArray(array(
 	),
     'params'=>array(
         'aliasPattern'=>$aliasPattern,
+        'coreModels' => array('AccessItem', 'Role', 'UserRole', 'User', 'Page', 'PageWidget', 'Widget'),
 
     ),
 ), $config);

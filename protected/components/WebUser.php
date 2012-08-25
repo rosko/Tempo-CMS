@@ -2,7 +2,8 @@
 class WebUser extends CWebUser
 {
     private $_data=null;
-        
+    private $_access=array();
+
     public function getData()
     {
         if (!$this->isGuest) {
@@ -49,8 +50,12 @@ class WebUser extends CWebUser
 
     public function checkAccess($operation,$params=array(),$allowCaching=true)
     {
-        if($allowCaching && $params===array() && isset($this->_access[$operation]))
+        if($allowCaching && isset($this->_access[$operation]))
             return $this->_access[$operation];
+
+        if ($params===array()) {
+            return $this->data->checkFullAccess() || $this->hasRole($operation);
+        }
 
         $access = $this->data->may($operation, isset($params['object']) ? $params['object'] : array());
 

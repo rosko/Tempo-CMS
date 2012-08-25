@@ -1,5 +1,5 @@
 <?php if (!$readOnly) { ?>
-<div id="cms-area-<?=$name?>" class="<?php if ($editArea) { ?>cms-area <?php } ?>area" >
+<div id="cms-area-<?=$name?>" class="cms-area area" >
 <?php } ?>
 
 <?=$output?>

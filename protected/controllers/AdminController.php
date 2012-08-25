@@ -22,8 +22,8 @@ class AdminController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('siteSettings', 'siteMap'),
-				'users'=>array('@'),
+				'actions'=>array('siteSettings', 'rights', 'rightsAcoUpdate', 'siteMap'),
+                'roles'=>array(Role::ADMINISTRATOR),
 			),
 			array('deny',
 				'users'=>array('*'),
@@ -73,11 +73,77 @@ class AdminController extends Controller
 	}
 
     /**
+     * Управляет правами доступа
+     */
+    public function actionRights()
+    {
+        $this->render('rights');
+    }
+
+    public function actionRightsAcoUpdate($aco_class, $aco_key, $aco_value, $operation, $value, $is_deny=0)
+    {
+        $ret = true;
+
+        $savedItems = AccessItem::model()->findAllByAttributes(
+            array(
+                 'aco_class' => $aco_class,
+                 'aco_key' => $aco_key,
+                 'aco_value' => $aco_value,
+                 'action' => $operation,
+                 'is_deny' => $is_deny
+            )
+        );
+
+        $items = explode(',', $value);
+        foreach ($items as $item) {
+
+            list($aro_class, $aro_key, $aro_value) = explode(':', $item);
+
+            $alreadySaved = false;
+            foreach ($savedItems as $i => $saveItem) {
+
+                if ($saveItem['aro_class'] == $aro_class &&
+                    $saveItem['aro_key'] == $aro_key &&
+                    $saveItem['aro_value'] == $aro_value) {
+
+                    $alreadySaved = true;
+                    unset($savedItems[$i]);
+                    break;
+
+                }
+
+            }
+
+            if (!$alreadySaved) {
+
+                $accessItem = new AccessItem();
+                $accessItem->aco_class = $aco_class;
+                $accessItem->aco_key = $aco_key;
+                $accessItem->aco_value = $aco_value;
+                $accessItem->aro_class = $aro_class;
+                $accessItem->aro_key = $aro_key;
+                $accessItem->aro_value = $aro_value;
+                $accessItem->action = $operation;
+                $accessItem->is_deny = (bool)$is_deny;
+                $ret = $ret && $accessItem->save();
+
+            }
+
+        }
+
+        foreach ($savedItems as $saveItem) {
+            $saveItem->delete();
+        }
+
+        echo intval($ret);
+    }
+
+    /**
      * Отображает карту сайта
      */
 	public function actionSiteMap()
 	{
-		$tree = Page::model()->getTree();
+		$tree = Page::model()->allowed('update')->getTree();
 		$initially_open = array();
 		$opened_levels = Yii::app()->request->isAjaxRequest ? 1 : 2;
 		foreach ($tree as $pages)

@@ -15,7 +15,7 @@ class RecordsController extends Controller
 	{
 		return array(
 			array('allow',
-				'actions'=>array('create', 'delete', 'getUrl', 'fields', 'list', 'search', 'massUpdate',
+				'actions'=>array('create', 'delete', 'getUrl', 'fields', 'list', 'search', 'multiSearch', 'massUpdate',
                 ),
 				'users'=>array('@'),
 			),
@@ -98,6 +98,96 @@ class RecordsController extends Controller
         );
     }
 
+    public function actionMultiSearch($classNames, $searchValue, $page=1)
+    {
+        $classNames = unserialize($classNames);
+        $limit = Yii::app()->settings->getValue('defaultsPerPage');
+        $page = intval($page);
+        $params = array();
+        $sql = array();
+
+        $extraResults = array();
+
+        foreach ($classNames as $index => $classParams) {
+
+            if (!isset($classParams[0])) {
+                $extraResults = CMap::mergeArray($extraResults, $classParams);
+                continue;
+            }
+
+            $className = $classParams[0];
+            $pkPrefix = $classParams[1];
+            $pk = $classParams[2];
+            $fieldNames = explode(',', $classParams[3]);
+            $fieldNames = array_map('trim', $fieldNames);
+            $whereSql = array();
+
+            $object = new $className;
+            $tableName = $object->tableName();
+            $selectFields = array();
+
+            if (strpos($pk, '.') !== false) {
+
+                $tmp = explode('.', $pk);
+                $relationName = $tmp[0];
+                $pk = $tmp[1];
+
+                $relations = $object->relations();
+                if (!empty($relations[$relationName])) {
+                    $relation = $relations[$relationName];
+                    $className = $relation[1];
+                    $object = new $className;
+                    $tableName = $object->tableName();
+                }
+
+            }
+
+            foreach ($fieldNames as $fieldName) {
+
+                if (!in_array($fieldName, $object->searchAttributes())) continue;
+                if (method_exists($object, 'i18n') && in_array($fieldName, $object->i18n())) {
+                    $fieldName = Yii::app()->language . '_' . $fieldName;
+                }
+
+                if ($object->hasAttribute($fieldName)) {
+                    $selectFields[] = $fieldName;
+                    $whereSql[] = 'LOWER(`'.$fieldName.'`) LIKE LOWER(:value'.$index.')';
+
+                }
+
+            }
+
+            $fields = 'CONCAT(`' . implode('`, ", ", `', $selectFields) . '`) as `text`';
+            $sql[] = '(SELECT CONCAT(:pkPrefix'.$index.', `'.$pk.'`) as `id`, '.$fields.' FROM `' . $tableName . '`
+            WHERE ' . implode(' OR ', $whereSql) . ')';
+
+            $params[':pkPrefix'.$index] = $pkPrefix;
+            $params[':value'.$index] = $searchValue.'%';
+
+        }
+
+        $sql = implode(' UNION ', $sql) . ' ORDER BY `text` LIMIT :start, :limit';
+
+        $params[':start'] = $limit * ($page - 1);
+        $params[':limit'] = intval($limit+1);
+
+        $results = Yii::app()->getDb()->createCommand($sql)->bindValues($params)->queryAll();
+
+        foreach ($extraResults as $key => $text) {
+            $results[] = array(
+                'id' => $key,
+                'text' => $text,
+            );
+        }
+
+        $ret = array(
+            'results' => $results,
+            'more' => count($results) > $limit,
+        );
+        echo CJSON::encode($ret);
+
+    }
+
     public function actionSearch($className, $fieldName, $searchValue, $page=1)
     {
         $limit = Yii::app()->settings->getValue('defaultsPerPage');
@@ -118,7 +208,7 @@ class RecordsController extends Controller
             $fieldName = trim($fieldName);
             $oldFieldName = $fieldName;
 
-            if (!in_array($fieldName, $object->searchAttributes())) return false;
+            if (!in_array($fieldName, $object->searchAttributes())) continue;
             if (method_exists($object, 'i18n') && in_array($fieldName, $object->i18n())) {
                 $fieldName = Yii::app()->language . '_' . $fieldName;
             }

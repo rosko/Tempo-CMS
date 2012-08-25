@@ -35,7 +35,7 @@ class FilesController extends Controller
         return array(
             array('allow',
                 'actions'=>array('managerConnector', 'manager'),
-                'users'=>array('@'),
+                'roles'=>array(Role::AUTHOR, Role::EDITOR),
             ),
             array('deny',
                 'users'=>array('*'),

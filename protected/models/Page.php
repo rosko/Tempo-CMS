@@ -431,9 +431,6 @@ class Page extends I18nActiveRecord
                     'type' => 'ComboBox',
                     'array' => CHtml::listData(User::model()->findAll(), 'id', 'fullname'),
                 ),
-                'access' => array(
-                    'type' => 'text',
-                ),
             ),
             'buttons' => array(
                 'save' => array(
@@ -459,15 +456,18 @@ class Page extends I18nActiveRecord
             ),
             'access' => array(
                 'class' => 'application.behaviors.AccessCBehavior',
-                'operations' => array(
-                    'createChild' => 'Add child page',
-                    'read' => 'View page',
-                    'update' => 'Edit page content',
-                    'delete' => 'Delete page',
+                'operations' => CMap::mergeArray(
+                    array(
+                        'create' => Yii::t('cms', 'Create new page'),
+                        'read' => Yii::t('cms', 'View page'),
+                        'update' => Yii::t('cms', 'Edit page content'),
+                        'delete' => Yii::t('cms', 'Delete page'),
+                    ),
+                    self::operationsOnAreas()
                 ),
                 'defaultRules' => array(
                     // Создавать новые страницы могут только пользователи с ролью administrator
-                    'createChild' => array(
+                    'create' => array(
                         'User' => array(
                             array('roles', Role::ADMINISTRATOR),
                         ),
@@ -482,7 +482,6 @@ class Page extends I18nActiveRecord
                     'update' => array(
                         'User' => array(
                             array('roles', Role::EDITOR),
-                            array('login', 'nobody', 'deny' => true),
                         ),
                     ),
                     // Удалять страницу могут только администраторы
@@ -603,6 +602,24 @@ class Page extends I18nActiveRecord
             }
         }
         return false;
+    }
+
+    public static function operationsOnAreas($themeName=null)
+    {
+        $ret = array();
+        $areas = ThemeHelper::getDefined('areas', $themeName);
+        if (!empty($areas) && is_array($areas)) {
+            foreach ($areas as $area) {
+                $ret[self::areaOperation('read', $area)] = Yii::t('cms', 'View blocks on page area {area}', array('{area}' => $area));
+                $ret[self::areaOperation('update', $area)] = Yii::t('cms', 'Manage blocks on page area {area}', array('{area}' => $area));
+            }
+        }
+        return $ret;
+    }
+
+    public static function areaOperation($type, $area)
+    {
+        return $type . '_area_' . $area;
     }
 
 }

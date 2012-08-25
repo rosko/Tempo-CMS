@@ -10,7 +10,6 @@ return array(
     'Seconds' => 'Секунды',
     'Now' => 'Сейчас',
     'Ok' => 'Оk',
-    'URL' => 'Ввести адрес',
     'or' => 'или',
     'Browse uploaded' => 'Выбрать из загруженных',
 
@@ -108,7 +107,7 @@ return array(
     'Fill page by' => 'Заполнить страницу на основании',
     'By areas' => 'Из областей',
     'By page' => 'Со страницы',
-    
+
     'This page consists children pages' => 'Удаляемая страница содержит дочерние страницы',
     'Delete with all children pages' => 'Удалить со всеми дочерними страницами',
     'Delete this page, and move children pages on other place' => 'Удалить, а дочерние страницы перенести в другое место',
@@ -136,7 +135,7 @@ return array(
     'On this page' => 'Из этой страницы',
     'On all pages' => 'Со всех страниц',
     'Select' => 'Выбрать',
-    
+
     'Widget location on pages' => 'Размещение блока на страницах',
     'Check' => 'Отметить',
     'All pages' => 'Все страницы',
@@ -168,7 +167,7 @@ return array(
     'Link'=>'Ссылка',
     'Main language' => 'Основной язык',
     'Page language' => 'Язык страницы',
-    
+
     'Saving error. Attempt after ' => 'Ошибка при сохранении. Попытка через ',
     'Retry now' => 'Повторить сейчас',
     'Are you really want delete?' => 'Вы действительно хотите удалить? Данные будут удалены безвозвратно.',
@@ -237,7 +236,6 @@ return array(
     'Link field'=>'Поле для ссылки',
     'Slider field'=>'Ползунок',
     'Text editor'=>'Текстовый редактор',
-    'Captcha'=>'Каптча (защитный код)',
 
     'Validation rules'=>'Правила проверки',
 
@@ -251,7 +249,6 @@ return array(
     'Length'=>'Длина',
     'Numerical'=>'Число',
     'Captcha'=>'Код защиты',
-    'Type'=>'Тип',
     'File'=>'Файл',
     'Default'=>'По-умолчанию',
     'Exist'=>'Существование',
@@ -319,7 +316,7 @@ return array(
     'Administrator'=>'Администратор',
     'Editor'=>'Редактор',
     'Guest'=>'Гость (незарегистрированный пользователь)',
-    
+
     'Timezone'=>'Часовой пояс',
     'Default timezone'=>'Часовой пояс',
 
@@ -339,7 +336,6 @@ return array(
 
     'Select all' => 'Отметить все',
     'Unselect all' => 'Снять выделение',
-    'Ok' => 'Ок',
     'With selected' => 'С отмеченными',
     'Yes' => 'Да',
     'No' => 'Нет',
@@ -351,5 +347,13 @@ return array(
 
     'User roles' => 'Роли пользователей',
     'Role name' => 'Название роли',
+
+    'View page' => 'Смотреть страницу',
+    'Edit page content' => 'Редактировать содержимое страницы',
+
+    'Manage blocks on page area {area}' => 'Управлять блоками на странице в области {area}',
+    'View blocks on page area {area}' => 'Видеть блоки на странице в области {area}',
+
+    '{class} object with {attr}={value}' => 'Объект типа {class} с {attr}={value}',
 );
 

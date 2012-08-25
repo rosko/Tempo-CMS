@@ -152,6 +152,7 @@ class ContentUnit extends CComponent
                 $models = call_user_func(array($className, 'models'));
                 foreach ($models as $modelClassName) {
                     Yii::app()->installer->installTable($modelClassName);
+                    Yii::app()->installer->installDefaultAccess($modelClassName);
                 }
             }
             $config[$className] = $units[$className]['dir_alias'];

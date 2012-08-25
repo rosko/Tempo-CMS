@@ -27,4 +27,27 @@ class AccessItem extends CActiveRecord
         );
     }
 
+    public function getAroId()
+    {
+        return $this->aro_class . ':' . $this->aro_key . ':' . $this->aro_value;
+    }
+
+    public function getAroText($attribute='')
+    {
+        if (class_exists($this->aro_class)) {
+
+            if ($this->aro_key == 'id' &&
+                $obj = call_user_func(array($this->aro_class, 'model'))->findByPk($this->aro_value)) {
+
+                return $obj->getRecordTitle();
+
+            } else {
+
+                return call_user_func(array($this->aro_class, 'model'))->getFewRecordsTitle($this->aro_key, $this->aro_value);
+
+            }
+
+        }
+    }
+
 }

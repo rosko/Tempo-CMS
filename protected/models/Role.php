@@ -138,7 +138,7 @@ class Role extends I18nActiveRecord
         return array(
             self::GUEST => Yii::t('cms', 'Guest'),
             self::ANYBODY => Yii::t('cms', 'Anybody'),
-            self::AUTHENTICATED => Yii::t('cms', 'Authenticated'),
+            self::AUTHENTICATED => Yii::t('cms', 'Authenticated user'),
         );
     }
 

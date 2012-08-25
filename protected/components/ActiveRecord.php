@@ -106,4 +106,67 @@ class ActiveRecord extends CActiveRecord
         return array();
     }
 
+    public function getComplexAttribute($attribute)
+    {
+        $subAttr = '';
+        $value = null;
+        if (strpos($attribute, '.') !== false) {
+            $tmp = explode('.', $attribute);
+            $attribute = $tmp[0];
+            $subAttr = implode('.', array_slice($tmp, 1));
+        }
+
+        if ($attribute && ($this->hasAttribute($attribute) || $this->hasProperty($attribute)) || $this->getMetaData()->hasRelation($attribute)) {
+            $value = $this->$attribute;
+        }
+
+        if ($subAttr && is_object($value)) {
+            $value = $value->getComplexAttribute($subAttr);
+        }
+
+        return $value;
+
+    }
+
+    public function getRecordTitle($attribute='', $emergencyAttribute='id')
+    {
+        $attributes = array($attribute, 'title', 'fullname', 'widget.title', 'name');
+
+        foreach ($attributes as $attrName) {
+
+            $title = $this->getComplexAttribute($attrName);
+            if ($title) return $title;
+
+        }
+
+        $value = '';
+        if ($emergencyAttribute != 'id') {
+            $value = $this->getComplexAttribute($emergencyAttribute);
+        }
+        if (!$value) {
+            $emergencyAttribute = 'id';
+            $value = $this->id;
+        }
+
+        return Yii::t('cms', '{class} object with {attr}={value}',
+            array(
+                 '{class}' => get_class($this),
+                 '{attr}'  => $emergencyAttribute,
+                 '{value}' => $value,
+            )
+        );
+
+    }
+
+    public function getFewRecordsTitle($attrName, $attrValue)
+    {
+        return Yii::t('cms', '{class} object with {attr}={value}',
+            array(
+                 '{class}' => get_class($this),
+                 '{attr}'  => $attrName,
+                 '{value}' => $attrValue,
+            )
+        );
+    }
+
 }

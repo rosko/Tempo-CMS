@@ -8,6 +8,8 @@ class Area extends CWidget
     
     public function run()
     {
+        if (!$this->checkAccess()) return false;
+
         if ($this->name == 'main') {
             $hideMainAreaOn = array('site/login');
             if (in_array(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id, $hideMainAreaOn) ||
@@ -16,7 +18,10 @@ class Area extends CWidget
         }
 
         $page = Yii::app()->page->model;
-        $editArea = !$this->readOnly && !Yii::app()->user->isGuest && ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
+
+        $this->readOnly = !Yii::app()->user->checkAccess(Page::areaOperation('update', $this->name), array('object'=>$page));
+        // ((substr($this->name,0,4)=='main')||!Yii::app()->settings->getValue('simpleMode'));
+
         if (!empty($this->pageWidgets)) {
             $pageWidgets = $this->pageWidgets;
         } else {
@@ -36,7 +41,7 @@ class Area extends CWidget
                 'pageWidgetId'=>$pageWidget->id,
                 'id'=>$pageWidget->widget->id,
                 'language'=>Yii::app()->language,
-                'editMode'=>$editArea,
+                'readOnly'=>$this->readOnly,
                 'modify'=>$pageWidget->widget->modify,
             );
             $properties = array(
@@ -83,7 +88,7 @@ class Area extends CWidget
             $output .= $this->render('pageWidget', array(
                 'pageWidget'=>$pageWidget,
                 'widgetClass'=>$widgetClass,
-                'editArea'=>$editArea,
+                'readOnly'=>$this->readOnly,
                 'cacheVaryBy'=>$cacheVaryBy,
                 'properties'=>$properties,
             ), true);
@@ -91,9 +96,13 @@ class Area extends CWidget
         
         $this->render('area', array(
             'name'=>$this->name,
-            'editArea'=>$editArea,
             'output'=>$output,
             'readOnly'=>$this->readOnly,
         ));
+    }
+
+    protected function checkAccess()
+    {
+        return Yii::app()->user->checkAccess(Page::areaOperation('read', $this->name), array('object' => Yii::app()->page->model));
     }
 }

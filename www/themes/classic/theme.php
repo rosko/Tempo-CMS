@@ -2,6 +2,7 @@
 
 return array(
     'theme' => 'classic', // идентификатор темы
+    'name' => 'Classic',
     'screenshot' => null,
     'layouts' => array(
         'main' => array(

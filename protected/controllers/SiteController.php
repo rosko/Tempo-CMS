@@ -4,6 +4,32 @@ class SiteController extends Controller
 {
     public $defaultAction = 'login';
 
+    public function filters()
+    {
+        return array('accessControl');
+    }
+
+    public function accessRules()
+    {
+        return array(
+            array('allow',
+                  'actions' => array('login', 'captcha', 'error', 'feed', 'jsI18N'),
+                  'users' => array('*'),
+            ),
+            array('allow',
+                  'actions' => array('logout'),
+                  'roles' => array(Role::AUTHENTICATED),
+            ),
+            array('allow',
+                  'actions' => array('rebuild'),
+                  'roles' => array(Role::ADMINISTRATOR),
+            ),
+            array('deny',
+                  'users' => array('*'),
+            ),
+        );
+    }
+
     public function actions()
     {
         return array(

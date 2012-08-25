@@ -345,7 +345,7 @@ JS
     ),
     ));
 function showBranch($tree, $path) {
-    if ($tree)
+    if ($tree && isset($tree[$path]) && is_array($tree[$path]))
 	foreach ($tree[$path] as $page) {
 		$data = ($page['id'] == 1) ?  ' rel="mainpage"' : '';
 		echo '<li id="page-' . $page['id']. '" ' . $data . ' ><a rev="page" rel="'.$page['id'].'" href="#'.$page['id'].'"><ins>&nbsp;</ins>' . $page['title'] . "</a>\n";

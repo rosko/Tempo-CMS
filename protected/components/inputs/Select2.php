@@ -6,6 +6,8 @@ class Select2 extends CInputWidget
     public $showAttribute = 'name';
     public $searchAttribute;
 
+    public $classNames;
+
     public $options = array();
     public $data = array();
 
@@ -24,8 +26,6 @@ class Select2 extends CInputWidget
         } else {
             $this->htmlOptions['name'] = $name;
         }
-
-        $value = $this->hasModel() ? $this->model->{$this->attribute} : $this->value;
 
         $defaultOptions = array(
             'width' => '100%',
@@ -69,46 +69,15 @@ class Select2 extends CInputWidget
                         $selected[] = $items->attributes;
                     }
 
-                    $defaultOptions['ajax'] = array(
-                            'dataType' => 'json',
-                            'data' => 'js:'.<<<DATA
-    function(term,page) {
-        return {
-            searchValue: term,
-            page: page
-        };
-    }
-DATA
-                        ,
-                            'results' => 'js:'.<<<DATA
-    function (data,page) {
-        return {results: data.results, more: data.more};
-    }
-DATA
-                    );
+                    $defaultOptions['ajax'] = self::initAjax();
 
                     $this->options['ajax']['url'] = Yii::app()->createAbsoluteUrl('records/search', array(
                         'className' => $relation[1],
                         'fieldName' => $this->searchAttribute,
                     ));
-                    $formatAttributes = implode(' + ", " + object.', $showAttributes);
-                    $this->options['formatResult'] = 'js:'.<<<DATA
-                        function (object, container, query) {
-                            return object.{$formatAttributes};
-                        }
-DATA;
-                    $this->options['formatSelection'] = 'js:'.<<<DATA
-                        function (object, container, query) {
-                            return object.{$formatAttributes};
-                        }
-DATA;
-                    $jsonEncodedData = CJavaScript::encode($data);
-                    $this->options['initSelection'] = 'js:'.<<<DATA
-                        function (element, callback) {
-                            var data = {$jsonEncodedData};
-                            callback(data);
-                        }
-DATA;
+
+                    self::setDefaultFormat($showAttributes);
+                    self::setInitSelection($data);
 
                     $element = CHtml::hiddenField($name, implode(',', $selected), $this->htmlOptions);
 
@@ -116,13 +85,32 @@ DATA;
 
             }
 
-
             $element = $element ? $element : CHtml::activeDropDownList($this->model, $this->attribute, $this->data, $this->htmlOptions);
 
         } else {
 
+            if (!empty($this->classNames) && is_array($this->classNames)) {
+
+                $this->options['multiple'] = true;
+                $defaultOptions['ajax'] = self::initAjax();
+                $this->options['ajax']['url'] = Yii::app()->createAbsoluteUrl('records/multiSearch', array(
+                    'classNames' => serialize($this->classNames),
+                ));
+
+                self::setDefaultFormat(array('text'));
+                self::setInitSelection($this->data);
+
+                $selected = array();
+                foreach ($this->data as $item) {
+                    $selected[] = $item['id'];
+                }
+
+                $element = CHtml::hiddenField($name, implode(',', $selected), $this->htmlOptions);
+
+            }
+
             $this->htmlOptions['id'] = $this->id;
-            $element = CHtml::dropDownList($this->name, $this->value, $this->data, $this->htmlOptions);
+            $element = $element ? $element : CHtml::dropDownList($this->name, $this->value, $this->data, $this->htmlOptions);
 
         }
         echo $element;
@@ -135,6 +123,54 @@ DATA;
 
 
 
+    }
+
+    protected function initAjax()
+    {
+        return array(
+            'dataType' => 'json',
+            'data' => 'js:'.<<<DATA
+    function(term,page) {
+        return {
+            searchValue: term,
+            page: page
+        };
+    }
+DATA
+        ,
+            'results' => 'js:'.<<<DATA
+    function (data,page) {
+        return {results: data.results, more: data.more};
+    }
+DATA
+        );
+    }
+
+    protected function setDefaultFormat($showAttributes)
+    {
+        $formatAttributes = implode(' + ", " + object.', $showAttributes);
+        $this->options['formatResult'] = 'js:'.<<<DATA
+                        function (object, container, query) {
+                            return object.{$formatAttributes};
+                        }
+DATA;
+        $this->options['formatSelection'] = 'js:'.<<<DATA
+                        function (object, container, query) {
+                            return object.{$formatAttributes};
+                        }
+DATA;
+
+    }
+
+    public function setInitSelection($data)
+    {
+        $jsonEncodedData = CJavaScript::encode($data);
+        $this->options['initSelection'] = 'js:'.<<<DATA
+                        function (element, callback) {
+                            var data = {$jsonEncodedData};
+                            callback(data);
+                        }
+DATA;
     }
 
 }

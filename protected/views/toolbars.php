@@ -273,6 +273,16 @@ JS
         }
 JS
             ):null,
+            'rights' => !Yii::app()->user->isGuest ? array(
+                'icon' => 'safe',
+                'title' => Yii::t('cms', 'Access rights'),
+                'click' => 'js:function()'.<<<JS
+{
+            cmsLoadDialog('/?r=admin/rights&language={$language}');
+            return false;
+        }
+JS
+            ):null,
             'units'=> !Yii::app()->user->isGuest ? array(
                 'icon' => 'units',
                 'title' => Yii::t('cms', 'Units'),

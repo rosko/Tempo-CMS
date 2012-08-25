@@ -73,9 +73,8 @@ class Installer extends CApplicationComponent
     public function installAll($withUnits=true)
     {
         if (!$this->allowAccess()) return false;
-        $classNames = array('AccessItem', 'Role', 'UserRole', 'User', 'Page', 'PageWidget', 'Widget');
 
-        foreach ($classNames as $className) {
+        foreach (Yii::app()->params['coreModels'] as $className) {
 
             $this->installTable($className);
 
@@ -88,7 +87,7 @@ class Installer extends CApplicationComponent
 
     }
 
-    protected function installDefaultAccess($acoClass)
+    public function installDefaultAccess($acoClass)
     {
         $sql = 'select count(*) from `' . AccessItem::tableName() . '` where `aco_class` = :aco_class';
         $alreadyInstalled = Yii::app()->getDb()->createCommand($sql)->queryScalar(array('aco_class' => $acoClass));
